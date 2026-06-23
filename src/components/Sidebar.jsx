@@ -24,7 +24,7 @@ const menu = [
   { name: "Inventory",         path: "inventory",         icon: Boxes },
   { name: "Deliveries",        path: "deliveries",        icon: Truck },
   { name: "Customer Helpline", path: "customerHelpLine",  icon: HelpingHand },
-  { name: "Support",           path: "support",           icon: Headset },
+  { name: "Service Manager",           path: "support",           icon: Headset },
 ];
 
 /* ─── shared link renderer ─────────────────────────────────────────────── */
