@@ -6,10 +6,8 @@ import {
   Package,
   Clock3,
   CheckCircle2,
-  AlertTriangle,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Download,
 } from "lucide-react";
 
@@ -81,16 +79,21 @@ const statusColor = {
 };
 
 const StatCard = ({ label, value, Icon, iconColor, bg }) => (
-  <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-slate-100">
-    <div
-      className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center`}
-    >
-      <Icon className={iconColor} size={22} />
-    </div>
+  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-2">
+    <div className="flex items-center justify-between gap-4">
+      {/* Left */}
+      <div className="flex items-center gap-3 min-w-0">
+        <div
+          className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center shrink-0`}
+        >
+          <Icon className={iconColor} size={20} />
+        </div>
 
-    <div>
-      <p className="text-sm text-gray-500">{label}</p>
-      <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+        <p className="text-sm font-medium text-gray-600 truncate">{label}</p>
+      </div>
+
+      {/* Right */}
+      <h3 className="text-2xl font-bold text-slate-900 shrink-0">{value}</h3>
     </div>
   </div>
 );
@@ -120,7 +123,7 @@ const Production = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6 space-y-6">
+    <div className="px-4 md:px-4 space-y-2">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -152,16 +155,12 @@ const Production = () => {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <button
-              className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
+            <button className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               <Plus size={15} />
               New Batch
             </button>
 
-            <button
-              className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-            >
+            <button className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
               <Download size={15} />
               Export
             </button>
@@ -170,7 +169,7 @@ const Production = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
           label="Total Batches"
           value={stats.total}
@@ -225,19 +224,19 @@ const Production = () => {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
-            <thead className="bg-slate-50">
-              <tr className="text-sm text-gray-500">
-                <th className="text-left p-5">Batch ID</th>
-                <th className="text-left p-5">Product</th>
-                <th className="text-left p-5">Quantity</th>
-                <th className="text-left p-5">Shift</th>
-                <th className="text-left p-5">Start Date</th>
-                <th className="text-left p-5">Status</th>
-                <th className="text-left p-5">Action</th>
+      {/* Table - Desktop */}
+      <div className="hidden xl:block bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="max-h-[430px] overflow-y-auto">
+          <table className="w-full">
+            <thead className="sticky top-0 z-10 bg-slate-50">
+              <tr className="text-sm font-semibold text-gray-500">
+                <th className="text-left px-6 py-2">Batch ID</th>
+                <th className="text-left px-6 py-2">Product</th>
+                <th className="text-left px-6 py-2">Quantity</th>
+                <th className="text-left px-6 py-2">Shift</th>
+                <th className="text-left px-6 py-2">Start Date</th>
+                <th className="text-left px-6 py-2">Status</th>
+                <th className="text-left px-6 py-2">Action</th>
               </tr>
             </thead>
 
@@ -245,19 +244,30 @@ const Production = () => {
               {currentData.map((item) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-slate-50 transition border-t border-slate-100"
+                  className="group border-t border-slate-100 hover:bg-blue-50/40 transition"
                 >
-                  <td className="p-5 font-semibold">{item.batch}</td>
+                  <td className="px-6 py-2 font-semibold text-slate-800">
+                    {item.batch}
+                  </td>
 
-                  <td className="p-5">{item.product}</td>
+                  <td className="px-6 py-2">
+                    <div>
+                      <p className="font-medium text-slate-800">
+                        {item.product}
+                      </p>
+                      <p className="text-xs text-gray-400">{item.id}</p>
+                    </div>
+                  </td>
 
-                  <td className="p-5">{item.quantity} Units</td>
+                  <td className="px-6 py-2 text-gray-600">
+                    {item.quantity} Units
+                  </td>
 
-                  <td className="p-5">{item.shift}</td>
+                  <td className="px-6 py-2 text-gray-600">{item.shift}</td>
 
-                  <td className="p-5">{item.startDate}</td>
+                  <td className="px-6 py-2 text-gray-600">{item.startDate}</td>
 
-                  <td className="p-5">
+                  <td className="px-6 py-2">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor[item.status]}`}
                     >
@@ -265,8 +275,8 @@ const Production = () => {
                     </span>
                   </td>
 
-                  <td className="p-5">
-                    <button className="text-blue-600 font-medium hover:text-blue-800">
+                  <td className="px-6 py-2">
+                    <button className="text-blue-600 font-medium opacity-80 group-hover:opacity-100 hover:text-blue-800">
                       View Details
                     </button>
                   </td>
@@ -278,53 +288,58 @@ const Production = () => {
       </div>
 
       {/* Mobile cards */}
-      <div className="xl:hidden grid gap-4">
+      <div className="grid xl:hidden gap-4 sm:grid-cols-2">
         {currentData.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100"
+            className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition"
           >
-            <div className="flex justify-between">
+            <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-bold">{item.product}</h3>
-                <p className="text-sm text-gray-400">{item.batch}</p>
+                <h3 className="font-semibold text-slate-800">{item.product}</h3>
+
+                <p className="text-xs text-gray-400 mt-1">{item.batch}</p>
               </div>
 
               <span
-                className={`px-3 py-1 h-fit rounded-full text-xs font-semibold ${statusColor[item.status]}`}
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor[item.status]}`}
               >
                 {item.status}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-5 text-sm">
+            <div className="grid grid-cols-2 gap-5 mt-6">
               <div>
-                <p className="text-gray-400">Quantity</p>
-                <p>{item.quantity}</p>
+                <p className="text-xs text-gray-400">Quantity</p>
+                <p className="font-medium">{item.quantity} Units</p>
               </div>
 
               <div>
-                <p className="text-gray-400">Shift</p>
-                <p>{item.shift}</p>
+                <p className="text-xs text-gray-400">Shift</p>
+                <p className="font-medium">{item.shift}</p>
               </div>
 
               <div>
-                <p className="text-gray-400">Start Date</p>
-                <p>{item.startDate}</p>
+                <p className="text-xs text-gray-400">Start Date</p>
+                <p className="font-medium">{item.startDate}</p>
               </div>
 
               <div>
-                <p className="text-gray-400">Batch ID</p>
-                <p>{item.id}</p>
+                <p className="text-xs text-gray-400">Batch ID</p>
+                <p className="font-medium">{item.id}</p>
               </div>
             </div>
+
+            <button className="mt-5 w-full py-2 rounded-xl bg-blue-50 text-blue-600 font-medium hover:bg-blue-100 transition">
+              View Details
+            </button>
           </div>
         ))}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-400">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        <p className="text-xs sm:text-sm text-gray-400">
           Showing {start + 1} -{" "}
           {Math.min(start + PAGE_SIZE, filteredData.length)} of{" "}
           {filteredData.length}
