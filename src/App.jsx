@@ -1,11 +1,16 @@
 
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Login from './pages/auth/Login'
+import Dashboard from './pages/Dashboard'
 
-function App() {
-
+const App = () => {
   return (
-    <>
-      <h1 className="bg-white text-yellow-500">hwhejkl</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Login />}/>
+        <Route path='/dashboard' element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
