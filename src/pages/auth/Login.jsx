@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Eye, EyeOff, User } from "lucide-react";
 import bgImage from "../../assets/images/admin-poster.jpg";
 import logo from "../../assets/images/gocow_logo_color.png";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const login = () => {
     console.log({ userName, password });
+    navigate('/dashboard')
   };
 
   return (
