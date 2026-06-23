@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, User } from "lucide-react";
 import bgImage from "../../assets/images/admin-poster.jpg";
-import logo from "../../assets/images/gocow_logo_color.png";
+import logo from "../../assets/images/White Drop Logo-01.jpg";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -32,7 +32,7 @@ const Login = () => {
           {/* Logo */}
           <div className="relative flex justify-center mb-8">
             <div className="rounded-full bg-white p-4 shadow-xl">
-              <img src={logo} alt="Logo" className="h-16 object-contain" />
+              <img src={logo} alt="Logo" className="h-20 object-contain" />
             </div>
           </div>
 
