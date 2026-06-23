@@ -75,6 +75,7 @@ const Customer = () => {
     <div className="min-h-[80vh] p-2 space-y-4">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4">
+        {/* Left Side */}
         <div>
           <h1 className="text-xl font-semibold text-gray-900">
             Customer Management
@@ -84,14 +85,23 @@ const Customer = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => console.log("export")}
-          className="px-3.5 py-2 cursor-pointer text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
-        >
-          Export
-        </button>
-      </div>
+        {/* Right Side */}
+        <div className="flex items-center gap-3">
+          {/* Total Customers */}
+          <div className="px-3.5 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg">
+            Total Customers:{" "}
+            <span className="font-semibold text-gray-900">20</span>
+          </div>
 
+          {/* Export Button */}
+          <button
+            onClick={() => console.log("export")}
+            className="px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          >
+            Export
+          </button>
+        </div>
+      </div>
       {/* TABLE CARD */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-[350px] overflow-hidden">
         {/* HEADER TABLE */}
