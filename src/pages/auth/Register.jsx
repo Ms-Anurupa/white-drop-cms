@@ -165,7 +165,7 @@ const Register = () => {
             <button
               onClick={register}
               className="w-full rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400
-              py-3 text-white font-semibold shadow-lg transition hover:scale-[1.02]"
+              py-3 text-white cursor-pointer font-semibold shadow-lg transition hover:scale-[1.02]"
             >
               Create Account
             </button>
