@@ -94,7 +94,7 @@ const Customer = () => {
           </div>
 
           {/* Export Button */}
-          <button className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+          <button className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
             Export
           </button>
         </div>

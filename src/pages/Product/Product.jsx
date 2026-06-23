@@ -140,7 +140,7 @@ const Product = () => {
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => navigate("/dashboard/product/addProduct")}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus size={15} />
               Add product
@@ -148,7 +148,7 @@ const Product = () => {
 
             <button
               onClick={handleExport}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              className="w-full cursor-pointer sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             >
               <Download size={15} />
               Export
@@ -371,7 +371,7 @@ const Product = () => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="w-8 h-8 rounded-md border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
+                className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
               >
                 <ChevronLeft size={14} />
               </button>
@@ -383,7 +383,7 @@ const Product = () => {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages || 1, p + 1))}
                 disabled={page >= (totalPages || 1)}
-                className="w-8 h-8 rounded-md border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
+                className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-40"
               >
                 <ChevronRight size={14} />
               </button>
