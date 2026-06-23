@@ -212,7 +212,7 @@ const Production = () => {
               setActiveFilter(filter);
               setPage(1);
             }}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition
+            className={`px-4 cursor-pointer py-2 rounded-xl text-sm font-medium transition
             ${
               activeFilter === filter
                 ? "bg-blue-600 text-white"
