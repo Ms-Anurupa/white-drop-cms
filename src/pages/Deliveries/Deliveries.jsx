@@ -400,7 +400,7 @@ const Deliveries = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            className="w-8 h-8 cursor-pointer rounded-lg bg-white border border-gray-200 flex items-center justify-center disabled:opacity-40 hover:bg-gray-50 transition-colors"
             aria-label="Previous page"
           >
             <ChevronLeft size={15} />
@@ -411,7 +411,7 @@ const Deliveries = () => {
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            className="w-8 h-8 cursor-pointer rounded-lg bg-white border border-gray-200 flex items-center justify-center disabled:opacity-40 hover:bg-gray-50 transition-colors"
             aria-label="Next page"
           >
             <ChevronRight size={15} />

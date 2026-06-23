@@ -227,7 +227,7 @@ const Order = () => {
                     </td>
                   </tr>
                 ) : (
-                  paginated.map((o, index) => (
+                  paginated.map((o) => (
                     <tr
                       key={o.id}
                       className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
