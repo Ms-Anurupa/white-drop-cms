@@ -64,7 +64,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
+    <div className="min-h-[85vh] bg-gradient-to-br ">
       {/* CONTENT */}
       <div className="px-2 md:px-4 pb-4">
         {/* TOP BANNER */}
