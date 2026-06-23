@@ -15,12 +15,16 @@ import AddProduct from './components/AddProduct'
 import LocalityManager from './components/LocalityManager'
 import OfferManager from './components/OfferManager'
 import AddOffer from './components/AddOffer'
+import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Login />}/>
+        <Route path='/register' element={<Register />}/>
+        <Route path='/forgot-password' element={<ForgotPassword />}/>
         <Route path='/dashboard' element={<DashboardLayout />} >
           <Route index element={<Dashboard />}/>
           <Route path='product' element={<Product />}/>

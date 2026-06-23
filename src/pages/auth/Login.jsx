@@ -12,7 +12,7 @@ const Login = () => {
 
   const login = () => {
     console.log({ userName, password });
-    navigate('/dashboard')
+    navigate("/dashboard");
   };
 
   return (
@@ -58,7 +58,7 @@ const Login = () => {
 
               <User
                 size={20}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-800"
               />
             </div>
 
@@ -78,17 +78,28 @@ const Login = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-5 top-1/2 -translate-y-1/2 text-white/70"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? (
+                  <EyeOff size={20} className="text-gray-800 cursor-pointer" />
+                ) : (
+                  <Eye size={20} className="text-gray-800 cursor-pointer" />
+                )}
               </button>
             </div>
+            <div className="flex justify-end items-center gap-3 text-sm">
+              <button
+               onClick={() => navigate('/register')}
+               className="text-white/80 cursor-pointer hover:text-cyan-300 transition">
+                New User? Register
+              </button>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end">
-              <button className="text-sm text-white/80 hover:text-cyan-300 transition">
+              <span className="text-white/40">|</span>
+
+              <button 
+               onClick={() => navigate('/forgot-password')}
+              className="text-white/80 cursor-pointer hover:text-cyan-300 transition">
                 Forgot Password?
               </button>
             </div>
-
             {/* Login Button */}
             <button
               onClick={login}
