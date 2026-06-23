@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
 import customerImg from "../../assets/images/customer-service.png";
 import placeImg from "../../assets/images/place.png";
 import discountImg from "../../assets/images/discount.png";
@@ -31,7 +30,7 @@ const Support = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Locality Manager */}
             <div
-              onClick={() => navigate("/locality-manager")}
+              onClick={() => navigate("/dashboard/support/locality-manager")}
               className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-center gap-4">
@@ -52,7 +51,7 @@ const Support = () => {
 
             {/* Offer Manager */}
             <div
-              onClick={() => navigate("/offer-manager")}
+              onClick={() => navigate("/dashboard/support/offer-manager")}
               className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-green-400 to-green-900 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-center gap-4">
