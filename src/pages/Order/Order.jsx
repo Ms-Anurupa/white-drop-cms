@@ -69,7 +69,7 @@ const Order = () => {
   };
 
   return (
-    <div className="min-h-[80vh] p-2 space-y-4">
+    <div className="h-full p-2 sm:p-3 md:p-4 space-y-4 overflow-hidden">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -81,12 +81,12 @@ const Order = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center w-full lg:w-auto">
           {/* Search */}
-          <div className="relative">
+          <div className="relative w-full sm:w-52">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="w-full absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               value={search}
@@ -114,7 +114,7 @@ const Order = () => {
           {/* Export */}
           <button
             onClick={handleExport}
-            className="inline-flex cursor-pointer items-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            className="w-full sm:w-auto inline-flex cursor-pointer items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
           >
             <Download size={15} />
             Export
@@ -123,102 +123,146 @@ const Order = () => {
       </div>
 
       {/* ── TABLE CARD ── */}
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-[380px]">
-        {/* HEADER */}
-        <table className="w-full text-sm table-fixed">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              {[
-                "Order ID",
-                "Customer",
-                "Order Total",
-                "Shipping Address",
-                "Status",
-                "Created At",
-                "Assigned To",
-                "Phone",
-                "Action",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-[380px] overflow-hidden">
+        {/* mobile table cards */}
+        <div className="sm:hidden flex-1 overflow-y-auto p-3 space-y-3">
+          {paginated.map((o) => (
+            <div key={o.id} className="border border-gray-100 rounded-xl p-3">
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-800">{o.id}</h3>
+
+                  <p className="text-sm text-gray-500">{o.customer}</p>
+                </div>
+
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(
+                    o.status,
+                  )}`}
                 >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        </table>
+                  {o.status}
+                </span>
+              </div>
 
-        {/* BODY */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+              <div className="grid grid-cols-2 gap-y-3 mt-3 text-sm">
+                <div>
+                  <p className="text-gray-400">Total</p>
+                  <p>₹{o.total}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-400">Phone</p>
+                  <p>{o.phone}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-400">Assigned</p>
+                  <p>{o.assignedTo}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-400">Date</p>
+                  <p>{o.createdAt}</p>
+                </div>
+              </div>
+
+              <button className="mt-4 w-full px-3 py-2 text-xs rounded-lg border border-gray-200 hover:bg-gray-50">
+                View
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/*desktop HEADER */}
+        <div className="hidden sm:flex flex-col flex-1 overflow-hidden">
           <table className="w-full text-sm table-fixed">
-            <tbody>
-              {paginated.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={9}
-                    className="px-4 py-12 text-center text-gray-400"
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                {[
+                  "Order ID",
+                  "Customer",
+                  "Order Total",
+                  "Shipping Address",
+                  "Status",
+                  "Created At",
+                  "Assigned To",
+                  "Phone",
+                  "Action",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    No orders found
-                  </td>
-                </tr>
-              ) : (
-                paginated.map((o, index) => (
-                  <tr
-                    key={o.id}
-                    className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
-                  >
-                    <td className="px-3 py-3 font-medium text-gray-800">
-                      {o.id}
-                    </td>
-
-                    <td className="px-3 py-3 text-gray-700">{o.customer}</td>
-
-                    <td className="px-3 py-3 font-medium text-gray-800">
-                      ₹{o.total}
-                    </td>
-
-                    <td className="px-3 py-3 text-gray-500">
-                      {o.address}
-                    </td>
-
-                    <td className="px-3 py-3">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor(
-                          o.status,
-                        )}`}
-                      >
-                        {o.status}
-                      </span>
-                    </td>
-
-                    <td className="px-3 py-3 text-gray-500">
-                      {o.createdAt}
-                    </td>
-
-                    <td className="px-3 py-3 text-gray-700">
-                      {o.assignedTo}
-                    </td>
-
-                    <td className="px-3 py-3 text-gray-500">
-                      {o.phone}
-                    </td>
-
-                    <td className="px-3 py-3">
-                      <button className="px-3 py-1 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">
-                        View
-                      </button>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          </table>
+          {/* BODY */}
+          <div className="flex-1 overflow-y-auto">
+            <table className="w-full text-sm table-fixed">
+              <tbody>
+                {paginated.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      className="px-4 py-12 text-center text-gray-400"
+                    >
+                      No orders found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  paginated.map((o, index) => (
+                    <tr
+                      key={o.id}
+                      className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
+                    >
+                      <td className="px-3 py-3 font-medium text-gray-800">
+                        {o.id}
+                      </td>
+
+                      <td className="px-3 py-3 text-gray-700">{o.customer}</td>
+
+                      <td className="px-3 py-3 font-medium text-gray-800">
+                        ₹{o.total}
+                      </td>
+
+                      <td className="px-3 py-3 text-gray-500">{o.address}</td>
+
+                      <td className="px-3 py-3">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor(
+                            o.status,
+                          )}`}
+                        >
+                          {o.status}
+                        </span>
+                      </td>
+
+                      <td className="px-3 py-3 text-gray-500">{o.createdAt}</td>
+
+                      <td className="px-3 py-3 text-gray-700">
+                        {o.assignedTo}
+                      </td>
+
+                      <td className="px-3 py-3 text-gray-500">{o.phone}</td>
+
+                      <td className="px-3 py-3">
+                        <button className="px-3 py-1 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* PAGINATION */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100">
+        <div className="shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-100">
           <p className="text-xs text-gray-500">
             {filtered.length === 0
               ? "No results"
