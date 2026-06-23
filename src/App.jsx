@@ -11,6 +11,7 @@ import Deliveries from './pages/Deliveries/Deliveries'
 import Support from './pages/Support/Support'
 import Inventory from './pages/Inventory/Inventory'
 import CustomerHelpLine from './pages/CustomerHelpLine/CustomerHelpLine'
+import AddProduct from './components/AddProduct'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path='/dashboard' element={<DashboardLayout />} >
           <Route index element={<Dashboard />}/>
           <Route path='product' element={<Product />}/>
+          <Route path='product/addProduct' element={<AddProduct />}/>
           <Route path='customer' element={<Customer />}/>
           <Route path='orders' element={<Order />}/>
           <Route path='production' element={<Production />}/>
