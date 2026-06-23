@@ -262,13 +262,13 @@ const Product = () => {
                             onClick={() =>
                               navigate(`/dashboard/product/edit/${item.id}`)
                             }
-                            className="px-3 py-1 text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+                            className="px-3 cursor-pointer py-1 text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="px-3 py-1 text-xs font-medium rounded-md border border-red-100 bg-white hover:bg-red-50 text-red-600"
+                            className="px-3 py-1 cursor-pointer text-xs font-medium rounded-md border border-red-100 bg-white hover:bg-red-50 text-red-600"
                           >
                             Delete
                           </button>
