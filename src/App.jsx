@@ -14,6 +14,7 @@ import CustomerHelpLine from './pages/CustomerHelpLine/CustomerHelpLine'
 import AddProduct from './components/AddProduct'
 import LocalityManager from './components/LocalityManager'
 import OfferManager from './components/OfferManager'
+import AddOffer from './components/AddOffer'
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='support' element={<Support />}/>
           <Route path='support/locality-manager' element={<LocalityManager />}/>
           <Route path='support/offer-manager' element={<OfferManager />}/>
+          <Route path='support/offer-manager/add-offer' element={<AddOffer />}/>
         </Route>
       </Routes>
     </BrowserRouter>
