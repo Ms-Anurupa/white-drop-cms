@@ -1,18 +1,29 @@
 const Header = () => {
   return (
-    <div>
-      <header className="h-16 bg-white shadow flex items-center justify-between px-6">
-        <h2 className="text-lg font-semibold text-gray-700">CMS Dashboard</h2>
+    <header className="h-14 bg-white shadow px-3 sm:px-4 md:px-6 flex items-center justify-between">
+      {/* Title */}
+      <div className="min-w-0">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-700 truncate">
+          CMS Dashboard
+        </h2>
+      </div>
 
-        <div className="flex items-center gap-4">
-          <img
-            src="https://i.pravatar.cc/40"
-            className="w-10 h-10 rounded-full"
-            alt="user"
-          />
+      {/* Right section */}
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Optional username */}
+        <div className="hidden sm:block text-right">
+          <p className="text-sm font-medium text-gray-700">Admin</p>
+          <p className="text-xs text-gray-400">Administrator</p>
         </div>
-      </header>
-    </div>
+
+        {/* Avatar */}
+        <img
+          src="https://i.pravatar.cc/40"
+          alt="user"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+        />
+      </div>
+    </header>
   );
 };
 
