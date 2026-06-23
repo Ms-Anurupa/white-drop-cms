@@ -7,6 +7,7 @@ import inventoryImg from "../assets/images/inventory.png";
 import mapImg from "../assets/images/map.png";
 import helpLine from "../assets/images/helpline.png";
 import customerServiceImg from "../assets/images/customer-service.png";
+import { ArrowRight } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,11 +35,13 @@ const Dashboard = () => {
       title: "Daily Milk Production",
       img: productionImg,
       gradient: "from-cyan-500 to-sky-400",
+      onClick: () => navigate("/dashboard/production"),
     },
     {
       title: "Inventory Manager",
       img: inventoryImg,
       gradient: "from-emerald-500 to-green-400",
+      onClick: () => navigate("/dashboard/inventory"),
     },
     {
       title: "Track Deliveries",
@@ -50,6 +53,7 @@ const Dashboard = () => {
       title: "Customer Helpline",
       img: helpLine,
       gradient: "from-yellow-500 to-orange-400",
+      onClick: () => navigate("/dashboard/customerHelpLine"),
     },
     {
       title: "Service Manager",
@@ -104,7 +108,10 @@ const Dashboard = () => {
                     clas
                     sName="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform"
                   >
-                    trending_flat
+                    <ArrowRight
+                      size={16}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
                   </span>
                 </div>
               </div>

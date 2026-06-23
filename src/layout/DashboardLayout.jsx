@@ -8,16 +8,18 @@ import {
   Boxes,
   Truck,
   Headset,
+  HelpingHand,
 } from "lucide-react";
 
 const menu = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Product", path: "product", icon: Package },
-  { name: "Customer", path: "customer", icon: Users },
+  { name: "Customers", path: "customer", icon: Users },
   { name: "Orders", path: "orders", icon: ShoppingCart },
   { name: "Production", path: "production", icon: Factory },
   { name: "Inventory", path: "inventory", icon: Boxes },
   { name: "Deliveries", path: "deliveries", icon: Truck },
+  { name: "Customer HelpLine", path: "customerHelpLine", icon: HelpingHand },
   { name: "Support", path: "support", icon: Headset },
 ];
 

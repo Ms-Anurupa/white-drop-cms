@@ -10,6 +10,7 @@ import Production from './pages/Production/Production'
 import Deliveries from './pages/Deliveries/Deliveries'
 import Support from './pages/Support/Support'
 import Inventory from './pages/Inventory/Inventory'
+import CustomerHelpLine from './pages/CustomerHelpLine/CustomerHelpLine'
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
           <Route path='production' element={<Production />}/>
           <Route path='inventory' element={<Inventory />}/>
           <Route path='deliveries' element={<Deliveries />}/>
+          <Route path='customerHelpLine' element={<CustomerHelpLine />}/>
           <Route path='support' element={<Support />}/>
         </Route>
       </Routes>
