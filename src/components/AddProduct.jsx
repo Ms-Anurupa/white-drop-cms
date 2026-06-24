@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
-import { Check, Delete } from "lucide-react";
+import { useConfirm } from "./ConfirmProvider";
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
   const createProduct = productDataStore((state) => state.createProduct);
 
   const [productList, setProductList] = useState({
@@ -90,8 +91,65 @@ const AddProduct = () => {
     }));
   };
 
+  const validateProduct = () => {
+    if (!productList.product_name.trim()) {
+      return "Product Name is required";
+    }
+
+    if (!productList.product_description.trim()) {
+      return "Product Description is required";
+    }
+
+    if (!productList.catch_phrase.trim()) {
+      return "Product catch phrase is required";
+    }
+
+    if (productList.images.length === 0) {
+      return "At least one image is required";
+    }
+
+    for (let i = 0; i < productList.variants.length; i++) {
+      const v = productList.variants[i];
+
+      if (!v.variant_name.trim()) {
+        return `Variant ${i + 1}: Name is required`;
+      }
+
+      if (v.price === "") {
+        return `Variant ${i + 1}: Price is required`;
+      }
+
+      if (v.stock_quantity === "") {
+        return `Variant ${i + 1}: Stock quantity is required`;
+      }
+
+      if (!v.sku.trim()) {
+        return `Variant ${i + 1}: SKU is required`;
+      }
+    }
+
+    return null;
+  };
+
   const handleCreateProduct = async () => {
     try {
+      //validations
+      const error = validateProduct();
+
+      if (error) {
+        toast.error(error);
+        console.log("errr", error);
+        
+        return;
+      }
+
+      const confirmMessage = await confirm({
+        title: "Add Product",
+        message: "This will add the product. Continue?",
+      });
+
+      if (!confirmMessage) return;
+
       const formData = new FormData();
       formData.append("productData", JSON.stringify(productList));
 
@@ -341,13 +399,8 @@ const AddProduct = () => {
                         onChange={(e) => handleVariantChange(index, e)}
                         className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
                       >
-                        <option value={true}>
-                          <Check size={18} className="text-green-600" /> In
-                          Stock
-                        </option>
-                        <option value={false}>
-                          <Delete size={18} /> Out of Stock
-                        </option>
+                        <option value={true}>In Stock</option>
+                        <option value={false}>Out of Stock</option>
                       </select>
                     </div>
                   </div>
