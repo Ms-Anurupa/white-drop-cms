@@ -1,14 +1,22 @@
 import { useState, useRef, useEffect } from "react";
+import authStore from "../zustand/Store/authStore";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const logOut = authStore((state) => state.logOut);
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    // clear tokens 
-    localStorage.removeItem("token");
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      await logOut();
+      console.log("logged out");
+
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    } catch {
+      toast.error("LogOut Failed");
+    }
   };
 
   // close on outside click
@@ -33,7 +41,10 @@ const Header = () => {
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative" ref={dropdownRef}>
+      <div
+        className="flex items-center gap-2 sm:gap-4 shrink-0 relative"
+        ref={dropdownRef}
+      >
         {/* User info */}
         <div className="hidden sm:block text-right">
           <p className="text-sm font-medium text-gray-700">Admin</p>
