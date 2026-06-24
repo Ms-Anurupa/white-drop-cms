@@ -19,6 +19,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import GlobalLoader from "./components/GlobalLoader";
 import { ConfirmProvider } from "./components/ConfirmProvider";
 import { ToastContainer } from "react-toastify";
+import EditProduct from "./components/EditProduct";
 
 const App = () => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
               <Route index element={<Dashboard />} />
               <Route path="product" element={<Product />} />
               <Route path="product/addProduct" element={<AddProduct />} />
+              <Route path="product/editProduct/:id" element={<EditProduct />} />
               <Route path="customer" element={<Customer />} />
               <Route path="orders" element={<Order />} />
               <Route path="production" element={<Production />} />

@@ -4,6 +4,9 @@ import api from "../axios";
 import authStore from "./authStore";
 
 const productDataStore = create((set) => ({
+  products: [],
+  ProductData: [],
+
   createProduct: async (formData) => {
     try {
       const res = await api.post("/admin/createProduct", formData, {
@@ -11,6 +14,39 @@ const productDataStore = create((set) => ({
         headers: {
           "Content-Type": "multipart/form-data",
         },
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getAllProducts: async () => {
+    try {
+      const res = await api.get("/admin/getAllProducts", {
+        withAuth: true,
+      });
+      set({ products: res.data?.allProductsList });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getProductById: async () => {
+    try {
+      const res = await api.get("/admin/getProductById", {
+        withAuth: true,
+      });
+      set({ ProductData: res.data });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  deleteProductById: async (payload) => {
+    try {
+      const res = await api.post("/admin/deleteProductById", payload, {
+        withAuth: true,
       });
       return res.data;
     } catch (error) {

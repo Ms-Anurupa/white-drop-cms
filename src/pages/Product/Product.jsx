@@ -1,78 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Plus,
   Download,
   ChevronLeft,
   ChevronRight,
-  Droplets,
-  Flame,
-  Package,
-  Coffee,
-  Layers,
-  Box,
+  Edit,
+  Delete,
 } from "lucide-react";
-
-const PRODUCT_ICONS = {
-  Milk: Droplets,
-  Butter: Package,
-  Cheese: Layers,
-  Yogurt: Coffee,
-  Ghee: Flame,
-  Paneer: Box,
-};
-
-const INITIAL_PRODUCTS = [
-  {
-    id: 1,
-    name: "Milk",
-    catchPhrase: "Pure & Fresh",
-    price: 50,
-    availability: "In Stock",
-    unit: "Litre",
-  },
-  {
-    id: 2,
-    name: "Butter",
-    catchPhrase: "Creamy Taste",
-    price: 120,
-    availability: "Out of Stock",
-    unit: "Pack",
-  },
-  {
-    id: 3,
-    name: "Cheese",
-    catchPhrase: "Rich & Soft",
-    price: 200,
-    availability: "In Stock",
-    unit: "Kg",
-  },
-  {
-    id: 4,
-    name: "Yogurt",
-    catchPhrase: "Healthy & Natural",
-    price: 80,
-    availability: "In Stock",
-    unit: "Cup",
-  },
-  {
-    id: 5,
-    name: "Ghee",
-    catchPhrase: "Pure Desi Ghee",
-    price: 600,
-    availability: "Out of Stock",
-    unit: "Kg",
-  },
-  {
-    id: 6,
-    name: "Paneer",
-    catchPhrase: "Soft & Fresh",
-    price: 300,
-    availability: "In Stock",
-    unit: "Kg",
-  },
-];
+import productDataStore from "../../zustand/Store/productDataStore";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 5;
 
@@ -80,12 +18,21 @@ const Product = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const { products, getAllProducts, deleteProductById } = productDataStore();
+
+  //fetch data
+  useEffect(() => {
+    getAllProducts();
+  }, [getAllProducts]);
+
+  useEffect(() => {
+    console.log("allProducts", products);
+  }, [products]);
 
   const filtered = products.filter(
     (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.catchPhrase.toLowerCase().includes(search.toLowerCase()),
+      p.product_name.toLowerCase().includes(search.toLowerCase()) ||
+      p.catch_phrase.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -97,8 +44,16 @@ const Product = () => {
     (p) => p.availability === "Out of Stock",
   ).length;
 
-  const handleDelete = (id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      const payload = {
+        productId: id,
+      }
+      await deleteProductById(payload)
+      getAllProducts();
+    } catch {
+      toast.error("Failed to delete product")
+    }
   };
 
   const handleExport = () => {
@@ -184,8 +139,6 @@ const Product = () => {
               </p>
             ) : (
               paginated.map((item, index) => {
-                const Icon = PRODUCT_ICONS[item.name] ?? Package;
-
                 return (
                   <div
                     key={item.id}
@@ -199,12 +152,12 @@ const Product = () => {
                           </span>
 
                           <h3 className="font-medium text-gray-800">
-                            {item.name}
+                            {item.product_name}
                           </h3>
                         </div>
 
                         <p className="text-xs text-gray-500 mt-1">
-                          {item.catchPhrase}
+                          {item.catch_phrase}
                         </p>
 
                         <div className="mt-2 flex items-center gap-2">
@@ -225,24 +178,23 @@ const Product = () => {
                       </div>
 
                       <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
-                        <Icon size={16} />
+                        {/* <Icon size={16} /> */}
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={() =>
-                          navigate(`/dashboard/product/edit/${item.id}`)
+                          navigate(`/dashboard/product/editProduct/${item.id}`)
                         }
                         className="flex-1 py-2 text-xs rounded-lg border border-gray-200 hover:bg-gray-50"
                       >
                         Edit
                       </button>
 
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="flex-1 py-2 text-xs rounded-lg border border-red-100 text-red-600 hover:bg-red-50"
-                      >
+                      <button 
+                      onClick={() => handleDelete(item.id)}
+                      className="flex-1 py-2 text-xs rounded-lg border border-red-100 text-red-600 hover:bg-red-50">
                         Delete
                       </button>
                     </div>
@@ -286,8 +238,6 @@ const Product = () => {
                   </tr>
                 ) : (
                   paginated.map((item, index) => {
-                    const Icon = PRODUCT_ICONS[item.name] ?? Package;
-
                     return (
                       <tr
                         key={item.id}
@@ -298,16 +248,16 @@ const Product = () => {
                         </td>
 
                         <td className="px-4 py-3 font-medium text-gray-800">
-                          {item.name}
+                          {item.product_name}
                         </td>
 
                         <td className="px-4 py-3 text-gray-500">
-                          {item.catchPhrase}
+                          {item.catch_phrase}
                         </td>
 
                         <td className="px-4 py-3">
                           <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
-                            <Icon size={16} />
+                            {/* <Icon size={16} /> */}
                           </div>
                         </td>
 
@@ -333,16 +283,15 @@ const Product = () => {
                               onClick={() =>
                                 navigate(`/dashboard/product/edit/${item.id}`)
                               }
-                              className="px-3 py-1 text-xs rounded-md border border-gray-200 hover:bg-gray-50"
+                              className="px-3 py-1 cursor-pointer text-xs rounded-md border border-gray-200 hover:bg-gray-50"
                             >
-                              Edit
+                              <Edit size={18} />
                             </button>
 
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="px-3 py-1 text-xs rounded-md border border-red-100 text-red-600 hover:bg-red-50"
-                            >
-                              Delete
+                            <button 
+                             onClick={() => handleDelete(item.id)}
+                             className="px-3 py-1 cursor-pointer text-xs rounded-md border border-red-100 text-red-600 hover:bg-red-50">
+                              <Delete size={18} />
                             </button>
                           </div>
                         </td>
