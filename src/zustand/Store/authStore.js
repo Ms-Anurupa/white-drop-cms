@@ -18,8 +18,28 @@ const authStore = create(
             withAuth: false,
           });
           console.log(res.data);
-          const { userAdmin, access_token } = res.data;
-          set({ user: userAdmin, authToken: access_token });
+          const { admin, access_token } = res.data;
+          const userData = {
+            admin_id: admin.admin_id,
+            first_name: admin.first_name,
+            last_name: admin.last_name,
+            email: admin.email,
+            phone_number: admin.phone_number,
+            privilege: admin.privilege,
+            status: admin.status,
+          };
+
+          // store in zustand state
+          set({
+            user: userData,
+            authToken: access_token,
+          });
+
+          // store in localStorage
+          localStorage.setItem("admin_user", JSON.stringify(userData));
+          localStorage.setItem("admin_token", access_token);
+          localStorage.setItem("admin_privilege", admin.privilege);
+
           return res.data;
         } catch (error) {
           // throw error;
