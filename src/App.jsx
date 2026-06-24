@@ -17,10 +17,13 @@ import OfferManager from './components/OfferManager'
 import AddOffer from './components/AddOffer'
 import Register from './pages/auth/Register'
 import ForgotPassword from './pages/auth/ForgotPassword'
+import GlobalLoader from './components/GlobalLoader'
 
 const App = () => {
   return (
+    <>
     <BrowserRouter>
+    <GlobalLoader />
       <Routes>
         <Route path='/' element={<Login />}/>
         <Route path='/register' element={<Register />}/>
@@ -42,6 +45,7 @@ const App = () => {
         </Route>
       </Routes>
     </BrowserRouter>
+    </>
   )
 }
 

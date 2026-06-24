@@ -7,11 +7,9 @@ const authStore = create(
   persist((set) => ({
     user: null,
     authToken: null,
-    loadingAction: null,
 
     //login
-    login: async (loginData) => {
-      set({ loadingAction: "login" });
+    adminLogin: async (loginData) => {
       // eslint-disable-next-line no-useless-catch
       try {
         // Using your api instance configured with custom headers/auth rules
@@ -19,8 +17,11 @@ const authStore = create(
           withAuth: false,
         });
         console.log(res.data);
+        const { userAdmin, access_token} = res.data;
+        set({user: userAdmin, authToken: access_token})
+        return res.data;
       } catch (error) {
-        throw error;
+        // throw error;
       }
     },
   })),

@@ -1,18 +1,36 @@
 import { useState } from "react";
 import { Eye, EyeOff, User } from "lucide-react";
 import bgImage from "../../assets/images/admin-poster.jpg";
-import logo from "../../assets/images/White Drop Logo-01.jpg";
+import logo from "../../assets/images/logo_nobg.png";
 import { useNavigate } from "react-router-dom";
+import authStore from "../../zustand/Store/authStore";
+import { toast } from "react-toastify";
+import loaderStore from "../../zustand/Store/loaderStore";
 
 const Login = () => {
-  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const adminLogin = authStore((state) => state.adminLogin);
+  const { showLoader, hideLoader } = loaderStore();
   const navigate = useNavigate();
 
-  const login = () => {
-    console.log({ userName, password });
-    navigate("/dashboard");
+  const handleLogin = async () => {
+    try {
+      showLoader()
+      const loginData = {
+        email: email,
+        password: password,
+      }
+      const res = await adminLogin(loginData);
+      console.log("res", res.data);
+      console.log({ email, password });
+      navigate("/dashboard");
+    } catch {
+      toast.error("Login Failed")
+    } finally {
+      hideLoader()
+    }
   };
 
   return (
@@ -45,14 +63,14 @@ const Login = () => {
           </div>
 
           <div className="relative space-y-5">
-            {/* Username */}
+            {/* email */}
             <div className="relative">
               <input
                 type="text"
                 placeholder="Email Id / Phone No."
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && login()}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 className="w-full rounded-2xl bg-white/20 border border-white/30 py-4 pl-5 pr-12 text-white placeholder:text-white/60 outline-none backdrop-blur-md focus:border-cyan-300 transition-all"
               />
 
@@ -69,7 +87,7 @@ const Login = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && login()}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 className="w-full rounded-2xl bg-white/20 border border-white/30 py-4 pl-5 pr-12 text-white placeholder:text-white/60 outline-none backdrop-blur-md focus:border-cyan-300 transition-all"
               />
 
@@ -102,7 +120,7 @@ const Login = () => {
             </div>
             {/* Login Button */}
             <button
-              onClick={login}
+              onClick={handleLogin}
               className="w-full cursor-pointer rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 py-4 text-white font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/50"
             >
               Login
