@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
@@ -8,6 +8,8 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const createProduct = productDataStore((state) => state.createProduct);
+  const ProductUnit = productDataStore((state) => state.ProductUnit);
+  const getProductUnit = productDataStore((state) => state.getProductUnit);
 
   const [productList, setProductList] = useState({
     product_name: "",
@@ -91,6 +93,12 @@ const AddProduct = () => {
     }));
   };
 
+  useEffect(() => {
+    getProductUnit().catch(() => {
+      toast.error("Failed to get product units");
+    });
+  }, []);
+
   const validateProduct = () => {
     if (!productList.product_name.trim()) {
       return "Product Name is required";
@@ -139,7 +147,7 @@ const AddProduct = () => {
       if (error) {
         toast.error(error);
         console.log("errr", error);
-        
+
         return;
       }
 
@@ -377,14 +385,32 @@ const AddProduct = () => {
                         <label className="text-sm font-semibold text-slate-600">
                           {label}
                         </label>
-                        <input
-                          type={type}
-                          name={name}
-                          value={variant[name]}
-                          onChange={(e) => handleVariantChange(index, e)}
-                          placeholder={placeholder}
-                          className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
-                        />
+
+                        {name === "unit" ? (
+                          <select
+                            name="unit"
+                            value={variant.unit}
+                            onChange={(e) => handleVariantChange(index, e)}
+                            className="px-4 py-3 cursor-pointer rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
+                          >
+                            <option value="">Select Unit</option>
+
+                            {ProductUnit?.map((unit) => (
+                              <option key={unit} value={unit}>
+                                {unit}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={type}
+                            name={name}
+                            value={variant[name]}
+                            onChange={(e) => handleVariantChange(index, e)}
+                            placeholder={placeholder}
+                            className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                          />
+                        )}
                       </div>
                     ))}
 

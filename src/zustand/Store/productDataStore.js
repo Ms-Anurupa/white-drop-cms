@@ -6,6 +6,7 @@ import authStore from "./authStore";
 const productDataStore = create((set) => ({
   products: [],
   ProductData: [],
+  ProductUnit: [],
 
   createProduct: async (formData) => {
     try {
@@ -53,6 +54,29 @@ const productDataStore = create((set) => ({
       throw error;
     }
   },
+
+
+  hardDeleteProduct: async (payload) => {
+    try {
+      const res = await api.post("/admin/hardDeleteProduct", payload, {
+        withAuth: true,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getProductUnit: async () => {
+    try {
+      const res = await api.get("/admin/getProductUnit", {
+        withAuth: true,
+      });
+      set({ ProductUnit: res.data?.data });
+    } catch  {
+    }
+  },
+
 }));
 
 export default productDataStore;

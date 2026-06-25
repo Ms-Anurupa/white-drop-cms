@@ -23,24 +23,23 @@ const EditProduct = () => {
   });
 
   useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await getProductById(id);
+
+        setProductList({
+          product_name: res.product_name || "",
+          product_description: res.product_description || "",
+          catch_phrase: res.catch_phrase || "",
+          images: res.images || [],
+          variants: res.variants || [],
+        });
+      } catch {
+        toast.error("Failed to fetch product");
+      }
+    };
     fetchProduct();
   }, [id]);
-
-  const fetchProduct = async () => {
-    try {
-      const res = await getProductById(id);
-
-      setProductList({
-        product_name: res.product_name || "",
-        product_description: res.product_description || "",
-        catch_phrase: res.catch_phrase || "",
-        images: res.images || [],
-        variants: res.variants || [],
-      });
-    } catch {
-      toast.error("Failed to fetch product");
-    }
-  };
 
   const handleUpdateProduct = async () => {
     try {

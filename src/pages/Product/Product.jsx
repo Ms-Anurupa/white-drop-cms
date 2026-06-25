@@ -11,14 +11,17 @@ import {
 } from "lucide-react";
 import productDataStore from "../../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
+import { useConfirm } from "../../components/ConfirmProvider";
 
 const PAGE_SIZE = 5;
 
 const Product = () => {
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { products, getAllProducts, deleteProductById } = productDataStore();
+  const { products, getAllProducts, deleteProductById, hardDeleteProduct } =
+    productDataStore();
 
   //fetch data
   useEffect(() => {
@@ -35,24 +38,53 @@ const Product = () => {
       p.catch_phrase.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const start = (page - 1) * PAGE_SIZE;
-  const paginated = filtered.slice(start, start + PAGE_SIZE);
+  const hydratedProducts = filtered.map((p) => ({
+    ...p,
+    variant: p.variants?.[0] || {},
+  }));
 
-  const inStock = products.filter((p) => p.availability === "In Stock").length;
-  const outOfStock = products.filter(
-    (p) => p.availability === "Out of Stock",
+  const totalPages = Math.ceil(hydratedProducts.length / PAGE_SIZE);
+  const start = (page - 1) * PAGE_SIZE;
+  const paginated = hydratedProducts.slice(start, start + PAGE_SIZE);
+
+  const inStock = products.filter((p) =>
+    p.variants?.some((v) => v.availability),
   ).length;
 
-  const handleDelete = async (id) => {
+  const outOfStock = products.filter((p) =>
+    p.variants?.every((v) => !v.availability),
+  ).length;
+
+  const handleStatusChange = async (productId, status) => {
     try {
-      const payload = {
-        productId: id,
-      }
-      await deleteProductById(payload)
+      await deleteProductById({
+        productId,
+        status,
+      });
+
+      await getAllProducts();
+
+      toast.success("Status updated");
+    } catch {
+      toast.error("Failed to update status");
+    }
+  };
+  const handleHardDelete = async (productId) => {
+    try {
+      const confirmMessage = await confirm({
+        title: "Deelete Product",
+        message: "This will permanently delete the product. Continue?",
+      });
+
+      if (!confirmMessage) return;
+      await hardDeleteProduct({
+        productId,
+      });
+
+      toast.success("Product deleted");
       getAllProducts();
     } catch {
-      toast.error("Failed to delete product")
+      toast.error("Failed to delete product");
     }
   };
 
@@ -172,7 +204,7 @@ const Product = () => {
                                 : "bg-red-50 text-red-600"
                             }`}
                           >
-                            {item.availability}
+                            {item.status}
                           </span>
                         </div>
                       </div>
@@ -192,9 +224,10 @@ const Product = () => {
                         Edit
                       </button>
 
-                      <button 
-                      onClick={() => handleDelete(item.id)}
-                      className="flex-1 py-2 text-xs rounded-lg border border-red-100 text-red-600 hover:bg-red-50">
+                      <button
+                        onClick={() => handleHardDelete(item.id)}
+                        className="flex-1 py-2 text-xs rounded-lg border border-red-100 text-red-600 hover:bg-red-50"
+                      >
                         Delete
                       </button>
                     </div>
@@ -212,16 +245,17 @@ const Product = () => {
                   {[
                     "Sl No.",
                     "Name",
-                    "Catch phrase",
+                    "Catch Phrase",
                     "Image",
                     "Price",
                     "Availability",
                     "Unit",
+                    "Status",
                     "Actions",
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -256,41 +290,70 @@ const Product = () => {
                         </td>
 
                         <td className="px-4 py-3">
-                          <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
-                            {/* <Icon size={16} /> */}
-                          </div>
+                          <img
+                            src={`${import.meta.env.VITE_BASE_URL}/uploads/product/${
+                              item.product_images?.[0]
+                            }`}
+                            alt={item.product_name}
+                            className="w-12 h-12 rounded-lg object-cover border"
+                          />
                         </td>
 
-                        <td className="px-4 py-3 font-medium">₹{item.price}</td>
+                        <td className="px-4 py-3 font-medium">
+                          ₹{item.variant?.price ?? "-"}
+                        </td>
 
                         <td className="px-4 py-3">
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              item.availability === "In Stock"
+                              item.variant?.availability
                                 ? "bg-emerald-50 text-emerald-700"
                                 : "bg-red-50 text-red-600"
                             }`}
                           >
-                            {item.availability}
+                            {item.variant?.availability
+                              ? "In Stock"
+                              : "Out of Stock"}
                           </span>
                         </td>
 
-                        <td className="px-4 py-3 text-gray-500">{item.unit}</td>
+                        <td className="px-4 py-3 text-gray-500">
+                          {item.variant?.unit ?? "-"}
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <select
+                            value={item.status ?? "ACTIVE"}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                item.product_id,
+                                e.target.value,
+                              )
+                            }
+                            className="px-2 py-1 text-xs border border-gray-200 rounded-md"
+                          >
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                          </select>
+                        </td>
 
                         <td className="px-3 py-3">
                           <div className="flex gap-2">
                             <button
                               onClick={() =>
-                                navigate(`/dashboard/product/edit/${item.id}`)
+                                navigate(
+                                  `/dashboard/product/edit/${item.product_id}`,
+                                )
                               }
-                              className="px-3 py-1 cursor-pointer text-xs rounded-md border border-gray-200 hover:bg-gray-50"
+                              className="px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
                             >
                               <Edit size={18} />
                             </button>
 
-                            <button 
-                             onClick={() => handleDelete(item.id)}
-                             className="px-3 py-1 cursor-pointer text-xs rounded-md border border-red-100 text-red-600 hover:bg-red-50">
+                            <button
+                              onClick={() => handleHardDelete(item.product_id)}
+                              className="px-3 py-1 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50"
+                            >
                               <Delete size={18} />
                             </button>
                           </div>
