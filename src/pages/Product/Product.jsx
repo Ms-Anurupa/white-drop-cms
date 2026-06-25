@@ -72,7 +72,7 @@ const Product = () => {
   const handleHardDelete = async (productId) => {
     try {
       const confirmMessage = await confirm({
-        title: "Deelete Product",
+        title: "Delete Product",
         message: "This will permanently delete the product. Continue?",
       });
 
