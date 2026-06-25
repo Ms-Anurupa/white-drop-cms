@@ -13,6 +13,9 @@ const EditProduct = () => {
   const editProductById = productDataStore((state) => state.editProductById);
   const ProductUnit = productDataStore((state) => state.ProductUnit);
   const getProductUnit = productDataStore((state) => state.getProductUnit);
+  const deleteProductVariantById = productDataStore(
+    (state) => state.deleteProductVariantById,
+  );
 
   const [productList, setProductList] = useState({
     product_name: "",
@@ -109,12 +112,36 @@ const EditProduct = () => {
     }));
   };
 
-  const removeVariant = (index) => {
+  const removeVariant = async (index) => {
+  const variant = productList.variants[index];
+
+  try {
+    // Existing variant 
+    if (variant?.product_item_id) {
+      const confirmMessage = await confirm({
+        title: "Delete Product Variant",
+        message: "This will permanently delete the product variant. Continue?",
+      });
+
+      if (!confirmMessage) return;
+
+      await deleteProductVariantById({
+        variantId: variant.product_item_id,
+      });
+
+      toast.success("Variant deleted successfully");
+    }
+
+    // Remove from local state
     setProductList((prev) => ({
       ...prev,
       variants: prev.variants.filter((_, i) => i !== index),
     }));
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to delete variant");
+  }
+};
 
   const handleUpdateProduct = async () => {
     try {

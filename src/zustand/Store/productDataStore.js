@@ -91,6 +91,17 @@ const productDataStore = create((set) => ({
     }
   },
 
+    deleteProductVariantById: async (payload) => {
+    try {
+      const res = await api.post("/admin/deleteProductVariantById", payload, {
+        withAuth: true,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
 }));
 
 export default productDataStore;
