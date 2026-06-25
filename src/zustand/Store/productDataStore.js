@@ -33,14 +33,14 @@ const productDataStore = create((set) => ({
     }
   },
 
-  getProductById: async () => {
+  getProductById: async (productId) => {
     try {
-      const res = await api.get("/admin/getProductById", {
+      const res = await api.get("/admin/getProductById",{
         withAuth: true,
+        params: {productId},
       });
       set({ ProductData: res.data });
-    } catch (error) {
-      throw error;
+    } catch {
     }
   },
 

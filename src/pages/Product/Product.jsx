@@ -291,11 +291,11 @@ const Product = () => {
 
                         <td className="px-4 py-3">
                           <img
-                            src={`${import.meta.env.VITE_BASE_URL}/uploads/product/${
+                            src={`${import.meta.env.VITE_BASE_URL}/product_images/${
                               item.product_images?.[0]
                             }`}
                             alt={item.product_name}
-                            className="w-12 h-12 rounded-lg object-cover border"
+                            className="w-12 h-12 rounded-lg object-cover "
                           />
                         </td>
 
@@ -342,7 +342,7 @@ const Product = () => {
                             <button
                               onClick={() =>
                                 navigate(
-                                  `/dashboard/product/edit/${item.product_id}`,
+                                  `/dashboard/product/editProduct/${item.product_id}`,
                                 )
                               }
                               className="px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
