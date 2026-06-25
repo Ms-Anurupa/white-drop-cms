@@ -77,6 +77,20 @@ const productDataStore = create((set) => ({
     }
   },
 
+  editProductById: async (formData) => {
+    try {
+      const res = await api.post("/admin/editProductById", formData, {
+        withAuth: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
 }));
 
 export default productDataStore;

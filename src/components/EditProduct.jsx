@@ -10,7 +10,7 @@ const EditProduct = () => {
   const { confirm } = useConfirm();
 
   const getProductById = productDataStore((state) => state.getProductById);
-  const updateProduct = productDataStore((state) => state.updateProduct);
+  const editProductById = productDataStore((state) => state.editProductById);
   const ProductUnit = productDataStore((state) => state.ProductUnit);
   const getProductUnit = productDataStore((state) => state.getProductUnit);
 
@@ -30,36 +30,36 @@ const EditProduct = () => {
   }, []);
 
   // Fetch product and prefill
-useEffect(() => {
-  const fetchProduct = async () => {
-    try {
-      await getProductById(product_id);
-      const store = productDataStore.getState().ProductData;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        await getProductById(product_id);
+        const store = productDataStore.getState().ProductData;
 
-      setProductList({
-        product_name: store.product?.product_name || "",
-        product_description: store.product?.product_description || "",
-        catch_phrase: store.product?.catch_phrase || "",
-        images: store.product?.product_images || [],
-        variants: Array.isArray(store.product?.variants)
-          ? store.product.variants.map((v) => ({
-              product_item_id: v.product_item_id,
-              variant_name: v.variant_name || "",
-              unit: v.unit || "",
-              package: v.package || "",
-              price: v.price ?? "",
-              stock_quantity: v.stock_quantity ?? "",
-              availability: v.availability ?? true,
-              sku: v.sku || "",
-            }))
-          : [],
-      });
-    } catch {
-      toast.error("Failed to fetch product");
-    }
-  };
-  fetchProduct();
-}, [product_id]);
+        setProductList({
+          product_name: store.product?.product_name || "",
+          product_description: store.product?.product_description || "",
+          catch_phrase: store.product?.catch_phrase || "",
+          images: store.product?.product_images || [],
+          variants: Array.isArray(store.product?.variants)
+            ? store.product.variants.map((v) => ({
+                product_item_id: v.product_item_id,
+                variant_name: v.variant_name || "",
+                unit: v.unit || "",
+                package: v.package || "",
+                price: v.price ?? "",
+                stock_quantity: v.stock_quantity ?? "",
+                availability: v.availability ?? true,
+                sku: v.sku || "",
+              }))
+            : [],
+        });
+      } catch {
+        toast.error("Failed to fetch product");
+      }
+    };
+    fetchProduct();
+  }, [product_id]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -126,7 +126,22 @@ useEffect(() => {
       if (!confirmMessage) return;
 
       const formData = new FormData();
-      formData.append("productData", JSON.stringify(productList));
+
+      const payload = {
+        productId: product_id,
+
+        product_name: productList.product_name,
+        product_description: productList.product_description,
+        catch_phrase: productList.catch_phrase,
+
+        existingImages: productList.images.filter(
+          (img) => typeof img === "string",
+        ),
+
+        variants: productList.variants,
+      };
+
+      formData.append("productData", JSON.stringify(payload));
 
       productList.images.forEach((file) => {
         if (file instanceof File) {
@@ -134,10 +149,12 @@ useEffect(() => {
         }
       });
 
-      await updateProduct(product_id, formData);
+      await editProductById(formData);
+
       toast.success("Product updated successfully");
       navigate("/dashboard/product");
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Product update failed");
     }
   };
@@ -315,12 +332,42 @@ useEffect(() => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {[
-                      { label: "Variant Name", name: "variant_name", placeholder: "e.g. 500 ML", type: "text" },
-                      { label: "Unit", name: "unit", placeholder: "e.g. ML", type: "text" },
-                      { label: "Package", name: "package", placeholder: "e.g. Bottle", type: "text" },
-                      { label: "Price (₹)", name: "price", placeholder: "e.g. 25", type: "number" },
-                      { label: "Stock Quantity", name: "stock_quantity", placeholder: "e.g. 100", type: "number" },
-                      { label: "SKU", name: "sku", placeholder: "e.g. CM-500", type: "text" },
+                      {
+                        label: "Variant Name",
+                        name: "variant_name",
+                        placeholder: "e.g. 500 ML",
+                        type: "text",
+                      },
+                      {
+                        label: "Unit",
+                        name: "unit",
+                        placeholder: "e.g. ML",
+                        type: "text",
+                      },
+                      {
+                        label: "Package",
+                        name: "package",
+                        placeholder: "e.g. Bottle",
+                        type: "text",
+                      },
+                      {
+                        label: "Price (₹)",
+                        name: "price",
+                        placeholder: "e.g. 25",
+                        type: "number",
+                      },
+                      {
+                        label: "Stock Quantity",
+                        name: "stock_quantity",
+                        placeholder: "e.g. 100",
+                        type: "number",
+                      },
+                      {
+                        label: "SKU",
+                        name: "sku",
+                        placeholder: "e.g. CM-500",
+                        type: "text",
+                      },
                     ].map(({ label, name, placeholder, type }) => (
                       <div key={name} className="flex flex-col gap-1.5">
                         <label className="text-sm font-semibold text-slate-600">
@@ -363,7 +410,7 @@ useEffect(() => {
                         name="availability"
                         value={variant.availability}
                         onChange={(e) => handleVariantChange(index, e)}
-                        className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
+                        className="px-4 py-3 cursor-pointer rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
                       >
                         <option value={true}>In Stock</option>
                         <option value={false}>Out of Stock</option>
