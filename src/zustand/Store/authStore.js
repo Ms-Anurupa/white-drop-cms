@@ -8,6 +8,11 @@ const authStore = create(
     (set) => ({
       user: null,
       authToken: null,
+      verifiedUser: null,
+      
+      setVerifiedUser: (data) => {
+        set({ verifiedUser: data})
+      },
 
       //login
       adminLogin: async (loginData) => {
@@ -74,7 +79,7 @@ const authStore = create(
         // eslint-disable-next-line no-useless-catch
         try {
           const res = await api.post("/admin/adminReister", payload, {
-            withAuth: false,
+            withAuth: true,
           });
           return res.data;
         } catch (error) {

@@ -9,11 +9,12 @@ import { toast } from "react-toastify";
 const Register = () => {
   const navigate = useNavigate();
   const adminRegister = authStore((state) => state.adminRegister);
+  const verifiedUser = authStore((state) => state.verifiedUser);
 
   const [registerData, setRegisterData] = useState({
-    first_name: "",
+    first_name: verifiedUser?.name || "",
     last_name: "",
-    email: "",
+    email: verifiedUser?.email || "",
     password: "",
     phone_number: "",
     otp: "",
@@ -32,7 +33,7 @@ const Register = () => {
         if (!registerData.first_name.trim()) {
       return toast.error("First name is required");
     }
-
+ 
     if (!registerData.last_name.trim()) {
       return toast.error("Last name is required");
     }
@@ -118,19 +119,38 @@ const Register = () => {
               Create Account
             </h1>
             <p className="text-white text-xs sm:text-sm">
-              Sign up to get started
+              Sign up to get started   
             </p>
           </div>
 
           {/* Form */}
           <div className="space-y-2 sm:space-y-2">
-            {/* Name */}
+            {/*first Name */}
             <div className="relative">
               <input
                 type="text"
-                name="name"
-                placeholder="Full Name"
-                value={registerData.name}
+                name="first_name"
+                placeholder="First Name"
+                value={registerData.first_name}
+                disabled={!!verifiedUser}
+                onChange={handleChange}
+                className="w-full rounded-2xl bg-white/20 border border-white/30
+                py-3 pl-5 pr-12 text-white placeholder:text-white/60
+                outline-none backdrop-blur-md focus:border-cyan-300"
+              />
+              <User
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                size={18}
+              />
+            </div>
+
+            {/*last Name */}
+            <div className="relative">
+              <input
+                type="text"
+                name="last_name"
+                placeholder="Last Name"
+                value={registerData.last_name}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -149,6 +169,7 @@ const Register = () => {
                 name="email"
                 placeholder="Email Address"
                 value={registerData.email}
+                disabled={!!verifiedUser}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -164,9 +185,9 @@ const Register = () => {
             <div className="relative">
               <input
                 type="text"
-                name="phone"
+                name="phone_number"
                 placeholder="Phone Number"
-                value={registerData.phone}
+                value={registerData.phone_number}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-2 pl-5 pr-12 text-white placeholder:text-white/60

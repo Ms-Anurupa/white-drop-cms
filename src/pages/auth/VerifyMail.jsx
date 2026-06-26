@@ -10,6 +10,7 @@ const VerifyMail = () => {
   const navigate = useNavigate();
   const sendOtp = authStore((state) => state.sendOtp);
   const verifyOtp = authStore((state) => state.verifyOtp);
+  const setVerifiedUser = authStore((state) => state.setVerifiedUser);
 
   const [verificationStep, setVerificationStep] = useState(1);
   const [isOtpRequested, setIsOtpRequested] = useState(false);
@@ -69,6 +70,11 @@ const VerifyMail = () => {
       const res = await verifyOtp(payload);
 
       toast.success(res?.message || "Email verified successfully");
+
+      setVerifiedUser({
+        name: emailData.name,
+        email: emailData.email,
+      })
 
       navigate("/register");
     } catch (error) {
@@ -156,7 +162,7 @@ const VerifyMail = () => {
 
               <button
                 onClick={handleOtpSend}
-                className="w-full rounded-2xl bg-gradient-to-r
+                className="w-full cursor-pointer rounded-2xl bg-gradient-to-r
                 from-blue-600 to-cyan-500 py-3 text-white
                 font-semibold shadow-lg transition hover:scale-[1.02]"
               >
@@ -188,14 +194,14 @@ const VerifyMail = () => {
                 onClick={handleVerifyEmailOtp}
                 className="w-full rounded-2xl bg-gradient-to-r
                 from-yellow-500 to-yellow-400 py-3 text-white
-                font-semibold shadow-lg transition hover:scale-[1.02]"
+                font-semibold cursor-pointer shadow-lg transition hover:scale-[1.02]"
               >
                 Verify OTP
               </button>
 
               <button
                 onClick={handleOtpSend}
-                className="w-full text-cyan-300 text-sm hover:underline"
+                className="w-full cursor-pointer text-cyan-300 text-sm hover:underline"
               >
                 Resend OTP
               </button>
