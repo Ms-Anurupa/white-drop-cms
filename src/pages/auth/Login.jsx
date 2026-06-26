@@ -59,7 +59,7 @@ const Login = () => {
             <h1 className="text-4xl font-bold text-blue-600 tracking-wide">
               Welcome Back
             </h1>
-            <p className="text-white/80 mt-2 text-sm">Sign in to continue</p>
+            <p className="text-white mt-2 text-sm">Sign in to continue</p>
           </div>
 
           <div className="relative space-y-5">

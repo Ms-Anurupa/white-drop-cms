@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, User, Mail, Phone } from "lucide-react";
 import bgImage from "../../assets/images/admin-poster.jpg";
-import logo from "../../assets/images/White Drop Logo-01.jpg";
+import logo from "../../assets/images/logo_nobg.png";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {

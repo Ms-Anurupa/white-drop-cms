@@ -3,7 +3,7 @@ import { Mail, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import bgImage from "../../assets/images/admin-poster.jpg";
-import logo from "../../assets/images/White Drop Logo-01.jpg";
+import logo from "../../assets/images/logo_nobg.png";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

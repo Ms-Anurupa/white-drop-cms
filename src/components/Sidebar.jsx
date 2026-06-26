@@ -14,6 +14,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import logo from "../assets/images/logo_nobg.png";
 
 const menu = [
   { name: "Dashboard",         path: "/dashboard",        icon: LayoutDashboard, end: true },
@@ -74,8 +75,9 @@ const Sidebar = () => {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-slate-100 shrink-0">
-        <span className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-          <LayoutDashboard size={14} className="text-white" />
+        <span className="w-7 h-7 flex items-center justify-center">
+          {/* <LayoutDashboard size={14} className="text-white" /> */}
+            <img src={logo} alt="Logo" className="h-20 object-contain" />
         </span>
         <span className="text-base font-semibold text-gray-900 tracking-tight">
           CMS <span className="text-blue-600">Admin</span>
