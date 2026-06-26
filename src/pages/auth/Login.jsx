@@ -105,7 +105,7 @@ const Login = () => {
             </div>
             <div className="flex justify-end items-center gap-3 text-sm">
               <button
-               onClick={() => navigate('/register')}
+               onClick={() => navigate('/verify-mail')}
                className="text-white/80 cursor-pointer hover:text-cyan-300 transition">
                 New User? Register
               </button>

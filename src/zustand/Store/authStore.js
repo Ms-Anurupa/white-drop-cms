@@ -46,6 +46,54 @@ const authStore = create(
         }
       },
 
+      sendOtp: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/otp/sendOtp", payload, {
+            withAuth: false,
+          });
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      verifyOtp: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/otp/verifyOtp", payload, {
+            withAuth: false,
+          });
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      adminRegister: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/admin/adminReister", payload, {
+            withAuth: false,
+          });
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      sendForgotPassOtp: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/admin/sendForgotPassOtp", payload, {
+            withAuth: false,
+          });
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
       logOut: () => {
         set({ user: null, authToken: null });
 

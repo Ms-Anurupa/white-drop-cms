@@ -20,6 +20,7 @@ import GlobalLoader from "./components/GlobalLoader";
 import { ConfirmProvider } from "./components/ConfirmProvider";
 import { ToastContainer } from "react-toastify";
 import EditProduct from "./components/EditProduct";
+import VerifyMail from "./pages/auth/VerifyMail";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
           <GlobalLoader />
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/verify-mail" element={<VerifyMail />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/dashboard" element={<DashboardLayout />}>

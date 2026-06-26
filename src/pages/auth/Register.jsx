@@ -3,28 +3,87 @@ import { Eye, EyeOff, User, Mail, Phone } from "lucide-react";
 import bgImage from "../../assets/images/admin-poster.jpg";
 import logo from "../../assets/images/logo_nobg.png";
 import { useNavigate } from "react-router-dom";
+import authStore from "../../zustand/Store/authStore";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
+  const adminRegister = authStore((state) => state.adminRegister);
 
-  const [form, setForm] = useState({
-    name: "",
+  const [registerData, setRegisterData] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
-    phone: "",
     password: "",
-    confirmPassword: "",
+    phone_number: "",
+    otp: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
   };
 
-  const register = () => {
-    console.log(form);
-    navigate("/dashboard");
+  const handleRegister = async () => {
+    try {
+      //validations 
+        if (!registerData.first_name.trim()) {
+      return toast.error("First name is required");
+    }
+
+    if (!registerData.last_name.trim()) {
+      return toast.error("Last name is required");
+    }
+
+    if (!registerData.email.trim()) {
+      return toast.error("Email is required");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(registerData.email)) {
+      return toast.error("Please enter a valid email");
+    }
+
+    if (!registerData.phone_number.trim()) {
+      return toast.error("Phone number is required");
+    }
+
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!phoneRegex.test(registerData.phone_number)) {
+      return toast.error("Please enter a valid 10-digit phone number");
+    }
+
+    if (!registerData.password) {
+      return toast.error("Password is required");
+    }
+
+    if (registerData.password.length < 6) {
+      return toast.error(
+        "Password must be at least 6 characters"
+      );
+    }
+
+    if (!registerData.confirmPassword) {
+      return toast.error("Please confirm your password");
+    }
+
+    if (registerData.password !== registerData.confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+
+      const payload = {
+        ...registerData,
+      }
+      const res = await adminRegister(payload);
+      console.log(res.data);
+      navigate("/dashboard");
+    } catch {
+      toast.error("Registration Failed");
+    }
   };
 
   return (
@@ -71,7 +130,7 @@ const Register = () => {
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                value={form.name}
+                value={registerData.name}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -89,7 +148,7 @@ const Register = () => {
                 type="email"
                 name="email"
                 placeholder="Email Address"
-                value={form.email}
+                value={registerData.email}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -107,7 +166,7 @@ const Register = () => {
                 type="text"
                 name="phone"
                 placeholder="Phone Number"
-                value={form.phone}
+                value={registerData.phone}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-2 pl-5 pr-12 text-white placeholder:text-white/60
@@ -125,7 +184,7 @@ const Register = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
-                value={form.password}
+                value={registerData.password}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -146,7 +205,7 @@ const Register = () => {
                 type={showConfirm ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                value={form.confirmPassword}
+                value={registerData.confirmPassword}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -163,7 +222,7 @@ const Register = () => {
 
             {/* Button */}
             <button
-              onClick={register}
+              onClick={handleRegister}
               className="w-full rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400
               py-3 text-white cursor-pointer font-semibold shadow-lg transition hover:scale-[1.02]"
             >
