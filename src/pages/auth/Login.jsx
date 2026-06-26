@@ -67,7 +67,7 @@ const Login = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Email Id / Phone No."
+                placeholder="Email Id"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}

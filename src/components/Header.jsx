@@ -1,23 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import authStore from "../zustand/Store/authStore";
-import { toast } from "react-toastify";
 
-const Header = () => {
+const Header = ({onLogOut}) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const logOut = authStore((state) => state.logOut);
-
-  const handleLogout = async () => {
-    try {
-      await logOut();
-      console.log("logged out");
-
-      localStorage.removeItem("token");
-      window.location.href = "/";
-    } catch {
-      toast.error("LogOut Failed");
-    }
-  };
 
   // close on outside click
   useEffect(() => {
@@ -64,7 +49,7 @@ const Header = () => {
           {open && (
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50">
               <button
-                onClick={handleLogout}
+                onClick={onLogOut}
                 className="w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 Logout

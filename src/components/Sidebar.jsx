@@ -65,19 +65,18 @@ const NavItem = ({ item, onClick }) => {
 };
 
 /* ─── main component ────────────────────────────────────────────────────── */
-const Sidebar = () => {
+const Sidebar = ({onLogOut}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const close = () => setMobileOpen(false);
 
   /* inner sidebar body — reused for both desktop and mobile drawer */
-  const SidebarBody = ({ onNavClick }) => (
+  const SidebarBody = ({ onNavClick, onLogOut }) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-slate-100 shrink-0">
         <span className="w-7 h-7 flex items-center justify-center">
-          {/* <LayoutDashboard size={14} className="text-white" /> */}
-            <img src={logo} alt="Logo" className="h-20 object-contain" />
+          <img src={logo} alt="Logo" className="h-20 object-contain" />
         </span>
         <span className="text-base font-semibold text-gray-900 tracking-tight">
           CMS <span className="text-blue-600">Admin</span>
@@ -108,6 +107,16 @@ const Sidebar = () => {
         ))}
       </nav>
 
+      {/* Mobile Logout */}
+    <div className="lg:hidden px-4 pb-3">
+      <button
+        onClick={onLogOut}
+        className="w-full cursor-pointer rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+      >
+        Logout
+      </button>
+    </div>
+
       {/* Footer */}
       <div className="shrink-0 px-4 py-3 border-t border-slate-100">
         <div className="flex items-center gap-3">
@@ -129,7 +138,7 @@ const Sidebar = () => {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-white border-b border-slate-100 flex items-center px-4 gap-3">
         <button
           onClick={() => setMobileOpen(true)}
-          className="p-1.5 rounded-lg text-gray-500 hover:bg-slate-100 transition-colors"
+          className="p-1.5 cursor-pointer rounded-lg text-gray-500 hover:bg-slate-100 transition-colors"
           aria-label="Open menu"
         >
           <Menu size={20} />
@@ -159,17 +168,17 @@ const Sidebar = () => {
         {/* Close button */}
         <button
           onClick={close}
-          className="absolute top-3.5 right-3 p-1.5 rounded-lg text-gray-400 hover:bg-slate-100 transition-colors"
+          className="absolute cursor-pointer top-3.5 right-3 p-1.5 rounded-lg text-gray-400 hover:bg-slate-100 transition-colors"
           aria-label="Close menu"
         >
           <X size={18} />
         </button>
-        <SidebarBody onNavClick={close} />
+        <SidebarBody onNavClick={close} onLogOut={onLogOut}/>
       </div>
 
       {/* ── DESKTOP SIDEBAR ─────────────────────────────────────────────── */}
       <aside className="hidden lg:flex flex-col w-60 h-screen bg-white border-r border-slate-100 shrink-0">
-        <SidebarBody />
+        <SidebarBody onLogOut={onLogOut}/>
       </aside>
     </>
   );
