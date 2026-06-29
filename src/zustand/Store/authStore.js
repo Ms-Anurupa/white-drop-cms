@@ -12,6 +12,7 @@ const authStore = create(
       
       setVerifiedUser: (data) => {
         set({ verifiedUser: {
+          name: data?.name,
           email: data?.email,
           otp: data?.otp,
         }})

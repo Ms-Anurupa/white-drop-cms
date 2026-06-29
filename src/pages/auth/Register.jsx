@@ -10,8 +10,9 @@ const Register = () => {
   const navigate = useNavigate();
   const adminRegister = authStore((state) => state.adminRegister);
   const verifiedUser = authStore((state) => state.verifiedUser);
-  const clearVerificationUser = authStore((state) => state.clearVerificationUser);
-
+  const clearVerificationUser = authStore(
+    (state) => state.clearVerificationUser,
+  );
 
   const [registerData, setRegisterData] = useState({
     first_name: verifiedUser?.name || "",
@@ -22,7 +23,7 @@ const Register = () => {
     phone_number: "",
     privilege: "",
   });
-
+  const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -32,56 +33,60 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      //validations 
-        if (!registerData.first_name.trim()) {
-      return toast.error("First name is required");
-    }
- 
-    if (!registerData.last_name.trim()) {
-      return toast.error("Last name is required");
-    }
+      //validations
+      if (!registerData.first_name.trim()) {
+        return toast.error("First name is required");
+      }
 
-    if (!registerData.email.trim()) {
-      return toast.error("Email is required");
-    }
+      if (!registerData.last_name.trim()) {
+        return toast.error("Last name is required");
+      }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!registerData.email.trim()) {
+        return toast.error("Email is required");
+      }
 
-    if (!emailRegex.test(registerData.email)) {
-      return toast.error("Please enter a valid email");
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!registerData.phone_number.trim()) {
-      return toast.error("Phone number is required");
-    }
+      if (!emailRegex.test(registerData.email)) {
+        return toast.error("Please enter a valid email");
+      }
 
-    const phoneRegex = /^[6-9]\d{9}$/;
+      if (!registerData.phone_number.trim()) {
+        return toast.error("Phone number is required");
+      }
 
-    if (!phoneRegex.test(registerData.phone_number)) {
-      return toast.error("Please enter a valid 10-digit phone number");
-    }
+      if (!registerData.privilege) {
+        return toast.error("Privilege  is required");
+      }
 
-    if (!registerData.password) {
-      return toast.error("Password is required");
-    }
+      const phoneRegex = /^[6-9]\d{9}$/;
 
-    if (registerData.password.length < 6) {
-      return toast.error(
-        "Password must be at least 6 characters"
-      );
-    }
+      if (!phoneRegex.test(registerData.phone_number)) {
+        return toast.error("Please enter a valid 10-digit phone number");
+      }
 
-    if (!registerData.confirmPassword) {
-      return toast.error("Please confirm your password");
-    }
+      if (!registerData.password) {
+        return toast.error("Password is required");
+      }
 
-    if (registerData.password !== registerData.confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
+      if (registerData.password.length < 6) {
+        return toast.error("Password must be at least 6 characters");
+      }
+
+      if (!registerData.confirmPassword) {
+        return toast.error("Please confirm your password");
+      }
+
+      if (registerData.password !== registerData.confirmPassword) {
+        return toast.error("Passwords do not match");
+      }
+
+      setIsRegistering(true);
 
       const payload = {
         ...registerData,
-      }
+      };
       const res = await adminRegister(payload);
       console.log(res.data);
       clearVerificationUser();
@@ -89,6 +94,8 @@ const Register = () => {
       navigate("/");
     } catch {
       toast.error("Registration Failed");
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -137,7 +144,7 @@ const Register = () => {
                 name="first_name"
                 placeholder="First Name"
                 value={registerData.first_name}
-                disabled={!!verifiedUser}
+                disabled={!!verifiedUser || isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -156,6 +163,7 @@ const Register = () => {
                 name="last_name"
                 placeholder="Last Name"
                 value={registerData.last_name}
+                disabled={isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -174,7 +182,7 @@ const Register = () => {
                 name="email"
                 placeholder="Email Address"
                 value={registerData.email}
-                disabled={!!verifiedUser}
+                disabled={!!verifiedUser || isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -193,6 +201,7 @@ const Register = () => {
                 name="phone_number"
                 placeholder="Phone Number"
                 value={registerData.phone_number}
+                disabled={isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-2 pl-5 pr-12 text-white placeholder:text-white/60
@@ -211,6 +220,7 @@ const Register = () => {
                 name="password"
                 placeholder="Password"
                 value={registerData.password}
+                disabled={isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -218,6 +228,7 @@ const Register = () => {
               />
               <button
                 type="button"
+                disabled={isRegistering}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
               >
@@ -232,6 +243,7 @@ const Register = () => {
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 value={registerData.confirmPassword}
+                disabled={isRegistering}
                 onChange={handleChange}
                 className="w-full rounded-2xl bg-white/20 border border-white/30
                 py-3 pl-5 pr-12 text-white placeholder:text-white/60
@@ -239,6 +251,7 @@ const Register = () => {
               />
               <button
                 type="button"
+                disabled={isRegistering}
                 onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
               >
@@ -250,6 +263,7 @@ const Register = () => {
               <select
                 name="privilege"
                 value={registerData.privilege}
+                disabled={isRegistering}
                 onChange={handleChange}
                 className="w-full cursor-pointer rounded-2xl bg-white/20 border border-white/30
     py-3 px-5 text-white outline-none backdrop-blur-md
@@ -270,10 +284,15 @@ const Register = () => {
             {/* Button */}
             <button
               onClick={handleRegister}
-              className="w-full rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400
-              py-3 text-white cursor-pointer font-semibold shadow-lg transition hover:scale-[1.02]"
+              disabled={isRegistering}
+              className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
+    ${
+      isRegistering
+        ? "bg-gray-500 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-yellow-500 to-yellow-400 hover:scale-[1.02] cursor-pointer"
+    }`}
             >
-              Create Account
+              {isRegistering ? "Creating Account..." : "Create Account"}
             </button>
 
             {/* Login link */}

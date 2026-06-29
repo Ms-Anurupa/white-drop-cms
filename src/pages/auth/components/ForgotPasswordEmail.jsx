@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Mail } from "lucide-react";
 import { toast } from "react-toastify";
 import authStore from "../../../zustand/Store/authStore";
 
 const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
   const sendForgotPassOtp = authStore((state) => state.sendForgotPassOtp);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   const handleEmailSubmit = async () => {
     try {
@@ -17,6 +19,8 @@ const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
         return toast.error("Please enter a valid email");
       }
 
+      setIsSendingOtp(true);
+
       await sendForgotPassOtp({ email });
 
       toast.success("OTP sent successfully");
@@ -24,6 +28,8 @@ const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
       onSuccess();
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send OTP");
+    } finally {
+        setIsSendingOtp(false)
     }
   };
 
@@ -41,6 +47,7 @@ const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
 
       <div className="relative mb-5">
         <input
+          disabled={isSendingOtp}
           type="email"
           placeholder="Email Address"
           value={email}
@@ -60,12 +67,15 @@ const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
 
       <button
         onClick={handleEmailSubmit}
-        className="w-full rounded-2xl bg-gradient-to-r
-        from-yellow-500 to-yellow-400 py-3
-        text-white font-semibold shadow-lg
-        transition hover:scale-[1.02] cursor-pointer"
+        disabled={isSendingOtp}
+        className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
+    ${
+      isSendingOtp
+        ? "bg-gray-500 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-yellow-500 to-yellow-400 hover:scale-[1.02] cursor-pointer"
+    }`}
       >
-        Send OTP
+        {isSendingOtp ? "Sending..." : "Send OTP"}
       </button>
     </>
   );
