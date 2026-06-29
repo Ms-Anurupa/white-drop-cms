@@ -22,8 +22,8 @@ const Login = () => {
         email: email,
         password: password,
       }
-      const res = await adminLogin(loginData);
-      console.log("res", res.data);
+      await adminLogin(loginData);
+      // console.log("res", res.data);
       console.log({ email, password });
       navigate("/dashboard");
     } catch {

@@ -11,7 +11,10 @@ const authStore = create(
       verifiedUser: null,
       
       setVerifiedUser: (data) => {
-        set({ verifiedUser: data})
+        set({ verifiedUser: {
+          email: data?.email,
+          otp: data?.otp,
+        }})
       },
 
       clearVerificationUser : () => set({
@@ -94,7 +97,7 @@ const authStore = create(
       sendForgotPassOtp: async (payload) => {
         // eslint-disable-next-line no-useless-catch
         try {
-          const res = await api.post("/admin/sendForgotPassOtp", payload, {
+          const res = await api.post("/auth/forgot-password", payload, {
             withAuth: false,
           });
           return res.data;
@@ -102,6 +105,37 @@ const authStore = create(
           throw error;
         }
       },
+
+      
+      verifyForgotPassOtp: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/auth/verify-forgot-pasword-otp", payload, {
+            withAuth: false,
+          });
+          set({
+            verifiedUser: payload.email,
+            otp: payload.otp,
+          })
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+
+      resetPassword: async (payload) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+          const res = await api.post("/auth/resetPassword", payload, {
+            withAuth: false,
+          });
+          return res.data;
+        } catch (error) {
+          throw error;
+        }
+      },
+
 
       logOut: () => {
         set({ user: null, authToken: null });
