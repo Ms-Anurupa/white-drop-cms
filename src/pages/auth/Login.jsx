@@ -17,6 +17,12 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      if(!email) {
+        return toast.error("Please enter a valid email")
+      }
+      if(!password) {
+        return toast.error("Please enter valid password")
+      }
       showLoader();
       const loginData = {
         email: email,
