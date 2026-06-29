@@ -46,10 +46,60 @@ const VerifyMail = () => {
   };
 
   const handleOtpKeyDown = (e, index) => {
-    // Move to previous box on Backspace
-    if (e.key === "Backspace" && !emailData.otp[index] && index > 0) {
+    // Backspace
+    if (e.key === "Backspace") {
+      if (emailData.otp[index]) {
+        const updatedOtp = [...emailData.otp];
+        updatedOtp[index] = "";
+
+        setEmailData((prev) => ({
+          ...prev,
+          otp: updatedOtp,
+        }));
+      } else if (index > 0) {
+        document.getElementById(`otp-${index - 1}`)?.focus();
+      }
+    }
+
+    // Arrow Left
+    if (e.key === "ArrowLeft" && index > 0) {
       document.getElementById(`otp-${index - 1}`)?.focus();
     }
+
+    // Arrow Right
+    if (e.key === "ArrowRight" && index < 5) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+
+    // Enter
+    if (e.key === "Enter") {
+      handleVerifyEmailOtp();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+
+    const pastedOtp = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+
+    if (!pastedOtp) return;
+
+    const updatedOtp = Array(6).fill("");
+
+    pastedOtp.split("").forEach((digit, i) => {
+      updatedOtp[i] = digit;
+    });
+
+    setEmailData((prev) => ({
+      ...prev,
+      otp: updatedOtp,
+    }));
+
+    const nextIndex = Math.min(pastedOtp.length, 5);
+    document.getElementById(`otp-${nextIndex}`)?.focus();
   };
 
   const handleOtpSend = async () => {
@@ -231,6 +281,7 @@ const VerifyMail = () => {
                       disabled={isVerifyingOtp}
                       onChange={(e) => handleOtpChange(e.target.value, index)}
                       onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                      onPaste={handleOtpPaste}
                       className="w-12 h-12 rounded-xl
       bg-white/20 border border-white/30
       text-center text-lg font-semibold

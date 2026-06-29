@@ -17,19 +17,19 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      showLoader()
+      showLoader();
       const loginData = {
         email: email,
         password: password,
-      }
+      };
       await adminLogin(loginData);
       // console.log("res", res.data);
       console.log({ email, password });
       navigate("/dashboard");
     } catch {
-      toast.error("Login Failed")
+      toast.error("Login Failed");
     } finally {
-      hideLoader()
+      hideLoader();
     }
   };
 
@@ -105,16 +105,18 @@ const Login = () => {
             </div>
             <div className="flex justify-end items-center gap-3 text-sm">
               <button
-               onClick={() => navigate('/verify-mail')}
-               className="text-white/80 cursor-pointer hover:text-cyan-300 transition">
+                onClick={() => navigate("/verify-mail")}
+                className="text-white/80 cursor-pointer hover:text-cyan-300 transition"
+              >
                 New User? Register
               </button>
 
               <span className="text-white/40">|</span>
 
-              <button 
-               onClick={() => navigate('/forgot-password')}
-              className="text-white/80 cursor-pointer hover:text-cyan-300 transition">
+              <button
+                onClick={() => navigate("/forgot-password")}
+                className="text-white/80 cursor-pointer hover:text-cyan-300 transition"
+              >
                 Forgot Password?
               </button>
             </div>

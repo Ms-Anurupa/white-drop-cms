@@ -29,7 +29,7 @@ const ForgotPasswordEmail = ({ email, setEmail, onSuccess }) => {
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send OTP");
     } finally {
-        setIsSendingOtp(false)
+      setIsSendingOtp(false);
     }
   };
 
