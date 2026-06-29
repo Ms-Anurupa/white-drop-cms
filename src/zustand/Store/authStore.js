@@ -14,6 +14,10 @@ const authStore = create(
         set({ verifiedUser: data})
       },
 
+      clearVerificationUser : () => set({
+        verifiedUser: null,
+      }),
+
       //login
       adminLogin: async (loginData) => {
         // eslint-disable-next-line no-useless-catch
@@ -78,7 +82,7 @@ const authStore = create(
       adminRegister: async (payload) => {
         // eslint-disable-next-line no-useless-catch
         try {
-          const res = await api.post("/admin/adminReister", payload, {
+          const res = await api.post("/admin/adminRegister", payload, {
             withAuth: true,
           });
           return res.data;
@@ -110,7 +114,7 @@ const authStore = create(
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       // Clean practice: only persist session tokens
-      partialize: (state) => ({ user: state.user, authToken: state.authToken }),
+      partialize: (state) => ({ user: state.user, authToken: state.authToken, verifiedUser: state.verifiedUser, }),
     },
   ),
 );

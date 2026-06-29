@@ -12,7 +12,7 @@ const VerifyMail = () => {
   const verifyOtp = authStore((state) => state.verifyOtp);
   const setVerifiedUser = authStore((state) => state.setVerifiedUser);
 
-  const [verificationStep, setVerificationStep] = useState(1);
+  // const [verificationStep, setVerificationStep] = useState(1);
   const [isOtpRequested, setIsOtpRequested] = useState(false);
   const [emailData, setEmailData] = useState({
     name: "",
@@ -52,7 +52,7 @@ const VerifyMail = () => {
 
       toast.success(res?.message || "OTP sent successfully");
       setIsOtpRequested(true);
-      setVerificationStep(2);
+      // setVerificationStep(2);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send OTP");
     }
@@ -74,6 +74,7 @@ const VerifyMail = () => {
       setVerifiedUser({
         name: emailData.name,
         email: emailData.email,
+        otp: emailData.otp,
       })
 
       navigate("/register");
@@ -129,7 +130,7 @@ const VerifyMail = () => {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Full Name"
+                  placeholder="First Name"
                   value={emailData.name}
                   onChange={handleChange}
                   className="w-full rounded-2xl bg-white/20 border border-white/30

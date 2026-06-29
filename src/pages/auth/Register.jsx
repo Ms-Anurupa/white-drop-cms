@@ -10,15 +10,17 @@ const Register = () => {
   const navigate = useNavigate();
   const adminRegister = authStore((state) => state.adminRegister);
   const verifiedUser = authStore((state) => state.verifiedUser);
+  const clearVerificationUser = authStore((state) => state.clearVerificationUser);
 
 
   const [registerData, setRegisterData] = useState({
     first_name: verifiedUser?.name || "",
     last_name: "",
     email: verifiedUser?.email || "",
+    otp: verifiedUser?.otp,
     password: "",
     phone_number: "",
-    otp: "",
+    privilege: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +33,7 @@ const Register = () => {
   const handleRegister = async () => {
     try {
       //validations 
-        if (!registerData?.first_name.trim()) {
+        if (!registerData.first_name.trim()) {
       return toast.error("First name is required");
     }
  
@@ -82,7 +84,9 @@ const Register = () => {
       }
       const res = await adminRegister(payload);
       console.log(res.data);
-      navigate("/dashboard");
+      clearVerificationUser();
+      toast.success("Registration Successfull");
+      navigate("/");
     } catch {
       toast.error("Registration Failed");
     }
@@ -120,7 +124,7 @@ const Register = () => {
               Create Account
             </h1>
             <p className="text-white text-xs sm:text-sm">
-              Sign up to get started   
+              Sign up to get started
             </p>
           </div>
 
@@ -240,6 +244,27 @@ const Register = () => {
               >
                 {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+            </div>
+
+            <div className="relative">
+              <select
+                name="privilege"
+                value={registerData.privilege}
+                onChange={handleChange}
+                className="w-full cursor-pointer rounded-2xl bg-white/20 border border-white/30
+    py-3 px-5 text-white outline-none backdrop-blur-md
+    focus:border-cyan-300"
+              >
+                <option value="" className="text-black">
+                  Select Role
+                </option>
+                <option value="ADMIN" className="text-black">
+                  ADMIN
+                </option>
+                <option value="SUPER USER" className="text-black">
+                  SUPER_USER
+                </option>
+              </select>
             </div>
 
             {/* Button */}
