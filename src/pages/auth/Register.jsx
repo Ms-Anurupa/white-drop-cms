@@ -11,6 +11,7 @@ const Register = () => {
   const adminRegister = authStore((state) => state.adminRegister);
   const verifiedUser = authStore((state) => state.verifiedUser);
 
+
   const [registerData, setRegisterData] = useState({
     first_name: verifiedUser?.name || "",
     last_name: "",
@@ -30,7 +31,7 @@ const Register = () => {
   const handleRegister = async () => {
     try {
       //validations 
-        if (!registerData.first_name.trim()) {
+        if (!registerData?.first_name.trim()) {
       return toast.error("First name is required");
     }
  
