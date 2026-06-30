@@ -9,18 +9,21 @@ const authStore = create(
       user: null,
       authToken: null,
       verifiedUser: null,
-      
+
       setVerifiedUser: (data) => {
-        set({ verifiedUser: {
-          name: data?.name,
-          email: data?.email,
-          otp: data?.otp,
-        }})
+        set({
+          verifiedUser: {
+            name: data?.name,
+            email: data?.email,
+            otp: data?.otp,
+          },
+        });
       },
 
-      clearVerificationUser : () => set({
-        verifiedUser: null,
-      }),
+      clearVerificationUser: () =>
+        set({
+          verifiedUser: null,
+        }),
 
       //login
       adminLogin: async (loginData) => {
@@ -30,7 +33,7 @@ const authStore = create(
           const res = await api.post("/admin/adminLogin", loginData, {
             withAuth: false,
           });
-          console.log(res.data);
+          // console.log(res.data);
           const { admin, access_token } = res.data;
           const userData = {
             admin_id: admin.admin_id,
@@ -107,23 +110,25 @@ const authStore = create(
         }
       },
 
-      
       verifyForgotPassOtp: async (payload) => {
         // eslint-disable-next-line no-useless-catch
         try {
-          const res = await api.post("/auth/verify-forgot-pasword-otp", payload, {
-            withAuth: false,
-          });
+          const res = await api.post(
+            "/auth/verify-forgot-pasword-otp",
+            payload,
+            {
+              withAuth: false,
+            },
+          );
           set({
             verifiedUser: payload.email,
             otp: payload.otp,
-          })
+          });
           return res.data;
         } catch (error) {
           throw error;
         }
       },
-
 
       resetPassword: async (payload) => {
         // eslint-disable-next-line no-useless-catch
@@ -137,7 +142,6 @@ const authStore = create(
         }
       },
 
-
       logOut: () => {
         set({ user: null, authToken: null });
 
@@ -149,7 +153,11 @@ const authStore = create(
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       // Clean practice: only persist session tokens
-      partialize: (state) => ({ user: state.user, authToken: state.authToken, verifiedUser: state.verifiedUser, }),
+      partialize: (state) => ({
+        user: state.user,
+        authToken: state.authToken,
+        verifiedUser: state.verifiedUser,
+      }),
     },
   ),
 );

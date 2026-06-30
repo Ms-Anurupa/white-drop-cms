@@ -1,75 +1,29 @@
-import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Delete, Edit, View } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Delete, View } from "lucide-react";
+import customerStore from "../../zustand/Store/customerStore";
 
 const PAGE_SIZE = 5;
 
 const Customer = () => {
   const [page, setPage] = useState(1);
+  const getAllCustomers = customerStore((state) => state.getAllCustomers);
+  const customers = customerStore((state) => state.customers);
 
-  const customers = [
-    {
-      id: 1,
-      phone: "9876543210",
-      name: "Rahul Sharma",
-      type: "Premium",
-      wallet: 1200,
-      joined: "2025-01-10",
-      subscription: "Gold",
-    },
-    {
-      id: 2,
-      phone: "9123456780",
-      name: "Anita Roy",
-      type: "Regular",
-      wallet: 450,
-      joined: "2025-03-18",
-      subscription: "Silver",
-    },
-    {
-      id: 3,
-      phone: "9988776655",
-      name: "Amit Das",
-      type: "Premium",
-      wallet: 3200,
-      joined: "2024-12-02",
-      subscription: "Platinum",
-    },
-    {
-      id: 4,
-      phone: "9001122334",
-      name: "Neha Gupta",
-      type: "Regular",
-      wallet: 780,
-      joined: "2025-02-21",
-      subscription: "Silver",
-    },
-    {
-      id: 5,
-      phone: "9001122334",
-      name: "Neha Gupta",
-      type: "Regular",
-      wallet: 780,
-      joined: "2025-02-21",
-      subscription: "Silver",
-    },
-    {
-      id: 6,
-      phone: "9001122334",
-      name: "Neha Gupta",
-      type: "Regular",
-      wallet: 780,
-      joined: "2025-02-21",
-      subscription: "Silver",
-    },
-  ];
+  useEffect(() => {
+    getAllCustomers();
+  }, [getAllCustomers])
+
+  useEffect(() => {
+    console.log("customers", customers);
+  }, [customers])
 
   const totalPages = Math.ceil(customers.length / PAGE_SIZE);
 
   const start = (page - 1) * PAGE_SIZE;
 
-  const paginated = useMemo(() => {
-    return customers.slice(start, start + PAGE_SIZE);
-  }, [page]);
+  // const paginated = useMemo(() => {
+  //   return customers.slice(start, start + PAGE_SIZE);
+  // }, [customers, page]);
 
   return (
     <div className="h-full p-2 sm:p-3 md:p-4 space-y-4 overflow-hidden">
@@ -104,45 +58,45 @@ const Customer = () => {
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-[350px] overflow-hidden">
         {/* /mobile table cards */}
         <div className="sm:hidden flex-1 overflow-y-auto p-2 space-y-3">
-          {paginated.map((c, index) => (
+          {customers.map((c) => (
             <div
-              key={c.id}
+              key={c?.userUid}
               className="border border-gray-100 rounded-xl p-3 bg-white"
             >
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-800">{c.name}</h3>
+                    <h3 className="font-semibold text-gray-800">{c?.customer_name}</h3>
 
-                    <p className="text-sm text-gray-500">{c.phone}</p>
+                    <p className="text-sm text-gray-500">{c?.phone_num}</p>
                   </div>
 
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${
-                      c.type === "Premium"
+                      c?.customer_type === "Premium"
                         ? "bg-purple-100 text-purple-700"
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    {c.type}
+                    {c?.customer_type}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
                   <div>
                     <p className="text-gray-400">Wallet</p>
-                    <p>₹{c.wallet}</p>
+                    <p>₹{c?.wallet_balance}</p>
                   </div>
 
                   <div>
                     <p className="text-gray-400">Joined</p>
-                    <p>{c.joined}</p>
+                    <p>{c?.joined || "NA"}</p>
                   </div>
 
                   <div>
                     <p className="text-gray-400">Subscription</p>
                     <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
-                      {c.subscription}
+                      {c?.subscription || "NA"}
                     </span>
                   </div>
                 </div>
@@ -150,10 +104,6 @@ const Customer = () => {
                 <div className="flex justify-end gap-3 pt-2">
                   <button className="text-gray-700">
                     <View size={18} />
-                  </button>
-
-                  <button className="text-blue-600">
-                    <Edit size={18} />
                   </button>
 
                   <button className="text-red-600">
@@ -194,7 +144,7 @@ const Customer = () => {
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-sm table-fixed">
               <tbody>
-                {paginated.length === 0 ? (
+                {customers?.length === 0 ? (
                   <tr>
                     <td
                       colSpan={8}
@@ -204,9 +154,9 @@ const Customer = () => {
                     </td>
                   </tr>
                 ) : (
-                  paginated.map((c, index) => (
+                  customers?.map((c, index) => (
                     <tr
-                      key={c.id}
+                      key={c?.userUid}
                       className="border-b border-gray-50 hover:bg-gray-50 transition"
                     >
                       <td className="px-2 py-3 text-gray-400">
@@ -214,34 +164,34 @@ const Customer = () => {
                       </td>
 
                       <td className="px-2 py-3 font-medium text-gray-700">
-                        {c.phone}
+                        {c?.phone_num}
                       </td>
 
                       <td className="px-4 py-3 font-medium text-gray-800">
-                        {c.name}
+                        {c?.customer_name}
                       </td>
 
                       <td className="px-4 py-3">
                         <span
                           className={`px-2 py-1 text-xs rounded-full ${
-                            c.type === "Premium"
+                            c?.customer_type === "Premium"
                               ? "bg-purple-100 text-purple-700"
                               : "bg-gray-100 text-gray-600"
                           }`}
                         >
-                          {c.type}
+                          {c?.customer_type}
                         </span>
                       </td>
 
                       <td className="px-4 py-3 font-medium text-gray-800">
-                        ₹{c.wallet}
+                        ₹{c?.wallet_balance}
                       </td>
 
                       <td className="px-4 py-3 text-gray-500">{c.joined}</td>
 
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
-                          {c.subscription}
+                          {c?.subscription || "NA"}
                         </span>
                       </td>
 
@@ -249,10 +199,6 @@ const Customer = () => {
                         <div className="flex gap-2">
                           <button className="text-amber-950 hover:bg-gray-100">
                             <View size={20} />
-                          </button>
-
-                          <button className=" text-blue-600 hover:bg-blue-50">
-                            <Edit size={20} />
                           </button>
 
                           <button className="border-red-200 text-red-600 hover:bg-red-50">
