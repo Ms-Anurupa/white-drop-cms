@@ -32,6 +32,18 @@ const customerStore = create((set) => ({
     },
 
 
+    deleteCustomerDetails: async (payload) => {
+        try {
+            const res = await api.post("/admin/deleteCustomerDetails", payload, {
+                withAuth: true,
+            })
+            return res.data;
+        } catch {
+            // throw error
+        }
+    },
+
+
 }));
 
 export default customerStore;

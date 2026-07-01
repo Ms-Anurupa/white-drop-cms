@@ -314,7 +314,7 @@ const Product = () => {
 
                         <td className="px-4 py-3">
                           <img
-                            src={`${import.meta.env.VITE_BASE_URL}/product_images/${
+                            src={`${import.meta.env.VITE_BASE_URL}/${
                               item.product_images?.[0]
                             }`}
                             alt={item.product_name}

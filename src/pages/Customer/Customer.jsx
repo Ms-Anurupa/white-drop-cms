@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Delete, View } from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
+import { useConfirm } from "../../components/ConfirmProvider";
 
 const PAGE_SIZE = 5;
 
 const Customer = () => {
   const [page, setPage] = useState(1);
+  const { confirm } = useConfirm();
   const getAllCustomers = customerStore((state) => state.getAllCustomers);
   const customers = customerStore((state) => state.customers);
   const exportCustomerDetails = customerStore((state) => state.exportCustomerDetails);
+  const deleteCustomerDetails = customerStore((state) => state.deleteCustomerDetails);
 
   useEffect(() => {
     getAllCustomers();
@@ -44,9 +47,25 @@ const Customer = () => {
     }
   }
 
-  // const paginated = useMemo(() => {
-  //   return customers.slice(start, start + PAGE_SIZE);
-  // }, [customers, page]);
+  const handleCustomerDelete = async () => {
+    try {
+
+      const confirmMessage = await confirm({
+        title: "Delete Customer",
+        message: "This will permanently delete the customer. Continue?",
+      });
+
+      if (!confirmMessage) return;
+
+      const payload = {
+        id: "id",
+      }
+      await deleteCustomerDetails(payload);
+
+    } catch {
+        toast.error("Failed to delete customer");
+    }
+  }
 
   return (
     <div className="h-full p-2 sm:p-3 md:p-4 space-y-4 overflow-hidden">
@@ -220,11 +239,11 @@ const Customer = () => {
 
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
-                          <button className="text-amber-950 hover:bg-gray-100">
+                          {/* <button className="text-amber-950 hover:bg-gray-100">
                             <View size={20} />
-                          </button>
+                          </button> */}
 
-                          <button className="border-red-200 text-red-600 hover:bg-red-50">
+                          <button onClick={handleCustomerDelete} title="Delete User" className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50">
                             <Delete size={20} />
                           </button>
                         </div>
