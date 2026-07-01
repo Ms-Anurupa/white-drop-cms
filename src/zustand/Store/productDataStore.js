@@ -102,6 +102,20 @@ const productDataStore = create((set) => ({
     }
   },
 
+
+  exportProductDetails: async () => {
+    try {
+      const res = await api.get("/admin/exportProductDetails", {
+        withAuth: true,
+        responseType: "blob",
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+ 
+
 }));
 
 export default productDataStore;

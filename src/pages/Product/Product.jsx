@@ -20,8 +20,13 @@ const Product = () => {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const { products, getAllProducts, deleteProductById, hardDeleteProduct } =
-    productDataStore();
+  const {
+    products,
+    getAllProducts,
+    deleteProductById,
+    hardDeleteProduct,
+    exportProductDetails,
+  } = productDataStore();
 
   //fetch data
   useEffect(() => {
@@ -88,8 +93,26 @@ const Product = () => {
     }
   };
 
-  const handleExport = () => {
-    console.log("export");
+  const handleExport = async () => {
+    try {
+      const file = await exportProductDetails();
+
+      const url = window.URL.createObjectURL(file);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "proucts.xlsx";
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Products exported successfully");
+    } catch {
+      toast.error("Failed to export data");
+    }
   };
 
   return (
