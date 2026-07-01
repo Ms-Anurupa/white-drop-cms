@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import orderDataStore from "../../zustand/Store/orderDataStore";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 5;
 
@@ -39,6 +40,7 @@ const PAGE_SIZE = 5;
 
 const Order = () => {
   const getAllOrders = orderDataStore((state) => state.getAllOrders);
+  const exportOrderDetails = orderDataStore((state) => state.exportOrderDetails);
   const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -59,8 +61,25 @@ const Order = () => {
   const start = (page - 1) * PAGE_SIZE;
   const paginated = filtered.slice(start, start + PAGE_SIZE);
 
-  const handleExport = () => {
-    console.log("export orders");
+  const handleExport = async () => {
+    try {
+      const file = await exportOrderDetails();
+      const url = window.URL.createObjectURL(file);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "orders.xlsx";
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Order data exported successfully");
+    } catch {
+      toast.error("Failed to export order details");
+    }
   };
 
   const statusColor = (status) => {

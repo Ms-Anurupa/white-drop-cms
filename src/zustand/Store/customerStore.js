@@ -16,7 +16,22 @@ const customerStore = create((set) => ({
         } catch (error) {
             throw error
         }
-    }
+    },
+
+
+    exportCustomerDetails: async () => {
+        try {
+            const res = await api.get("/admin/exportCustomerDetails", {
+                withAuth: true,
+                responseType: "blob",
+            })
+            return res.data;
+        } catch {
+            // throw error
+        }
+    },
+
+
 }));
 
 export default customerStore;

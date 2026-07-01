@@ -18,7 +18,20 @@ const orderDataStore = create((set) => ({
         } catch (error) {
             throw error;
         }
-    }
+    },
+
+
+    exportOrderDetails: async () => {
+        try {
+            const res = await api.get("/admin/exportOrderDetails", {
+                withAuth: true,
+                responseType: "blob",
+            });
+            return res.data;
+        } catch {
+            // throw error;
+        }
+    },
 }));
 
 export default orderDataStore;

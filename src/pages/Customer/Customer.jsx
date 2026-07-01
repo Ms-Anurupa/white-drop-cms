@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Delete, View } from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 5;
 
@@ -8,6 +9,7 @@ const Customer = () => {
   const [page, setPage] = useState(1);
   const getAllCustomers = customerStore((state) => state.getAllCustomers);
   const customers = customerStore((state) => state.customers);
+  const exportCustomerDetails = customerStore((state) => state.exportCustomerDetails);
 
   useEffect(() => {
     getAllCustomers();
@@ -20,6 +22,27 @@ const Customer = () => {
   const totalPages = Math.ceil(customers.length / PAGE_SIZE);
 
   const start = (page - 1) * PAGE_SIZE;
+
+  const handleExport = async () => {
+    try {
+      const file = await exportCustomerDetails();
+      const url = window.URL.createObjectURL(file);
+
+      const link = document.createElement("a")
+      link.href=url;
+      link.download="customers.xlsx";
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Customer data exported successfully");
+    } catch {
+      toast.error("Failed to export customer details");
+    }
+  }
 
   // const paginated = useMemo(() => {
   //   return customers.slice(start, start + PAGE_SIZE);
@@ -48,7 +71,7 @@ const Customer = () => {
           </div>
 
           {/* Export Button */}
-          <button className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+          <button onClick={handleExport} className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
             Export
           </button>
         </div>
