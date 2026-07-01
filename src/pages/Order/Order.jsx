@@ -1,46 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import orderDataStore from "../../zustand/Store/orderDataStore";
 
 const PAGE_SIZE = 5;
 
-const INITIAL_ORDERS = [
-  {
-    id: "ORD-1001",
-    customer: "Rahul Sharma",
-    total: 1200,
-    address: "Salt Lake, Kolkata",
-    status: "Pending",
-    createdAt: "2026-06-20",
-    assignedTo: "Delivery Boy A",
-    phone: "9876543210",
-  },
-  {
-    id: "ORD-1002",
-    customer: "Anita Das",
-    total: 850,
-    address: "Park Street, Kolkata",
-    status: "Delivered",
-    createdAt: "2026-06-19",
-    assignedTo: "Delivery Boy B",
-    phone: "9123456780",
-  },
-  {
-    id: "ORD-1003",
-    customer: "Sourav Roy",
-    total: 2400,
-    address: "New Town, Kolkata",
-    status: "Shipped",
-    createdAt: "2026-06-18",
-    assignedTo: "Delivery Boy C",
-    phone: "9988776655",
-  },
-];
+// const INITIAL_ORDERS = [
+//   {
+//     id: "ORD-1001",
+//     customer: "Rahul Sharma",
+//     total: 1200,
+//     address: "Salt Lake, Kolkata",
+//     status: "Pending",
+//     createdAt: "2026-06-20",
+//     assignedTo: "Delivery Boy A",
+//     phone: "9876543210",
+//   },
+//   {
+//     id: "ORD-1002",
+//     customer: "Anita Das",
+//     total: 850,
+//     address: "Park Street, Kolkata",
+//     status: "Delivered",
+//     createdAt: "2026-06-19",
+//     assignedTo: "Delivery Boy B",
+//     phone: "9123456780",
+//   },
+//   {
+//     id: "ORD-1003",
+//     customer: "Sourav Roy",
+//     total: 2400,
+//     address: "New Town, Kolkata",
+//     status: "Shipped",
+//     createdAt: "2026-06-18",
+//     assignedTo: "Delivery Boy C",
+//     phone: "9988776655",
+//   },
+// ];
 
 const Order = () => {
+  const getAllOrders = orderDataStore((state) => state.getAllOrders);
+  const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [orders] = useState(INITIAL_ORDERS);
   const [dateFilter, setDateFilter] = useState("all");
+
+  useEffect(() => {
+    getAllOrders();
+  }, [getAllOrders]);
 
   const filtered = orders.filter(
     (o) =>

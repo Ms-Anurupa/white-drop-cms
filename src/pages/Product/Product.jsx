@@ -330,7 +330,7 @@ const Product = () => {
                                 e.target.value,
                               )
                             }
-                            className="px-2 py-1 text-xs border border-gray-200 rounded-md"
+                            className="px-2 py-1 cursor-pointer text-xs border border-gray-200 rounded-md"
                           >
                             <option value="ACTIVE">Active</option>
                             <option value="INACTIVE">Inactive</option>
@@ -340,6 +340,7 @@ const Product = () => {
                         <td className="px-3 py-3">
                           <div className="flex gap-2">
                             <button
+                              title="Edit Product"
                               onClick={() =>
                                 navigate(
                                   `/dashboard/product/editProduct/${item.product_id}`,
@@ -351,6 +352,7 @@ const Product = () => {
                             </button>
 
                             <button
+                              title="Delete Product"
                               onClick={() => handleHardDelete(item.product_id)}
                               className="px-3 py-1 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50"
                             >
