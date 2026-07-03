@@ -18,8 +18,9 @@ const AddProduct = () => {
     images: [],
     variants: [
       {
-        variant_name: "",
+        quantity:"",
         unit: "",
+        variant_name: "",
         package: "",
         price: "",
         stock_quantity: "",
@@ -74,8 +75,9 @@ const AddProduct = () => {
       variants: [
         ...prev.variants,
         {
-          variant_name: "",
+          quantity: "",
           unit: "",
+          variant_name: "",
           package: "",
           price: "",
           stock_quantity: "",
@@ -119,9 +121,9 @@ const AddProduct = () => {
     for (let i = 0; i < productList.variants.length; i++) {
       const v = productList.variants[i];
 
-      if (!v.variant_name.trim()) {
-        return `Variant ${i + 1}: Name is required`;
-      }
+      // if (!v.variant_name.trim()) {
+      //   return `Variant ${i + 1}: Name is required`;
+      // }
 
       if (v.price === "") {
         return `Variant ${i + 1}: Price is required`;
@@ -168,6 +170,7 @@ const AddProduct = () => {
       }
       console.log("productData", productList);
 
+      console.log(Object.fromEntries(formData))
       const res = await createProduct(formData);
       console.log("product res", res.data);
 
@@ -345,15 +348,21 @@ const AddProduct = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {[
                       {
-                        label: "Variant Name",
-                        name: "variant_name",
-                        placeholder: "e.g. 500 ML",
+                        label: "Quantity",
+                        name: "quantity",
+                        placeholder: "e.g. 500",
                         type: "text",
                       },
                       {
                         label: "Unit",
                         name: "unit",
                         placeholder: "e.g. ML",
+                        type: "text",
+                      },
+                      {
+                        label: "Variant Name",
+                        name: "variant_name",
+                        placeholder: "Optional",
                         type: "text",
                       },
                       {

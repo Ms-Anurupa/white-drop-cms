@@ -353,10 +353,11 @@ const Product = () => {
                                 e.target.value,
                               )
                             }
-                            className="px-2 py-1 cursor-pointer text-xs border border-gray-200 rounded-md"
+                            className="px-2 py-1  cursor-pointer text-xs border border-gray-200 rounded-md"
                           >
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                            <option value="COMING_SOON">COMING_SOON</option>
                           </select>
                         </td>
 
@@ -369,7 +370,7 @@ const Product = () => {
                                   `/dashboard/product/editProduct/${item.product_id}`,
                                 )
                               }
-                              className="px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
+                              className="mx-6 px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
                             >
                               <Edit size={18} />
                             </button>
