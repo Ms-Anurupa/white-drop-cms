@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
+import resolveUrl from "../utils/resolveUrl";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -251,7 +252,7 @@ const EditProduct = () => {
                         <img
                           src={
                             typeof img === "string"
-                              ? `${import.meta.env.VITE_BASE_URL}/product_images/${img}`
+                              ? resolveUrl(img)
                               : URL.createObjectURL(img)
                           }
                           className="w-full h-full object-cover"
