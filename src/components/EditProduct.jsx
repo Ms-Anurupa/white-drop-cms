@@ -48,6 +48,7 @@ const EditProduct = () => {
             ? store.product.variants.map((v) => ({
                 product_item_id: v.product_item_id,
                 variant_name: v.variant_name || "",
+                quantity: v.quantity || "",
                 unit: v.unit || "",
                 package: v.package || "",
                 price: v.price ?? "",
@@ -100,8 +101,9 @@ const EditProduct = () => {
       variants: [
         ...prev.variants,
         {
-          variant_name: "",
+          quantity:"",
           unit: "",
+          variant_name: "",
           package: "",
           price: "",
           stock_quantity: "",
@@ -360,15 +362,21 @@ const EditProduct = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {[
                       {
-                        label: "Variant Name",
-                        name: "variant_name",
-                        placeholder: "e.g. 500 ML",
+                        label: "Quantity",
+                        name: "quantity",
+                        placeholder: "e.g. 500",
                         type: "text",
                       },
                       {
                         label: "Unit",
                         name: "unit",
                         placeholder: "e.g. ML",
+                        type: "text",
+                      },
+                      {
+                        label: "Variant Name",
+                        name: "variant_name",
+                        placeholder: "e.g. 500 ML",
                         type: "text",
                       },
                       {
