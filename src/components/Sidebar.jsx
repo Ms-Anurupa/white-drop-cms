@@ -13,6 +13,7 @@ import {
   HelpingHand,
   Menu,
   X,
+  PackageCheck,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 
@@ -24,6 +25,7 @@ const menu = [
   { name: "Production",        path: "production",        icon: Factory },
   { name: "Inventory",         path: "inventory",         icon: Boxes },
   { name: "Deliveries",        path: "deliveries",        icon: Truck },
+  { name: "Delivery Partner List",     path: "deliveryPartners",  icon: PackageCheck },
   { name: "Customer Helpline", path: "customerHelpLine",  icon: HelpingHand },
   { name: "Service Manager",           path: "support",           icon: Headset },
 ];
@@ -100,9 +102,16 @@ const Sidebar = ({onLogOut}) => {
         ))}
 
         <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+          Delivery Executive Details
+        </p>
+        {menu.slice(7, 8).map((item) => (
+          <NavItem key={item.path} item={item} onClick={onNavClick} />
+        ))}
+
+        <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
           Help
         </p>
-        {menu.slice(7).map((item) => (
+        {menu.slice(8).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
       </nav>

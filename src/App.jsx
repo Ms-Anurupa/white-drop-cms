@@ -21,6 +21,8 @@ import { ConfirmProvider } from "./components/ConfirmProvider";
 import { ToastContainer } from "react-toastify";
 import EditProduct from "./components/EditProduct";
 import VerifyMail from "./pages/auth/VerifyMail";
+import DeliveryPartnerList from "./pages/DeliveryPartner/DeliveryPartnerList";
+import DeliveryPartnerDetails from "./components/DeliveryPartnerDetails";
 
 const App = () => {
   return (
@@ -49,6 +51,8 @@ const App = () => {
               <Route path="production" element={<Production />} />
               <Route path="inventory" element={<Inventory />} />
               <Route path="deliveries" element={<Deliveries />} />
+              <Route path="deliveryPartners" element={<DeliveryPartnerList />} />
+              <Route path="deliveryPartnerDetails/:id" element={<DeliveryPartnerDetails />} />
               <Route path="customerHelpLine" element={<CustomerHelpLine />} />
               <Route path="support" element={<Support />} />
               <Route
