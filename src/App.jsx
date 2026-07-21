@@ -45,14 +45,23 @@ const App = () => {
               <Route index element={<Dashboard />} />
               <Route path="product" element={<Product />} />
               <Route path="product/addProduct" element={<AddProduct />} />
-              <Route path="product/editProduct/:product_id" element={<EditProduct />} />
+              <Route
+                path="product/editProduct/:product_id"
+                element={<EditProduct />}
+              />
               <Route path="customer" element={<Customer />} />
               <Route path="orders" element={<Order />} />
               <Route path="production" element={<Production />} />
               <Route path="inventory" element={<Inventory />} />
               <Route path="deliveries" element={<Deliveries />} />
-              <Route path="deliveryPartners" element={<DeliveryPartnerList />} />
-              <Route path="deliveryPartnerDetails/:id" element={<DeliveryPartnerDetails />} />
+              <Route
+                path="deliveryPartners"
+                element={<DeliveryPartnerList />}
+              />
+              <Route
+                path="deliveryPartnerDetails/:deliveryPersonId"
+                element={<DeliveryPartnerDetails />}
+              />
               <Route path="customerHelpLine" element={<CustomerHelpLine />} />
               <Route path="support" element={<Support />} />
               <Route
