@@ -22,7 +22,7 @@ const getStatus = (active) => (active ? "Active" : "Inactive");
 
 const getFullName = (p) => {
   const name = [p.firstName, p.lastName].filter(Boolean).join(" ");
-  return name || "Profile Incomplete";
+  return name || "Not Provided";
 };
 
 const getInitials = (p) => {
@@ -114,7 +114,7 @@ const DeliveryPartnerList = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 text-left text-sm text-gray-600">
                   <tr>
-                    <th className="p-3">Partner ID</th>
+                    {/* <th className="p-3">Partner ID</th> */}
                     <th className="p-3">Name</th>
                     <th className="p-3">Vehicle No.</th>
                     <th className="p-3">Contact</th>
@@ -132,9 +132,9 @@ const DeliveryPartnerList = () => {
                         key={p.deliveryPersonId}
                         className="border-b border-gray-100 hover:bg-gray-50 transition"
                       >
-                        <td className="p-3 font-medium text-gray-500 text-xs">
+                        {/* <td className="p-3 font-medium text-gray-500 text-xs">
                           {p.deliveryPersonId}
-                        </td>
+                        </td> */}
                         <td className="p-3">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center overflow-hidden">
@@ -143,6 +143,10 @@ const DeliveryPartnerList = () => {
                                   src={p.photo}
                                   alt={getFullName(p)}
                                   className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=6B7280&size=256";
+                                  }}
                                 />
                               ) : (
                                 getInitials(p)
@@ -160,11 +164,11 @@ const DeliveryPartnerList = () => {
                           </div>
                         </td>
                         <td className="p-3 text-gray-600 flex items-center gap-1">
-                          <Bike size={14} /> {p.vehicleNumber || "—"}
+                          <Bike size={14} /> {p.vehicleNumber || "Not Provided"}
                         </td>
                         <td className="p-3 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
-                            <Phone size={14} /> {p.phoneNum}
+                            <Phone size={14} /> {p.phoneNum || "Not Provided"}
                           </span>
                         </td>
                         <td className="p-3 text-sm text-gray-600">
