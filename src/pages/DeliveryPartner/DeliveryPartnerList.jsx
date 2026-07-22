@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import deliveryPartnerStore from "../../zustand/Store/deliveryPartnerStore";
 import noDoc from "../../assets/images/nodoc.svg";
+import Loader from "../../components/Loader";
 
 const PAGE_SIZE = 6;
 
@@ -55,6 +56,7 @@ const DeliveryPartnerList = () => {
     (state) => state.getDeliveryPersons,
   );
   const partners = deliveryPartnerStore((state) => state.partners);
+  const loading = deliveryPartnerStore((state) => state.loading);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -79,7 +81,10 @@ const DeliveryPartnerList = () => {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [page, filtered]);
 
-  // ================= LIST "PAGE" =================
+  if (loading) {
+    return <Loader text="Loading delivery partners..." />;
+  }
+
   return (
     <div className="p-2 sm:p-2 space-y-2">
       {/* HEADER */}

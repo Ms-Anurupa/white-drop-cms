@@ -11,6 +11,7 @@ import {
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { useEffect, useState } from "react";
 import noDoc from "../assets/images/nodoc.svg";
+import Loader from "./Loader";
 
 const DeliveryPartnerDetails = () => {
   const [previewImage, setPreviewImage] = useState(null);
@@ -21,6 +22,7 @@ const DeliveryPartnerDetails = () => {
     (state) => state.getDeliveryPersonById,
   );
   const partnerDetails = deliveryPartnerStore((state) => state.partnerDetails);
+  const loading = deliveryPartnerStore((state) => state.loading);
 
   useEffect(() => {
     if (deliveryPersonId) {
@@ -46,6 +48,10 @@ const DeliveryPartnerDetails = () => {
         <p className="text-gray-500">Delivery partnerDetails not found.</p>
       </div>
     );
+  }
+
+  if (loading) {
+    return <Loader text="Loading delivery partner details..." />;
   }
 
   return (

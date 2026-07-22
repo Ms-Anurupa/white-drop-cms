@@ -5,9 +5,11 @@ import api from "../axios";
 const deliveryPartnerStore = create((set) => ({
   partners: [],
   partnerDetails: [],
+  loading: false,
 
   getDeliveryPersons: async () => {
     try {
+      set({loading: true})
       const res = await api.get("/admin/getDeliveryPersons", {
         withAuth: true,
       });
@@ -16,11 +18,14 @@ const deliveryPartnerStore = create((set) => ({
       });
     } catch (error) {
       throw error;
+    } finally {
+      set({ loading: false });
     }
   },
 
   getDeliveryPersonById: async (deliveryPersonId) => {
     try {
+      set({loading: true})
       const res = await api.get("/admin/getDeliveryPersonById", {
         withAuth: true,
         params: { deliveryPersonId },
@@ -30,6 +35,8 @@ const deliveryPartnerStore = create((set) => ({
       });
     } catch (error) {
       throw error;
+    } finally {
+      set({ loading: false });
     }
   },
 }));
