@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import deliveryPartnerStore from "../../zustand/Store/deliveryPartnerStore";
+import noDoc from "../../assets/images/nodoc.svg";
 
 const PAGE_SIZE = 6;
 
@@ -21,7 +22,12 @@ const statusStyle = {
 const getStatus = (active) => (active ? "Active" : "Inactive");
 
 const getFullName = (p) => {
-  const name = [p.firstName, p.lastName].filter(Boolean).join(" ");
+  const name = [
+    p?.deliveryPersonDetails?.firstName,
+    p?.deliveryPersonDetails?.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
   return name || "Not Provided";
 };
 
@@ -59,8 +65,8 @@ const DeliveryPartnerList = () => {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return (partners || []).filter((p) =>
-      `${p.firstName ?? ""} ${p.lastName ?? ""} ${p.deliveryPersonId ?? ""} ${p.phoneNum ?? ""} ${p.vehicleNumber ?? ""}`
+    return partners.filter((p) =>
+      `${p.deliveryPersonDetails?.firstName ?? ""} ${p.deliveryPersonDetails?.lastName ?? ""} ${p.deliveryPersonDetails?.deliveryPersonId ?? ""} ${p.phoneNum ?? ""} ${p.deliveryPersonDetails?.vehicleNumber ?? ""}`
         .toLowerCase()
         .includes(q),
     );
@@ -125,11 +131,11 @@ const DeliveryPartnerList = () => {
                 </thead>
 
                 <tbody>
-                  {paginated.map((p) => {
-                    const status = getStatus(p.active);
+                  {paginated?.map((p) => {
+                    const status = getStatus(p?.deliveryPersonDetails?.active);
                     return (
                       <tr
-                        key={p.deliveryPersonId}
+                        key={p?.deliveryPersonDetails?.deliveryPersonId}
                         className="border-b border-gray-100 hover:bg-gray-50 transition"
                       >
                         {/* <td className="p-3 font-medium text-gray-500 text-xs">
@@ -138,14 +144,13 @@ const DeliveryPartnerList = () => {
                         <td className="p-3">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center overflow-hidden">
-                              {p.photo ? (
+                              {p.deliveryPersonDetails?.photo ? (
                                 <img
-                                  src={p.photo}
+                                  src={p.deliveryPersonDetails?.photo}
                                   alt={getFullName(p)}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    e.currentTarget.src =
-                                      "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=6B7280&size=256";
+                                    e.currentTarget.src = noDoc;
                                   }}
                                 />
                               ) : (
@@ -154,7 +159,7 @@ const DeliveryPartnerList = () => {
                             </div>
                             <span
                               className={
-                                p.firstName
+                                p.deliveryPersonDetails?.firstName
                                   ? "font-medium"
                                   : "italic text-gray-400"
                               }
@@ -164,15 +169,18 @@ const DeliveryPartnerList = () => {
                           </div>
                         </td>
                         <td className="p-3 text-gray-600 flex items-center gap-1">
-                          <Bike size={14} /> {p.vehicleNumber || "Not Provided"}
+                          <Bike size={14} />{" "}
+                          {p?.deliveryPersonDetails?.vehicleNumber ||
+                            "Not Provided"}
                         </td>
                         <td className="p-3 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
-                            <Phone size={14} /> {p.phoneNum || "Not Provided"}
+                            <Phone size={14} />{" "}
+                            {p.deliveryPersonDetails?.phoneNo || "Not Provided"}
                           </span>
                         </td>
                         <td className="p-3 text-sm text-gray-600">
-                          {formatDate(p.createdAt)}
+                          {formatDate(p.deliveryPersonDetails?.createdAt)}
                         </td>
                         <td className="p-3">
                           <span
@@ -185,7 +193,7 @@ const DeliveryPartnerList = () => {
                           <button
                             onClick={() =>
                               navigate(
-                                `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonId}`,
+                                `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonDetails?.deliveryPersonId}`,
                               )
                             }
                             className="text-blue-600 hover:text-blue-800 cursor-pointer flex items-center gap-1 text-sm"
@@ -205,16 +213,16 @@ const DeliveryPartnerList = () => {
           {/* ================= MOBILE CARD VIEW ================= */}
           <div className="md:hidden space-y-3">
             {paginated.map((p) => {
-              const status = getStatus(p.active);
+              const status = getStatus(p.deliveryPersonDetails?.active);
               return (
                 <div
-                  key={p.deliveryPersonId}
+                  key={p.deliveryPersonDetails?.deliveryPersonId}
                   className="bg-white rounded-xl shadow-sm p-4 space-y-2"
                 >
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-xs text-gray-500">
-                      {p.deliveryPersonId}
-                    </span>
+                    {/* <span className="font-medium text-xs text-gray-500">
+                      {p.deliveryPersonDetails?.deliveryPersonId}
+                    </span> */}
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${statusStyle[status]}`}
                     >
@@ -224,11 +232,14 @@ const DeliveryPartnerList = () => {
 
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center overflow-hidden shrink-0">
-                      {p.photo ? (
+                      {p.deliveryPersonDetails?.photo ? (
                         <img
-                          src={p.photo}
+                          src={p.deliveryPersonDetails?.photo}
                           alt={getFullName(p)}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = noDoc;
+                          }}
                         />
                       ) : (
                         getInitials(p)
@@ -237,7 +248,7 @@ const DeliveryPartnerList = () => {
                     <div>
                       <p
                         className={
-                          p.firstName
+                          p.deliveryPersonDetails?.firstName
                             ? "font-medium text-sm"
                             : "italic text-gray-400 text-sm"
                         }
@@ -246,24 +257,25 @@ const DeliveryPartnerList = () => {
                       </p>
                       <p className="text-gray-500 flex items-center gap-1 text-xs">
                         <Bike size={12} />{" "}
-                        {p.vehicleNumber || "No vehicle on file"}
+                        {p.deliveryPersonDetails?.vehicleNumber ||
+                          "No vehicle on file"}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-xs text-gray-600 space-y-1">
                     <p className="flex items-center gap-1">
-                      <Phone size={12} /> {p.phoneNum}
+                      <Phone size={12} /> {p.deliveryPersonDetails?.phoneNo}
                     </p>
                     <p className="text-gray-400">
-                      Joined {formatDate(p.createdAt)}
+                      Joined {formatDate(p.deliveryPersonDetails?.createdAt)}
                     </p>
                   </div>
 
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonId}`,
+                        `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonDetails?.deliveryPersonId}`,
                       )
                     }
                     className="w-full mt-2 py-2 rounded-lg bg-blue-50 text-blue-600 text-sm flex items-center justify-center gap-1"

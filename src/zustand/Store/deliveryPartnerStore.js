@@ -12,7 +12,7 @@ const deliveryPartnerStore = create((set) => ({
         withAuth: true,
       });
       set({
-        partners: res.data?.deliveryPartners,
+        partners: res.data?.deliveryPersons,
       });
     } catch (error) {
       throw error;
