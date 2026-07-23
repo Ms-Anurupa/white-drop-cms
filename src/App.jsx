@@ -23,6 +23,7 @@ import EditProduct from "./components/EditProduct";
 import VerifyMail from "./pages/auth/VerifyMail";
 import DeliveryPartnerList from "./pages/DeliveryPartner/DeliveryPartnerList";
 import DeliveryPartnerDetails from "./components/DeliveryPartnerDetails";
+import LocationTracker from "./components/LocationTracker";
 
 const App = () => {
   return (
@@ -39,6 +40,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/verify-mail" element={<VerifyMail />} />
+            <Route path="/location-tracker/:driverId" element={<LocationTracker />} />
+
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
