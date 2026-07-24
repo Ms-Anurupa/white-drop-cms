@@ -184,6 +184,11 @@ const DeliveryPartnerDetails = () => {
   const signedImages = useSignedImageObject(imageObject, "delPersonDocs");
 
   const getDisplayValue = (field) => {
+    // console.log(field, {
+    //   local: previews[field],
+    //   signed: signedImages[field],
+    // });
+
     const localBlobs = toImageArrayRaw(previews[field]).filter(isBlobUrl);
     return localBlobs.length ? localBlobs : signedImages[field];
   };
@@ -415,7 +420,6 @@ const DeliveryPartnerDetails = () => {
                     <input
                       id="profile-upload"
                       hidden
-                      multiple
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleImageChange("photo", e)}
@@ -999,7 +1003,7 @@ const DeliveryPartnerDetails = () => {
 
           {/* Modal Content */}
           <div
-            className="relative max-w-6xl w-full"
+            className="relative max-w-4xl w-full"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image Card */}
@@ -1048,7 +1052,7 @@ const DeliveryPartnerDetails = () => {
                   <>
                     <button
                       type="button"
-                      className="absolute left-5 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition"
+                      className="absolute cursor-pointer left-5 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition"
                       onClick={goPrev}
                     >
                       <ChevronLeft size={28} />
@@ -1056,7 +1060,7 @@ const DeliveryPartnerDetails = () => {
 
                     <button
                       type="button"
-                      className="absolute right-5 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition"
+                      className="absolute cursor-pointer right-5 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/50 p-3 text-white hover:bg-black/70 transition"
                       onClick={goNext}
                     >
                       <ChevronRight size={28} />

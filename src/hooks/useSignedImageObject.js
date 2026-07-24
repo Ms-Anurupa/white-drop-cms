@@ -3,9 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 
 const useSignedImageObject = (images = {}, folderName) => {
-  const getSignedUrl = deliveryPartnerStore(
-    (state) => state.getSignedUrl,
-  );
+  const getSignedUrl = deliveryPartnerStore((state) => state.getSignedUrl);
 
   const [signedImages, setSignedImages] = useState({});
 
@@ -31,14 +29,11 @@ const useSignedImageObject = (images = {}, folderName) => {
           // File selected from input
           if (value instanceof File) {
             result[key] = URL.createObjectURL(value);
-            return; 
+            return;
           }
 
           // Already a blob
-          if (
-            typeof value === "string" &&
-            value.startsWith("blob:")
-          ) {
+          if (typeof value === "string" && value.startsWith("blob:")) {
             result[key] = value;
             return;
           }
@@ -46,26 +41,46 @@ const useSignedImageObject = (images = {}, folderName) => {
           // Already signed url
           if (
             typeof value === "string" &&
-            (value.startsWith("http://") ||
-              value.startsWith("https://"))
+            (value.startsWith("http://") || value.startsWith("https://"))
           ) {
             result[key] = value;
             return;
           }
 
           // Handle array
-          let fileName = value;
-
+          // Handle multiple images
           if (Array.isArray(value)) {
-            fileName = value[0];
+            const urls = await Promise.all(
+              value.map(async (fileName) => {
+                if (!fileName) return "";
+
+                if (cacheRef.current.has(fileName)) {
+                  return cacheRef.current.get(fileName);
+                }
+
+                try {
+                  const url = await getSignedUrl(fileName, folderName);
+                  cacheRef.current.set(fileName, url);
+                  return url;
+                } catch (err) {
+                  console.error(err);
+                  return "";
+                }
+              }),
+            );
+
+            result[key] = urls.filter(Boolean);
+            return;
           }
+
+          // Handle single image
+          const fileName = value;
 
           if (!fileName) {
             result[key] = "";
             return;
           }
 
-          // Cache lookup
           if (cacheRef.current.has(fileName)) {
             result[key] = cacheRef.current.get(fileName);
             return;
