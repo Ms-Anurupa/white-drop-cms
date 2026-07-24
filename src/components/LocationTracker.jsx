@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socketService } from '../Service/SocketService';
+import DriverMap from './DriverMap';
 
 export default function LocationTracker() {
   const { driverId } = useParams();
@@ -38,6 +39,7 @@ export default function LocationTracker() {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Live Tracking</h2>
+      <DriverMap driverLocation={driverLocation}/>
       <div className="mb-4">
         <span className="text-gray-500">Driver ID:</span> 
         <span className="ml-2 font-mono">{driverId}</span>
