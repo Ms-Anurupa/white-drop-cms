@@ -234,7 +234,11 @@ const Customer = () => {
                       </td>
 
                       <td className="px-4 py-3 text-gray-500">
-                        {new Date(c.createdAt).toLocaleDateString("en-GB")}
+                        {new Date(c.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </td>
 
                       <td className="px-4 py-3">
