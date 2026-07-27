@@ -58,7 +58,7 @@ const authStore = create(
 
           return res.data;
         } catch (error) {
-          // throw error;
+          throw error;
         }
       },
 
