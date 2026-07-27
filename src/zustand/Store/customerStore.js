@@ -26,8 +26,9 @@ const customerStore = create((set) => ({
                 responseType: "blob",
             })
             return res.data;
-        } catch {
-            // throw error
+        } catch(error) {
+            console.error(error);
+            throw error
         }
     },
 
