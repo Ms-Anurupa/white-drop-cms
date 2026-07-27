@@ -30,8 +30,8 @@ const Customer = () => {
     try {
       const file = await exportCustomerDetails();
 
-      console.log(file);
-      console.log(file instanceof Blob);
+      // console.log(file);
+      // console.log(file instanceof Blob);
       const url = window.URL.createObjectURL(file);
 
       const link = document.createElement("a")
