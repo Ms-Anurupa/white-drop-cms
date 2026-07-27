@@ -4,7 +4,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Phone,
-  BadgeCheck,
   Calendar,
   BookUser,
   Bike,
@@ -124,6 +123,86 @@ const DeliveryPartnerDetails = () => {
     setIsDirty(true);
   };
 
+  // invalid characters and enforce max length as the user types
+  const sanitizeAadhar = (v) => v.replace(/\D/g, "").slice(0, 12);
+
+  const sanitizePan = (v) =>
+    v
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toUpperCase()
+      .slice(0, 10);
+
+  const sanitizeDL = (v) =>
+    v
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toUpperCase()
+      .slice(0, 15);
+
+  // Masks input to the exact shape required by vehicleNumber
+  const sanitizeVehicleNumber = (raw) => {
+    const cleaned = raw.toUpperCase().replace(/[^A-Z0-9 -]/g, "");
+
+    let letters1 = "";
+    let sep1 = "";
+    let digits1 = "";
+    let sep2 = "";
+    let letters2 = "";
+    let sep3 = "";
+    let digits2 = "";
+    let i = 0;
+    const n = cleaned.length;
+
+    // Group 1: up to 2 letters
+    while (i < n && letters1.length < 2 && /[A-Z]/.test(cleaned[i])) {
+      letters1 += cleaned[i];
+      i++;
+    }
+    if (i < n && /[ -]/.test(cleaned[i]) && letters1.length > 0) {
+      sep1 = cleaned[i];
+      i++;
+    }
+
+    // Group 2: up to 2 digits
+    while (i < n && digits1.length < 2 && /[0-9]/.test(cleaned[i])) {
+      digits1 += cleaned[i];
+      i++;
+    }
+    if (i < n && /[ -]/.test(cleaned[i]) && digits1.length > 0) {
+      sep2 = cleaned[i];
+      i++;
+    }
+
+    // Group 3: up to 3 letters
+    while (i < n && letters2.length < 3 && /[A-Z]/.test(cleaned[i])) {
+      letters2 += cleaned[i];
+      i++;
+    }
+    if (i < n && /[ -]/.test(cleaned[i]) && letters2.length > 0) {
+      sep3 = cleaned[i];
+      i++;
+    }
+
+    // Group 4: up to 4 digits
+    while (i < n && digits2.length < 4 && /[0-9]/.test(cleaned[i])) {
+      digits2 += cleaned[i];
+      i++;
+    }
+
+    return letters1 + sep1 + digits1 + sep2 + letters2 + sep3 + digits2;
+  };
+
+  const handleAadharChange = (e) =>
+    handleChange("aadharNo", sanitizeAadhar(e.target.value));
+
+  const handlePanChange = (e) =>
+    handleChange("panNo", sanitizePan(e.target.value));
+
+  const handleDlChange = (e) =>
+    handleChange("dlNo", sanitizeDL(e.target.value));
+
+  const handleVehicleNumberChange = (e) =>
+    handleChange("vehicleNumber", sanitizeVehicleNumber(e.target.value));
+
   // Shared handler for profile photo + document image uploads (multi-file)
   const handleImageChange = (field, e) => {
     const files = Array.from(e.target.files);
@@ -185,80 +264,27 @@ const DeliveryPartnerDetails = () => {
 
   const signedImages = useSignedImageObject(imageObject, "delPersonDocs");
 
-  const getDisplayValue = (field) => {
-    // console.log(field, {
-    //   local: previews[field],
-    //   signed: signedImages[field],
-    // });
-
-    const localBlobs = toImageArrayRaw(previews[field]).filter(isBlobUrl);
-    return localBlobs.length ? localBlobs : signedImages[field];
-  };
-
   function toImageArrayRaw(value) {
     if (Array.isArray(value)) return value.filter(Boolean);
     if (value) return [value];
     return [];
   }
 
-  const handleModalAddImages = (e) => {
-    const files = Array.from(e.target.files);
+  // dropped just because a new local file was also added.
+  const getDisplayValue = (field) => {
+    const rawArr = toImageArrayRaw(previews[field]);
 
-    if (!files.length) return;
+    if (!rawArr.length) return signedImages[field];
 
-    const blobs = files.map((file) => URL.createObjectURL(file));
+    const signedArr = toImageArrayRaw(signedImages[field]);
+    let signedIdx = 0;
 
-    const field = previewImage.field;
-
-    setUpdatedData((prev) => ({
-      ...prev,
-      [field]: [...toImageArrayRaw(prev[field]), ...files],
-    }));
-
-    setPreviews((prev) => {
-      const current = toImageArrayRaw(prev[field]);
-
-      return {
-        ...prev,
-        [field]: [...current, ...blobs],
-      };
+    return rawArr.map((item) => {
+      if (isBlobUrl(item)) return item;
+      const signed = signedArr[signedIdx];
+      signedIdx += 1;
+      return signed || item;
     });
-
-    setPreviewImage((prev) => ({
-      ...prev,
-      images: [...prev.images, ...blobs],
-      index: prev.images.length,
-    }));
-
-    setIsDirty(true);
-  };
-
-  const handleModalRemoveImage = () => {
-    const field = previewImage.field;
-
-    const idx = previewImage.index;
-
-    setUpdatedData((prev) => ({
-      ...prev,
-      [field]: toImageArrayRaw(prev[field]).filter((_, i) => i !== idx),
-    }));
-
-    setPreviews((prev) => ({
-      ...prev,
-      [field]: toImageArrayRaw(prev[field]).filter((_, i) => i !== idx),
-    }));
-
-    setPreviewImage((prev) => {
-      const images = prev.images.filter((_, i) => i !== idx);
-
-      return {
-        ...prev,
-        images,
-        index: images.length ? Math.min(prev.index, images.length - 1) : 0,
-      };
-    });
-
-    setIsDirty(true);
   };
 
   const vehicleNumberRegex = /^[A-Z]{2}[ -]?\d{1,2}[ -]?[A-Z]{1,3}[ -]?\d{4}$/i;
@@ -315,8 +341,8 @@ const DeliveryPartnerDetails = () => {
       return;
     }
 
-    // Optional DL format validation (remove if not needed)
-    if (updatedData.dlNo.trim().length < 8) {
+    // DL format validation
+    if (updatedData.dlNo.trim().length < 15) {
       toast.error("Invalid Driving License number");
       return;
     }
@@ -410,8 +436,7 @@ const DeliveryPartnerDetails = () => {
     return [];
   };
 
-  // Opens the slider modal for a given field, always starting at the first image
-  const openPreview = (field, label, signedValue) => {
+  const openPreview = (label, field, signedValue) => {
     const images = toImageArray(signedValue);
     if (!images.length) return;
     setPreviewImage({ field, images, index: 0, label });
@@ -588,22 +613,44 @@ const DeliveryPartnerDetails = () => {
 
               <div className="flex-1">
                 {isEditing ? (
-                  <div className="flex gap-2">
-                    <input
-                      value={updatedData?.firstName || ""}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
-                      placeholder="First name"
-                      className="rounded-md border border-slate-300 px-3 py-1.5 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="firstName"
+                        className="mb-1 text-sm font-medium text-slate-600"
+                      >
+                        First Name
+                      </label>
 
-                    <input
-                      value={updatedData?.lastName || ""}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
-                      placeholder="Last name"
-                      className="rounded-md border border-slate-300 px-3 py-1.5 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
-                    />
+                      <input
+                        id="firstName"
+                        value={updatedData?.firstName || ""}
+                        onChange={(e) =>
+                          handleChange("firstName", e.target.value)
+                        }
+                        placeholder="First name"
+                        className="rounded-md border border-slate-300 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="lastName"
+                        className="mb-1 text-sm font-medium text-slate-600"
+                      >
+                        Last Name
+                      </label>
+
+                      <input
+                        id="lastName"
+                        value={updatedData?.lastName || ""}
+                        onChange={(e) =>
+                          handleChange("lastName", e.target.value)
+                        }
+                        placeholder="Last name"
+                        className="rounded-md border border-slate-300 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <h2 className="text-xl font-semibold text-slate-800">
@@ -629,63 +676,20 @@ const DeliveryPartnerDetails = () => {
 
             {/* Right Section */}
             <div className="flex justify-end">
-              {isEditing ? (
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-                  <div className="text-right">
-                    <p className="text-xs text-slate-500 uppercase tracking-wide">
-                      Account Status
-                    </p>
-                    <p
-                      className={`text-sm font-semibold ${
-                        updatedData?.active ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {updatedData?.active ? "Active" : "Inactive"}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleChange("active", !updatedData?.active)}
-                    className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-300 ${
-                      updatedData?.active ? "bg-green-500" : "bg-slate-300"
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
+                <div className="text-right">
+                  <p className="text-xs text-slate-500 uppercase tracking-wide">
+                    Account Status
+                  </p>
+                  <p
+                    className={`text-sm font-semibold ${
+                      updatedData?.active ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    <span
-                      className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
-                        updatedData?.active ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+                    {updatedData?.active ? "Active" : "Inactive"}
+                  </p>
                 </div>
-              ) : (
-                <div
-                  className={`flex items-center gap-2 rounded-xl px-4 py-3 ${
-                    partnerDetails?.active
-                      ? "bg-green-50 border border-green-200"
-                      : "bg-red-50 border border-red-200"
-                  }`}
-                >
-                  <BadgeCheck
-                    size={18}
-                    className={
-                      partnerDetails?.active ? "text-green-600" : "text-red-600"
-                    }
-                  />
-
-                  <div>
-                    <p
-                      className={`font-semibold ${
-                        partnerDetails?.active
-                          ? "text-green-700"
-                          : "text-red-700"
-                      }`}
-                    >
-                      {partnerDetails?.active ? "Active" : "Inactive"}
-                    </p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -751,8 +755,10 @@ const DeliveryPartnerDetails = () => {
 
               <input
                 disabled={!isEditing}
-                value={updatedData?.vehicleNumber || "Not Provided"}
-                onChange={(e) => handleChange("vehicleNumber", e.target.value)}
+                value={updatedData?.vehicleNumber || ""}
+                placeholder="Not Provided"
+                maxLength={14}
+                onChange={handleVehicleNumberChange}
                 className={inputClass(
                   isEditing,
                   "h-11 rounded-xl border-slate-300 bg-white uppercase font-medium",
@@ -908,10 +914,9 @@ const DeliveryPartnerDetails = () => {
                   {isEditing ? (
                     <input
                       value={updatedData?.vehicleNumber || ""}
-                      onChange={(e) =>
-                        handleChange("vehicleNumber", e.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      maxLength={14}
+                      onChange={handleVehicleNumberChange}
+                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200"
                     />
                   ) : (
                     <div className="mt-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 font-medium">
@@ -985,7 +990,9 @@ const DeliveryPartnerDetails = () => {
                   {isEditing ? (
                     <input
                       value={updatedData?.aadharNo || ""}
-                      onChange={(e) => handleChange("aadharNo", e.target.value)}
+                      inputMode="numeric"
+                      maxLength={12}
+                      onChange={handleAadharChange}
                       className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200"
                     />
                   ) : (
@@ -1059,8 +1066,9 @@ const DeliveryPartnerDetails = () => {
                   {isEditing ? (
                     <input
                       value={updatedData?.panNo || ""}
-                      onChange={(e) => handleChange("panNo", e.target.value)}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
+                      maxLength={10}
+                      onChange={handlePanChange}
+                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
                     />
                   ) : (
                     <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-medium">
@@ -1134,8 +1142,9 @@ const DeliveryPartnerDetails = () => {
                   {isEditing ? (
                     <input
                       value={updatedData?.dlNo || ""}
-                      onChange={(e) => handleChange("dlNo", e.target.value)}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
+                      maxLength={15}
+                      onChange={handleDlChange}
+                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
                     />
                   ) : (
                     <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-medium">
@@ -1174,43 +1183,15 @@ const DeliveryPartnerDetails = () => {
             <div className="overflow-hidden rounded-3xl bg-white shadow-2xl">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                <h3 className="text-lg font-semibold">{previewImage.label}</h3>
+                <h3 className="text-lg font-semibold text-slate-800">
+                  {previewImage.label}
+                </h3>
 
-                <div className="flex items-center gap-2">
-                  {isEditing && (
-                    <>
-                      <input
-                        hidden
-                        id="modal-upload"
-                        multiple
-                        type="file"
-                        accept="image/*"
-                        onChange={handleModalAddImages}
-                      />
-
-                      <label
-                        htmlFor="modal-upload"
-                        className="px-3 py-2 rounded-lg bg-cyan-600 text-white cursor-pointer"
-                      >
-                        Add
-                      </label>
-
-                      <button
-                        type="button"
-                        onClick={handleModalRemoveImage}
-                        className="px-3 py-2 rounded-lg bg-red-600 text-white"
-                      >
-                        Remove
-                      </button>
-                    </>
-                  )}
-
-                  {previewImage.images.length > 1 && (
-                    <span className="text-xs text-slate-500">
-                      {previewImage.index + 1} / {previewImage.images.length}
-                    </span>
-                  )}
-                </div>
+                {previewImage.images.length > 1 && (
+                  <span className="text-xs font-medium text-slate-400">
+                    {previewImage.index + 1} / {previewImage.images.length}
+                  </span>
+                )}
               </div>
 
               {/* Sliding track */}
