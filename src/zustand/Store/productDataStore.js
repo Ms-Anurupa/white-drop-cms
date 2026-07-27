@@ -35,7 +35,7 @@ const productDataStore = create((set) => ({
 
   getProductById: async (productId) => {
     try {
-      const res = await api.get("/admin/getProductById",{
+      const res = await api.get("/page/getProductById",{
         withAuth: true,
         params: {productId},
       });
