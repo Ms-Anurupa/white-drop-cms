@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Delete, View } from "lucide-react";
+import { ChevronLeft, ChevronRight, Delete, View, Search } from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
+import useDebounce from "../../utils/useDebounce";
 
 const PAGE_SIZE = 5;
 
@@ -14,13 +15,12 @@ const Customer = () => {
   const exportCustomerDetails = customerStore((state) => state.exportCustomerDetails);
   const deleteCustomerDetails = customerStore((state) => state.deleteCustomerDetails);
 
-  useEffect(() => {
-    getAllCustomers();
-  }, [getAllCustomers])
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
-    console.log("customers", customers);
-  }, [customers])
+    getAllCustomers(debouncedSearch);
+  }, [debouncedSearch, getAllCustomers]);
 
   const totalPages = Math.ceil(customers.length / PAGE_SIZE);
 
@@ -85,17 +85,35 @@ const Customer = () => {
         </div>
 
         {/* Right Side */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full lg:w-auto">
+          {/* Search */}
+          <div className="relative w-full sm:w-64">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or phone..."
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+            />
+          </div>
+
           {/* Total Customers */}
-          <div className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg text-center">
+          <div className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg text-center whitespace-nowrap">
             Total Customers:{" "}
-            <span className="font-semibold text-gray-900">20</span>
+            <span className="font-semibold text-gray-900">
+              {customers.length}
+            </span>
           </div>
 
           {/* Export Button */}
           <button
             onClick={handleExport}
-            className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+            className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition cursor-pointer"
           >
             Export
           </button>
