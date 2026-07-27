@@ -8,10 +8,11 @@ const deliveryPartnerStore = create((set) => ({
   url: [],
   loading: false,
 
-  getDeliveryPersons: async () => {
+  getDeliveryPersons: async (deliveryPersonId, search) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getDeliveryPersons", {
+        params: { deliveryPersonId, search },
         withAuth: true,
       });
       set({
@@ -70,7 +71,6 @@ const deliveryPartnerStore = create((set) => ({
     }
   },
 
-
   verifyDeliveryPersonDocs: async (payload) => {
     try {
       set({ loading: true });
@@ -84,7 +84,20 @@ const deliveryPartnerStore = create((set) => ({
       set({ loading: false });
     }
   },
-  
+
+  updateStatusDelPerson: async (payload) => {
+    try {
+      set({ loading: true });
+      const res = await api.post("/admin/updateStatusDelPerson", payload, {
+        withAuth: true,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default deliveryPartnerStore;

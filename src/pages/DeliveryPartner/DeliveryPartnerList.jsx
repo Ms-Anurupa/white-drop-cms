@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from "react";
 import {
   Search,
   Phone,
@@ -13,6 +14,7 @@ import deliveryPartnerStore from "../../zustand/Store/deliveryPartnerStore";
 import noDoc from "../../assets/images/nodoc.svg";
 import Loader from "../../components/Loader";
 import useSignedImages from "../../hooks/useSignedImages";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 6;
 
@@ -20,8 +22,6 @@ const statusStyle = {
   Active: "bg-green-100 text-green-600",
   Inactive: "bg-gray-200 text-gray-500",
 };
-
-const getStatus = (active) => (active ? "Active" : "Inactive");
 
 const getFullName = (p) => {
   const name = [p?.firstName, p?.lastName].filter(Boolean).join(" ");
@@ -52,6 +52,9 @@ const DeliveryPartnerList = () => {
     (state) => state.getDeliveryPersons,
   );
   const partners = deliveryPartnerStore((state) => state.partners);
+  const updateStatusDelPerson = deliveryPartnerStore(
+    (state) => state.updateStatusDelPerson,
+  );
   const loading = deliveryPartnerStore((state) => state.loading);
   const imageUrls = useSignedImages(
     partners,
@@ -60,28 +63,42 @@ const DeliveryPartnerList = () => {
     "deliveryPersonId",
   );
   const [search, setSearch] = useState("");
+  // const [deliveryPersonId, setDeliveryPersonId] = useState("");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getDeliveryPersons();
-  }, [getDeliveryPersons]);
+    setPage(1);
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return partners.filter((p) =>
-      `${p?.firstName ?? ""} ${p?.lastName ?? ""} ${p?.deliveryPersonId ?? ""} ${p.phoneNum ?? ""} ${p?.vehicleNumber ?? ""}`
-        .toLowerCase()
-        .includes(q),
-    );
-  }, [search, partners]);
+    const timer = setTimeout(() => {
+      getDeliveryPersons("", search.trim());
+    }, 600);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const paginated = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filtered.slice(start, start + PAGE_SIZE);
-  }, [page, filtered]);
+  useEffect(() => {
+    console.log("partners", partners);
+  }, [partners]);
+
+  const handleStatusChange = async (active, deliveryPersonId) => {
+    try {
+      const payload = {
+        deliveryPersonId: deliveryPersonId,
+        status: active,
+      };
+
+      await updateStatusDelPerson(payload);
+
+      toast.success("Status updated successfully");
+
+      await getDeliveryPersons();
+    } catch {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const totalPages = Math.ceil(partners.length / PAGE_SIZE) || 1;
 
   if (loading) {
     return <Loader text="Loading delivery partners..." />;
@@ -103,23 +120,20 @@ const DeliveryPartnerList = () => {
           />
           <input
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search partners..."
             className="w-full pl-9 pr-3 py-2 text-sm sm:text-base rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
       </div>
 
-      {filtered.length === 0 && (
+      {partners.length === 0 && (
         <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500 text-sm">
           No delivery partners found.
         </div>
       )}
 
-      {filtered.length > 0 && (
+      {partners.length > 0 && (
         <>
           {/* ================= DESKTOP TABLE ================= */}
           <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
@@ -138,8 +152,7 @@ const DeliveryPartnerList = () => {
                 </thead>
 
                 <tbody>
-                  {paginated?.map((p) => {
-                    const status = getStatus(p?.active);
+                  {partners?.map((p) => {
                     return (
                       <tr
                         key={p?.deliveryPersonId}
@@ -185,11 +198,24 @@ const DeliveryPartnerList = () => {
                           {formatDate(p?.createdAt)}
                         </td>
                         <td className="p-3">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${statusStyle[status]}`}
+                          <select
+                            value={p.active ? "true" : "false"}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                e.target.value === "true",
+                                p.deliveryPersonId,
+                              )
+                            }
+                            className={`rounded-lg border px-3 py-2 text-sm font-medium cursor-pointer outline-none transition
+      ${
+        p.active
+          ? "border-green-200 bg-green-50 text-green-700"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
                           >
-                            {status}
-                          </span>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                          </select>
                         </td>
                         <td className="p-3">
                           <button
@@ -214,8 +240,7 @@ const DeliveryPartnerList = () => {
 
           {/* ================= MOBILE CARD VIEW ================= */}
           <div className="md:hidden space-y-3">
-            {paginated.map((p) => {
-              const status = getStatus(p?.active);
+            {partners.map((p) => {
               return (
                 <div
                   key={p?.deliveryPersonId}

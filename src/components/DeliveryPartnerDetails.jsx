@@ -19,6 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import noDoc from "../assets/images/nodoc.svg";
 import Loader from "./Loader";
 import useSignedImageObject from "../hooks/useSignedImageObject";
+import { toast } from "react-toastify";
 
 const DeliveryPartnerDetails = () => {
   const { deliveryPersonId } = useParams();
@@ -42,6 +43,7 @@ const DeliveryPartnerDetails = () => {
   const [updatedData, setUpdatedData] = useState(null);
   const [previews, setPreviews] = useState({});
   const [previewImage, setPreviewImage] = useState({
+    field: "",
     images: [],
     index: 0,
     label: "",
@@ -199,7 +201,152 @@ const DeliveryPartnerDetails = () => {
     return [];
   }
 
+  const handleModalAddImages = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (!files.length) return;
+
+    const blobs = files.map((file) => URL.createObjectURL(file));
+
+    const field = previewImage.field;
+
+    setUpdatedData((prev) => ({
+      ...prev,
+      [field]: [...toImageArrayRaw(prev[field]), ...files],
+    }));
+
+    setPreviews((prev) => {
+      const current = toImageArrayRaw(prev[field]);
+
+      return {
+        ...prev,
+        [field]: [...current, ...blobs],
+      };
+    });
+
+    setPreviewImage((prev) => ({
+      ...prev,
+      images: [...prev.images, ...blobs],
+      index: prev.images.length,
+    }));
+
+    setIsDirty(true);
+  };
+
+  const handleModalRemoveImage = () => {
+    const field = previewImage.field;
+
+    const idx = previewImage.index;
+
+    setUpdatedData((prev) => ({
+      ...prev,
+      [field]: toImageArrayRaw(prev[field]).filter((_, i) => i !== idx),
+    }));
+
+    setPreviews((prev) => ({
+      ...prev,
+      [field]: toImageArrayRaw(prev[field]).filter((_, i) => i !== idx),
+    }));
+
+    setPreviewImage((prev) => {
+      const images = prev.images.filter((_, i) => i !== idx);
+
+      return {
+        ...prev,
+        images,
+        index: images.length ? Math.min(prev.index, images.length - 1) : 0,
+      };
+    });
+
+    setIsDirty(true);
+  };
+
+  const vehicleNumberRegex = /^[A-Z]{2}[ -]?\d{1,2}[ -]?[A-Z]{1,3}[ -]?\d{4}$/i;
+
   const handleSave = async () => {
+    // Required field validations
+    if (!updatedData.firstName?.trim()) {
+      toast.error("First name is required");
+      return;
+    }
+
+    if (!updatedData.lastName?.trim()) {
+      toast.error("Last name is required");
+      return;
+    }
+
+    if (!updatedData.details?.trim()) {
+      toast.error("Details are required");
+      return;
+    }
+
+    if (!updatedData.vehicleNumber?.trim()) {
+      toast.error("Vehicle number is required");
+      return;
+    }
+
+    if (!vehicleNumberRegex.test(updatedData.vehicleNumber.trim())) {
+      toast.error("Enter a valid vehicle number (e.g. WB06AB1234)");
+      return;
+    }
+
+    if (!updatedData.aadharNo?.trim()) {
+      toast.error("Aadhar number is required");
+      return;
+    }
+
+    if (!/^\d{12}$/.test(updatedData.aadharNo.trim())) {
+      toast.error("Aadhar number must be 12 digits");
+      return;
+    }
+
+    if (!updatedData.panNo?.trim()) {
+      toast.error("PAN number is required");
+      return;
+    }
+
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(updatedData.panNo.trim())) {
+      toast.error("Invalid PAN number");
+      return;
+    }
+
+    if (!updatedData.dlNo?.trim()) {
+      toast.error("Driving License number is required");
+      return;
+    }
+
+    // Optional DL format validation (remove if not needed)
+    if (updatedData.dlNo.trim().length < 8) {
+      toast.error("Invalid Driving License number");
+      return;
+    }
+
+    const imageValidationFields = [
+      { key: "photo", label: "Profile photo" },
+      { key: "vehicleImage", label: "Vehicle image" },
+      { key: "aadharImage", label: "Aadhar image" },
+      { key: "panImage", label: "PAN image" },
+      { key: "dlImage", label: "Driving License image" },
+    ];
+
+    for (const { key, label } of imageValidationFields) {
+      const value = updatedData[key];
+
+      const hasImage =
+        value &&
+        // Existing image URL/path
+        ((typeof value === "string" && value.trim()) ||
+          // Existing image array
+          (Array.isArray(value) && value.length > 0) ||
+          // Newly selected file
+          value instanceof File);
+
+      if (!hasImage) {
+        toast.error(`${label} is required`);
+        return;
+      }
+    }
+
     const formData = new FormData();
 
     formData.append(
@@ -264,10 +411,10 @@ const DeliveryPartnerDetails = () => {
   };
 
   // Opens the slider modal for a given field, always starting at the first image
-  const openPreview = (label, signedValue) => {
+  const openPreview = (field, label, signedValue) => {
     const images = toImageArray(signedValue);
     if (!images.length) return;
-    setPreviewImage({ images, index: 0, label });
+    setPreviewImage({ field, images, index: 0, label });
   };
 
   const handleTouchStart = (e) => {
@@ -397,11 +544,15 @@ const DeliveryPartnerDetails = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    openPreview("Profile Photo", getDisplayValue("photo"))
+                    openPreview(
+                      "Profile Photo",
+                      "photo",
+                      getDisplayValue("photo"),
+                    )
                   }
                   className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-slate-100 bg-teal-50 flex items-center justify-center"
                 >
-                  {partnerDetails?.photo ? (
+                  {getDisplayValue("photo")?.length ? (
                     <img
                       src={firstImage(getDisplayValue("photo"))}
                       alt="Profile"
@@ -409,8 +560,8 @@ const DeliveryPartnerDetails = () => {
                     />
                   ) : (
                     <span className="text-xl font-semibold text-teal-700">
-                      {partnerDetails?.firstName?.[0] ?? ""}
-                      {partnerDetails?.lastName?.[0] ?? ""}
+                      {updatedData?.firstName?.[0] ?? ""}
+                      {updatedData?.lastName?.[0] ?? ""}
                     </span>
                   )}
                 </button>
@@ -713,7 +864,11 @@ const DeliveryPartnerDetails = () => {
                     alt="Vehicle"
                     className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
                     onClick={() =>
-                      openPreview("Vehicle", getDisplayValue("vehicleImage"))
+                      openPreview(
+                        "Vehicle",
+                        "vehicleImage",
+                        getDisplayValue("vehicleImage"),
+                      )
                     }
                   />
 
@@ -789,6 +944,7 @@ const DeliveryPartnerDetails = () => {
                     onClick={() =>
                       openPreview(
                         "Aadhaar Card",
+                        "aadharImage",
                         getDisplayValue("aadharImage"),
                       )
                     }
@@ -860,7 +1016,11 @@ const DeliveryPartnerDetails = () => {
                     alt="PAN Card"
                     className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
                     onClick={() =>
-                      openPreview("PAN Card", getDisplayValue("panImage"))
+                      openPreview(
+                        "PAN Card",
+                        "panImage",
+                        getDisplayValue("panImage"),
+                      )
                     }
                   />
 
@@ -931,7 +1091,11 @@ const DeliveryPartnerDetails = () => {
                     alt="Driving Licence"
                     className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
                     onClick={() =>
-                      openPreview("Driving Licence", getDisplayValue("dlImage"))
+                      openPreview(
+                        "Driving Licence",
+                        "dlImage",
+                        getDisplayValue("dlImage"),
+                      )
                     }
                   />
 
@@ -1010,15 +1174,43 @@ const DeliveryPartnerDetails = () => {
             <div className="overflow-hidden rounded-3xl bg-white shadow-2xl">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                <h3 className="text-lg font-semibold text-slate-800">
-                  {previewImage.label}
-                </h3>
+                <h3 className="text-lg font-semibold">{previewImage.label}</h3>
 
-                {previewImage.images.length > 1 && (
-                  <span className="text-xs font-medium text-slate-400">
-                    {previewImage.index + 1} / {previewImage.images.length}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {isEditing && (
+                    <>
+                      <input
+                        hidden
+                        id="modal-upload"
+                        multiple
+                        type="file"
+                        accept="image/*"
+                        onChange={handleModalAddImages}
+                      />
+
+                      <label
+                        htmlFor="modal-upload"
+                        className="px-3 py-2 rounded-lg bg-cyan-600 text-white cursor-pointer"
+                      >
+                        Add
+                      </label>
+
+                      <button
+                        type="button"
+                        onClick={handleModalRemoveImage}
+                        className="px-3 py-2 rounded-lg bg-red-600 text-white"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+
+                  {previewImage.images.length > 1 && (
+                    <span className="text-xs text-slate-500">
+                      {previewImage.index + 1} / {previewImage.images.length}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Sliding track */}
