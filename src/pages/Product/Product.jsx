@@ -13,6 +13,7 @@ import productDataStore from "../../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
 import resolveUrl from "../../utils/resolveUrl";
+import { getProductUrl } from "../../utils/resolveProductUrl";
 
 const PAGE_SIZE = 5;
 
@@ -33,10 +34,6 @@ const Product = () => {
   useEffect(() => {
     getAllProducts();
   }, [getAllProducts]);
-
-  useEffect(() => {
-    console.log("allProducts", products);
-  }, [products]);
 
   const filtered = products.filter(
     (p) =>
@@ -315,7 +312,7 @@ const Product = () => {
 
                         <td className="px-4 py-3">
                           <img
-                            src={resolveUrl(item?.product_images?.[0])}
+                            src={getProductUrl(item?.product_images?.[0])}
                             alt={item.product_name}
                             className="w-12 h-12 rounded-lg object-cover "
                           />

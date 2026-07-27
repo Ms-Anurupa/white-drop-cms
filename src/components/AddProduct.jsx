@@ -165,7 +165,7 @@ const AddProduct = () => {
 
       if (productList.images && productList.images.length > 0) {
         productList.images.forEach((file) => {
-          formData.append("product_images", file);
+          formData.append("productImages", file);
         });
       }
       console.log("productData", productList);
