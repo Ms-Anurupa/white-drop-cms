@@ -90,7 +90,10 @@ const Customer = () => {
           </div>
 
           {/* Export Button */}
-          <button onClick={handleExport} className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+          <button
+            onClick={handleExport}
+            className="w-full cursor-pointer sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          >
             Export
           </button>
         </div>
@@ -108,7 +111,9 @@ const Customer = () => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-800">{c?.customer_name}</h3>
+                    <h3 className="font-semibold text-gray-800">
+                      {c?.customer_name}
+                    </h3>
 
                     <p className="text-sm text-gray-500">{c?.phone_num}</p>
                   </div>
@@ -166,7 +171,6 @@ const Customer = () => {
                   "Sl No",
                   "Phone Number",
                   "Name",
-                  "Type",
                   "Wallet Balance",
                   "Joined On",
                   "Subscriptions",
@@ -210,10 +214,10 @@ const Customer = () => {
                       </td>
 
                       <td className="px-4 py-3 font-medium text-gray-800">
-                        {c?.customer_name}
+                        {c?.customer_name ?? "-"}
                       </td>
 
-                      <td className="px-4 py-3">
+                      {/* <td className="px-4 py-3">
                         <span
                           className={`px-2 py-1 text-xs rounded-full ${
                             c?.customer_type === "Premium"
@@ -223,13 +227,15 @@ const Customer = () => {
                         >
                           {c?.customer_type}
                         </span>
-                      </td>
+                      </td> */}
 
                       <td className="px-4 py-3 font-medium text-gray-800">
                         ₹{c?.wallet_balance}
                       </td>
 
-                      <td className="px-4 py-3 text-gray-500">{c.joined}</td>
+                      <td className="px-4 py-3 text-gray-500">
+                        {new Date(c.createdAt).toLocaleDateString("en-GB")}
+                      </td>
 
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
@@ -243,7 +249,11 @@ const Customer = () => {
                             <View size={20} />
                           </button> */}
 
-                          <button onClick={handleCustomerDelete} title="Delete User" className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50">
+                          <button
+                            onClick={handleCustomerDelete}
+                            title="Delete User"
+                            className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50"
+                          >
                             <Delete size={20} />
                           </button>
                         </div>
