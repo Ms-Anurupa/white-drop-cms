@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
 import resolveUrl from "../../utils/resolveUrl";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 8;
 
 const Product = () => {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ const Product = () => {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:p-4 space-y-2">
+    <div className="px-4 py-2 sm:p-2 md:px-4 md:py-1 space-y-2">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -184,7 +184,7 @@ const Product = () => {
       </div>
 
       {/* TABLE CARD */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[350px]">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-112.5">
         {/* CONTENT */}
         <div className="flex-1 overflow-hidden">
           {/* MOBILE VIEW */}
@@ -279,7 +279,7 @@ const Product = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                      className="px-2 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -301,19 +301,19 @@ const Product = () => {
                         key={item.id}
                         className="border-b border-gray-50 hover:bg-slate-50"
                       >
-                        <td className="px-4 py-3 text-gray-400">
+                        <td className="px-2 py-3 text-gray-400">
                           {start + index + 1}
                         </td>
 
-                        <td className="px-4 py-3 font-medium text-gray-800">
+                        <td className="px-2 py-3 font-medium text-gray-800">
                           {item.product_name}
                         </td>
 
-                        <td className="px-4 py-3 text-gray-500">
+                        <td className="px-2 py-3 text-gray-500">
                           {item.catch_phrase}
                         </td>
 
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3">
                           <img
                             src={resolveUrl(item?.product_images?.[0])}
                             alt={item.product_name}
@@ -321,11 +321,11 @@ const Product = () => {
                           />
                         </td>
 
-                        <td className="px-4 py-3 font-medium">
+                        <td className="px-2 py-3 font-medium">
                           ₹{item.variant?.price ?? "-"}
                         </td>
 
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3">
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               item.variant?.availability
@@ -339,11 +339,11 @@ const Product = () => {
                           </span>
                         </td>
 
-                        <td className="px-4 py-3 text-gray-500">
+                        <td className="px-2 py-3 text-gray-500">
                           {item.variant?.unit ?? "-"}
                         </td>
 
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-3">
                           <select
                             value={item.status ?? "ACTIVE"}
                             onChange={(e) =>
@@ -352,7 +352,7 @@ const Product = () => {
                                 e.target.value,
                               )
                             }
-                            className="px-2 py-1  cursor-pointer text-xs border border-gray-200 rounded-md"
+                            className="px-2 py-1 cursor-pointer text-xs border border-gray-200 rounded-md"
                           >
                             <option value="ACTIVE">ACTIVE</option>
                             <option value="INACTIVE">INACTIVE</option>
@@ -360,7 +360,7 @@ const Product = () => {
                           </select>
                         </td>
 
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3">
                           <div className="flex gap-2">
                             <button
                               title="Edit Product"
@@ -369,7 +369,7 @@ const Product = () => {
                                   `/dashboard/product/editProduct/${item.product_id}`,
                                 )
                               }
-                              className="mx-6 px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
+                              className="mx-2 px-3 py-1 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-50"
                             >
                               <Edit size={18} />
                             </button>
