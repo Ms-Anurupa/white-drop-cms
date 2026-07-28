@@ -5,41 +5,8 @@ import { toast } from "react-toastify";
 
 const PAGE_SIZE = 5;
 
-// const INITIAL_ORDERS = [
-//   {
-//     id: "ORD-1001",
-//     customer: "Rahul Sharma",
-//     total: 1200,
-//     address: "Salt Lake, Kolkata",
-//     status: "Pending",
-//     createdAt: "2026-06-20",
-//     assignedTo: "Delivery Boy A",
-//     phone: "9876543210",
-//   },
-//   {
-//     id: "ORD-1002",
-//     customer: "Anita Das",
-//     total: 850,
-//     address: "Park Street, Kolkata",
-//     status: "Delivered",
-//     createdAt: "2026-06-19",
-//     assignedTo: "Delivery Boy B",
-//     phone: "9123456780",
-//   },
-//   {
-//     id: "ORD-1003",
-//     customer: "Sourav Roy",
-//     total: 2400,
-//     address: "New Town, Kolkata",
-//     status: "Shipped",
-//     createdAt: "2026-06-18",
-//     assignedTo: "Delivery Boy C",
-//     phone: "9988776655",
-//   },
-// ];
-
 const Order = () => {
-  const getAllOrders = orderDataStore((state) => state.getAllOrders);
+  const getOrderListing = orderDataStore((state) => state.getOrderListing);
   const exportOrderDetails = orderDataStore((state) => state.exportOrderDetails);
   const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
@@ -47,14 +14,19 @@ const Order = () => {
   const [dateFilter, setDateFilter] = useState("all");
 
   useEffect(() => {
-    getAllOrders();
-  }, [getAllOrders]);
+    console.log("orders", orders);
+  }, [orders]);
+
+
+  useEffect(() => {
+    getOrderListing();
+  }, [getOrderListing]);
 
   const filtered = orders.filter(
     (o) =>
-      o.id.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer.toLowerCase().includes(search.toLowerCase()) ||
-      o.phone.includes(search),
+      o.orderId.toLowerCase().includes(search.toLowerCase()) ||
+      o.user?.customer_name.toLowerCase().includes(search.toLowerCase()) ||
+      o.user?.phone_num.includes(search),
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -82,16 +54,24 @@ const Order = () => {
     }
   };
 
-  const statusColor = (status) => {
-    switch (status) {
-      case "Delivered":
-        return "bg-emerald-50 text-emerald-700";
-      case "Shipped":
-        return "bg-blue-50 text-blue-700";
-      default:
-        return "bg-amber-50 text-amber-700";
-    }
-  };
+const statusColor = (status) => {
+  switch (status) {
+    case "DELIVERED":
+      return "bg-emerald-100 text-emerald-700";
+
+    case "SHIPPED":
+      return "bg-blue-100 text-blue-700";
+
+    case "PROCESSING":
+      return "bg-amber-100 text-amber-700";
+
+    case "CANCELLED":
+      return "bg-red-100 text-red-700";
+
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
 
   return (
     <div className="h-full p-2 sm:p-3 md:p-4 space-y-4 overflow-hidden">
@@ -122,19 +102,19 @@ const Order = () => {
               }}
               placeholder="Search orders..."
               className="
-      w-full
-      pl-10 pr-3 py-2
-      text-sm
-      bg-white
-      border border-gray-200
-      rounded-xl
-      shadow-sm
-      placeholder:text-gray-400
-      focus:outline-none
-      focus:ring-2 focus:ring-blue-500/20
-      focus:border-blue-500
-      transition-all
-    "
+                    w-full
+                    pl-10 pr-3 py-2
+                    text-sm
+                    bg-white
+                    border border-gray-200
+                    rounded-xl
+                    shadow-sm
+                    placeholder:text-gray-400
+                    focus:outline-none
+                    focus:ring-2 focus:ring-blue-500/20
+                    focus:border-blue-500
+                    transition-all
+                  "
             />
           </div>
 
@@ -166,37 +146,37 @@ const Order = () => {
         {/* mobile table cards */}
         <div className="sm:hidden flex-1 overflow-y-auto p-3 space-y-3">
           {paginated.map((o) => (
-            <div key={o.id} className="border border-gray-100 rounded-xl p-3">
+            <div key={o.orderId} className="border border-gray-100 rounded-xl p-3">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-800">{o.id}</h3>
+                  <h3 className="font-semibold text-gray-800">{o.orderId}</h3>
 
-                  <p className="text-sm text-gray-500">{o.customer}</p>
+                  <p className="text-sm text-gray-500">{o.user?.customer_name}</p>
                 </div>
 
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(
-                    o.status,
+                    o.orderStatus,
                   )}`}
                 >
-                  {o.status}
+                  {o.orderStatus}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-y-3 mt-3 text-sm">
                 <div>
                   <p className="text-gray-400">Total</p>
-                  <p>₹{o.total}</p>
+                  <p>₹{o.orderTotal}</p>
                 </div>
 
                 <div>
                   <p className="text-gray-400">Phone</p>
-                  <p>{o.phone}</p>
+                  <p>{o.user?.phone}</p>
                 </div>
 
                 <div>
-                  <p className="text-gray-400">Assigned</p>
-                  <p>{o.assignedTo}</p>
+                  <p className="text-gray-400">Customer Type</p>
+                  <p>{o.user?.customer_type || "NA"}</p>
                 </div>
 
                 <div>
@@ -219,13 +199,15 @@ const Order = () => {
               <tr>
                 {[
                   "Order ID",
-                  "Customer",
+                  "Customer Name",
                   "Order Total",
                   "Shipping Address",
                   "Status",
                   "Created At",
-                  "Assigned To",
+                  "Customer Type",
                   "Phone",
+                  "Wallet Balance",
+                  "Appartment",
                   "Action",
                 ].map((h) => (
                   <th
@@ -254,38 +236,42 @@ const Order = () => {
                 ) : (
                   paginated.map((o) => (
                     <tr
-                      key={o.id}
+                      key={o.orderId}
                       className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
                     >
                       <td className="px-3 py-3 font-medium text-gray-800">
-                        {o.id}
+                        {o.orderId}
                       </td>
 
-                      <td className="px-3 py-3 text-gray-700">{o.customer}</td>
+                      <td className="px-3 py-3 text-gray-700">{o.user?.customer_name}</td>
 
                       <td className="px-3 py-3 font-medium text-gray-800">
-                        ₹{o.total}
+                        ₹{o.orderTotal}
                       </td>
 
-                      <td className="px-3 py-3 text-gray-500">{o.address}</td>
+                      <td className="px-3 py-3 text-gray-500">{o.shippingAddress?.locality}</td>
 
                       <td className="px-3 py-3">
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor(
-                            o.status,
+                            o.orderStatus,
                           )}`}
                         >
-                          {o.status}
+                          {o.orderStatus}
                         </span>
                       </td>
 
                       <td className="px-3 py-3 text-gray-500">{o.createdAt}</td>
 
-                      <td className="px-3 py-3 text-gray-700">
-                        {o.assignedTo}
+                      <td className="px-3 py-3 text-center text-gray-700">
+                        {o.user?.customer_type || "NA"}
                       </td>
 
-                      <td className="px-3 py-3 text-gray-500">{o.phone}</td>
+                      <td className="px-3 py-3 text-gray-500">{o.user?.phone_num}</td>
+
+                      <td className="px-3 py-3 text-center text-gray-500">{o.user?.wallet_balance}</td>
+
+                      <td className="px-3 py-3 text-gray-500">{o.shippingAddress?.apartment}</td>
 
                       <td className="px-3 py-3">
                         <button className="px-3 py-1 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">

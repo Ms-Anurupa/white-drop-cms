@@ -6,14 +6,14 @@ const orderDataStore = create((set) => ({
     orders: [],
 
 
-    getAllOrders: async () => {
+    getOrderListing: async () => {
         try {
-            const res = await api.get("/admin/getAllOrders", {
+            const res = await api.get("/admin/getOrderListing", {
                 withAuth: true,
             });
 
             set({
-                orders: res.data?.orders,
+                orders: res.data?.data,
             })
         } catch (error) {
             throw error;
