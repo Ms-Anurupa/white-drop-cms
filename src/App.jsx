@@ -24,6 +24,7 @@ import VerifyMail from "./pages/auth/VerifyMail";
 import DeliveryPartnerList from "./pages/DeliveryPartner/DeliveryPartnerList";
 import DeliveryPartnerDetails from "./components/DeliveryPartnerDetails";
 import LocationTracker from "./components/LocationTracker";
+import OrderViewDetails from "./components/OrderViewDetails";
 
 const App = () => {
   return (
@@ -54,6 +55,7 @@ const App = () => {
               />
               <Route path="customer" element={<Customer />} />
               <Route path="orders" element={<Order />} />
+              <Route path="orders/orderDetails/:id" element={<OrderViewDetails />} />
               <Route path="production" element={<Production />} />
               <Route path="inventory" element={<Inventory />} />
               <Route path="deliveries" element={<Deliveries />} />
