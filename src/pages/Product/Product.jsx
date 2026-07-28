@@ -12,7 +12,6 @@ import {
 import productDataStore from "../../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
-import resolveUrl from "../../utils/resolveUrl";
 import { getProductUrl } from "../../utils/resolveProductUrl";
 
 const PAGE_SIZE = 8;

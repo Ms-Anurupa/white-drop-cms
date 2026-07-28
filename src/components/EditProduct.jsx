@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
-import resolveUrl from "../utils/resolveUrl";
 import { getProductUrl } from "../utils/resolveProductUrl";
 
 const EditProduct = () => {
