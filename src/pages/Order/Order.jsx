@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
-import resolveUrl from "../../utils/resolveUrl";
 import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
+import { getProductUrl } from "../../utils/resolveProductUrl";
 
 const PAGE_SIZE = 8;
 
@@ -11,7 +11,7 @@ const Order = () => {
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
-  );
+  );  
   const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -246,7 +246,7 @@ const Order = () => {
 
                       <td className="px-3 py-3 text-center text-gray-700">
                         <img
-                          src={resolveUrl(
+                          src={getProductUrl(
                             o?.orderItems?.[0]?.product?.product_images?.[0],
                           )}
                           alt="Product"
