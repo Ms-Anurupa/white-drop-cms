@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
-import resolveUrl from "../utils/resolveUrl";
+import { getProductUrl } from "../utils/resolveProductUrl";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -175,7 +175,7 @@ const EditProduct = () => {
 
       productList.images.forEach((file) => {
         if (file instanceof File) {
-          formData.append("product_images", file);
+          formData.append("productImages", file);
         }
       });
 
@@ -252,7 +252,7 @@ const EditProduct = () => {
                         <img
                           src={
                             typeof img === "string"
-                              ? resolveUrl(img)
+                              ? getProductUrl(img)
                               : URL.createObjectURL(img)
                           }
                           className="w-full h-full object-cover"
