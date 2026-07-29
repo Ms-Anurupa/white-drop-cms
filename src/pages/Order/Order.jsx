@@ -50,7 +50,6 @@ const Order = () => {
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
   );
-  );
   const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -200,15 +199,6 @@ const Order = () => {
               {dateCounts[dateFilter]}
             </span>
           </p>
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-500">
-              Track orders, delivery & status
-            </p>
-
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 text-sm font-semibold text-blue-700">
-              {filterLabel}: {filteredOrders.length}
-            </span>
-          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center w-full lg:w-auto">
@@ -247,9 +237,11 @@ const Order = () => {
           </select>
 
           {/* Export */}
+
           <button
             onClick={handleExport}
-            className="w-full sm:w-auto inline-flex cursor-pointer items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm"
+            className="w-full flex flex-1 gap-2 sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600
+             text-white rounded-lg hover:bg-emerald-700 transition cursor-pointer"
           >
             <Download size={16} />
             Export
