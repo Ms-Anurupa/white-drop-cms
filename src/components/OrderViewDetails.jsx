@@ -15,10 +15,10 @@ import {
   CircleDot,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import resolveUrl from "../utils/resolveUrl";
 import { useNavigate, useParams } from "react-router-dom";
 import orderDataStore from "../zustand/Store/orderDataStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
+import { getProductUrl } from "../utils/resolveProductUrl";
 
 const STATUS_TOKENS = {
   DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
@@ -386,7 +386,7 @@ const OrderViewDetails = () => {
                     }
                   >
                     <img
-                      src={resolveUrl(item.product?.product_images?.[0])}
+                      src={getProductUrl(item.product?.product_images?.[0])}
                       alt={item.product?.product_name}
                       className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
                       style={{ border: "1px solid #E4E1D6" }}

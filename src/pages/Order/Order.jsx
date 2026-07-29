@@ -5,13 +5,13 @@ import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
 import { getProductUrl } from "../../utils/resolveProductUrl";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 const Order = () => {
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
-  );  
+  );
   const orders = orderDataStore((state) => state.orders);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -58,6 +58,13 @@ const Order = () => {
 
     return true;
   });
+
+  const filterLabel = {
+    all: "All Orders",
+    today: "Today's Orders",
+    week: "This Week",
+    month: "This Month",
+  }[dateFilter];
 
   const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
   const start = (page - 1) * PAGE_SIZE;
@@ -111,9 +118,15 @@ const Order = () => {
           <h1 className="text-xl font-semibold text-gray-900">
             Order Management
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Track orders, delivery & status
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-gray-500">
+              Track orders, delivery & status
+            </p>
+
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 text-sm font-semibold text-blue-700">
+              {filterLabel}: {filteredOrders.length}
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center w-full lg:w-auto">
@@ -192,29 +205,46 @@ const Order = () => {
       </div>
 
       {/* ── TABLE CARD ── */}
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-125 overflow-hidden">
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-100 overflow-hidden">
         {/*desktop HEADER */}
         <div className="hidden sm:flex flex-col flex-1 overflow-hidden">
           <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-16" /> {/* Sl No */}
+              <col className="w-40" /> {/* Order ID */}
+              <col className="w-20" /> {/* Product */}
+              <col className="w-24" /> {/* Price */}
+              <col className="w-72" /> {/* Customer */}
+              <col className="w-28" /> {/* Status */}
+              <col className="w-44" /> {/* Date */}
+              <col className="w-24" /> {/* Action */}
+            </colgroup>
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                {[
-                  "Sl No.",
-                  "Order ID",
-                  "Product Image",
-                  "Order Total",
-                  "Customer Details",
-                  "Status",
-                  "Created At",
-                  "Action",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-3 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider"
-                  >
-                    {h}
-                  </th>
-                ))}
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+                  Sl No.
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+                  Order ID
+                </th>
+                <th className="px-3 py-3 text-center text-xs font-semibold uppercase text-gray-700">
+                  Product
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+                  Order Price
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+                  Customer Details
+                </th>
+                <th className="px-3 py-3 text-center text-xs font-semibold uppercase text-gray-700">
+                  Status
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+                  Created At
+                </th>
+                <th className="px-3 py-3 text-center text-xs font-semibold uppercase text-gray-700">
+                  Action
+                </th>
               </tr>
             </thead>
           </table>
@@ -237,14 +267,14 @@ const Order = () => {
                       key={o.orderId}
                       className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
                     >
-                      <td className="px-3 py-3 font-medium whitespace-nowrap text-gray-800">
+                      <td className="w-16 px-3 py-3 font-medium whitespace-nowrap text-gray-800">
                         {start + idx + 1}
                       </td>
-                      <td className="px-3 py-3 font-medium whitespace-nowrap text-gray-800">
+                      <td className="w-40 px-3 py-3 font-medium whitespace-nowrap text-gray-800">
                         {o.orderId}
                       </td>
 
-                      <td className="px-3 py-3 text-center text-gray-700">
+                      <td className="w-20 px-3 py-3 text-center text-gray-700">
                         <img
                           src={getProductUrl(
                             o?.orderItems?.[0]?.product?.product_images?.[0],
@@ -254,26 +284,44 @@ const Order = () => {
                         />
                       </td>
 
-                      <td className="px-3 py-3 font-medium text-gray-800">
+                      <td className="w-24 px-3 py-3 font-medium text-gray-800">
                         ₹{o.orderTotal}
                       </td>
 
-                      <td className="px-3 py-3 text-gray-500">
-                        <span className="text-gray-600 font-semibold">
-                          {o.user?.customer_name} <br />
-                        </span>
-                        <span>
-                          {o.shippingAddress?.locality} <br />
-                        </span>
-                        <span className="text-gray-600 font-semibold">
-                          {o.user?.phone_num} <br />
-                        </span>
-                        <span>
-                          {o.shippingAddress?.apartment} <br />
-                        </span>
+                      <td className="w-72 px-3 py-2 align-top">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-start">
+                            <span className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                              Customer
+                            </span>
+                            <span className="font-semibold text-gray-800">
+                              {o.user?.customer_name || "-"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-start">
+                            <span className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                              Phone
+                            </span>
+                            <span className="text-gray-700">
+                              {o.user?.phone_num || "-"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-start">
+                            <span className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                              Address
+                            </span>
+                            <span className="text-gray-600 leading-5">
+                              {o.shippingAddress?.apartment || "-"}
+                              <br />
+                              {o.shippingAddress?.locality || ""}
+                            </span>
+                          </div>
+                        </div>
                       </td>
 
-                      <td className="px-3 py-3">
+                      <td className="w-28 px-3 py-3">
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor(
                             o.orderStatus,
@@ -283,14 +331,23 @@ const Order = () => {
                         </span>
                       </td>
 
-                      <td className="px-3 py-3 text-gray-500">{o.createdAt}</td>
+                      <td className="w-44 px-3 py-3 text-gray-600 whitespace-nowrap">
+                        {new Date(o.createdAt).toLocaleString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </td>
 
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 text-center">
                         <button
                           onClick={() =>
                             navigate(`/dashboard/orders/orderDetails/${o.id}`)
                           }
-                          className="px-3 py-1 text-center cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+                          className="px-3 py-1 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
                         >
                           View
                         </button>
