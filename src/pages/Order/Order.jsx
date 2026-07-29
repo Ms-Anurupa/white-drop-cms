@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   Download,
@@ -56,28 +56,56 @@ const Order = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
   const [dateFilter, setDateFilter] = useState("all");
-  const [addressPopover, setAddressPopover] = useState(null);
+  const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
+  const [popoverPos, setPopoverPos] = useState(null); // { top, left } — set once measured
+  const popoverRef = useRef(null);
 
   const navigate = useNavigate();
 
   const showAddressPopover = (e, order) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const popoverWidth = 288; // matches w-72
-    const margin = 12;
-
-    let left = rect.left;
-    if (left + popoverWidth + margin > window.innerWidth) {
-      left = window.innerWidth - popoverWidth - margin;
-    }
-
-    setAddressPopover({
-      order,
-      top: rect.bottom + 8,
-      left: Math.max(left, margin),
-    });
+    const anchor = e.currentTarget.getBoundingClientRect();
+    setPopoverPos(null); // reset so it doesn't flash the previous row's position
+    setHoveredOrder({ order, anchor });
   };
 
-  const hideAddressPopover = () => setAddressPopover(null);
+  const hideAddressPopover = () => {
+    setHoveredOrder(null);
+    setPopoverPos(null);
+  };
+
+  // Position the popover only after it has rendered, using its real measured
+  // size — this is what makes the above/below flip and edge-clamping accurate,
+  // rather than guessing at a fixed height.
+  useLayoutEffect(() => {
+    if (!hoveredOrder || !popoverRef.current) return;
+
+    const { anchor } = hoveredOrder;
+    const { width, height } = popoverRef.current.getBoundingClientRect();
+    const margin = 12;
+    const gap = 8;
+
+    let left = anchor.left;
+    if (left + width + margin > window.innerWidth) {
+      left = window.innerWidth - width - margin;
+    }
+    left = Math.max(left, margin);
+
+    const spaceBelow = window.innerHeight - anchor.bottom;
+    const spaceAbove = anchor.top;
+
+    let top;
+    if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
+      // enough room below (or more room below than above) — show under the row
+      top = anchor.bottom + gap;
+      top = Math.min(top, window.innerHeight - margin - height);
+    } else {
+      // not enough room below — flip above the row
+      top = anchor.top - height - gap;
+    }
+    top = Math.max(top, margin);
+
+    setPopoverPos({ top, left });
+  }, [hoveredOrder]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -537,29 +565,35 @@ const Order = () => {
         </div>
       </div>
 
-      {/* CUSTOMER ADDRESS POPOVER — fixed positioned so it escapes any overflow/scroll container */}
-      {addressPopover && (
+      {/* CUSTOMER ADDRESS POPOVER — fixed positioned so it escapes any overflow/scroll
+          container, and positioned only after measuring its real rendered size */}
+      {hoveredOrder && (
         <div
-          className="fixed z-50 w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none"
-          style={{ top: addressPopover.top, left: addressPopover.left }}
+          ref={popoverRef}
+          className="fixed z-50 w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
+          style={
+            popoverPos
+              ? { top: popoverPos.top, left: popoverPos.left, opacity: 1 }
+              : { top: 0, left: 0, opacity: 0 }
+          }
         >
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
             Delivery address
           </p>
           <p className="text-sm font-medium text-gray-900">
-            {addressPopover.order.user?.customer_name}
+            {hoveredOrder.order.user?.customer_name}
           </p>
           <p className="text-sm text-gray-500 mt-0.5">
-            {addressPopover.order.user?.phone_num}
+            {hoveredOrder.order.user?.phone_num}
           </p>
           <p className="text-sm text-gray-600 mt-2 leading-relaxed">
             {[
-              addressPopover.order.shippingAddress?.apartment,
-              addressPopover.order.shippingAddress?.locality,
-              addressPopover.order.shippingAddress?.landmark,
-              addressPopover.order.shippingAddress?.city,
-              addressPopover.order.shippingAddress?.state,
-              addressPopover.order.shippingAddress?.pincode,
+              hoveredOrder.order.shippingAddress?.apartment,
+              hoveredOrder.order.shippingAddress?.locality,
+              hoveredOrder.order.shippingAddress?.landmark,
+              hoveredOrder.order.shippingAddress?.city,
+              hoveredOrder.order.shippingAddress?.state,
+              hoveredOrder.order.shippingAddress?.pincode,
             ]
               .filter(Boolean)
               .join(", ") || "No address details available"}
