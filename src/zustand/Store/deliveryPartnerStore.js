@@ -8,11 +8,11 @@ const deliveryPartnerStore = create((set) => ({
   url: [],
   loading: false,
 
-  getDeliveryPersons: async (deliveryPersonId, search) => {
+  getDeliveryPersons: async ({ search = "", page = 1, limit = 8, fromDate = "", toDate = "" }) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getDeliveryPersons", {
-        params: { deliveryPersonId, search },
+        params: { search, page, limit, fromDate, toDate },
         withAuth: true,
       });
       set({
