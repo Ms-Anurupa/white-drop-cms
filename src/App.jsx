@@ -25,6 +25,7 @@ import DeliveryPartnerList from "./pages/DeliveryPartner/DeliveryPartnerList";
 import DeliveryPartnerDetails from "./components/DeliveryPartnerDetails";
 import LocationTracker from "./components/LocationTracker";
 import OrderViewDetails from "./components/OrderViewDetails";
+import CreateDeliveryPartner from "./components/CreateDeliveryPartner";
 
 const App = () => {
   return (
@@ -41,7 +42,10 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/verify-mail" element={<VerifyMail />} />
-            <Route path="/location-tracker/:driverId" element={<LocationTracker />} />
+            <Route
+              path="/location-tracker/:driverId"
+              element={<LocationTracker />}
+            />
 
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -55,7 +59,10 @@ const App = () => {
               />
               <Route path="customer" element={<Customer />} />
               <Route path="orders" element={<Order />} />
-              <Route path="orders/orderDetails/:id" element={<OrderViewDetails />} />
+              <Route
+                path="orders/orderDetails/:id"
+                element={<OrderViewDetails />}
+              />
               <Route path="production" element={<Production />} />
               <Route path="inventory" element={<Inventory />} />
               <Route path="deliveries" element={<Deliveries />} />
@@ -77,6 +84,10 @@ const App = () => {
               <Route
                 path="support/offer-manager/add-offer"
                 element={<AddOffer />}
+              />
+              <Route
+                path="createDeliveryPartner"
+                element={<CreateDeliveryPartner/>}
               />
             </Route>
           </Routes>

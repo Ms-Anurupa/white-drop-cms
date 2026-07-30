@@ -7,8 +7,38 @@ const deliveryPartnerStore = create((set) => ({
   partnerDetails: [],
   url: [],
   loading: false,
+  creating: false,
+  createError: null,
 
-  getDeliveryPersons: async ({ search = "", page = 1, limit = 8, fromDate = "", toDate = "" }) => {
+  createDeliveryAccount: async ({ phoneNo, firstName, lastName }) => {
+    set({ creating: true, createError: null });
+    try {
+      const { data } = await api.post("/admin/createDeliveryAccount", {
+        phoneNo,
+        firstName,
+        lastName,
+      }, {withAuth: true});
+
+      set((state) => ({
+        creating: false,
+        partners: [data.user, ...state.partners],
+      }));
+
+      return { success: true, user: data.user };
+    } catch (err) {
+      const message =
+        err?.response?.data?.message || "Failed to create delivery account.";
+      set({ creating: false, createError: message });
+      return { success: false, message };
+    }
+  },
+  getDeliveryPersons: async ({
+    search = "",
+    page = 1,
+    limit = 8,
+    fromDate = "",
+    toDate = "",
+  }) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getDeliveryPersons", {
