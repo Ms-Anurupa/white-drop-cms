@@ -1,42 +1,127 @@
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Delete, View, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Eye,
+  Trash2,
+  Users,
+} from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
 import useDebounce from "../../utils/useDebounce";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
+
+const JOIN_FILTERS = [
+  { key: "all", label: "All time", countLabel: "Total customers" },
+  { key: "today", label: "Today", countLabel: "Joined today" },
+  { key: "week", label: "This week", countLabel: "Joined this week" },
+  { key: "month", label: "This month", countLabel: "Joined this month" },
+  { key: "year", label: "This year", countLabel: "Joined this year" },
+];
+
+const formatDate = (value) => {
+  if (!value) return "NA";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "NA";
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const matchesJoinFilter = (customer, filter) => {
+  if (filter === "all") return true;
+
+  const joined = new Date(customer.createdAt);
+  if (Number.isNaN(joined.getTime())) return false;
+
+  const now = new Date();
+
+  if (filter === "today") {
+    return joined.toDateString() === now.toDateString();
+  }
+
+  if (filter === "week") {
+    const weekAgo = new Date();
+    weekAgo.setDate(now.getDate() - 7);
+    return joined >= weekAgo;
+  }
+
+  if (filter === "month") {
+    return (
+      joined.getMonth() === now.getMonth() &&
+      joined.getFullYear() === now.getFullYear()
+    );
+  }
+
+  if (filter === "year") {
+    return joined.getFullYear() === now.getFullYear();
+  }
+
+  return true;
+};
 
 const Customer = () => {
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [joinFilter, setJoinFilter] = useState("all");
   const { confirm } = useConfirm();
   const getAllCustomers = customerStore((state) => state.getAllCustomers);
   const customers = customerStore((state) => state.customers);
-  const exportCustomerDetails = customerStore((state) => state.exportCustomerDetails);
-  const deleteCustomerDetails = customerStore((state) => state.deleteCustomerDetails);
+  const exportCustomerDetails = customerStore(
+    (state) => state.exportCustomerDetails,
+  );
+  const deleteCustomerDetails = customerStore(
+    (state) => state.deleteCustomerDetails,
+  );
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     getAllCustomers(debouncedSearch);
+    setPage(1);
   }, [debouncedSearch, getAllCustomers]);
 
-  const totalPages = Math.ceil(customers.length / PAGE_SIZE);
+  const filteredCustomers = useMemo(
+    () => customers.filter((c) => matchesJoinFilter(c, joinFilter)),
+    [customers, joinFilter],
+  );
 
-  const start = (page - 1) * PAGE_SIZE;
+  const joinCounts = useMemo(
+    () => ({
+      all: customers.length,
+      today: customers.filter((c) => matchesJoinFilter(c, "today")).length,
+      week: customers.filter((c) => matchesJoinFilter(c, "week")).length,
+      month: customers.filter((c) => matchesJoinFilter(c, "month")).length,
+      year: customers.filter((c) => matchesJoinFilter(c, "year")).length,
+    }),
+    [customers],
+  );
+
+  const totalPages = Math.max(
+    Math.ceil(filteredCustomers.length / pageSize),
+    1,
+  );
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * pageSize;
+  const paginated = filteredCustomers.slice(start, start + pageSize);
 
   const handleExport = async () => {
     try {
       const file = await exportCustomerDetails();
-
-      // console.log(file);
-      // console.log(file instanceof Blob);
       const url = window.URL.createObjectURL(file);
 
-      const link = document.createElement("a")
-      link.href=url;
-      link.download="customers.xlsx";
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "customers.xlsx";
 
       document.body.appendChild(link);
       link.click();
@@ -48,285 +133,420 @@ const Customer = () => {
     } catch {
       toast.error("Failed to export customer details");
     }
-  }
+  };
 
-  const handleCustomerDelete = async () => {
+  const handleCustomerDelete = async (customerId) => {
     try {
-
       const confirmMessage = await confirm({
-        title: "Delete Customer",
+        title: "Delete customer",
         message: "This will permanently delete the customer. Continue?",
       });
 
       if (!confirmMessage) return;
 
-      const payload = {
-        id: "id",
-      }
-      await deleteCustomerDetails(payload);
+      await deleteCustomerDetails({ id: customerId });
+      await getAllCustomers(debouncedSearch);
 
+      toast.success("Customer deleted");
     } catch {
-        toast.error("Failed to delete customer");
+      toast.error("Failed to delete customer");
     }
-  }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const windowSize = 1;
+    const addRange = (from, to) => {
+      for (let i = from; i <= to; i++) pages.push(i);
+    };
+
+    if (totalPages <= 7) {
+      addRange(1, totalPages);
+      return pages;
+    }
+
+    pages.push(1);
+    const left = Math.max(2, currentPage - windowSize);
+    const right = Math.min(totalPages - 1, currentPage + windowSize);
+
+    if (left > 2) pages.push("ellipsis-left");
+    addRange(left, right);
+    if (right < totalPages - 1) pages.push("ellipsis-right");
+    pages.push(totalPages);
+
+    return pages;
+  };
 
   return (
-    <div className="h-full p-2 sm:p-3 md:p-4 space-y-4 overflow-hidden">
-      {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-        {/* Left Side */}
+    <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
+      {/* ── HEADER ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Customer Management
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Manage customer data, wallets & subscriptions
+          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>Manage customer data, wallets &amp; subscriptions</span>
+            <span className="text-blue-600 font-medium">
+              {JOIN_FILTERS.find((f) => f.key === joinFilter)?.countLabel}:{" "}
+              {joinCounts[joinFilter]}
+            </span>
           </p>
         </div>
 
-        {/* Right Side */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full lg:w-auto">
-          {/* Search */}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center w-full lg:w-auto">
           <div className="relative w-full sm:w-64">
             <Search
               size={16}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
-
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or phone..."
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+              placeholder="Search by name or phone…"
+              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
             />
           </div>
 
-          {/* Total Customers */}
-          <div className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg text-center whitespace-nowrap">
-            Total Customers:{" "}
-            <span className="font-semibold text-gray-900">
-              {customers.length}
-            </span>
-          </div>
-
-          {/* Export Button */}
           <button
             onClick={handleExport}
-            className="w-full sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm cursor-pointer"
           >
+            <Download size={16} />
             Export
           </button>
         </div>
       </div>
 
-      {/* TABLE CARD */}
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm flex flex-col h-[350px] overflow-hidden">
-        {/* /mobile table cards */}
-        <div className="sm:hidden flex-1 overflow-y-auto p-2 space-y-3">
-          {customers.map((c) => (
-            <div
-              key={c?.userUid}
-              className="border border-gray-100 rounded-xl p-3 bg-white"
+      {/* ── STAT CARDS ── */}
+      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          icon={<Users size={16} className="text-blue-600" />}
+          label="Total customers"
+          value={customers.length}
+        />
+        <StatCard
+          label="Joined this month"
+          value={joinCounts.month}
+          valueClass="text-emerald-600"
+          dotClass="bg-emerald-500"
+        />
+        <StatCard
+          label="Joined this year"
+          value={joinCounts.year}
+          valueClass="text-blue-600"
+          dotClass="bg-blue-500"
+        />
+      </div> */}
+
+      {/* ── JOIN DATE FILTER — segmented pills with live counts ── */}
+      <div className="flex flex-wrap gap-2">
+        {JOIN_FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => {
+              setJoinFilter(f.key);
+              setPage(1);
+            }}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium border transition cursor-pointer ${
+              joinFilter === f.key
+                ? "bg-blue-600 border-blue-600 text-white shadow-sm"
+                : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {f.label}
+            <span
+              className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
+                joinFilter === f.key
+                  ? "bg-white/20 text-white"
+                  : "bg-gray-100 text-gray-500"
+              }`}
             >
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">
-                      {c?.customer_name}
-                    </h3>
+              {joinCounts[f.key]}
+            </span>
+          </button>
+        ))}
+      </div>
 
-                    <p className="text-sm text-gray-500">{c?.phone_num}</p>
+      {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* MOBILE VIEW */}
+        <div className="block sm:hidden divide-y divide-gray-100">
+          {paginated.length === 0 ? (
+            <EmptyState />
+          ) : (
+            paginated.map((c, index) => (
+              <div key={c?.userUid} className="p-4 hover:bg-slate-50">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400 shrink-0">
+                        #{start + index + 1}
+                      </span>
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {c?.customer_name ?? "-"}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{c?.phone_num}</p>
                   </div>
-
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      c?.customer_type === "Premium"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {c?.customer_type}
+                  <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full shrink-0">
+                    {c?.subscription || "NA"}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-y-2 text-sm">
+                <div className="grid grid-cols-2 gap-y-2 text-sm mt-3">
                   <div>
-                    <p className="text-gray-400">Wallet</p>
-                    <p>₹{c?.wallet_balance}</p>
+                    <p className="text-xs text-gray-400">Wallet balance</p>
+                    <p className="font-medium text-gray-800">
+                      ₹{c?.wallet_balance ?? 0}
+                    </p>
                   </div>
-
                   <div>
-                    <p className="text-gray-400">Joined</p>
-                    <p>{c?.joined || "NA"}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Subscription</p>
-                    <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
-                      {c?.subscription || "NA"}
-                    </span>
+                    <p className="text-xs text-gray-400">Joined on</p>
+                    <p className="font-medium text-gray-800">
+                      {formatDate(c?.createdAt)}
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-2">
-                  <button className="text-gray-700">
-                    <View size={18} />
+                <div className="flex gap-2 mt-3">
+                  <button className="flex-1 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5">
+                    <Eye size={13} />
+                    View
                   </button>
-
-                  <button className="text-red-600">
-                    <Delete size={18} />
+                  <button
+                    onClick={() => handleCustomerDelete(c?.userUid)}
+                    className="flex-1 py-2 text-xs font-medium rounded-lg border border-red-100 text-red-600 hover:bg-red-50 inline-flex items-center justify-center gap-1.5"
+                  >
+                    <Trash2 size={13} />
+                    Delete
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        {/* HEADER TABLE */}
-        <div className="hidden sm:flex flex-col flex-1 overflow-hidden">
-          <table className="w-full text-sm table-fixed">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
+        {/* DESKTOP TABLE */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-100">
                 {[
-                  "Sl No",
-                  "Phone Number",
+                  "Sl No.",
                   "Name",
-                  "Wallet Balance",
-                  "Joined On",
-                  "Subscriptions",
+                  "Phone number",
+                  "Wallet balance",
+                  "Joined on",
+                  "Subscription",
                   "Actions",
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-          </table>
-          {/* BODY */}
-          <div className="flex-1 overflow-y-auto">
-            <table className="w-full text-sm table-fixed">
-              <tbody>
-                {customers?.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="px-4 py-10 text-center text-gray-400"
-                    >
-                      No customers found
+
+            <tbody className="divide-y divide-gray-50">
+              {paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>
+                    <EmptyState />
+                  </td>
+                </tr>
+              ) : (
+                paginated.map((c, index) => (
+                  <tr key={c?.userUid} className="hover:bg-slate-50 transition">
+                    <td className="px-4 py-3.5 text-gray-400">
+                      {start + index + 1}
+                    </td>
+
+                    <td className="px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                      {c?.customer_name ?? "-"}
+                    </td>
+
+                    <td className="px-4 py-3.5 text-gray-600 whitespace-nowrap">
+                      {c?.phone_num}
+                    </td>
+
+                    <td className="px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                      ₹{c?.wallet_balance ?? 0}
+                    </td>
+
+                    <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
+                      {formatDate(c?.createdAt)}
+                    </td>
+
+                    <td className="px-4 py-3.5">
+                      <span className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
+                        {c?.subscription || "NA"}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-3.5">
+                      <div className="flex gap-2">
+                        <button
+                          title="View customer"
+                          className="p-2 cursor-pointer rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
+                        >
+                          <Eye size={15} />
+                        </button>
+                        <button
+                          title="Delete customer"
+                          onClick={() => handleCustomerDelete(c?.userUid)}
+                          className="p-2 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50 transition"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  customers?.map((c, index) => (
-                    <tr
-                      key={c?.userUid}
-                      className="border-b border-gray-50 hover:bg-gray-50 transition"
-                    >
-                      <td className="px-2 py-3 text-gray-400">
-                        {start + index + 1}
-                      </td>
-
-                      <td className="px-2 py-3 font-medium text-gray-700">
-                        {c?.phone_num}
-                      </td>
-
-                      <td className="px-4 py-3 font-medium text-gray-800">
-                        {c?.customer_name ?? "-"}
-                      </td>
-
-                      {/* <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            c?.customer_type === "Premium"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {c?.customer_type}
-                        </span>
-                      </td> */}
-
-                      <td className="px-4 py-3 font-medium text-gray-800">
-                        ₹{c?.wallet_balance}
-                      </td>
-
-                      <td className="px-4 py-3 text-gray-500">
-                        {new Date(c.createdAt).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">
-                          {c?.subscription || "NA"}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          {/* <button className="text-amber-950 hover:bg-gray-100">
-                            <View size={20} />
-                          </button> */}
-
-                          <button
-                            onClick={handleCustomerDelete}
-                            title="Delete User"
-                            className="cursor-pointer border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            <Delete size={20} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* PAGINATION (fixed bottom) */}
-        <div className="shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-100">
-          <p className="text-xs text-gray-500">
-            {customers.length === 0
-              ? "No results"
-              : `${start + 1}–${Math.min(
-                  start + PAGE_SIZE,
-                  customers.length,
-                )} of ${customers.length}`}
-          </p>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              disabled={page === 1}
-              className="w-7 h-7 cursor-pointer flex items-center justify-center rounded-md border bg-white disabled:opacity-40"
-            >
-              <ChevronLeft size={14} />
-            </button>
-
-            <span className="text-xs font-medium min-w-[40px] text-center">
-              {page} / {totalPages || 1}
+        {/* PAGINATION */}
+        <div className="border-t border-gray-100 px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span>
+              {filteredCustomers.length === 0
+                ? "No results"
+                : `Showing ${start + 1}–${Math.min(
+                    start + pageSize,
+                    filteredCustomers.length,
+                  )} of ${filteredCustomers.length}`}
             </span>
 
-            <button
-              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              disabled={page === totalPages}
-              className="w-7 h-7 cursor-pointer flex items-center justify-center rounded-md border bg-white disabled:opacity-40"
+            <label className="flex items-center gap-1.5">
+              <span className="hidden md:inline">Rows per page</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <PageButton
+              onClick={() => setPage(1)}
+              disabled={currentPage === 1}
+              label="First page"
+            >
+              <ChevronsLeft size={14} />
+            </PageButton>
+
+            <PageButton
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              label="Previous page"
+            >
+              <ChevronLeft size={14} />
+            </PageButton>
+
+            <div className="flex items-center gap-1 mx-1">
+              {getPageNumbers().map((p, i) =>
+                typeof p === "number" ? (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    aria-current={p === currentPage ? "page" : undefined}
+                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
+                      p === currentPage
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ) : (
+                  <span
+                    key={`${p}-${i}`}
+                    className="w-8 h-8 flex items-center justify-center text-gray-300 text-xs"
+                  >
+                    …
+                  </span>
+                ),
+              )}
+            </div>
+
+            <PageButton
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
+              label="Next page"
             >
               <ChevronRight size={14} />
-            </button>
+            </PageButton>
+
+            <PageButton
+              onClick={() => setPage(totalPages)}
+              disabled={currentPage >= totalPages}
+              label="Last page"
+            >
+              <ChevronsRight size={14} />
+            </PageButton>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const PageButton = ({ children, onClick, disabled, label }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={label}
+    aria-label={label}
+    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+  >
+    {children}
+  </button>
+);
+
+const StatCard = ({
+  icon,
+  label,
+  value,
+  valueClass = "text-gray-900",
+  dotClass,
+}) => (
+  <div className="bg-white border border-gray-100 rounded-xl px-5 py-4 shadow-sm">
+    <div className="flex items-center gap-2 mb-1.5">
+      {dotClass && <span className={`w-2 h-2 rounded-full ${dotClass}`} />}
+      {icon}
+      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+        {label}
+      </p>
+    </div>
+    <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
+  </div>
+);
+
+const EmptyState = () => (
+  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
+    <Users size={32} className="text-gray-300" />
+    <p className="text-sm font-medium text-gray-500">No customers found</p>
+    <p className="text-xs text-gray-400">
+      Try adjusting your search or filters
+    </p>
+  </div>
+);
 
 export default Customer;
