@@ -24,7 +24,6 @@ import Loader from "../../components/Loader";
 import useSignedImages from "../../hooks/useSignedImages";
 import { toast } from "react-toastify";
 
-
 const PAGE_LIMIT = 8;
 
 const getFullName = (p) => {
@@ -91,7 +90,7 @@ const AreaCoverCell = ({ text }) => {
   const handleMouseEnter = () => {
     if (!isTruncated || !textRef.current) return;
     const rect = textRef.current.getBoundingClientRect();
-    const tooltipWidth = 256; // matches max-w-xs
+    const tooltipWidth = 256; // matches max-w-xs, keeps tooltip width fixed
     const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 16);
     setTooltipPos({ top: rect.bottom + 8, left: Math.max(left, 8) });
     setShowTooltip(true);
@@ -116,7 +115,7 @@ const AreaCoverCell = ({ text }) => {
         createPortal(
           <div
             style={{ top: tooltipPos.top, left: tooltipPos.left }}
-            className="fixed z-50 max-w-xs bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none"
+            className="fixed z-100 w-64 text-gray-950 bg-white text-xs shadow-gray-500 rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none break-words"
           >
             {text}
           </div>,
@@ -418,7 +417,7 @@ const DeliveryPartnerList = () => {
                             <option value="false">● Inactive</option>
                           </select>
                         </td>
-                        <td className="p-3 text-sm">
+                        <td className="p-3 text-sm text-black bg-white">
                           <AreaCoverCell text={p?.areaCovered} />
                         </td>
                         <td className="p-3">
@@ -511,7 +510,9 @@ const DeliveryPartnerList = () => {
                     <p className="flex items-start gap-1.5">
                       <MapPin size={12} className="mt-0.5 shrink-0" />
                       {p?.areaCovered ? (
-                        <span className="break-words">{p.areaCovered}</span>
+                        <span className="p-3 text-sm text-black bg-white">
+                          {p.areaCovered}
+                        </span>
                       ) : (
                         <span className="italic text-gray-400">
                           Area not assigned
