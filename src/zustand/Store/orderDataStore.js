@@ -5,9 +5,11 @@ import api from "../axios";
 const orderDataStore = create((set) => ({
   orders: [],
   orderDetails: [],
+  loading: false,
 
   getOrderListing: async (status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" ) => {
     try {
+      set({ loading: true });
       const res = await api.get("/admin/getOrderListing", {
         withAuth: true,
         params: { search, status, page, limit, fromDate, toDate },
@@ -18,6 +20,8 @@ const orderDataStore = create((set) => ({
       });
     } catch (error) {
       throw error;
+    } finally {
+      set({ loading: false });
     }
   },
 
@@ -33,7 +37,7 @@ const orderDataStore = create((set) => ({
       });
     } catch (error) {
       throw error;
-    }
+    } 
   },
 
 

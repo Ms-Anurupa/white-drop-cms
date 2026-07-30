@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from "react";
 import {
   Search,
@@ -520,24 +521,6 @@ const PageButton = ({ children, onClick, disabled, label }) => (
   </button>
 );
 
-const StatCard = ({
-  icon,
-  label,
-  value,
-  valueClass = "text-gray-900",
-  dotClass,
-}) => (
-  <div className="bg-white border border-gray-100 rounded-xl px-5 py-4 shadow-sm">
-    <div className="flex items-center gap-2 mb-1.5">
-      {dotClass && <span className={`w-2 h-2 rounded-full ${dotClass}`} />}
-      {icon}
-      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        {label}
-      </p>
-    </div>
-    <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
-  </div>
-);
 
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">

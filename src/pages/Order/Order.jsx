@@ -8,11 +8,13 @@ import {
   ChevronsRight,
   Eye,
   PackageSearch,
+  CalendarRange,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
 import { getProductUrl } from "../../utils/resolveProductUrl";
+import Loader from "../../components/Loader";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -51,6 +53,7 @@ const Order = () => {
     (state) => state.exportOrderDetails,
   );
   const orders = orderDataStore((state) => state.orders);
+  const loading = orderDataStore((state) => state.loading);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -59,6 +62,8 @@ const Order = () => {
   const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
   const [popoverPos, setPopoverPos] = useState(null); // { top, left } — set once measured
   const popoverRef = useRef(null);
+  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState("");
 
   const navigate = useNavigate();
 
@@ -109,11 +114,23 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      getOrderListing(search, status);
+      getOrderListing({ search, status, fromDate, toDate });
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
-  }, [getOrderListing, search, status]);
+  }, [getOrderListing, search, status, fromDate, toDate]);
+
+
+  const handleFromDateChange = (value) => {
+    setFromDate(value);
+  };
+  const handleToDateChange = (value) => {
+    setToDate(value);
+  };
+  const clearDates = () => {
+    setFromDate("");
+    setToDate("");
+  };
 
   const matchesDateFilter = (order, filter) => {
     if (filter === "all") return true;
@@ -212,6 +229,8 @@ const Order = () => {
     return pages;
   };
 
+  if (loading) return <Loader text="Loading order history lists..." />;
+
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
       {/* ── HEADER ── */}
@@ -229,47 +248,36 @@ const Order = () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center w-full lg:w-auto">
-          {/* Search */}
-          <div className="relative w-full sm:w-60">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-            <input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search orders…"
-              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-            />
+        <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
+          {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+            {/* Search */}
+            <div className=" w-full md:w-72">
+              <label className="text-[11px] text-gray-500 mb-1 block">
+                Search
+              </label>
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search orders..."
+                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Status Filter */}
-          <select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              setPage(1);
-            }}
-            className="px-3 py-2.5 cursor-pointer text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-          >
-            <option value="">All statuses</option>
-            <option value="PROCESSING">Processing</option>
-            <option value="INTRANSIT">In transit</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="FAILED">Failed</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-
-          {/* Export */}
-
+          {/* Export — pinned to the row's end via justify-between + shrink-0,
+      so it never shifts regardless of what the left cluster does */}
           <button
             onClick={handleExport}
-            className="w-full flex flex-1 gap-2 sm:w-auto px-3.5 py-2 text-sm font-medium bg-emerald-600
-             text-white rounded-lg hover:bg-emerald-700 transition cursor-pointer"
+            className="h-10 px-4 flex items-center gap-2 rounded-lg shrink-0
+    bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
           >
             <Download size={16} />
             Export
@@ -304,6 +312,50 @@ const Order = () => {
             </span>
           </button>
         ))}
+      </div>
+      {/* From / To */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3.5 flex flex-wrap items-end gap-4">
+        <div className="flex items-center gap-2 text-gray-500 text-sm pb-2">
+          <CalendarRange size={16} />
+          <span className="font-medium">Joined date</span>
+        </div>
+        <div className="flex items-end gap-2">
+          <div className="flex flex-col">
+            <label className="text-[11px] text-gray-500 mb-1">From</label>
+            <input
+              type="date"
+              value={fromDate}
+              max={toDate || undefined}
+              onChange={(e) => handleFromDateChange(e.target.value)}
+              className="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-[11px] text-gray-500 mb-1">To</label>
+            <input
+              type="date"
+              value={toDate}
+              min={fromDate || undefined}
+              onChange={(e) => handleToDateChange(e.target.value)}
+              className="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+            />
+          </div>
+
+          {/* Clear reserves its own slot so it doesn't nudge the From/To inputs
+          themselves — it only ever grows the left cluster, never Export */}
+          {(fromDate || toDate) && (
+            <button
+              onClick={clearDates}
+              className="h-10 px-4 rounded-lg border border-red-200
+          text-red-600 text-sm hover:bg-red-50 transition shrink-0"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
