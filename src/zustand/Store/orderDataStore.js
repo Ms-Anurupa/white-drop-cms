@@ -7,12 +7,12 @@ const orderDataStore = create((set) => ({
   orderDetails: [],
   loading: false,
 
-  getOrderListing: async (search, status) => {
+  getOrderListing: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getOrderListing", {
         withAuth: true,
-        params: { search, status },
+        params: { search, status, page, limit, fromDate, toDate },
       });
 
       set({

@@ -310,9 +310,9 @@ const DeliveryPartnerList = () => {
         {(fromDate || toDate) && (
           <button
             onClick={clearDateFilter}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition"
+            className="h-8.5 px-4 rounded-lg border border-red-200
+          text-red-600 text-sm hover:bg-red-50 transition shrink-0 cursor-pointer"
           >
-            <X size={14} />
             Clear
           </button>
         )}

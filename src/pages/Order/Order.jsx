@@ -114,7 +114,7 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      getOrderListing({ search, status, fromDate, toDate });
+      getOrderListing({ status, search, page, pageSize, fromDate, toDate });
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
@@ -285,40 +285,42 @@ const Order = () => {
         </div>
       </div>
 
-      {/* ── DATE RANGE FILTER — segmented pills with live counts ── */}
-      <div className="flex flex-wrap gap-2">
-        {DATE_FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => {
-              setDateFilter(f.key);
-              setPage(1);
-            }}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium border transition cursor-pointer ${
-              dateFilter === f.key
-                ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-                : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            {f.label}
-            <span
-              className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
+      {/* ── DATE FILTER BAR — pills + custom range, unified ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-wrap items-center gap-3">
+        {/* Segmented pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {DATE_FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => {
+                setDateFilter(f.key);
+                setPage(1);
+              }}
+              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium border transition cursor-pointer ${
                 dateFilter === f.key
-                  ? "bg-white/20 text-white"
-                  : "bg-gray-100 text-gray-500"
+                  ? "bg-blue-600 border-blue-600 text-white shadow-sm"
+                  : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
-              {dateCounts[f.key]}
-            </span>
-          </button>
-        ))}
-      </div>
-      {/* From / To */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3.5 flex flex-wrap items-end gap-4">
-        <div className="flex items-center gap-2 text-gray-500 text-sm pb-2">
-          <CalendarRange size={16} />
-          <span className="font-medium">Joined date</span>
+              {f.label}
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
+                  dateFilter === f.key
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {dateCounts[f.key]}
+              </span>
+            </button>
+          ))}
         </div>
+
+        {/* Divider — only shows on wide screens where the row is horizontal */}
+        <div className="hidden sm:block w-px self-stretch bg-gray-100 mx-10" />
+
+        
+
         <div className="flex items-end gap-2">
           <div className="flex flex-col">
             <label className="text-[11px] text-gray-500 mb-1">From</label>
@@ -327,10 +329,12 @@ const Order = () => {
               value={fromDate}
               max={toDate || undefined}
               onChange={(e) => handleFromDateChange(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm
+              className="h-9 px-3 rounded-lg border border-gray-200 bg-white text-sm
           focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
             />
           </div>
+
+          <span className="text-gray-300 pb-2">→</span>
 
           <div className="flex flex-col">
             <label className="text-[11px] text-gray-500 mb-1">To</label>
@@ -339,18 +343,16 @@ const Order = () => {
               value={toDate}
               min={fromDate || undefined}
               onChange={(e) => handleToDateChange(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm
+              className="h-9 px-3 rounded-lg border border-gray-200 bg-white text-sm
           focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
             />
           </div>
 
-          {/* Clear reserves its own slot so it doesn't nudge the From/To inputs
-          themselves — it only ever grows the left cluster, never Export */}
           {(fromDate || toDate) && (
             <button
               onClick={clearDates}
-              className="h-10 px-4 rounded-lg border border-red-200
-          text-red-600 text-sm hover:bg-red-50 transition shrink-0"
+              className="h-9 px-3 rounded-lg border border-red-200
+          text-red-600 text-sm hover:bg-red-50 transition shrink-0 cursor-pointer"
             >
               Clear
             </button>
