@@ -16,6 +16,7 @@ import {
   CalendarRange,
   X,
   MapPin,
+  Plus
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import deliveryPartnerStore from "../../zustand/Store/deliveryPartnerStore";
@@ -202,17 +203,18 @@ const DeliveryPartnerList = () => {
   return (
     <div className="p-3 sm:p-4 space-y-4 bg-gray-50 min-h-screen">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
-            Delivery Partners
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Manage riders, verify documents, and track onboarding.
-          </p>
-        </div>
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+          Delivery Partners
+        </h1>
+        <p className="text-sm text-gray-500 mt-0.5">
+          Manage riders, verify documents, and track onboarding.
+        </p>
+      </div>
 
-        <div className="relative w-full md:w-72">
+      <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="relative flex-1 md:w-72">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             size={16}
@@ -224,7 +226,16 @@ const DeliveryPartnerList = () => {
             className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white border border-gray-200 shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition"
           />
         </div>
+
+        <button
+          onClick={() => navigate("/dashboard/createDeliveryPartner")}
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm hover:bg-blue-700 active:scale-[0.98] transition shrink-0 cursor-pointer"
+        >
+          <Plus size={16} />
+          Add Partner
+        </button>
       </div>
+    </div>
 
       {/* STATS STRIP */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
