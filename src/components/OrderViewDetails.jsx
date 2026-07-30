@@ -424,7 +424,7 @@ const OrderViewDetails = () => {
                         {item.product?.product_name}
                       </h3>
                       <p
-                        className="text-xs mt-0.5 truncate"
+                        className="text-xs mt-0.5 whitespace-normal"
                         style={{ color: "#8A8778" }}
                       >
                         {item.product?.product_description}
