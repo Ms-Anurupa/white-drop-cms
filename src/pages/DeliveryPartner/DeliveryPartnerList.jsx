@@ -169,7 +169,7 @@ const DeliveryPartnerList = () => {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [search, page, fromDate, toDate]);
+  }, [search, page, fromDate, toDate, getDeliveryPersons]);
 
   const handleStatusChange = async (active, deliveryPersonId) => {
     try {
