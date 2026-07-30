@@ -13,12 +13,14 @@ import {
   Phone,
   Navigation,
   CircleDot,
+  Home,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import orderDataStore from "../zustand/Store/orderDataStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { getProductUrl } from "../utils/resolveProductUrl";
+import { useConfirm } from "./ConfirmProvider";
 
 const STATUS_TOKENS = {
   DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
@@ -74,6 +76,7 @@ const avatarStyle = (seed = "") => {
 const OrderViewDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
 
   const getOrderById = orderDataStore((state) => state.getOrderById);
   const orderDetails = orderDataStore((state) => state.orderDetails);
@@ -89,7 +92,7 @@ const OrderViewDetails = () => {
   const [dpMenuOpen, setDpMenuOpen] = useState(false);
   const [dpSearch, setDpSearch] = useState("");
   const [assigning, setAssigning] = useState(false);
-  const [assignedDp, setAssignedDp] = useState(null);
+  const [assignedDpId, setAssignedDpId] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -109,8 +112,12 @@ const OrderViewDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    if (orderDetails?.deliveryPartner) {
-      setAssignedDp(orderDetails.deliveryPartner);
+    const deliveryAgent = orderDetails?.orderItems?.[0]?.deliveryAgent;
+
+    if (deliveryAgent) {
+      setAssignedDpId(deliveryAgent.deliveryPersonId || deliveryAgent.id);
+    } else {
+      setAssignedDpId(null);
     }
   }, [orderDetails]);
 
@@ -126,12 +133,34 @@ const OrderViewDetails = () => {
     );
   }, [partners, dpSearch]);
 
+  const assignedDp = useMemo(() => {
+    const deliveryAgent = orderDetails?.orderItems?.[0]?.deliveryAgent;
+
+    if (deliveryAgent) {
+      return deliveryAgent;
+    }
+
+    if (!assignedDpId) return null;
+
+    return partners?.find(
+      (p) => p.deliveryPersonId === assignedDpId || p.id === assignedDpId,
+    );
+  }, [assignedDpId, partners, orderDetails]);
+
   const handleAssign = async (dp) => {
     if (!dp || assigning || !orderDetails) return;
     console.log(orderDetails);
 
     setAssigning(true);
     try {
+      const confirmMessage = await confirm({
+        title: "Assign Delivery Partner",
+        message:
+          "This will assign the delivery partner for this order. Continue?",
+      });
+
+      if (!confirmMessage) return;
+
       const payload = {
         id: orderDetails?.id,
         deliveryPersonId: dp.deliveryPersonId,
@@ -139,7 +168,8 @@ const OrderViewDetails = () => {
       console.log("payload", payload);
 
       await associateOrderToDelPerson(payload);
-      setAssignedDp(dp);
+      await getOrderById(orderDetails.id);
+      setAssignedDpId(dp.deliveryPersonId || dp.id);
       setDpMenuOpen(false);
       setDpSearch("");
       toast.success(
@@ -229,16 +259,16 @@ const OrderViewDetails = () => {
   const isCancelled = order.orderStatus === "CANCELLED";
 
   return (
-    <div className="min-h-screen w-full" style={pageStyle}>
+    <div className="min-h-[85vh] w-full" style={pageStyle}>
       {fontImport}
 
       {/* Header */}
       <div
-        className="sticky top-0 z-20"
+        className="sticky -mt-4 z-20"
         style={{
           background: "rgba(247,246,242,0.92)",
           backdropFilter: "blur(8px)",
-          borderBottom: "1px solid #E4E1D6",
+          borderBottom: "1px solid #faf7ed",
         }}
       >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -260,17 +290,14 @@ const OrderViewDetails = () => {
             <div>
               <div className="flex items-center gap-3 flex-wrap">
                 <h1
-                  className="mono text-lg font-semibold tracking-tight"
-                  style={{ color: "#14213D" }}
+                  className="mono text-lg font-bold tracking-tight"
+                  style={{ color: "#264da3" }}
                 >
                   {order.orderId}
                 </h1>
                 <StatusPill status={order.orderStatus} />
               </div>
-              <p
-                className="flex items-center gap-1.5 mt-1 text-xs"
-                style={{ color: "#8A8778" }}
-              >
+              <p className="flex items-center text-gray-950 gap-1.5 mt-1 text-xs">
                 <Clock size={12} />
                 {new Date(order.createdAt).toLocaleString("en-IN", {
                   dateStyle: "medium",
@@ -281,14 +308,11 @@ const OrderViewDetails = () => {
           </div>
 
           <div className="text-right">
-            <p
-              className="text-[11px] uppercase tracking-wider font-medium"
-              style={{ color: "#8A8778" }}
-            >
+            <p className="text-[11px] uppercase text-gray-950 tracking-wider font-medium">
               Total amount
             </p>
             <h2
-              className="mono text-2xl font-semibold"
+              className="mono text-2xl font-bold"
               style={{ color: "#14213D" }}
             >
               ₹{Number(order.orderTotal || 0).toLocaleString("en-IN")}
@@ -311,7 +335,7 @@ const OrderViewDetails = () => {
                     <div className="flex items-center gap-2">
                       <CircleDot
                         size={14}
-                        style={{ color: done ? "#C65D2E" : "#D3D1C7" }}
+                        style={{ color: done ? "#8a340e" : "#D3D1C7" }}
                         strokeWidth={2.5}
                       />
                       <span
@@ -567,11 +591,17 @@ const OrderViewDetails = () => {
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0"
                     style={{
-                      background: avatarStyle(assignedDp.name).bg,
-                      color: avatarStyle(assignedDp.name).text,
+                      background: avatarStyle(
+                        `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
+                      ).bg,
+                      color: avatarStyle(
+                        `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
+                      ).text,
                     }}
                   >
-                    {initials(assignedDp.name)}
+                    {initials(
+                      `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3
@@ -580,15 +610,22 @@ const OrderViewDetails = () => {
                     >
                       {assignedDp.firstName} {assignedDp.lastName}
                     </h3>
-                    {assignedDp.phone && (
+                    {assignedDp.phoneNo && (
                       <p
                         className="mono text-xs flex items-center gap-1 mt-0.5"
                         style={{ color: "#8A8778" }}
                       >
                         <Phone size={11} />
-                        {assignedDp.phone}
+                        {assignedDp.phoneNo}
                       </p>
                     )}
+                    <p
+                      className="mono text-xs flex items-center gap-1 mt-0.5"
+                      style={{ color: "#8A8778" }}
+                    >
+                      <Home size={11} />
+                      {assignedDp.areaCovered}
+                    </p>
                   </div>
                   <button
                     onClick={() => setDpMenuOpen(!dpMenuOpen)}
@@ -626,7 +663,7 @@ const OrderViewDetails = () => {
 
               {dpMenuOpen && (
                 <div
-                  className="mt-4 rounded-xl overflow-hidden"
+                  className="mt-4 rounded-xl overflow-visible relative"
                   style={{ border: "1px solid #E4E1D6" }}
                 >
                   <div
@@ -649,40 +686,118 @@ const OrderViewDetails = () => {
 
                   <div className="max-h-56 overflow-y-auto">
                     {filteredPartners.map((dp) => (
-                      <button
-                        key={dp.id}
-                        onClick={() => handleAssign(dp)}
-                        disabled={assigning}
-                        className="w-full p-3 flex items-center justify-between cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "#FAF9F5")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "transparent")
-                        }
+                      <div
+                        key={dp.deliveryPersonId}
+                        className="group border-b border-gray-100 last:border-b-0"
                       >
-                        <div className="flex items-center gap-2.5">
+                        <button
+                          onClick={() => handleAssign(dp)}
+                          disabled={
+                            assigning ||
+                            assignedDpId === (dp.deliveryPersonId || dp.id)
+                          }
+                          className="w-full p-3 flex items-center justify-between transition-colors hover:bg-[#FAF9F5] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold"
+                              style={{
+                                background: avatarStyle(
+                                  `${dp.firstName} ${dp.lastName}`,
+                                ).bg,
+                                color: avatarStyle(
+                                  `${dp.firstName} ${dp.lastName}`,
+                                ).text,
+                              }}
+                            >
+                              {initials(`${dp.firstName} ${dp.lastName}`)}
+                            </div>
+
+                            <div className="text-left">
+                              <p
+                                className="text-sm font-medium"
+                                style={{ color: "#14213D" }}
+                              >
+                                {dp.firstName} {dp.lastName}
+                              </p>
+
+                              <p
+                                className="text-xs"
+                                style={{ color: "#8A8778" }}
+                              >
+                                {dp.areaCovered || "Area not assigned"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {assignedDpId === (dp.deliveryPersonId || dp.id) && (
+                            <Check size={16} style={{ color: "#C65D2E" }} />
+                          )}
+                        </button>
+
+                        {/* Hover Details */}
+                        <div
+                          className="
+        max-h-0
+        overflow-hidden
+        group-hover:max-h-60
+        transition-all
+        duration-300
+      "
+                        >
                           <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold"
+                            className="mx-3 mb-3 rounded-lg p-3 text-xs"
                             style={{
-                              background: avatarStyle(dp.firstName).bg,
-                              color: avatarStyle(dp.firstName).text,
+                              background: "#FAF9F5",
+                              border: "1px solid #E4E1D6",
+                              color: "#14213D",
                             }}
                           >
-                            {initials(dp.firstName)}
+                            <div className="grid grid-cols-2 gap-y-2">
+                              <span style={{ color: "#8A8778" }}>Phone</span>
+                              <span>{dp.phoneNo}</span>
+
+                              <span style={{ color: "#8A8778" }}>Vehicle</span>
+                              <span>{dp.vehicleNumber}</span>
+
+                              <span style={{ color: "#8A8778" }}>Area</span>
+                              <span>{dp.areaCovered || "-"}</span>
+
+                              <span style={{ color: "#8A8778" }}>Status</span>
+                              <span
+                                className={
+                                  dp.active ? "text-green-600" : "text-red-500"
+                                }
+                              >
+                                {dp.active ? "Active" : "Inactive"}
+                              </span>
+
+                              <span style={{ color: "#8A8778" }}>
+                                Documents
+                              </span>
+                              <span
+                                className={
+                                  dp.documentsVerified
+                                    ? "text-green-600"
+                                    : "text-yellow-600"
+                                }
+                              >
+                                {dp.documentsVerified ? "Verified" : "Pending"}
+                              </span>
+                            </div>
                           </div>
-                          <p
-                            className="text-sm font-medium"
-                            style={{ color: "#14213D" }}
-                          >
-                            {dp.firstName} {dp.lastName}
-                          </p>
                         </div>
-                        {assignedDp?.id === dp.id && (
-                          <Check size={16} style={{ color: "#C65D2E" }} />
-                        )}
-                      </button>
+                      </div>
                     ))}
+
+                    {filteredPartners.length === 0 && (
+                      <p
+                        className="text-center text-xs py-6"
+                        style={{ color: "#B4B2A9" }}
+                      >
+                        No partners match that search.
+                      </p>
+                    )}
                     {filteredPartners.length === 0 && (
                       <p
                         className="text-center text-xs py-6"
