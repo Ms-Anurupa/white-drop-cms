@@ -232,7 +232,7 @@ const Order = () => {
   if (loading) return <Loader text="Loading order history lists..." />;
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
+    <div className="py-6 sm:px-2 lg:px-2 space-y-6 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -252,7 +252,7 @@ const Order = () => {
           {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
             {/* Search */}
-            <div className=" w-full md:w-72">
+            <div className="w-full sm:w-64 lg:w-72">
               <label className="text-[11px] text-gray-500 mb-1 block">
                 Search
               </label>
@@ -425,29 +425,43 @@ const Order = () => {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="hidden sm:block">
+          <table className="w-full table-fixed text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                {[
-                  "Sl No.",
-                  "Order ID",
-                  "Image",
-                  "Total",
-                  "Customer",
-                  "Status",
-                  "Created at",
-                  "Action",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+  <tr className="bg-gray-50 border-b border-gray-100">
+    <th className="w-14 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Sl No.
+    </th>
+
+    <th className="w-40 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Order ID
+    </th>
+
+    <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Image
+    </th>
+
+    <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Total
+    </th>
+
+    <th className="w-56 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Customer
+    </th>
+
+    <th className="w-36 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Status
+    </th>
+
+    <th className="w-44 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Created At
+    </th>
+
+    <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+      Action
+    </th>
+  </tr>
+</thead>
 
             <tbody className="divide-y divide-gray-50">
               {paginated.length === 0 ? (
@@ -459,11 +473,11 @@ const Order = () => {
               ) : (
                 paginated.map((o, idx) => (
                   <tr key={o.orderId} className="hover:bg-slate-50 transition">
-                    <td className="px-4 py-3.5 text-gray-400">
+                    <td className="w-16 px-4 py-3.5 text-gray-400">
                       {start + idx + 1}
                     </td>
 
-                    <td className="px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                    <td className="w-36 px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
                       {o.orderId}
                     </td>
 

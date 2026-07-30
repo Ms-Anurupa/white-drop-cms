@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   ArrowLeft,
   Package,
@@ -22,6 +22,7 @@ import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { getProductUrl } from "../utils/resolveProductUrl";
 import { useConfirm } from "./ConfirmProvider";
 import Loader from "./Loader";
+import { createPortal } from "react-dom";
 
 const STATUS_TOKENS = {
   DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
@@ -51,6 +52,71 @@ const StatusPill = ({ status }) => {
 };
 
 const STAGES = ["PROCESSING", "SHIPPED", "DELIVERED"];
+
+// truncated area-covered line for the assigned delivery partner address card
+const AreaCoveredHover = ({ text }) => {
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
+  const textRef = useRef(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      setIsTruncated(textRef.current.scrollWidth > textRef.current.clientWidth);
+    }
+  }, [text]);
+
+  if (!text) {
+    return (
+      <p className="text-xs italic mt-0.5" style={{ color: "#B4B2A9" }}>
+        Area not assigned
+      </p>
+    );
+  }
+
+  const handleMouseEnter = () => {
+    if (!isTruncated || !textRef.current) return;
+    const rect = textRef.current.getBoundingClientRect();
+    const tooltipWidth = 256; // fixed tooltip width
+    const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 16);
+    setTooltipPos({ top: rect.bottom + 8, left: Math.max(left, 8) });
+    setShowTooltip(true);
+  };
+
+  return (
+    <>
+      <p
+        className="flex items-center gap-1 mt-0.5 text-xs"
+        style={{ color: "#8A8778" }}
+      >
+        <Home size={11} className="shrink-0" />
+        <span
+          ref={textRef}
+          className="truncate"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          {text}
+        </span>
+      </p>
+      {showTooltip &&
+        isTruncated &&
+        createPortal(
+          <div
+            style={{
+              top: tooltipPos.top,
+              left: tooltipPos.left,
+            }}
+            className="fixed z-50 w-64 text-gray-950 bg-white text-xs 
+            rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none break-words"
+          >
+            {text}
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+};
 
 const initials = (name = "") =>
   name
@@ -571,7 +637,8 @@ const OrderViewDetails = () => {
               {assignedDp ? (
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0"
+                    className="w-12 h-12 rounded-full flex items-center justify-center
+                     font-semibold text-sm flex-shrink-0"
                     style={{
                       background: avatarStyle(
                         `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
@@ -601,13 +668,8 @@ const OrderViewDetails = () => {
                         {assignedDp.phoneNo}
                       </p>
                     )}
-                    <p
-                      className="mono text-xs flex items-center gap-1 mt-0.5"
-                      style={{ color: "#8A8778" }}
-                    >
-                      <Home size={11} />
-                      {assignedDp.areaCovered}
-                    </p>
+
+                    <AreaCoveredHover text={assignedDp.areaCovered} />
                   </div>
                   <button
                     onClick={() => setDpMenuOpen(!dpMenuOpen)}
@@ -704,7 +766,7 @@ const OrderViewDetails = () => {
                               </p>
 
                               <p
-                                className="text-xs"
+                                className="text-xs whitespace-normal"
                                 style={{ color: "#8A8778" }}
                               >
                                 {dp.areaCovered || "Area not assigned"}
@@ -743,7 +805,9 @@ const OrderViewDetails = () => {
                               <span>{dp.vehicleNumber}</span>
 
                               <span style={{ color: "#8A8778" }}>Area</span>
-                              <span>{dp.areaCovered || "-"}</span>
+                              <span className="whitespace-normal">
+                                {dp.areaCovered || "-"}
+                              </span>
 
                               <span style={{ color: "#8A8778" }}>Status</span>
                               <span
