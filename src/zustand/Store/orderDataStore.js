@@ -7,7 +7,7 @@ const orderDataStore = create((set) => ({
   orderDetails: [],
   loading: false,
 
-  getOrderListing: async (status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" ) => {
+  getOrderListing: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getOrderListing", {

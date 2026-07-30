@@ -114,7 +114,7 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      getOrderListing({ search, status, fromDate, toDate });
+      getOrderListing({ status, search, page, pageSize, fromDate, toDate });
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
