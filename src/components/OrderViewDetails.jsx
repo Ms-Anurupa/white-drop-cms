@@ -21,6 +21,7 @@ import orderDataStore from "../zustand/Store/orderDataStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { getProductUrl } from "../utils/resolveProductUrl";
 import { useConfirm } from "./ConfirmProvider";
+import Loader from "./Loader";
 
 const STATUS_TOKENS = {
   DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
@@ -190,26 +191,7 @@ const OrderViewDetails = () => {
     `}</style>
   );
 
-  if (loading) {
-    return (
-      <div
-        className="min-h-screen w-full flex items-center justify-center"
-        style={pageStyle}
-      >
-        {fontImport}
-        <div className="flex flex-col items-center gap-3">
-          <Loader2
-            size={22}
-            className="animate-spin"
-            style={{ color: "#B4B2A9" }}
-          />
-          <p className="text-sm" style={{ color: "#8A8778" }}>
-            Loading order…
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loader text="Loading order details..." />;
 
   if (!orderDetails) {
     return (

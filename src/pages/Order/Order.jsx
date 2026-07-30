@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
 import { getProductUrl } from "../../utils/resolveProductUrl";
+import Loader from "../../components/Loader";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -51,6 +52,7 @@ const Order = () => {
     (state) => state.exportOrderDetails,
   );
   const orders = orderDataStore((state) => state.orders);
+  const loading = orderDataStore((state) => state.loading);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -211,6 +213,8 @@ const Order = () => {
 
     return pages;
   };
+
+  if (loading) return <Loader text="Loading order history lists..." />;
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
