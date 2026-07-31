@@ -290,7 +290,7 @@ const DeliveryPartnerDetails = () => {
   const vehicleNumberRegex = /^[A-Z]{2}[ -]?\d{1,2}[ -]?[A-Z]{1,3}[ -]?\d{4}$/i;
 
   const handleSave = async () => {
-    // Required field validations
+
     if (!updatedData.firstName?.trim()) {
       toast.error("First name is required");
       return;
@@ -301,8 +301,8 @@ const DeliveryPartnerDetails = () => {
       return;
     }
 
-    if (!updatedData.details?.trim()) {
-      toast.error("Details are required");
+    if (!updatedData.areaCovered?.trim()) {
+      toast.error("areaCovered are required");
       return;
     }
 
@@ -381,7 +381,7 @@ const DeliveryPartnerDetails = () => {
         deliveryPersonId,
         firstName: updatedData.firstName || "",
         lastName: updatedData.lastName || "",
-        details: updatedData.details || "",
+        areaCovered: updatedData.areaCovered || "",
         vehicleNumber: updatedData.vehicleNumber || "",
         aadharNo: updatedData.aadharNo || "",
         panNo: updatedData.panNo || "",
@@ -424,6 +424,9 @@ const DeliveryPartnerDetails = () => {
       setIsDirty(false);
       setIsEditing(false);
       await getDeliveryPersonById(deliveryPersonId);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Failed to save changes.");
     } finally {
       setSaving(false);
     }
@@ -775,10 +778,7 @@ const DeliveryPartnerDetails = () => {
 
                 <div>
                   <p className="text-xs uppercase tracking-wider text-slate-400">
-                    Additional Details
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    Description or remarks
+                    Area covered by delivery person
                   </p>
                 </div>
               </div>
@@ -786,8 +786,8 @@ const DeliveryPartnerDetails = () => {
               <textarea
                 rows={5}
                 disabled={!isEditing}
-                value={updatedData?.details || "Not Provided"}
-                onChange={(e) => handleChange("details", e.target.value)}
+                value={updatedData?.areaCovered ?? "Not Provided"}
+                onChange={(e) => handleChange("areaCovered", e.target.value)}
                 className={`resize-none ${inputClass(
                   isEditing,
                   "rounded-xl border-slate-300 bg-white",
