@@ -14,6 +14,7 @@ import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
 import { getProductUrl } from "../../utils/resolveProductUrl";
 import Loader from "../../components/Loader";
+import DateFilter from "../../components/DateFilter";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -199,11 +200,17 @@ const Order = () => {
     [orders],
   );
 
+  // const DATE_FILTERS = [
+  //   { key: "all", label: "All orders", countLabel: "Total orders" },
+  //   { key: "today", label: "Today", countLabel: "Today's orders" },
+  //   { key: "week", label: "This week", countLabel: "This week's orders" },
+  //   { key: "month", label: "This month", countLabel: "This month's orders" },
+  // ];
   const DATE_FILTERS = [
-    { key: "all", label: "All orders", countLabel: "Total orders" },
-    { key: "today", label: "Today", countLabel: "Today's orders" },
-    { key: "week", label: "This week", countLabel: "This week's orders" },
-    { key: "month", label: "This month", countLabel: "This month's orders" },
+    { key: "all", label: "All orders" },
+    { key: "today", label: "Today" },
+    { key: "week", label: "This week" },
+    { key: "month", label: "This month" },
   ];
 
   const totalPages = Math.max(Math.ceil(filteredOrders.length / pageSize), 1);
@@ -312,79 +319,19 @@ const Order = () => {
         </div>
       </div>
 
-      {/* ── DATE FILTER BAR — pills + custom range, unified ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-wrap items-center gap-3">
-        {/* Segmented pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {DATE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => {
-                setDateFilter(f.key);
-                setPage(1);
-              }}
-              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium border transition cursor-pointer ${
-                dateFilter === f.key
-                  ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-                  : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              {f.label}
-              <span
-                className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                  dateFilter === f.key
-                    ? "bg-white/20 text-white"
-                    : "bg-gray-100 text-gray-500"
-                }`}
-              >
-                {dateCounts[f.key]}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* Divider — only shows on wide screens where the row is horizontal */}
-        <div className="hidden sm:block w-px self-stretch bg-gray-100 mx-10" />
-
-        <div className="flex items-end gap-2">
-          <div className="flex flex-col">
-            <label className="text-[11px] text-gray-500 mb-1">From</label>
-            <input
-              type="date"
-              value={fromDate}
-              max={toDate || undefined}
-              onChange={(e) => handleFromDateChange(e.target.value)}
-              className="h-9 px-3 rounded-lg border border-gray-200 bg-white text-sm
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-            />
-          </div>
-
-          <span className="text-gray-300 pb-2">→</span>
-
-          <div className="flex flex-col">
-            <label className="text-[11px] text-gray-500 mb-1">To</label>
-            <input
-              type="date"
-              value={toDate}
-              min={fromDate || undefined}
-              onChange={(e) => handleToDateChange(e.target.value)}
-              className="h-9 px-3 rounded-lg border border-gray-200 bg-white text-sm
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-            />
-          </div>
-
-          {(fromDate || toDate) && (
-            <button
-              onClick={clearDates}
-              className="h-9 px-3 rounded-lg border border-red-200
-          text-red-600 text-sm hover:bg-red-50 transition shrink-0 cursor-pointer"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-      </div>
-
+    <DateFilter
+      filters={DATE_FILTERS.map((f) => ({ ...f, count: dateCounts[f.key] }))}
+      activeFilter={dateFilter}
+      onFilterChange={(key) => {
+        setDateFilter(key);
+        setPage(1);
+      }}
+      fromDate={fromDate}
+      toDate={toDate}
+      onFromDateChange={handleFromDateChange}
+      onToDateChange={handleToDateChange}
+      onClear={clearDates}
+    />
       {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* MOBILE VIEW */}

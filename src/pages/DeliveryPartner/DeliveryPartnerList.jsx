@@ -13,9 +13,8 @@ import {
   CheckCircle2,
   XCircle,
   ShieldCheck,
-  CalendarRange,
   MapPin,
-  Plus
+  Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import deliveryPartnerStore from "../../zustand/Store/deliveryPartnerStore";
@@ -23,6 +22,7 @@ import noDoc from "../../assets/images/nodoc.svg";
 import Loader from "../../components/Loader";
 import useSignedImages from "../../hooks/useSignedImages";
 import { toast } from "react-toastify";
+import DateFilter from "../../components/DateFilter";
 
 const PAGE_LIMIT = 8;
 
@@ -147,40 +147,44 @@ const DeliveryPartnerList = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const navigate = useNavigate();
+  const isPartialDateRange = Boolean(fromDate) !== Boolean(toDate);
 
   const totalPages = pagination.totalPages || 1;
   const total = pagination.total ?? partners.length;
 
+  // Only apply the date range once BOTH ends are picked, otherwise send
+  // empty strings so a half-picked range doesn't filter anything out.
+   const buildQueryParams = () => ({
+     search: search.trim(),
+     page,
+     limit: PAGE_LIMIT,
+     fromDate,
+     toDate,
+   });
+
   // Reset to page 1 whenever a filter changes
-  useEffect(() => {
-    setPage(1);
-  }, [search, fromDate, toDate]);
+   useEffect(() => {
+     setPage(1);
+   }, [search, fromDate, toDate]);
 
   useEffect(() => {
+    if (isPartialDateRange) return; // wait for the second date before calling
+
     const timer = setTimeout(() => {
-      getDeliveryPersons({
-        search: search.trim(),
-        page,
-        limit: PAGE_LIMIT,
-        fromDate,
-        toDate,
-      });
+      getDeliveryPersons(buildQueryParams());
     }, 400);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, page, fromDate, toDate, getDeliveryPersons]);
 
   const handleStatusChange = async (active, deliveryPersonId) => {
     try {
       await updateStatusDelPerson({ deliveryPersonId, status: active });
       toast.success("Status updated successfully");
-      await getDeliveryPersons({
-        search: search.trim(),
-        page,
-        limit: PAGE_LIMIT,
-        fromDate,
-        toDate,
-      });
+      if (!isPartialDateRange) {
+        await getDeliveryPersons(buildQueryParams());
+      }
     } catch {
       toast.error("Failed to update status");
     }
@@ -201,39 +205,39 @@ const DeliveryPartnerList = () => {
   return (
     <div className="p-3 sm:p-4 space-y-4 bg-gray-50 min-h-screen">
       {/* HEADER */}
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
-          Delivery Partners
-        </h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Manage riders, verify documents, and track onboarding.
-        </p>
-      </div>
-
-      <div className="flex items-center gap-2 w-full md:w-auto">
-        <div className="relative flex-1 md:w-72">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={16}
-          />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search partners..."
-            className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white border border-gray-200 shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition"
-          />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+            Delivery Partners
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Manage riders, verify documents, and track onboarding.
+          </p>
         </div>
 
-        <button
-          onClick={() => navigate("/dashboard/createDeliveryPartner")}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm hover:bg-blue-700 active:scale-[0.98] transition shrink-0 cursor-pointer"
-        >
-          <Plus size={16} />
-          Add Partner
-        </button>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-72">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search partners..."
+              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white border border-gray-200 shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition"
+            />
+          </div>
+
+          <button
+            onClick={() => navigate("/dashboard/createDeliveryPartner")}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm hover:bg-blue-700 active:scale-[0.98] transition shrink-0 cursor-pointer"
+          >
+            <Plus size={16} />
+            Add Partner
+          </button>
+        </div>
       </div>
-    </div>
 
       {/* STATS STRIP */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -289,48 +293,15 @@ const DeliveryPartnerList = () => {
       </div>
 
       {/* DATE FILTER */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3.5 flex flex-wrap items-end gap-4">
-        <div className="flex items-center gap-2 text-gray-500 text-sm pb-2">
-          <CalendarRange size={16} />
-          <span className="font-medium">Joined date</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[11px] text-gray-500">From</label>
-          <input
-            type="date"
-            value={fromDate}
-            max={toDate || undefined}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-[11px] text-gray-500">To</label>
-          <input
-            type="date"
-            value={toDate}
-            min={fromDate || undefined}
-            onChange={(e) => setToDate(e.target.value)}
-            className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-        </div>
-
-        {(fromDate || toDate) && (
-          <button
-            onClick={clearDateFilter}
-            className="h-8.5 px-4 rounded-lg border border-red-200
-          text-red-600 text-sm hover:bg-red-50 transition shrink-0 cursor-pointer"
-          >
-            Clear
-          </button>
-        )}
-
-        <p className="text-xs text-gray-400 ml-auto pb-2">
-          {total} partner{total === 1 ? "" : "s"} found
-        </p>
-      </div>
+      <DateFilter
+        rangeLabel="Joined date"
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={setFromDate}
+        onToDateChange={setToDate}
+        onClear={clearDateFilter}
+        trailingText={`${total} partner${total === 1 ? "" : "s"} found`}
+      />
 
       {partners.length === 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-gray-500 text-sm">
