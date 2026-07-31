@@ -8,7 +8,6 @@ import {
   ChevronsRight,
   Eye,
   PackageSearch,
-  CalendarRange,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -114,12 +113,40 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      getOrderListing({ status, search, page, pageSize, fromDate, toDate });
-      setPage(1);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [getOrderListing, search, status, fromDate, toDate]);
+      // Wait until both dates are selected
+      if ((fromDate && !toDate) || (!fromDate && toDate)) {
+        return;
+      }
 
+      setPage(1);
+
+      getOrderListing({
+        status,
+        search,
+        page: 1,
+        pageSize,
+        fromDate,
+        toDate,
+      });
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [getOrderListing, search, status, pageSize, fromDate, toDate]);
+
+  useEffect(() => {
+    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+      return;
+    }
+
+    getOrderListing({
+      status,
+      search,
+      page,
+      pageSize,
+      fromDate,
+      toDate,
+    });
+  }, [page]);
 
   const handleFromDateChange = (value) => {
     setFromDate(value);
@@ -319,8 +346,6 @@ const Order = () => {
         {/* Divider — only shows on wide screens where the row is horizontal */}
         <div className="hidden sm:block w-px self-stretch bg-gray-100 mx-10" />
 
-        
-
         <div className="flex items-end gap-2">
           <div className="flex flex-col">
             <label className="text-[11px] text-gray-500 mb-1">From</label>
@@ -428,40 +453,40 @@ const Order = () => {
         <div className="hidden sm:block">
           <table className="w-full table-fixed text-sm">
             <thead>
-  <tr className="bg-gray-50 border-b border-gray-100">
-    <th className="w-14 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Sl No.
-    </th>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="w-14 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Sl No.
+                </th>
 
-    <th className="w-40 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Order ID
-    </th>
+                <th className="w-40 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Order ID
+                </th>
 
-    <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Image
-    </th>
+                <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Image
+                </th>
 
-    <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Total
-    </th>
+                <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Total
+                </th>
 
-    <th className="w-56 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Customer
-    </th>
+                <th className="w-56 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Customer
+                </th>
 
-    <th className="w-36 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Status
-    </th>
+                <th className="w-36 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Status
+                </th>
 
-    <th className="w-44 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Created At
-    </th>
+                <th className="w-44 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Created At
+                </th>
 
-    <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
-      Action
-    </th>
-  </tr>
-</thead>
+                <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                  Action
+                </th>
+              </tr>
+            </thead>
 
             <tbody className="divide-y divide-gray-50">
               {paginated.length === 0 ? (
