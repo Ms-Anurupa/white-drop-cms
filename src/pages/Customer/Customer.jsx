@@ -15,6 +15,7 @@ import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
 import useDebounce from "../../utils/useDebounce";
+import DateFilter from "../../components/DateFilter";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
@@ -22,8 +23,7 @@ const JOIN_FILTERS = [
   { key: "all", label: "All time", countLabel: "Total customers" },
   { key: "today", label: "Today", countLabel: "Joined today" },
   { key: "week", label: "This week", countLabel: "Joined this week" },
-  { key: "month", label: "This month", countLabel: "Joined this month" },
-  { key: "year", label: "This year", countLabel: "Joined this year" },
+  { key: "month", label: "This month", countLabel: "Joined this month" }
 ];
 
 const formatDate = (value) => {
@@ -73,6 +73,8 @@ const Customer = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [joinFilter, setJoinFilter] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const { confirm } = useConfirm();
   const getAllCustomers = customerStore((state) => state.getAllCustomers);
   const customers = customerStore((state) => state.customers);
@@ -86,10 +88,30 @@ const Customer = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
+  // true only when the user has picked just one end of the range —
+  // in that state we hold off calling the API entirely
+  const isPartialDateRange = Boolean(fromDate) !== Boolean(toDate);
+
+  const buildQueryParams = () => ({
+    search: debouncedSearch,
+    page,
+    limit: pageSize,
+    fromDate,
+    toDate,
+  });
+
   useEffect(() => {
-    getAllCustomers(debouncedSearch);
+    if (isPartialDateRange) return; // wait for the second date before calling
+
+    getAllCustomers(buildQueryParams());
     setPage(1);
-  }, [debouncedSearch, getAllCustomers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, fromDate, toDate, getAllCustomers]);
+
+  const clearDates = () => {
+    setFromDate("");
+    setToDate("");
+  };
 
   const filteredCustomers = useMemo(
     () => customers.filter((c) => matchesJoinFilter(c, joinFilter)),
@@ -146,7 +168,9 @@ const Customer = () => {
       if (!confirmMessage) return;
 
       await deleteCustomerDetails({ id: customerId });
-      await getAllCustomers(debouncedSearch);
+      if (!isPartialDateRange) {
+        await getAllCustomers(buildQueryParams());
+      }
 
       toast.success("Customer deleted");
     } catch {
@@ -220,55 +244,19 @@ const Customer = () => {
         </div>
       </div>
 
-      {/* ── STAT CARDS ── */}
-      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          icon={<Users size={16} className="text-blue-600" />}
-          label="Total customers"
-          value={customers.length}
-        />
-        <StatCard
-          label="Joined this month"
-          value={joinCounts.month}
-          valueClass="text-emerald-600"
-          dotClass="bg-emerald-500"
-        />
-        <StatCard
-          label="Joined this year"
-          value={joinCounts.year}
-          valueClass="text-blue-600"
-          dotClass="bg-blue-500"
-        />
-      </div> */}
-
-      {/* ── JOIN DATE FILTER — segmented pills with live counts ── */}
-      <div className="flex flex-wrap gap-2">
-        {JOIN_FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => {
-              setJoinFilter(f.key);
-              setPage(1);
-            }}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium border transition cursor-pointer ${
-              joinFilter === f.key
-                ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-                : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            {f.label}
-            <span
-              className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
-                joinFilter === f.key
-                  ? "bg-white/20 text-white"
-                  : "bg-gray-100 text-gray-500"
-              }`}
-            >
-              {joinCounts[f.key]}
-            </span>
-          </button>
-        ))}
-      </div>
+      <DateFilter
+        filters={JOIN_FILTERS.map((f) => ({ ...f, count: joinCounts[f.key] }))}
+        activeFilter={joinFilter}
+        onFilterChange={(key) => {
+          setJoinFilter(key);
+          setPage(1);
+        }}
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={setFromDate}
+        onToDateChange={setToDate}
+        onClear={clearDates}
+      />
 
       {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -520,7 +508,6 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     {children}
   </button>
 );
-
 
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import {
   Search,
@@ -50,7 +50,6 @@ const formatDate = (dateStr) => {
   });
 };
 
-// Builds a windowed page list with ellipses, e.g. [1, "...", 4, 5, 6, "...", 12]
 const getPageNumbers = (current, total) => {
   if (total <= 1) return [1];
   const delta = 1;
@@ -69,8 +68,45 @@ const getPageNumbers = (current, total) => {
   return range;
 };
 
-// Truncated area-covered text with a hover tooltip, shown only when
-// the text actually overflows its column width.
+const JOIN_FILTERS = [
+  { key: "all", label: "All time", countLabel: "Total partners" },
+  { key: "today", label: "Today", countLabel: "Joined today" },
+  { key: "week", label: "This week", countLabel: "Joined this week" },
+  { key: "month", label: "This month", countLabel: "Joined this month" },
+];
+
+const matchesJoinFilter = (partner, filter) => {
+  if (filter === "all") return true;
+
+  const joined = new Date(partner.createdAt);
+  if (Number.isNaN(joined.getTime())) return false;
+
+  const now = new Date();
+
+  if (filter === "today") {
+    return joined.toDateString() === now.toDateString();
+  }
+
+  if (filter === "week") {
+    const weekAgo = new Date();
+    weekAgo.setDate(now.getDate() - 7);
+    return joined >= weekAgo;
+  }
+
+  if (filter === "month") {
+    return (
+      joined.getMonth() === now.getMonth() &&
+      joined.getFullYear() === now.getFullYear()
+    );
+  }
+
+  if (filter === "year") {
+    return joined.getFullYear() === now.getFullYear();
+  }
+
+  return true;
+};
+
 const AreaCoverCell = ({ text }) => {
   const [isTruncated, setIsTruncated] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -90,7 +126,7 @@ const AreaCoverCell = ({ text }) => {
   const handleMouseEnter = () => {
     if (!isTruncated || !textRef.current) return;
     const rect = textRef.current.getBoundingClientRect();
-    const tooltipWidth = 256; // matches max-w-xs, keeps tooltip width fixed
+    const tooltipWidth = 256;
     const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 16);
     setTooltipPos({ top: rect.bottom + 8, left: Math.max(left, 8) });
     setShowTooltip(true);
@@ -100,7 +136,6 @@ const AreaCoverCell = ({ text }) => {
     <>
       <span className="flex items-center gap-1.5 text-gray-600 max-w-[180px]">
         <MapPin size={14} className="text-gray-400 shrink-0" />
-
         <span
           ref={textRef}
           className="truncate"
@@ -144,31 +179,46 @@ const DeliveryPartnerList = () => {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [joinFilter, setJoinFilter] = useState("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const navigate = useNavigate();
-  const isPartialDateRange = Boolean(fromDate) !== Boolean(toDate);
+
+  const joinCounts = useMemo(
+    () => ({
+      all: partners.length,
+      today: partners.filter((p) => matchesJoinFilter(p, "today")).length,
+      week: partners.filter((p) => matchesJoinFilter(p, "week")).length,
+      month: partners.filter((p) => matchesJoinFilter(p, "month")).length,
+      year: partners.filter((p) => matchesJoinFilter(p, "year")).length,
+    }),
+    [partners],
+  );
+
+  const filteredPartners = useMemo(
+    () => partners.filter((p) => matchesJoinFilter(p, joinFilter)),
+    [partners, joinFilter],
+  );
 
   const totalPages = pagination.totalPages || 1;
   const total = pagination.total ?? partners.length;
 
-  // Only apply the date range once BOTH ends are picked, otherwise send
-  // empty strings so a half-picked range doesn't filter anything out.
-   const buildQueryParams = () => ({
-     search: search.trim(),
-     page,
-     limit: PAGE_LIMIT,
-     fromDate,
-     toDate,
-   });
-
-  // Reset to page 1 whenever a filter changes
-   useEffect(() => {
-     setPage(1);
-   }, [search, fromDate, toDate]);
+  const buildQueryParams = () => ({
+    search: search.trim(),
+    page,
+    limit: PAGE_LIMIT,
+    fromDate,
+    toDate,
+  });
 
   useEffect(() => {
-    if (isPartialDateRange) return; // wait for the second date before calling
+    setPage(1);
+  }, [search, fromDate, toDate, joinFilter]);
+
+  useEffect(() => {
+    // If only one date is provided (partial range), DO NOT invoke the API.
+    const isPartialDate = Boolean(fromDate) !== Boolean(toDate);
+    if (isPartialDate) return;
 
     const timer = setTimeout(() => {
       getDeliveryPersons(buildQueryParams());
@@ -182,7 +232,8 @@ const DeliveryPartnerList = () => {
     try {
       await updateStatusDelPerson({ deliveryPersonId, status: active });
       toast.success("Status updated successfully");
-      if (!isPartialDateRange) {
+      const isPartialDate = Boolean(fromDate) !== Boolean(toDate);
+      if (!isPartialDate) {
         await getDeliveryPersons(buildQueryParams());
       }
     } catch {
@@ -195,8 +246,10 @@ const DeliveryPartnerList = () => {
     setToDate("");
   };
 
-  const activeOnPage = partners.filter((p) => p?.active).length;
-  const verifiedOnPage = partners.filter((p) => p?.documentsVerified).length;
+  const activeOnPage = filteredPartners.filter((p) => p?.active).length;
+  const verifiedOnPage = filteredPartners.filter(
+    (p) => p?.documentsVerified,
+  ).length;
 
   if (loading) {
     return <Loader text="Loading delivery partners..." />;
@@ -210,8 +263,12 @@ const DeliveryPartnerList = () => {
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Delivery Partners
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Manage riders, verify documents, and track onboarding.
+          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>Manage riders, verify documents, and track onboarding.</span>
+            <span className="text-blue-600 font-medium">
+              {JOIN_FILTERS.find((f) => f.key === joinFilter)?.countLabel}:{" "}
+              {joinCounts[joinFilter]}
+            </span>
           </p>
         </div>
 
@@ -258,7 +315,7 @@ const DeliveryPartnerList = () => {
           },
           {
             label: "Inactive (this page)",
-            value: partners.length - activeOnPage,
+            value: filteredPartners.length - activeOnPage,
             icon: XCircle,
             iconBg: "bg-gray-100",
             iconColor: "text-gray-500",
@@ -294,6 +351,12 @@ const DeliveryPartnerList = () => {
 
       {/* DATE FILTER */}
       <DateFilter
+        filters={JOIN_FILTERS.map((f) => ({ ...f, count: joinCounts[f.key] }))}
+        activeFilter={joinFilter}
+        onFilterChange={(key) => {
+          setJoinFilter(key);
+          setPage(1);
+        }}
         rangeLabel="Joined date"
         fromDate={fromDate}
         toDate={toDate}
@@ -303,13 +366,13 @@ const DeliveryPartnerList = () => {
         trailingText={`${total} partner${total === 1 ? "" : "s"} found`}
       />
 
-      {partners.length === 0 && (
+      {filteredPartners.length === 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-gray-500 text-sm">
           No delivery partners match these filters.
         </div>
       )}
 
-      {partners.length > 0 && (
+      {filteredPartners.length > 0 && (
         <>
           {/* ================= DESKTOP TABLE ================= */}
           <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -329,7 +392,7 @@ const DeliveryPartnerList = () => {
                 </thead>
 
                 <tbody>
-                  {partners.map((p, idx) => {
+                  {filteredPartners.map((p, idx) => {
                     const serialNo = (page - 1) * PAGE_LIMIT + idx + 1;
 
                     return (
@@ -424,7 +487,7 @@ const DeliveryPartnerList = () => {
 
           {/* ================= MOBILE CARD VIEW ================= */}
           <div className="md:hidden space-y-3">
-            {partners.map((p, idx) => {
+            {filteredPartners.map((p, idx) => {
               const serialNo = (page - 1) * PAGE_LIMIT + idx + 1;
 
               return (

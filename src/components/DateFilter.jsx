@@ -100,9 +100,9 @@ const DateFilter = ({
         </div>
       )}
 
-      {trailingText && (
+      {/* {trailingText && (
         <p className="text-xs text-gray-400 ml-auto pb-2">{trailingText}</p>
-      )}
+      )} */}
     </div>
   );
 };

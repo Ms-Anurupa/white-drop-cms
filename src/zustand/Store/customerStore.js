@@ -5,11 +5,13 @@ import api from "../axios";
 const customerStore = create((set) => ({
     customers: [],
 
-    getAllCustomers: async (search="") => {
+    getAllCustomers: async ({search="", fromDate, toDate}) => {
         try {
             const res = await api.get("/admin/getAllCustomers", {
                 params:{
                     search,
+                    fromDate,
+                    toDate
                 },
                 withAuth: true,
             })
