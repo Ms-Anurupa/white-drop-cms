@@ -16,6 +16,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
+import authStore from "../zustand/Store/authStore";
 
 const menu = [
   { name: "Dashboard",         path: "/dashboard",        icon: LayoutDashboard, end: true },
@@ -69,7 +70,7 @@ const NavItem = ({ item, onClick }) => {
 /* ─── main component ────────────────────────────────────────────────────── */
 const Sidebar = ({onLogOut}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const user = authStore((state) => state.user)
   const close = () => setMobileOpen(false);
 
   /* inner sidebar body — reused for both desktop and mobile drawer */
@@ -81,7 +82,7 @@ const Sidebar = ({onLogOut}) => {
           <img src={logo} alt="Logo" className="h-20 object-contain" />
         </span>
         <span className="text-base font-semibold text-gray-900 tracking-tight">
-          CMS <span className="text-blue-600">Admin</span>
+          CMS <span className="text-blue-600">{user?.first_name} {user?.last_name}</span>
         </span>
       </div>
 
@@ -133,8 +134,8 @@ const Sidebar = ({onLogOut}) => {
             A
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-800 truncate">Admin User</p>
-            <p className="text-[11px] text-gray-400 truncate">admin@cms.com</p>
+            <p className="text-xs font-medium text-gray-800 truncate">{user?.first_name} {user?.last_name}</p>
+            <p className="text-[11px] text-gray-400 truncate"> {user?.email}</p>
           </div>
         </div>
       </div>
@@ -153,7 +154,7 @@ const Sidebar = ({onLogOut}) => {
           <Menu size={20} />
         </button>
         <span className="text-base font-semibold text-gray-900 tracking-tight">
-          CMS <span className="text-blue-600">Admin</span>
+          CMS <span className="text-blue-600">{user?.first_name} {user?.last_name}</span>
         </span>
       </div>
 

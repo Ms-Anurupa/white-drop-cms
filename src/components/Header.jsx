@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import authStore from "../zustand/Store/authStore";
 
-const Header = ({onLogOut}) => {
+const Header = ({ onLogOut }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-
+  const user = authStore((state) => state.user);
   // close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,20 +33,21 @@ const Header = ({onLogOut}) => {
       >
         {/* User info */}
         <div className="hidden sm:block text-right">
-          <p className="text-sm font-medium text-gray-700">Admin</p>
-          <p className="text-xs text-gray-400">Administrator</p>
+          <p className="text-sm font-medium text-gray-700">
+            {user?.first_name} {user?.last_name}
+          </p>
+          <p className="text-xs text-gray-400">{user.email}</p>
         </div>
 
         {/* Avatar */}
         <div className="relative">
-          <img
+          {/* <img
             src="https://i.pravatar.cc/40"
             alt="user"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
             onClick={() => setOpen(!open)}
-          />
+          /> */}
 
-          {/* Dropdown */}
           {open && (
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50">
               <button
