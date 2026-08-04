@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Building2, Eye, Plus } from "lucide-react";
+import { Building2, Eye, Plus, Search } from "lucide-react";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import { useEffect, useState } from "react";
 
@@ -56,9 +56,7 @@ const EmptyState = ({ onCheckAccounts }) => (
 
 const CorporateOrder = () => {
   const navigate = useNavigate();
-  const getCorporateAccounts = corporateDataStore(
-    (state) => state.getCorporateAccounts,
-  );
+  
   const getCorporateOrders = corporateDataStore(
     (state) => state.getCorporateOrders,
   );
@@ -76,10 +74,6 @@ const CorporateOrder = () => {
 
   const goToAccounts = () =>
     navigate("/dashboard/corporate-orders/corporate-accounts");
-
-  useEffect(() => {
-    getCorporateAccounts();
-  }, [getCorporateAccounts]);
 
   useEffect(() => {
     getCorporateOrders({
@@ -121,26 +115,29 @@ const CorporateOrder = () => {
           </p>
         </div>
 
-        <div className="w-full lg:max-w-md lg:flex-1">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
-            Search
-          </label>
+        <div className="w-full sm:w-64 lg:w-72">
+          <div className="relative">
+            <Search
+              size={18}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
 
-          <input
-            type="text"
-            placeholder="Search Order ID / Product..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
-          />
+            <input
+              type="text"
+              placeholder="Search Order ID / Product..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
         </div>
 
         <button
           onClick={goToAccounts}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700 sm:w-auto"
+          className="inline-flex cursor-pointer w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700 sm:w-auto"
         >
           <Building2 size={18} />
           Check Corporate Accounts

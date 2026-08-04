@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,6 +10,7 @@ import {
   StickyNote,
   ShoppingCart,
   AlertTriangle,
+  Building2,
 } from "lucide-react";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import { toast } from "react-toastify";
@@ -36,6 +37,7 @@ const CreateCorporateOrder = () => {
     (state) => state.createCorporateOrderAdmin,
   );
   const [corporateData, setCorporateData] = useState({
+    corpoAccId: "",
     productName: "",
     description: "",
     unit: "L",
@@ -44,6 +46,32 @@ const CreateCorporateOrder = () => {
     orderTotal: 0,
     notes: "",
   });
+  const getCorporateAccounts = corporateDataStore(
+    (state) => state.getCorporateAccounts,
+  );
+
+  const corporateOrderAcc = corporateDataStore(
+    (state) => state.corporateOrderAcc,
+  );
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [page, setPage] = useState(1);
+
+  const limit = 10;
+
+  useEffect(() => {
+    getCorporateAccounts({
+      search,
+      status,
+      page,
+      limit,
+    });
+  }, [getCorporateAccounts, search, status, page]);
+
+  useEffect(() => {
+    console.log(corporateOrderAcc);
+  }, [corporateOrderAcc]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,23 +92,33 @@ const CreateCorporateOrder = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!corporateData.corpoAccId) {
+      toast.error("Please select a corporate account.");
+      return;
+    }
+
     if (!corporateData.productName.trim()) {
-      toast("Product name is required.");
+      toast.error("Product name is required.");
       return;
     }
 
     if (!corporateData.description.trim()) {
-      toast("Description is required.");
+      toast.error("Description is required.");
       return;
     }
 
     if (!corporateData.unit) {
-      toast("Please select a unit.");
+      toast.error("Please select a unit.");
       return;
     }
 
     if (!corporateData.qty || Number(corporateData.qty) <= 0) {
-      toast("Quantity must be greater than 0.");
+      toast.error("Quantity must be greater than 0.");
+      return;
+    }
+
+    if (!Number.isInteger(Number(corporateData.qty))) {
+      toast.error("Quantity must be a whole number.");
       return;
     }
 
@@ -88,19 +126,19 @@ const CreateCorporateOrder = () => {
       !corporateData.pricePerUnit ||
       Number(corporateData.pricePerUnit) <= 0
     ) {
-      toast("Price per unit must be greater than 0.");
+      toast.error("Price per unit must be greater than 0.");
       return;
     }
 
     if (!corporateData.notes.trim()) {
-      toast("Delivery notes are required.");
+      toast.error("Delivery notes are required.");
       return;
     }
 
     setLoading(true);
 
     const payload = {
-      corpoAccId: "cmsea7pri0000e39srqs5dds2",
+      corpoAccId: corporateOrderAcc.id,
       orderDetails: {
         productName: corporateData.productName,
         description: corporateData.description,
@@ -168,7 +206,48 @@ const CreateCorporateOrder = () => {
 
             {/* Product Name */}
             <div>
-              <label className="text-xs font-medium text-gray-700 mb-1.5 block">
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Corporate Account
+                </label>
+
+                <div className="relative">
+                  <Building2
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
+
+                  <select
+                    name="corpoAccId"
+                    value={corporateData.corpoAccId}
+                    onChange={handleChange}
+                    className="w-full appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="">Select Corporate Account</option>
+
+                    {corporateOrderAcc?.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.businessName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <svg
+                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <label className="text-xs mt-2 font-medium text-gray-700 mb-1.5 block">
                 Product Name
               </label>
 
@@ -179,6 +258,8 @@ const CreateCorporateOrder = () => {
                 />
 
                 <input
+                  required
+                  placeholder="Add Product Name"
                   name="productName"
                   value={corporateData.productName}
                   onChange={handleChange}
@@ -200,6 +281,8 @@ const CreateCorporateOrder = () => {
                 />
 
                 <textarea
+                  required
+                  placeholder="Add Product Description"
                   rows={3}
                   name="description"
                   value={corporateData.description}
@@ -223,6 +306,7 @@ const CreateCorporateOrder = () => {
                   />
 
                   <select
+                    required
                     name="unit"
                     value={corporateData.unit}
                     onChange={handleChange}
@@ -322,6 +406,8 @@ const CreateCorporateOrder = () => {
                 />
 
                 <textarea
+                  required
+                  placeholder="Add Delivery Notes"
                   rows={4}
                   name="notes"
                   value={corporateData.notes}
@@ -336,7 +422,7 @@ const CreateCorporateOrder = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+                className="px-4 py-2.5 cursor-pointer rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
               >
                 Cancel
               </button>
@@ -344,7 +430,7 @@ const CreateCorporateOrder = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition"
+                className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
 

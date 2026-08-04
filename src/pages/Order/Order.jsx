@@ -302,9 +302,6 @@ const Order = () => {
             </button>
             {/* Search */}
             <div className="w-full sm:w-64 lg:w-72">
-              <label className="text-[11px] text-gray-500 mb-1 block">
-                Search
-              </label>
               <div className="relative">
                 <Search
                   size={16}
