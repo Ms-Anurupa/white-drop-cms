@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
+import { Plus } from "lucide-react";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AddProduct = () => {
     images: [],
     variants: [
       {
-        quantity:"",
+        quantity: "",
         unit: "",
         variant_name: "",
         package: "",
@@ -170,7 +171,7 @@ const AddProduct = () => {
       }
       console.log("productData", productList);
 
-      console.log(Object.fromEntries(formData))
+      console.log(Object.fromEntries(formData));
       const res = await createProduct(formData);
       console.log("product res", res.data);
 
@@ -458,9 +459,10 @@ const AddProduct = () => {
             </button>
             <button
               onClick={handleCreateProduct}
-              className="px-8 py-3 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold shadow-lg shadow-blue-200 transition-all text-sm"
+              className="px-8 py-3 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold shadow-lg shadow-blue-200 transition-all text-sm flex items-center gap-2"
             >
-              Add Product →
+              <Plus size={18} />
+              Add Product
             </button>
           </div>
         </div>

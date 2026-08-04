@@ -27,6 +27,7 @@ import LocationTracker from "./components/LocationTracker";
 import OrderViewDetails from "./components/OrderViewDetails";
 import CreateDeliveryPartner from "./components/CreateDeliveryPartner";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreateCorporateOrder from "./components/CreateCorporateOrder";
 
 const App = () => {
   return (
@@ -63,6 +64,7 @@ const App = () => {
                 />
                 <Route path="customer" element={<Customer />} />
                 <Route path="orders" element={<Order />} />
+                <Route path="orders/create-corporate-order" element={<CreateCorporateOrder />} />
                 <Route
                   path="orders/orderDetails/:id"
                   element={<OrderViewDetails />}

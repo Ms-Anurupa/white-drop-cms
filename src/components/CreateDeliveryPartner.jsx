@@ -38,7 +38,7 @@ export default function CreateDeliveryPartner() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-4">
+    <div className="min-h-screen bg-gray-50/50 py-2 px-4">
       <div className="max-w-xl mx-auto">
         <button
           onClick={() => navigate(-1)}

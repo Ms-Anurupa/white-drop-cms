@@ -8,6 +8,8 @@ import {
   ChevronsRight,
   Eye,
   PackageSearch,
+  Building2,
+  Plus,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -285,6 +287,19 @@ const Order = () => {
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
           {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+            <button
+              onClick={() =>
+                navigate("/dashboard/orders/create-corporate-order")
+              }
+              className="group cursor-pointer inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:from-indigo-700 hover:to-blue-700 active:scale-95"
+            >
+              <Building2 size={18} />
+              <span>Create Corporate Order</span>
+              <Plus
+                size={16}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </button>
             {/* Search */}
             <div className="w-full sm:w-64 lg:w-72">
               <label className="text-[11px] text-gray-500 mb-1 block">
@@ -319,19 +334,19 @@ const Order = () => {
         </div>
       </div>
 
-    <DateFilter
-      filters={DATE_FILTERS.map((f) => ({ ...f, count: dateCounts[f.key] }))}
-      activeFilter={dateFilter}
-      onFilterChange={(key) => {
-        setDateFilter(key);
-        setPage(1);
-      }}
-      fromDate={fromDate}
-      toDate={toDate}
-      onFromDateChange={handleFromDateChange}
-      onToDateChange={handleToDateChange}
-      onClear={clearDates}
-    />
+      <DateFilter
+        filters={DATE_FILTERS.map((f) => ({ ...f, count: dateCounts[f.key] }))}
+        activeFilter={dateFilter}
+        onFilterChange={(key) => {
+          setDateFilter(key);
+          setPage(1);
+        }}
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={handleFromDateChange}
+        onToDateChange={handleToDateChange}
+        onClear={clearDates}
+      />
       {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* MOBILE VIEW */}
