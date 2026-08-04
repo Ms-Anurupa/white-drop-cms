@@ -5,6 +5,8 @@ import api from "../axios";
 
 const corporateDataStore = create((set) => ({
   corporateData: [],
+  corporateOrderAcc: [],
+  corporateOrderLists: [],
 
   createCorporateOrderAdmin: async (payload) => {
     try {
@@ -17,6 +19,37 @@ const corporateDataStore = create((set) => ({
       console.log("err", err);
       throw err
     }
+  },
+
+   getCorporateAccounts: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
+    try {
+      const res = await api.get("/admin/getCorporateAccounts", {
+        withAuth: true,
+        params: { search, status, page, limit, fromDate, toDate },
+      });
+
+      set({
+        corporateOrderAcc: res.data?.accounts,
+      });
+    } catch (error) {
+      throw error;
+    } 
+  },
+
+
+   getCorporateOrders: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
+    try {
+      const res = await api.get("/admin/getCorporateOrders", {
+        withAuth: true,
+        params: { search, status, page, limit, fromDate, toDate },
+      });
+
+      set({
+        corporateOrderLists: res.data?.orders,
+      });
+    } catch (error) {
+      throw error;
+    } 
   },
 
 }));

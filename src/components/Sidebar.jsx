@@ -23,6 +23,7 @@ const menu = [
   { name: "Product",           path: "product",           icon: Package },
   { name: "Customers",         path: "customer",          icon: Users },
   { name: "Orders",            path: "orders",            icon: ShoppingCart },
+  { name: "Corporate Orders",  path: "corporate-orders",  icon: ShoppingCart },
   { name: "Production",        path: "production",        icon: Factory },
   { name: "Inventory",         path: "inventory",         icon: Boxes },
   { name: "Deliveries",        path: "deliveries",        icon: Truck },
@@ -91,14 +92,14 @@ const Sidebar = ({onLogOut}) => {
         <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
           Main menu
         </p>
-        {menu.slice(0, 4).map((item) => (
+        {menu.slice(0, 5).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 
         <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
           Operations
         </p>
-        {menu.slice(4, 7).map((item) => (
+        {menu.slice(5, 7).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 
