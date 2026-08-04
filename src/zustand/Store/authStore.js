@@ -143,9 +143,16 @@ const authStore = create(
       },
 
       logOut: () => {
-        set({ user: null, authToken: null });
+        set({
+          user: null,
+          authToken: null,
+          verifiedUser: null,
+        });
 
         localStorage.removeItem("auth-storage");
+        localStorage.removeItem("admin_user");
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_privilege");
       },
     }),
 

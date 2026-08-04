@@ -10,7 +10,7 @@ import authStore from "./Store/authStore";
  * Extend axios config to support opt-in auth
  */
 export interface AuthAxiosRequestConfig extends InternalAxiosRequestConfig {
-  withAuth?: boolean; 
+  withAuth?: boolean;
   noTimeOut?: boolean;
 }
 
@@ -33,14 +33,14 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    
+
     if (config.noTimeOut) {
-      config.timeout = 0; 
+      config.timeout = 0;
     }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 /**
@@ -58,19 +58,20 @@ api.interceptors.response.use(
     // Only logout & redirect if auth was expected
     if (status === 401 && config?.withAuth && !isRedirecting) {
       isRedirecting = true;
-      
-      //Clearing the state via store's logout action instead of hitting localStorage manually
+
       authStore.getState().logOut();
-      authStore.getState().openAuthModal();
-      if (typeof window !== "undefined") {
-        if (window.location.pathname !== "/") {
-          window.location.href = "/";
-        }
+
+      if (window.location.pathname !== "/") {
+        window.location.replace("/");
       }
+
+      setTimeout(() => {
+        isRedirecting = false;
+      }, 1000);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

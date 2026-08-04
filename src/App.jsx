@@ -26,6 +26,7 @@ import DeliveryPartnerDetails from "./components/DeliveryPartnerDetails";
 import LocationTracker from "./components/LocationTracker";
 import OrderViewDetails from "./components/OrderViewDetails";
 import CreateDeliveryPartner from "./components/CreateDeliveryPartner";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
@@ -49,46 +50,53 @@ const App = () => {
 
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="product" element={<Product />} />
-              <Route path="product/addProduct" element={<AddProduct />} />
-              <Route
-                path="product/editProduct/:product_id"
-                element={<EditProduct />}
-              />
-              <Route path="customer" element={<Customer />} />
-              <Route path="orders" element={<Order />} />
-              <Route
-                path="orders/orderDetails/:id"
-                element={<OrderViewDetails />}
-              />
-              <Route path="production" element={<Production />} />
-              <Route path="inventory" element={<Inventory />} />
-              <Route path="deliveries" element={<Deliveries />} />
-              <Route
-                path="deliveryPartners"
-                element={<DeliveryPartnerList />}
-              />
-              <Route
-                path="deliveryPartnerDetails/:deliveryPersonId"
-                element={<DeliveryPartnerDetails />}
-              />
-              <Route path="customerHelpLine" element={<CustomerHelpLine />} />
-              <Route path="support" element={<Support />} />
-              <Route
-                path="support/locality-manager"
-                element={<LocalityManager />}
-              />
-              <Route path="support/offer-manager" element={<OfferManager />} />
-              <Route
-                path="support/offer-manager/add-offer"
-                element={<AddOffer />}
-              />
-              <Route
-                path="createDeliveryPartner"
-                element={<CreateDeliveryPartner/>}
-              />
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="product" element={<Product />} />
+                <Route path="product/addProduct" element={<AddProduct />} />
+                <Route
+                  path="product/editProduct/:product_id"
+                  element={<EditProduct />}
+                />
+                <Route path="customer" element={<Customer />} />
+                <Route path="orders" element={<Order />} />
+                <Route
+                  path="orders/orderDetails/:id"
+                  element={<OrderViewDetails />}
+                />
+                <Route path="production" element={<Production />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="deliveries" element={<Deliveries />} />
+                <Route
+                  path="deliveryPartners"
+                  element={<DeliveryPartnerList />}
+                />
+                <Route
+                  path="deliveryPartnerDetails/:deliveryPersonId"
+                  element={<DeliveryPartnerDetails />}
+                />
+                <Route path="customerHelpLine" element={<CustomerHelpLine />} />
+                <Route path="support" element={<Support />} />
+                <Route
+                  path="support/locality-manager"
+                  element={<LocalityManager />}
+                />
+                <Route
+                  path="support/offer-manager"
+                  element={<OfferManager />}
+                />
+                <Route
+                  path="support/offer-manager/add-offer"
+                  element={<AddOffer />}
+                />
+                <Route
+                  path="createDeliveryPartner"
+                  element={<CreateDeliveryPartner />}
+                />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>
