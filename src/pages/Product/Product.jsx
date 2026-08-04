@@ -211,7 +211,7 @@ const Product = () => {
             <EmptyState />
           ) : (
             paginated.map((item, index) => (
-              <div key={item.id} className="p-4 hover:bg-slate-50">
+              <div key={item.product_id} className="p-4 hover:bg-slate-50">
                 <div className="flex justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -291,7 +291,7 @@ const Product = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-50">
-              {paginated.length === 0 ? (
+              {paginated?.length === 0 ? (
                 <tr>
                   <td colSpan={9}>
                     <EmptyState />
@@ -299,7 +299,7 @@ const Product = () => {
                 </tr>
               ) : (
                 paginated.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition">
+                  <tr key={item.product_id} className="hover:bg-slate-50 transition">
                     <td className="px-4 py-3.5 text-gray-400">
                       {start + index + 1}
                     </td>
