@@ -41,12 +41,17 @@ const Header = ({ onLogOut }) => {
 
         {/* Avatar */}
         <div className="relative">
+          
           {/* <img
             src="https://i.pravatar.cc/40"
             alt="user"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover cursor-pointer"
             onClick={() => setOpen(!open)}
           /> */}
+
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm select-none">
+            {user?.first_name?.charAt(0)?.toUpperCase()}
+          </div>
 
           {open && (
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50">

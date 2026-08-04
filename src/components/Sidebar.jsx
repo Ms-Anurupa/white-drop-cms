@@ -131,7 +131,7 @@ const Sidebar = ({onLogOut}) => {
       <div className="shrink-0 px-4 py-3 border-t border-slate-100">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm select-none">
-            A
+            {user?.first_name?.charAt(0)?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-gray-800 truncate">{user?.first_name} {user?.last_name}</p>
