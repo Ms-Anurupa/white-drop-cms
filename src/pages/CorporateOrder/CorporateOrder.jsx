@@ -268,30 +268,29 @@ const CorporateOrder = () => {
   };
 
   const handleDownloadInvoice = async (orderId) => {
-    console.log("TODO")
-    // try {
-    //   const data = await getCorporateInvoice(orderId);
+    try {
+      const data = await getCorporateInvoice(orderId);
 
-    //   if (data?.signedUrl) {
+      if (data?.signedUrl) {
 
-    //     const fileResponse = await fetch(data.signedUrl);
-    //     const pdfBlob = await fileResponse.blob();
+        const fileResponse = await fetch(data.signedUrl);
+        const pdfBlob = await fileResponse.blob();
 
-    //     const url = window.URL.createObjectURL(pdfBlob);
+        const url = window.URL.createObjectURL(pdfBlob);
 
-    //     const a = document.createElement("a");
-    //     a.href = url;
-    //     a.download = `invoice-${orderId}.pdf`;
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `invoice-${orderId}.pdf`;
 
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     document.body.removeChild(a);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-    //     window.URL.revokeObjectURL(url);
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    // }
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleRegenerateInvoice =async (orderId) => {
