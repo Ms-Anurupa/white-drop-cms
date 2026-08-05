@@ -397,7 +397,7 @@ const CorporateOrder = () => {
       </div>
 
       {/* ── TABLE CARD ── */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         {/* MOBILE VIEW */}
         <div className="block lg:hidden divide-y divide-gray-100">
           {!hasOrders ? (
@@ -457,37 +457,36 @@ const CorporateOrder = () => {
                     dots={PAYMENT_STATUS_DOT}
                   />
                 </div>
-                  <SplitButton
-                    variant="primary"
-                    onClick={() => handleViewInvoice(o.id)}
-                    menuContent={
-                      <>
-                        <SplitButtonItem
-                          onClick={() => handleRegenerateInvoice(o.id)}
-                        >
-                          <span className="mr-2">
-                            <RotateCcw />
-                          </span>{" "}
-                          Regenerate
-                        </SplitButtonItem>
+                <SplitButton
+                  variant="primary"
+                  onClick={() => handleViewInvoice(o.id)}
+                  menuContent={
+                    <>
+                      <SplitButtonItem
+                        onClick={() => handleRegenerateInvoice(o.id)}
+                      >
+                        <span className="mr-2">
+                          <RotateCcw />
+                        </span>{" "}
+                        Regenerate
+                      </SplitButtonItem>
 
-                        <SplitButtonItem
-                          onClick={() => handleDownloadInvoice(o.id)}
-                        >
-                          <span className="mr-2">
-                            <Download />
-                          </span>{" "}
-                          Download
-                        </SplitButtonItem>
-                      </>
-                    }
-                  >
-                    <span className="mr-3">
-                      <EyeIcon />
-                    </span>{" "}
-                    View
-                  </SplitButton>
-
+                      <SplitButtonItem
+                        onClick={() => handleDownloadInvoice(o.id)}
+                      >
+                        <span className="mr-2">
+                          <Download />
+                        </span>{" "}
+                        Download
+                      </SplitButtonItem>
+                    </>
+                  }
+                >
+                  <span className="mr-3">
+                    <EyeIcon />
+                  </span>{" "}
+                  View
+                </SplitButton>
               </div>
             ))
           )}
@@ -495,166 +494,168 @@ const CorporateOrder = () => {
 
         {/* DESKTOP TABLE */}
         <div className="hidden lg:block">
-          <table className="w-full table-fixed text-sm overflow-scroll">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Sl No.
-                </th>
-                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Order ID
-                </th>
-                <th className="w-40 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Company
-                </th>
-                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Product
-                </th>
-                <th className="w-14 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Quantity
-                </th>
-                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Price/unit
-                </th>
-                <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Total
-                </th>
-                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Delivery
-                </th>
-                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Payment
-                </th>
-                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
-                  Created
-                </th>
-                <th className="w-20 px-2 py-3 text-center text-xs font-semibold text-gray-500">
-                  Action
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-gray-50">
-              {!hasOrders ? (
-                <tr>
-                  <td colSpan={11}>
-                    <EmptyState
-                      onCreate={() =>
-                        navigate(
-                          "/dashboard/corporate-orders/create-corporate-order",
-                        )
-                      }
-                    />
-                  </td>
+          <div className="w-full max-w-full overflow-x-auto">
+            <table className="text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Sl No.
+                  </th>
+                  <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Order ID
+                  </th>
+                  <th className="w-30 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Company
+                  </th>
+                  <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Product
+                  </th>
+                  <th className="w-14 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Quantity
+                  </th>
+                  <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Price/unit
+                  </th>
+                  <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Total
+                  </th>
+                  <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Delivery
+                  </th>
+                  <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Payment
+                  </th>
+                  <th className="w-26 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                    Created
+                  </th>
+                  <th className="w-14 px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                    Action
+                  </th>
                 </tr>
-              ) : (
-                filteredOrders.map((o, idx) => (
-                  <tr key={o.id} className="hover:bg-slate-50 transition">
-                    <td className="px-4 py-3.5 text-gray-400">
-                      {start + idx + 1}
-                    </td>
+              </thead>
 
-                    <td className="px-4 py-3.5 font-medium text-gray-900 ">
-                      {o.orderId}
-                    </td>
-
-                    <td
-                      className="px-4 py-3.5 text-gray-700 cursor-default"
-                      onMouseEnter={(e) => showCompanyPopover(e, o)}
-                      onMouseLeave={hideCompanyPopover}
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <Building2
-                          size={13}
-                          className="text-gray-400 shrink-0"
-                        />
-                        <span className="truncate font-medium">
-                          {o.corpoAcc?.businessName}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">
-                        GST: {o.corpoAcc?.gstNo || "-"}
-                      </p>
-                    </td>
-
-                    <td className="px-2 py-3.5 min-w-0">
-                      <p className="font-medium text-gray-900">
-                        {o.orderDetails?.productName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {o.orderDetails?.description}
-                      </p>
-                    </td>
-
-                    <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
-                      {o.orderDetails?.qty} {o.orderDetails?.unit}
-                    </td>
-
-                    <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
-                      {formatCurrency(o.orderDetails?.pricePerUnit)}
-                    </td>
-
-                    <td className="px-2 py-3.5 font-medium text-gray-900 whitespace-nowrap">
-                      {formatCurrency(o.orderDetails?.orderTotal)}
-                    </td>
-
-                    <td className="px-2 py-3.5">
-                      <StatusPill
-                        status={o.deliveryStatus}
-                        styles={DELIVERY_STATUS_STYLES}
-                        dots={DELIVERY_STATUS_DOT}
-                      />
-                    </td>
-
-                    <td className="px-2 py-3.5">
-                      <StatusPill
-                        status={o.paymentStatus}
-                        styles={PAYMENT_STATUS_STYLES}
-                        dots={PAYMENT_STATUS_DOT}
-                      />
-                    </td>
-
-                    <td className="px-2 py-3.5 text-gray-500">
-                      {formatDate(o.createdAt)}
-                    </td>
-
-                    <td className="px-2 py-3.5 text-center">
-                      <SplitButton
-                        variant="primary"
-                        onClick={() => handleViewInvoice(o.id)}
-                        menuContent={
-                          <>
-                            <SplitButtonItem
-                              onClick={() => handleRegenerateInvoice(o.id)}
-                            >
-                              <span className="mr-2">
-                                <RotateCcw />
-                              </span>{" "}
-                              Regenerate
-                            </SplitButtonItem>
-
-                            <SplitButtonItem
-                              onClick={() => handleDownloadInvoice(o.id)}
-                            >
-                              <span className="mr-2">
-                                <Download />
-                              </span>{" "}
-                              Download
-                            </SplitButtonItem>
-                          </>
+              <tbody className="divide-y divide-gray-50">
+                {!hasOrders ? (
+                  <tr>
+                    <td colSpan={11}>
+                      <EmptyState
+                        onCreate={() =>
+                          navigate(
+                            "/dashboard/corporate-orders/create-corporate-order",
+                          )
                         }
-                      >
-                        <span className="mr-3">
-                          <EyeIcon />
-                        </span>{" "}
-                        View
-                      </SplitButton>
+                      />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredOrders.map((o, idx) => (
+                    <tr key={o.id} className="hover:bg-slate-50 transition">
+                      <td className="px-4 py-3.5 text-gray-400">
+                        {start + idx + 1}
+                      </td>
+
+                      <td className="px-4 py-3.5 font-medium text-gray-900 ">
+                        {o.orderId}
+                      </td>
+
+                      <td
+                        className="px-4 py-3.5 text-gray-700 cursor-default"
+                        onMouseEnter={(e) => showCompanyPopover(e, o)}
+                        onMouseLeave={hideCompanyPopover}
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <Building2
+                            size={13}
+                            className="text-gray-400 shrink-0"
+                          />
+                          <span className="truncate font-medium">
+                            {o.corpoAcc?.businessName}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400 truncate mt-0.5">
+                          GST: {o.corpoAcc?.gstNo || "-"}
+                        </p>
+                      </td>
+
+                      <td className="px-2 py-3.5 min-w-0">
+                        <p className="font-medium text-gray-900">
+                          {o.orderDetails?.productName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {o.orderDetails?.description}
+                        </p>
+                      </td>
+
+                      <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                        {o.orderDetails?.qty} {o.orderDetails?.unit}
+                      </td>
+
+                      <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                        {formatCurrency(o.orderDetails?.pricePerUnit)}
+                      </td>
+
+                      <td className="px-2 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                        {formatCurrency(o.orderDetails?.orderTotal)}
+                      </td>
+
+                      <td className="px-2 py-3.5">
+                        <StatusPill
+                          status={o.deliveryStatus}
+                          styles={DELIVERY_STATUS_STYLES}
+                          dots={DELIVERY_STATUS_DOT}
+                        />
+                      </td>
+
+                      <td className="px-2 py-3.5">
+                        <StatusPill
+                          status={o.paymentStatus}
+                          styles={PAYMENT_STATUS_STYLES}
+                          dots={PAYMENT_STATUS_DOT}
+                        />
+                      </td>
+
+                      <td className="px-2 py-3.5 text-gray-500">
+                        {formatDate(o.createdAt)}
+                      </td>
+
+                      <td className="px-2 py-3.5 text-center">
+                        <SplitButton
+                          variant="primary"
+                          onClick={() => handleViewInvoice(o.id)}
+                          menuContent={
+                            <>
+                              <SplitButtonItem
+                                onClick={() => handleRegenerateInvoice(o.id)}
+                              >
+                                <span className="mr-2">
+                                  <RotateCcw />
+                                </span>{" "}
+                                Regenerate
+                              </SplitButtonItem>
+
+                              <SplitButtonItem
+                                onClick={() => handleDownloadInvoice(o.id)}
+                              >
+                                <span className="mr-2">
+                                  <Download />
+                                </span>{" "}
+                                Download
+                              </SplitButtonItem>
+                            </>
+                          }
+                        >
+                          <span className="mr-3">
+                            <EyeIcon />
+                          </span>{" "}
+                          View
+                        </SplitButton>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* PAGINATION */}
