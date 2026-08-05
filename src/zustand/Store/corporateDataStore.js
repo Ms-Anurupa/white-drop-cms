@@ -73,7 +73,7 @@ const corporateDataStore = create((set) => ({
           orderId,
         },
         withAuth: true,
-        responseType: "blob", //for return pdf 
+        responseType: "blob", //for return pdf
       });
 
       return res.data;

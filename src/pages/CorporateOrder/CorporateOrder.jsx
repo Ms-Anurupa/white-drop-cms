@@ -259,28 +259,34 @@ const CorporateOrder = () => {
   //download invoice
   const handleViewInvoice = async (orderId) => {
     try {
-      const res = await getCorporateInvoice(orderId);
+      const blob = await getCorporateInvoice(orderId);
 
-      if (res?.signedUrl) {
-        window.open(res.signedUrl, "_blank");
-      }
-    } catch (error) {
-      console.error(error);
+      const text = await blob.text();
+      const data = JSON.parse(text);
+
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleDownloadInvoice = async (orderId) => {
     try {
-      const res = await getCorporateInvoice(orderId);
+      const pdfBlob = await getCorporateInvoice(orderId);
 
-      if (res?.signedUrl) {
-        const link = document.createElement("a");
-        link.href = res.signedUrl;
-        link.download = "";
-        link.click();
-      }
-    } catch (error) {
-      console.error(error);
+      const url = window.URL.createObjectURL(pdfBlob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${orderId}.pdf`;
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
     }
   };
 
