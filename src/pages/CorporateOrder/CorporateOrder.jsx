@@ -630,7 +630,6 @@ const CorporateOrder = () => {
                       {formatDate(o.createdAt)}
                     </td>
 
-                    <td className="px-2 py-3.5 text-center">
                       <td className="px-2 py-3.5 text-center">
                         <div className="relative inline-flex rounded-lg shadow-sm">
                           {/* Left Button */}
@@ -678,7 +677,6 @@ const CorporateOrder = () => {
                           )}
                         </div>
                       </td>
-                    </td>
                   </tr>
                 ))
               )}

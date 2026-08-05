@@ -21,12 +21,6 @@ const units = [
   "mL",
   "Kg",
   "g",
-  "Pack",
-  "Piece",
-  "Box",
-  "Bottle",
-  "Tray",
-  "Dozen",
 ];
 
 const CreateCorporateOrder = () => {
@@ -139,7 +133,7 @@ const CreateCorporateOrder = () => {
     setLoading(true);
 
     const payload = {
-      corpoAccId: corporateOrderAcc.id,
+      corpoAccId: corporateData.corpoAccId,
       orderDetails: {
         productName: corporateData.productName,
         description: corporateData.description,
@@ -153,7 +147,7 @@ const CreateCorporateOrder = () => {
     };
     await createCorporateOrderAdmin(payload);
 
-    console.log(payload);
+    navigate(-1)
 
     setTimeout(() => {
       setLoading(false);
