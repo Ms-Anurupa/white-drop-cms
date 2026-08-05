@@ -495,7 +495,7 @@ const CorporateOrder = () => {
 
         {/* DESKTOP TABLE */}
         <div className="hidden lg:block">
-          <table className="w-full table-fixed text-sm">
+          <table className="w-full table-fixed text-sm overflow-scroll">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
                 <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500">

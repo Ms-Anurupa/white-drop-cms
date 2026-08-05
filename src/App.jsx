@@ -30,6 +30,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateCorporateOrder from "./components/CreateCorporateOrder";
 import CorporateOrder from "./pages/CorporateOrder/CorporateOrder";
 import CorporateAccounts from "./pages/CorporateAccounts/CorporateAccounts";
+import CreateCorporateAccount from "./components/CreateCorporateAccount";
 
 const App = () => {
   return (
@@ -69,6 +70,7 @@ const App = () => {
                 <Route path="corporate-orders" element={<CorporateOrder />} />
                 <Route path="corporate-accounts" element={<CorporateAccounts />} />
                 <Route path="corporate-orders/create-corporate-order" element={<CreateCorporateOrder />} />
+                <Route path="corporate-accounts/create-corporate-account" element={<CreateCorporateAccount />} />
                 <Route
                   path="orders/orderDetails/:id"
                   element={<OrderViewDetails />}
