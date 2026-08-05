@@ -267,9 +267,9 @@ const CorporateOrder = () => {
     }
   };
 
-  const handleDownloadInvoice = async (orderId) => {
+  const handleDownloadInvoice = async (id,orderId) => {
     try {
-      const data = await getCorporateInvoice(orderId);
+      const data = await getCorporateInvoice(id);
 
       if (data?.signedUrl) {
 
@@ -294,10 +294,8 @@ const CorporateOrder = () => {
   };
 
   const handleRegenerateInvoice =async (orderId) => {
-    // Integrate later
-    console.log("Regenerate", orderId);
     const data = await getCorporateInvoice(orderId,true);
-
+    //TODO add a toast here
   };
 
   if (loading) return <Loader text="Loading corporate orders..." />;
@@ -483,7 +481,7 @@ const CorporateOrder = () => {
                       </SplitButtonItem>
 
                       <SplitButtonItem
-                        onClick={() => handleDownloadInvoice(o.id)}
+                        onClick={() => handleDownloadInvoice(o.id,o.orderId)}
                       >
                         <span className="mr-2">
                           <Download />
