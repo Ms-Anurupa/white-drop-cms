@@ -52,6 +52,22 @@ const corporateDataStore = create((set) => ({
     } 
   },
 
+   getCorporateInvoice: async (orderId) => {
+    try {
+      const res = await api.get("/admin/getCorporateInvoice", {
+        params: {
+          orderId,
+        },
+        withAuth: true,
+        responseType: "blob", //for return pdf 
+      });
+
+      return res.data;
+    } catch (error) {
+      throw error;
+    } 
+  },
+
 }));
 
 export default corporateDataStore;

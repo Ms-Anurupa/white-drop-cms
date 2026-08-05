@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -15,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -81,6 +83,9 @@ const CorporateOrder = () => {
   );
   const corporateOrderLists = corporateDataStore(
     (state) => state.corporateOrderLists,
+  );
+  const getCorporateInvoice = corporateDataStore(
+    (state) => state.getCorporateInvoice,
   );
   const loading = corporateDataStore((state) => state.loading);
 
@@ -246,6 +251,27 @@ const CorporateOrder = () => {
     setDateFilter("all");
     setPage(1);
   };
+
+  //download invoice 
+  const handleDownloadInvoice = async (orderId) => {
+    try {
+      const data = await getCorporateInvoice(orderId);
+
+      const url = window.URL.createObjectURL(data)
+      const link = document.createElement("a")
+
+      link.href = url;
+      link.download = `Invoice-${orderId}.pdf`
+
+      document.body.appendChild(link);
+      link.click()
+      link.remove();
+
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error("Failed to download invoice")
+    }
+  }
 
   if (loading) return <Loader text="Loading corporate orders..." />;
 
@@ -417,8 +443,8 @@ const CorporateOrder = () => {
                 </div>
 
                 <button
-                  onClick={() => console.log(o)}
-                  className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
+                  onClick={() => handleDownloadInvoice(o.id)}
+                  className="mt-3 w-full cursor-pointer py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
                 >
                   <FileText size={13} />
                   Download invoice
@@ -555,7 +581,7 @@ const CorporateOrder = () => {
 
                     <td className="px-2 py-3.5 text-center">
                       <button
-                        onClick={() => console.log(o)}
+                        onClick={() => handleDownloadInvoice(o.id)}
                         title="Download invoice"
                         aria-label="Download invoice"
                         className="inline-flex items-center justify-center w-8 h-8 rounded-md 
