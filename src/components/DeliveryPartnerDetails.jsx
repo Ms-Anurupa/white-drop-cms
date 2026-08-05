@@ -12,6 +12,8 @@ import {
   Check,
   ChevronRight,
   ChevronLeft,
+  FileText,
+  ExternalLink,
 } from "lucide-react";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -19,6 +21,54 @@ import noDoc from "../assets/images/nodoc.svg";
 import Loader from "./Loader";
 import useSignedImageObject from "../hooks/useSignedImageObject";
 import { toast } from "react-toastify";
+
+// ---------------------------------------------------------------------------
+// Helpers for PDF detection
+// ---------------------------------------------------------------------------
+
+// Detect if a given src is a PDF — checks the file extension (ignoring query
+// params) and falls back to checking for blob URLs that were created from a
+// File object whose type is application/pdf (handled at upload time via the
+// `pdfBlobUrls` ref, see handleImageChange below).
+const isPdfUrl = (url) => {
+  if (!url || typeof url !== "string") return false;
+  const clean = url.split("?")[0].toLowerCase();
+  return clean.endsWith(".pdf");
+};
+
+// ---------------------------------------------------------------------------
+// Reusable document thumbnail — renders an image thumbnail for images,
+// or a PDF icon tile for PDFs (with an "on-file-type" flag passed in).
+// ---------------------------------------------------------------------------
+const DocumentPreview = ({ src, alt, onClick, badgeCount, isPdf }) => {
+  return (
+    <div className="relative">
+      {isPdf ? (
+        <button
+          type="button"
+          onClick={onClick}
+          className="w-25 h-24 rounded-xl border border-slate-200 bg-slate-100 cursor-pointer flex flex-col items-center justify-center gap-1 text-slate-500 hover:bg-slate-200 transition"
+        >
+          <FileText size={26} />
+          <span className="text-[10px] font-medium">PDF Document</span>
+        </button>
+      ) : (
+        <img
+          src={src || noDoc}
+          alt={alt}
+          className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+          onClick={onClick}
+        />
+      )}
+
+      {badgeCount > 1 && (
+        <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-[10px] font-semibold px-1.5 py-0.5">
+          +{badgeCount - 1}
+        </span>
+      )}
+    </div>
+  );
+};
 
 const DeliveryPartnerDetails = () => {
   const { deliveryPersonId } = useParams();
@@ -50,6 +100,11 @@ const DeliveryPartnerDetails = () => {
 
   // touch-swipe tracking for the slider
   const touchStartX = useRef(null);
+
+  // Tracks which locally-created blob: URLs correspond to PDF files, since a
+  // blob URL string alone has no file-extension to inspect (e.g.
+  // "blob:http://localhost/abc-123"). Keyed by blob URL -> boolean.
+  const pdfBlobMap = useRef({});
 
   useEffect(() => {
     if (deliveryPersonId) getDeliveryPersonById(deliveryPersonId);
@@ -214,9 +269,19 @@ const DeliveryPartnerDetails = () => {
       [field]: files,
     }));
 
+    const urls = files.map((file) => {
+      const url = URL.createObjectURL(file);
+      // Remember whether this freshly-created blob URL is a PDF so the
+      // preview logic can tell, since blob: URLs carry no extension.
+      pdfBlobMap.current[url] =
+        file.type === "application/pdf" ||
+        file.name?.toLowerCase().endsWith(".pdf");
+      return url;
+    });
+
     setPreviews((prev) => ({
       ...prev,
-      [field]: files.map((file) => URL.createObjectURL(file)),
+      [field]: urls,
     }));
 
     setIsDirty(true);
@@ -287,10 +352,15 @@ const DeliveryPartnerDetails = () => {
     });
   };
 
+  // Determines whether a given src (remote URL OR local blob URL) is a PDF.
+  const isPdfSrc = (src) => {
+    if (isBlobUrl(src)) return !!pdfBlobMap.current[src];
+    return isPdfUrl(src);
+  };
+
   const vehicleNumberRegex = /^[A-Z]{2}[ -]?\d{1,2}[ -]?[A-Z]{1,3}[ -]?\d{4}$/i;
 
   const handleSave = async () => {
-
     if (!updatedData.firstName?.trim()) {
       toast.error("First name is required");
       return;
@@ -865,10 +935,12 @@ const DeliveryPartnerDetails = () => {
 
               <div className="flex gap-5">
                 <div className="relative group">
-                  <img
+                  <DocumentPreview
                     src={firstImage(getDisplayValue("vehicleImage"))}
                     alt="Vehicle"
-                    className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+                    isPdf={isPdfSrc(
+                      firstImage(getDisplayValue("vehicleImage")),
+                    )}
                     onClick={() =>
                       openPreview(
                         "Vehicle",
@@ -876,14 +948,10 @@ const DeliveryPartnerDetails = () => {
                         getDisplayValue("vehicleImage"),
                       )
                     }
+                    badgeCount={
+                      toImageArray(getDisplayValue("vehicleImage")).length
+                    }
                   />
-
-                  {toImageArray(getDisplayValue("vehicleImage")).length > 1 && (
-                    <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-[10px] font-semibold px-1.5 py-0.5">
-                      +
-                      {toImageArray(getDisplayValue("vehicleImage")).length - 1}
-                    </span>
-                  )}
 
                   {isEditing && (
                     <>
@@ -892,7 +960,7 @@ const DeliveryPartnerDetails = () => {
                         hidden
                         multiple
                         type="file"
-                        accept="image/*"
+                        accept="image/*,application/pdf"
                         onChange={(e) => handleImageChange("vehicleImage", e)}
                       />
 
@@ -942,10 +1010,10 @@ const DeliveryPartnerDetails = () => {
 
               <div className="flex gap-5">
                 <div className="relative group">
-                  <img
+                  <DocumentPreview
                     src={firstImage(getDisplayValue("aadharImage"))}
                     alt="Aadhaar"
-                    className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+                    isPdf={isPdfSrc(firstImage(getDisplayValue("aadharImage")))}
                     onClick={() =>
                       openPreview(
                         "Aadhaar Card",
@@ -953,13 +1021,10 @@ const DeliveryPartnerDetails = () => {
                         getDisplayValue("aadharImage"),
                       )
                     }
+                    badgeCount={
+                      toImageArray(getDisplayValue("aadharImage")).length
+                    }
                   />
-
-                  {toImageArray(getDisplayValue("aadharImage")).length > 1 && (
-                    <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-[10px] font-semibold px-1.5 py-0.5">
-                      +{toImageArray(getDisplayValue("aadharImage")).length - 1}
-                    </span>
-                  )}
 
                   {isEditing && (
                     <>
@@ -968,7 +1033,7 @@ const DeliveryPartnerDetails = () => {
                         hidden
                         multiple
                         type="file"
-                        accept="image/*"
+                        accept="image/*,application/pdf"
                         onChange={(e) => handleImageChange("aadharImage", e)}
                       />
 
@@ -1018,10 +1083,10 @@ const DeliveryPartnerDetails = () => {
 
               <div className="flex gap-5">
                 <div className="relative group">
-                  <img
+                  <DocumentPreview
                     src={firstImage(getDisplayValue("panImage"))}
                     alt="PAN Card"
-                    className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+                    isPdf={isPdfSrc(firstImage(getDisplayValue("panImage")))}
                     onClick={() =>
                       openPreview(
                         "PAN Card",
@@ -1029,13 +1094,10 @@ const DeliveryPartnerDetails = () => {
                         getDisplayValue("panImage"),
                       )
                     }
+                    badgeCount={
+                      toImageArray(getDisplayValue("panImage")).length
+                    }
                   />
-
-                  {toImageArray(getDisplayValue("panImage")).length > 1 && (
-                    <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-[10px] font-semibold px-1.5 py-0.5">
-                      +{toImageArray(getDisplayValue("panImage")).length - 1}
-                    </span>
-                  )}
 
                   {isEditing && (
                     <>
@@ -1044,10 +1106,9 @@ const DeliveryPartnerDetails = () => {
                         hidden
                         multiple
                         type="file"
-                        accept="image/*"
+                        accept="image/*,application/pdf"
                         onChange={(e) => handleImageChange("panImage", e)}
                       />
-
                       <label
                         htmlFor="pan-upload"
                         className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer hover:bg-slate-800 transition"
@@ -1094,10 +1155,10 @@ const DeliveryPartnerDetails = () => {
 
               <div className="flex gap-5">
                 <div className="relative group">
-                  <img
+                  <DocumentPreview
                     src={firstImage(getDisplayValue("dlImage"))}
                     alt="Driving Licence"
-                    className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+                    isPdf={isPdfSrc(firstImage(getDisplayValue("dlImage")))}
                     onClick={() =>
                       openPreview(
                         "Driving Licence",
@@ -1105,13 +1166,8 @@ const DeliveryPartnerDetails = () => {
                         getDisplayValue("dlImage"),
                       )
                     }
+                    badgeCount={toImageArray(getDisplayValue("dlImage")).length}
                   />
-
-                  {toImageArray(getDisplayValue("dlImage")).length > 1 && (
-                    <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-[10px] font-semibold px-1.5 py-0.5">
-                      +{toImageArray(getDisplayValue("dlImage")).length - 1}
-                    </span>
-                  )}
 
                   {isEditing && (
                     <>
@@ -1120,7 +1176,7 @@ const DeliveryPartnerDetails = () => {
                         hidden
                         multiple
                         type="file"
-                        accept="image/*"
+                        accept="image/*,application/pdf"
                         onChange={(e) => handleImageChange("dlImage", e)}
                       />
 
@@ -1158,7 +1214,7 @@ const DeliveryPartnerDetails = () => {
         </div>
       </div>
 
-      {/* ================= IMAGE PREVIEW MODAL (sliding carousel) ================= */}
+      {/* ================= IMAGE / PDF PREVIEW MODAL (sliding carousel) ================= */}
       {previewImage?.images?.length > 0 && (
         <div
           className="fixed inset-0 z-10 bg-black/85 backdrop-blur-sm flex items-center
@@ -1187,11 +1243,26 @@ const DeliveryPartnerDetails = () => {
                   {previewImage.label}
                 </h3>
 
-                {previewImage.images.length > 1 && (
-                  <span className="text-xs font-medium text-slate-400">
-                    {previewImage.index + 1} / {previewImage.images.length}
-                  </span>
-                )}
+                <div className="flex items-center gap-3">
+                  {isPdfSrc(previewImage.images[previewImage.index]) && (
+                    <a
+                      href={previewImage.images[previewImage.index]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-medium text-cyan-700 hover:text-cyan-900 transition"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink size={13} />
+                      Open in new tab
+                    </a>
+                  )}
+
+                  {previewImage.images.length > 1 && (
+                    <span className="text-xs font-medium text-slate-400">
+                      {previewImage.index + 1} / {previewImage.images.length}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Sliding track */}
@@ -1211,12 +1282,20 @@ const DeliveryPartnerDetails = () => {
                       key={i}
                       className="w-full shrink-0 flex items-center justify-center p-6"
                     >
-                      <img
-                        src={src || noDoc}
-                        alt={`${previewImage.label} ${i + 1}`}
-                        className="max-h-[68vh] max-w-full object-contain rounded-xl shadow-xl select-none"
-                        draggable={false}
-                      />
+                      {isPdfSrc(src) ? (
+                        <iframe
+                          src={src}
+                          title={`${previewImage.label} ${i + 1}`}
+                          className="w-full h-[68vh] rounded-xl shadow-xl bg-white"
+                        />
+                      ) : (
+                        <img
+                          src={src || noDoc}
+                          alt={`${previewImage.label} ${i + 1}`}
+                          className="max-h-[68vh] max-w-full object-contain rounded-xl shadow-xl select-none"
+                          draggable={false}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
