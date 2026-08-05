@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -5,12 +6,12 @@ import {
   Loader2,
   Package,
   FileText,
-  Hash,
   IndianRupee,
   StickyNote,
   ShoppingCart,
   AlertTriangle,
   Building2,
+  Boxes,
 } from "lucide-react";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import { toast } from "react-toastify";
@@ -160,22 +161,22 @@ const CreateCorporateOrder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-2 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition mb-6 cursor-pointer group"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition mb-6 cursor-pointer group"
         >
           <ArrowLeft
             size={16}
             className="group-hover:-translate-x-0.5 transition-transform"
           />
-          Back to Orders
+          Back to Corporate Orders
         </button>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="px-6 sm:px-8 pt-4 pb-4 border-b border-gray-100">
+          <div className="px-6 sm:px-8 pt-2 pb-2 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
                 <ShoppingCart size={20} className="text-blue-600" />
@@ -192,7 +193,7 @@ const CreateCorporateOrder = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-6 space-y-5">
+          <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 space-y-2">
             {/* Warning */}
             <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
               <AlertTriangle
@@ -204,8 +205,9 @@ const CreateCorporateOrder = () => {
               </p>
             </div>
 
-            {/* Product Name */}
-            <div>
+            {/* Corporate Account / Product Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Corporate Account */}
               <div>
                 <label className="mb-2 block text-xs font-medium text-gray-700">
                   Corporate Account
@@ -221,7 +223,7 @@ const CreateCorporateOrder = () => {
                     name="corpoAccId"
                     value={corporateData.corpoAccId}
                     onChange={handleChange}
-                    className="w-full appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
                   >
                     <option value="">Select Corporate Account</option>
 
@@ -247,24 +249,28 @@ const CreateCorporateOrder = () => {
                   </svg>
                 </div>
               </div>
-              <label className="text-xs mt-2 font-medium text-gray-700 mb-1.5 block">
-                Product Name
-              </label>
 
-              <div className="relative">
-                <Package
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+              {/* Product Name */}
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Product Name
+                </label>
 
-                <input
-                  required
-                  placeholder="Add Product Name"
-                  name="productName"
-                  value={corporateData.productName}
-                  onChange={handleChange}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
+                <div className="relative">
+                  <Package
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    required
+                    placeholder="Add Product Name"
+                    name="productName"
+                    value={corporateData.productName}
+                    onChange={handleChange}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  />
+                </div>
               </div>
             </div>
 
@@ -341,13 +347,14 @@ const CreateCorporateOrder = () => {
                 </label>
 
                 <div className="relative">
-                  <Hash
+                  <Boxes
                     size={16}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
                   <input
                     type="number"
+                    placeholder="Enter quantity"
                     name="qty"
                     value={corporateData.qty}
                     onChange={handleChange}
@@ -372,6 +379,7 @@ const CreateCorporateOrder = () => {
 
                   <input
                     type="number"
+                    placeholder="Enter price"
                     name="pricePerUnit"
                     value={corporateData.pricePerUnit}
                     onChange={handleChange}
@@ -385,11 +393,12 @@ const CreateCorporateOrder = () => {
                   Order Total
                 </label>
 
-                <input
-                  value={`₹ ${corporateData.orderTotal}`}
-                  readOnly
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm font-semibold text-gray-700"
-                />
+                <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 to-slate-50 px-3 py-2.5">
+                  <IndianRupee size={16} className="text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-700">
+                    {corporateData.orderTotal || 0}
+                  </span>
+                </div>
               </div>
             </div>
 

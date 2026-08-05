@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
@@ -202,12 +203,6 @@ const Order = () => {
     [orders],
   );
 
-  // const DATE_FILTERS = [
-  //   { key: "all", label: "All orders", countLabel: "Total orders" },
-  //   { key: "today", label: "Today", countLabel: "Today's orders" },
-  //   { key: "week", label: "This week", countLabel: "This week's orders" },
-  //   { key: "month", label: "This month", countLabel: "This month's orders" },
-  // ];
   const DATE_FILTERS = [
     { key: "all", label: "All orders" },
     { key: "today", label: "Today" },
@@ -286,37 +281,7 @@ const Order = () => {
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
           {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-            <button
-              onClick={() =>
-                navigate("/dashboard/orders/create-corporate-order")
-              }
-              className="group cursor-pointer inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:from-indigo-700 hover:to-blue-700 active:scale-95"
-            >
-              <Building2 size={18} />
-              <span>Create Corporate Order</span>
-              <Plus
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </button>
-            {/* Search */}
-            <div className="w-full sm:w-64 lg:w-72">
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search orders..."
-                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                />
-              </div>
-            </div>
-          </div>
+          
 
           {/* Export — pinned to the row's end via justify-between + shrink-0,
       so it never shifts regardless of what the left cluster does */}

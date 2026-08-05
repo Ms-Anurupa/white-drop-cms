@@ -1,4 +1,3 @@
-import React from "react";
 import { CalendarRange } from "lucide-react";
 
 const DateFilter = ({
@@ -12,7 +11,6 @@ const DateFilter = ({
   onToDateChange,
   onClear,
   rangeLabel, // e.g. "Joined date" — shows a label+icon instead of pills
-  trailingText, // e.g. "12 partners found" — right-aligned note
 }) => {
   const hasPills = filters.length > 0;
 
@@ -99,10 +97,6 @@ const DateFilter = ({
           )}
         </div>
       )}
-
-      {/* {trailingText && (
-        <p className="text-xs text-gray-400 ml-auto pb-2">{trailingText}</p>
-      )} */}
     </div>
   );
 };

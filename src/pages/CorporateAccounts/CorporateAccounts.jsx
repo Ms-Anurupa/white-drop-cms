@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import corporateDataStore from "../zustand/Store/corporateDataStore";
+import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import { Building2, Eye } from "lucide-react";
 
 const CorporateAccounts = () => {
@@ -31,7 +31,7 @@ const CorporateAccounts = () => {
   }, [corporateOrderAcc]);
 
   return (
-    <div className="overflow-hidden rounded-2xl ">
+    <div className="overflow-hidden rounded-2xl bg-white px-4 py-2">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -43,9 +43,6 @@ const CorporateAccounts = () => {
         </div>
 
         <div className="w-full lg:max-w-md lg:flex-1">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
-            Search
-          </label>
 
           <input
             type="text"

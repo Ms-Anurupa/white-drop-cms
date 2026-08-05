@@ -1,163 +1,323 @@
+/* eslint-disable no-unused-vars */
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  PackageSearch,
+  Building2,
+  Plus,
+  FileText,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Eye, Plus, Search } from "lucide-react";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
-import { useEffect, useState } from "react";
+import Loader from "../../components/Loader";
+import DateFilter from "../../components/DateFilter";
 
-const deliveryBadgeClass = (status) =>
-  status === "PLACED"
-    ? "bg-blue-100 text-blue-700"
-    : status === "PROCESSING"
-      ? "bg-amber-100 text-amber-700"
-      : status === "INTRANSIT"
-        ? "bg-indigo-100 text-indigo-700"
-        : status === "DELIVERED"
-          ? "bg-green-100 text-green-700"
-          : status === "FAILED"
-            ? "bg-red-100 text-red-700"
-            : status === "CANCELLED"
-              ? "bg-gray-200 text-gray-700"
-              : "bg-gray-100 text-gray-700";
+const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
-const paymentBadgeClass = (status) =>
-  status === "COMPLETE"
-    ? "bg-green-100 text-green-700"
-    : status === "POSTPAID"
-      ? "bg-purple-100 text-purple-700"
-      : status === "PENDING"
-        ? "bg-yellow-100 text-yellow-700"
-        : status === "FAILED"
-          ? "bg-red-100 text-red-700"
-          : "bg-gray-100 text-gray-700";
+const DELIVERY_STATUS_STYLES = {
+  PLACED: "bg-blue-50 text-blue-700",
+  PROCESSING: "bg-amber-50 text-amber-700",
+  INTRANSIT: "bg-indigo-50 text-indigo-700",
+  DELIVERED: "bg-emerald-50 text-emerald-700",
+  FAILED: "bg-red-50 text-red-700",
+  CANCELLED: "bg-gray-100 text-gray-600",
+};
 
-const EmptyState = ({ onCheckAccounts }) => (
-  <div className="flex flex-col items-center justify-center px-4 py-16 sm:py-20">
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
-      <Plus size={28} className="text-blue-600" />
-    </div>
+const DELIVERY_STATUS_DOT = {
+  PLACED: "bg-blue-500",
+  PROCESSING: "bg-amber-500",
+  INTRANSIT: "bg-indigo-500",
+  DELIVERED: "bg-emerald-500",
+  FAILED: "bg-red-500",
+  CANCELLED: "bg-gray-400",
+};
 
-    <h3 className="mt-4 text-lg font-semibold text-gray-800">
-      No Corporate Orders
-    </h3>
+const PAYMENT_STATUS_STYLES = {
+  COMPLETE: "bg-emerald-50 text-emerald-700",
+  POSTPAID: "bg-purple-50 text-purple-700",
+  PENDING: "bg-amber-50 text-amber-700",
+  FAILED: "bg-red-50 text-red-700",
+};
 
-    <p className="mt-2 max-w-sm text-center text-sm text-gray-500">
-      There are no corporate orders available yet. Check your corporate accounts
-      and create a new order.
-    </p>
+const PAYMENT_STATUS_DOT = {
+  COMPLETE: "bg-emerald-500",
+  POSTPAID: "bg-purple-500",
+  PENDING: "bg-amber-500",
+  FAILED: "bg-red-500",
+};
 
-    <button
-      onClick={onCheckAccounts}
-      className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
-    >
-      <Eye size={18} />
-      Check Corporate Accounts
-    </button>
-  </div>
-);
+const DATE_FILTERS = [
+  { key: "all", label: "All orders" },
+  { key: "today", label: "Today" },
+  { key: "week", label: "This week" },
+  { key: "month", label: "This month" },
+];
+
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const formatCurrency = (value) =>
+  `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
 const CorporateOrder = () => {
   const navigate = useNavigate();
-  
+
   const getCorporateOrders = corporateDataStore(
     (state) => state.getCorporateOrders,
   );
   const corporateOrderLists = corporateDataStore(
     (state) => state.corporateOrderLists,
   );
+  const loading = corporateDataStore((state) => state.loading);
 
+  // ── search + filters (all sent to the server as search params) ──
   const [search, setSearch] = useState("");
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const [pageSize, setPageSize] = useState(10);
 
-  const goToAccounts = () =>
-    navigate("/dashboard/corporate-orders/corporate-accounts");
+  // client-side quick chip, layered on top of whatever the server returned
+  // for the current page — mirrors the Order listing page behaviour
+  const [dateFilter, setDateFilter] = useState("all");
 
+  const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
+  const [popoverPos, setPopoverPos] = useState(null);
+  const popoverRef = useRef(null);
+
+  const orders = corporateOrderLists || [];
+
+  const showCompanyPopover = (e, order) => {
+    const anchor = e.currentTarget.getBoundingClientRect();
+    setPopoverPos(null);
+    setHoveredOrder({ order, anchor });
+  };
+
+  const hideCompanyPopover = () => {
+    setHoveredOrder(null);
+    setPopoverPos(null);
+  };
+
+  useLayoutEffect(() => {
+    if (!hoveredOrder || !popoverRef.current) return;
+
+    const { anchor } = hoveredOrder;
+    const { width, height } = popoverRef.current.getBoundingClientRect();
+    const margin = 12;
+    const gap = 8;
+
+    let left = anchor.left;
+    if (left + width + margin > window.innerWidth) {
+      left = window.innerWidth - width - margin;
+    }
+    left = Math.max(left, margin);
+
+    const spaceBelow = window.innerHeight - anchor.bottom;
+    const spaceAbove = anchor.top;
+
+    let top;
+    if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
+      top = anchor.bottom + gap;
+      top = Math.min(top, window.innerHeight - margin - height);
+    } else {
+      top = anchor.top - height - gap;
+    }
+    top = Math.max(top, margin);
+
+    setPopoverPos({ top, left });
+  }, [hoveredOrder]);
+
+  // debounced fetch whenever search / filters / pageSize change — resets to page 1
   useEffect(() => {
-    getCorporateOrders({
-      deliveryStatus,
-      paymentStatus,
-      search,
-      page,
-      limit,
-      fromDate,
-      toDate,
-    });
+    const timer = setTimeout(() => {
+      if ((fromDate && !toDate) || (!fromDate && toDate)) return;
+
+      setPage(1);
+
+      getCorporateOrders({
+        search,
+        deliveryStatus,
+        paymentStatus,
+        fromDate,
+        toDate,
+        page: 1,
+        limit: pageSize,
+      });
+    }, 400);
+
+    return () => clearTimeout(timer);
   }, [
     getCorporateOrders,
+    search,
     deliveryStatus,
     paymentStatus,
-    search,
-    page,
-    limit,
     fromDate,
     toDate,
+    pageSize,
   ]);
 
+  // plain page-change fetch (no debounce, no reset)
   useEffect(() => {
-    console.log("corporateOrderLists", corporateOrderLists);
-  }, [corporateOrderLists]);
+    if ((fromDate && !toDate) || (!fromDate && toDate)) return;
 
-  const hasOrders = corporateOrderLists?.length > 0;
+    getCorporateOrders({
+      search,
+      deliveryStatus,
+      paymentStatus,
+      fromDate,
+      toDate,
+      page,
+      limit: pageSize,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  const handleFromDateChange = (value) => setFromDate(value);
+  const handleToDateChange = (value) => setToDate(value);
+  const clearDates = () => {
+    setFromDate("");
+    setToDate("");
+  };
+
+  const matchesDateFilter = (order, filter) => {
+    if (filter === "all") return true;
+
+    const orderDate = new Date(order.createdAt);
+    const now = new Date();
+
+    if (filter === "today") {
+      return orderDate.toDateString() === now.toDateString();
+    }
+    if (filter === "week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return orderDate >= weekAgo;
+    }
+    if (filter === "month") {
+      return (
+        orderDate.getMonth() === now.getMonth() &&
+        orderDate.getFullYear() === now.getFullYear()
+      );
+    }
+    return true;
+  };
+
+  const filteredOrders = useMemo(
+    () => orders.filter((order) => matchesDateFilter(order, dateFilter)),
+    [orders, dateFilter],
+  );
+
+  const dateCounts = useMemo(
+    () => ({
+      all: orders.length,
+      today: orders.filter((o) => matchesDateFilter(o, "today")).length,
+      week: orders.filter((o) => matchesDateFilter(o, "week")).length,
+      month: orders.filter((o) => matchesDateFilter(o, "month")).length,
+    }),
+    [orders],
+  );
+
+  const hasOrders = filteredOrders.length > 0;
+  const start = (page - 1) * pageSize;
+  const isLastPage = orders.length < pageSize;
+
+  const resetFilters = () => {
+    setSearch("");
+    setDeliveryStatus("");
+    setPaymentStatus("");
+    setFromDate("");
+    setToDate("");
+    setDateFilter("all");
+    setPage(1);
+  };
+
+  if (loading) return <Loader text="Loading corporate orders..." />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="py-6 sm:px-2 lg:px-2 space-y-2 bg-gray-50">
+      {/* ── HEADER ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Corporate Orders
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            View and manage all corporate orders.
+          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>View and manage all corporate orders</span>
+            <span className="text-blue-600 font-medium">
+              {DATE_FILTERS.find((f) => f.key === dateFilter)?.label}:{" "}
+              {dateCounts[dateFilter]}
+            </span>
           </p>
         </div>
 
-        <div className="w-full sm:w-64 lg:w-72">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap gap-3 items-stretch sm:items-center">
+          {/* Search */}
+          <div className="relative w-full sm:w-72">
             <Search
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
-
             <input
-              type="text"
-              placeholder="Search Order ID / Product..."
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search order ID, company, GST..."
+              className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
+                focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
             />
           </div>
-        </div>
 
-        <button
-          onClick={goToAccounts}
-          className="inline-flex cursor-pointer w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700 sm:w-auto"
-        >
-          <Building2 size={18} />
-          Check Corporate Accounts
-        </button>
+          <button
+            onClick={() =>
+              navigate("/dashboard/corporate-orders/create-corporate-order")
+            }
+            className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg shrink-0
+              bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition 
+              whitespace-nowrap cursor-pointer"
+          >
+            <Building2 size={16} />
+            Create Corporate Order
+            <Plus size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 grid grid-cols-1 gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:flex lg:flex-row lg:items-end">
-        <div className="w-full lg:w-52">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
+      <DateFilter
+        filters={DATE_FILTERS.map((f) => ({ ...f, count: dateCounts[f.key] }))}
+        activeFilter={dateFilter}
+        onFilterChange={(key) => setDateFilter(key)}
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={handleFromDateChange}
+        onToDateChange={handleToDateChange}
+        onClear={clearDates}
+      />
+
+      {/* ── STATUS FILTERS ── */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end">
+        <div className="w-full sm:w-48">
+          <label className="mb-1 block text-xs font-medium text-gray-500">
             Delivery Status
           </label>
-
           <select
             value={deliveryStatus}
-            onChange={(e) => {
-              setDeliveryStatus(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+            onChange={(e) => setDeliveryStatus(e.target.value)}
+            className="w-full cursor-pointer h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
           >
             <option value="">All</option>
             <option value="PLACED">Placed</option>
@@ -169,18 +329,14 @@ const CorporateOrder = () => {
           </select>
         </div>
 
-        <div className="w-full lg:w-52">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
+        <div className="w-full sm:w-48">
+          <label className="mb-1 block text-xs font-medium text-gray-500">
             Payment Status
           </label>
-
           <select
             value={paymentStatus}
-            onChange={(e) => {
-              setPaymentStatus(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+            onChange={(e) => setPaymentStatus(e.target.value)}
+            className="w-full cursor-pointer h-10 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
           >
             <option value="">All</option>
             <option value="COMPLETE">Complete</option>
@@ -190,261 +346,367 @@ const CorporateOrder = () => {
           </select>
         </div>
 
-        <div className="w-full lg:w-auto">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
-            From
-          </label>
-
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => {
-              setFromDate(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 lg:w-auto"
-          />
-        </div>
-
-        <div className="w-full lg:w-auto">
-          <label className="mb-1 block text-xs font-medium text-gray-600">
-            To
-          </label>
-
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => {
-              setToDate(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 lg:w-auto"
-          />
-        </div>
-
         <button
-          onClick={() => {
-            setSearch("");
-            setDeliveryStatus("");
-            setPaymentStatus("");
-            setFromDate("");
-            setToDate("");
-            setPage(1);
-          }}
-          className="w-full rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium hover:bg-gray-50 sm:col-span-2 lg:w-auto lg:col-span-1"
+          onClick={resetFilters}
+          className="h-10 px-4 cursor-pointer rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition sm:ml-auto"
         >
-          Reset
+          Reset filters
         </button>
       </div>
 
-      {/* Mobile / tablet: card list (< lg) */}
-      <div className="md:hidden">
-        {hasOrders ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {corporateOrderLists.map((order) => (
-              <div
-                key={order.id}
-                className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {order.orderId}
+      {/* ── TABLE CARD ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* MOBILE VIEW */}
+        <div className="block lg:hidden divide-y divide-gray-100">
+          {!hasOrders ? (
+            <EmptyState
+              onCreate={() =>
+                navigate("/dashboard/corporate-orders/create-corporate-order")
+              }
+            />
+          ) : (
+            filteredOrders.map((o, idx) => (
+              <div key={o.id} className="p-4 hover:bg-slate-50">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400 shrink-0">
+                        #{start + idx + 1}
+                      </span>
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {o.orderId}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                      <Building2 size={12} className="shrink-0" />
+                      <span className="truncate">
+                        {o.corpoAcc?.businessName}
+                      </span>
                     </p>
-                    <p className="text-xs text-gray-500">{order.corpoAccId}</p>
-                  </div>
-
-                  <button
-                    className="inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
-                    onClick={() => console.log(order)}
-                    aria-label="View order"
-                  >
-                    <Eye size={18} />
-                  </button>
-                </div>
-
-                <div className="mt-3 border-t border-gray-100 pt-3">
-                  <p className="text-sm font-medium text-gray-900">
-                    {order.orderDetails.productName}
-                  </p>
-                  <p className="line-clamp-1 text-xs text-gray-500">
-                    {order.orderDetails.description}
-                  </p>
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-500">Quantity</p>
-                    <p className="text-gray-800">
-                      {order.orderDetails.qty} {order.orderDetails.unit}
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formatDate(o.createdAt)}
                     </p>
                   </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500">Total</p>
-                    <p className="font-semibold text-gray-900">
-                      ₹{order.orderDetails.orderTotal.toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500">Created</p>
-                    <p className="text-gray-800">
-                      {new Date(order.createdAt).toLocaleDateString("en-IN")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${deliveryBadgeClass(
-                      order.deliveryStatus,
-                    )}`}
-                  >
-                    {order.deliveryStatus}
-                  </span>
-
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${paymentBadgeClass(
-                      order.paymentStatus,
-                    )}`}
-                  >
-                    {order.paymentStatus}
+                  <span className="font-semibold text-sm text-gray-900 shrink-0">
+                    {formatCurrency(o.orderDetails?.orderTotal)}
                   </span>
                 </div>
+
+                <div className="mt-3 text-xs text-gray-500 leading-relaxed">
+                  <p className="font-medium text-gray-700">
+                    {o.orderDetails?.productName}
+                  </p>
+                  <p className="line-clamp-1">{o.orderDetails?.description}</p>
+                  <p className="mt-1">
+                    {o.orderDetails?.qty} {o.orderDetails?.unit} ·{" "}
+                    {formatCurrency(o.orderDetails?.pricePerUnit)} / unit
+                  </p>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <StatusPill
+                    status={o.deliveryStatus}
+                    styles={DELIVERY_STATUS_STYLES}
+                    dots={DELIVERY_STATUS_DOT}
+                  />
+                  <StatusPill
+                    status={o.paymentStatus}
+                    styles={PAYMENT_STATUS_STYLES}
+                    dots={PAYMENT_STATUS_DOT}
+                  />
+                </div>
+
+                <button
+                  onClick={() => console.log(o)}
+                  className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
+                >
+                  <FileText size={13} />
+                  Download invoice
+                </button>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <EmptyState onCheckAccounts={goToAccounts} />
-          </div>
-        )}
-      </div>
+            ))
+          )}
+        </div>
 
-      {/* Desktop: table (lg and up) */}
-      <div className="hidden md:max-w-[1000px] lg:block rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50">
-              <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <th className="px-6 py-4">Order ID</th>
-                <th className="px-6 py-4">Company</th>
-                <th className="px-6 py-4">Product</th>
-                <th className="px-6 py-4">Quantity</th>
-                <th className="px-6 py-4">Total</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment</th>
-                <th className="px-6 py-4">Created</th>
-                <th className="px-6 py-4 text-center">Action</th>
+        {/* DESKTOP TABLE */}
+        <div className="hidden sm:block">
+          <table className="w-full table-fixed text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="w-12 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Sl No.
+                </th>
+                <th className="w-28 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Order ID
+                </th>
+                <th className="w-44 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Company
+                </th>
+                <th className="w-36 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Product
+                </th>
+                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Quantity
+                </th>
+                <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Price/unit
+                </th>
+                <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Total
+                </th>
+                <th className="w-28 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Delivery
+                </th>
+                <th className="w-26 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Payment
+                </th>
+                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  Created
+                </th>
+                <th className="w-12 px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                  Action
+                </th>
               </tr>
             </thead>
 
-            <tbody>
-              {hasOrders ? (
-                corporateOrderLists.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-gray-100 transition hover:bg-gray-50"
-                  >
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                      {order.orderId}
+            <tbody className="divide-y divide-gray-50">
+              {!hasOrders ? (
+                <tr>
+                  <td colSpan={11}>
+                    <EmptyState
+                      onCreate={() =>
+                        navigate(
+                          "/dashboard/corporate-orders/create-corporate-order",
+                        )
+                      }
+                    />
+                  </td>
+                </tr>
+              ) : (
+                filteredOrders.map((o, idx) => (
+                  <tr key={o.id} className="hover:bg-slate-50 transition">
+                    <td className="px-4 py-3.5 text-gray-400">
+                      {start + idx + 1}
                     </td>
 
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {order.corpoAccId}
+                    <td className="px-4 py-3.5 font-medium text-gray-900 ">
+                      {o.orderId}
                     </td>
 
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {order.orderDetails.productName}
-                        </p>
-                        <p className="line-clamp-1 text-xs text-gray-500">
-                          {order.orderDetails.description}
-                        </p>
+                    <td
+                      className="px-4 py-3.5 text-gray-700 cursor-default"
+                      onMouseEnter={(e) => showCompanyPopover(e, o)}
+                      onMouseLeave={hideCompanyPopover}
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Building2
+                          size={13}
+                          className="text-gray-400 shrink-0"
+                        />
+                        <span className="truncate font-medium">
+                          {o.corpoAcc?.businessName}
+                        </span>
                       </div>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">
+                        GST: {o.corpoAcc?.gstNo || "-"}
+                      </p>
                     </td>
 
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {order.orderDetails.qty} {order.orderDetails.unit}
+                    <td className="px-2 py-3.5 min-w-0">
+                      <p className="font-medium text-gray-900">
+                        {o.orderDetails?.productName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {o.orderDetails?.description}
+                      </p>
                     </td>
 
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
-                      ₹{order.orderDetails.orderTotal.toLocaleString()}
+                    <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                      {o.orderDetails?.qty} {o.orderDetails?.unit}
                     </td>
 
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${deliveryBadgeClass(
-                          order.deliveryStatus,
-                        )}`}
-                      >
-                        {order.deliveryStatus}
-                      </span>
+                    <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                      {formatCurrency(o.orderDetails?.pricePerUnit)}
                     </td>
 
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${paymentBadgeClass(
-                          order.paymentStatus,
-                        )}`}
-                      >
-                        {order.paymentStatus}
-                      </span>
+                    <td className="px-2 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                      {formatCurrency(o.orderDetails?.orderTotal)}
                     </td>
 
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                    <td className="px-2 py-3.5">
+                      <StatusPill
+                        status={o.deliveryStatus}
+                        styles={DELIVERY_STATUS_STYLES}
+                        dots={DELIVERY_STATUS_DOT}
+                      />
                     </td>
 
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-2 py-3.5">
+                      <StatusPill
+                        status={o.paymentStatus}
+                        styles={PAYMENT_STATUS_STYLES}
+                        dots={PAYMENT_STATUS_DOT}
+                      />
+                    </td>
+
+                    <td className="px-2 py-3.5 text-gray-500">
+                      {formatDate(o.createdAt)}
+                    </td>
+
+                    <td className="px-2 py-3.5 text-center">
                       <button
-                        className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
-                        onClick={() => console.log(order)}
-                        aria-label="View order"
+                        onClick={() => console.log(o)}
+                        title="Download invoice"
+                        aria-label="Download invoice"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md 
+                        border border-gray-200 bg-white hover:bg-gray-50 text-gray-600
+                        transition cursor-pointer"
                       >
-                        <Eye size={18} />
+                        <Download size={14} />
                       </button>
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan={9}>
-                    <EmptyState onCheckAccounts={goToAccounts} />
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Pagination */}
-      <div className="mt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
-        <p className="text-sm text-gray-500">Page {page}</p>
+        {/* PAGINATION */}
+        <div className="border-t border-gray-100 px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span>
+              {filteredOrders.length === 0
+                ? "No results"
+                : `Showing ${start + 1}–${start + filteredOrders.length}`}
+            </span>
 
-        <div className="flex w-full gap-2 sm:w-auto">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="flex-1 rounded-lg border px-4 py-2 disabled:opacity-40 sm:flex-none"
-          >
-            Previous
-          </button>
+            <label className="flex items-center gap-1.5">
+              <span className="hidden md:inline">Rows per page</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-          <button
-            disabled={corporateOrderLists.length < limit}
-            onClick={() => setPage((p) => p + 1)}
-            className="flex-1 rounded-lg border px-4 py-2 disabled:opacity-40 sm:flex-none"
-          >
-            Next
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Page {page}</span>
+
+            <PageButton
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              label="Previous page"
+            >
+              <ChevronLeft size={14} />
+            </PageButton>
+
+            <PageButton
+              onClick={() => setPage((p) => p + 1)}
+              disabled={isLastPage}
+              label="Next page"
+            >
+              <ChevronRight size={14} />
+            </PageButton>
+          </div>
         </div>
       </div>
+
+      {/* COMPANY DETAILS POPOVER */}
+      {hoveredOrder && (
+        <div
+          ref={popoverRef}
+          className="fixed z-50 w-80 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
+          style={
+            popoverPos
+              ? { top: popoverPos.top, left: popoverPos.left, opacity: 1 }
+              : { top: 0, left: 0, opacity: 0 }
+          }
+        >
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+            Company details
+          </p>
+          <p className="text-sm font-medium text-gray-900">
+            {hoveredOrder.order.corpoAcc?.businessName}
+          </p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            GST: {hoveredOrder.order.corpoAcc?.gstNo || "-"}
+          </p>
+          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+            Address:{" "}
+            {hoveredOrder.order.corpoAcc?.address ||
+              "No address details available"}
+          </p>
+          {hoveredOrder.order.orderDetails?.notes && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-3 mb-1">
+                Notes
+              </p>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {hoveredOrder.order.orderDetails.notes}
+              </p>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
+
+const PageButton = ({ children, onClick, disabled, label }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={label}
+    aria-label={label}
+    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+  >
+    {children}
+  </button>
+);
+
+const StatusPill = ({ status, styles, dots }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+      styles[status] || "bg-gray-100 text-gray-700"
+    }`}
+  >
+    <span
+      className={`w-1.5 h-1.5 rounded-full ${dots[status] || "bg-gray-400"}`}
+    />
+    {status || "UNKNOWN"}
+  </span>
+);
+
+const EmptyState = ({ onCreate }) => (
+  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
+    <PackageSearch size={32} className="text-gray-300" />
+    <p className="text-sm font-medium text-gray-500">
+      No corporate orders found
+    </p>
+    <p className="text-xs text-gray-400">
+      Try adjusting your search or filters
+    </p>
+    {onCreate && (
+      <button
+        onClick={onCreate}
+        className="mt-3 cursor-pointer inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-700 transition"
+      >
+        <Plus size={14} />
+        Create corporate order
+      </button>
+    )}
+  </div>
+);
 
 export default CorporateOrder;
