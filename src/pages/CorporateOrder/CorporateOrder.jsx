@@ -11,12 +11,15 @@ import {
   Building2,
   Plus,
   FileText,
+  RotateCcw,
+  EyeIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
 import { toast } from "react-toastify";
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -454,52 +457,37 @@ const CorporateOrder = () => {
                     dots={PAYMENT_STATUS_DOT}
                   />
                 </div>
-
-                <td className="px-2 py-3.5 text-center">
-                  <div className="relative inline-flex rounded-lg shadow-sm">
-                    {/* Left Button */}
-                    <button
-                      onClick={() => handleRegenerateInvoice(o.orderId)}
-                      className="px-3 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-l-lg transition cursor-pointer"
-                    >
-                      Regenerate
-                    </button>
-
-                    {/* Right Dropdown Toggle */}
-                    <button
-                      onClick={() =>
-                        setOpenMenu(openMenu === o.orderId ? null : o.orderId)
-                      }
-                      className="px-2 bg-blue-600 hover:bg-blue-700 border-l border-blue-500 rounded-r-lg text-white transition cursor-pointer"
-                    >
-                      ▼
-                    </button>
-
-                    {openMenu === o.orderId && (
-                      <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-gray-200 shadow-lg z-50 overflow-hidden">
-                        <button
-                          onClick={() => {
-                            handleViewInvoice(o.id);
-                            setOpenMenu(null);
-                          }}
-                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 transition"
+                  <SplitButton
+                    variant="primary"
+                    onClick={() => handleViewInvoice(o.id)}
+                    menuContent={
+                      <>
+                        <SplitButtonItem
+                          onClick={() => handleRegenerateInvoice(o.id)}
                         >
-                          👁 View
-                        </button>
+                          <span className="mr-2">
+                            <RotateCcw />
+                          </span>{" "}
+                          Regenerate
+                        </SplitButtonItem>
 
-                        <button
-                          onClick={() => {
-                            handleDownloadInvoice(o.id);
-                            setOpenMenu(null);
-                          }}
-                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 transition"
+                        <SplitButtonItem
+                          onClick={() => handleDownloadInvoice(o.id)}
                         >
-                          ⬇ Download
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </td>
+                          <span className="mr-2">
+                            <Download />
+                          </span>{" "}
+                          Download
+                        </SplitButtonItem>
+                      </>
+                    }
+                  >
+                    <span className="mr-3">
+                      <EyeIcon />
+                    </span>{" "}
+                    View
+                  </SplitButton>
+
               </div>
             ))
           )}
@@ -630,53 +618,38 @@ const CorporateOrder = () => {
                       {formatDate(o.createdAt)}
                     </td>
 
-                      <td className="px-2 py-3.5 text-center">
-                        <div className="relative inline-flex rounded-lg shadow-sm">
-                          {/* Left Button */}
-                          <button
-                            onClick={() => handleRegenerateInvoice(o.orderId)}
-                            className="px-3 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-l-lg transition cursor-pointer"
-                          >
-                            View
-                          </button>
+                    <td className="px-2 py-3.5 text-center">
+                      <SplitButton
+                        variant="primary"
+                        onClick={() => handleViewInvoice(o.id)}
+                        menuContent={
+                          <>
+                            <SplitButtonItem
+                              onClick={() => handleRegenerateInvoice(o.id)}
+                            >
+                              <span className="mr-2">
+                                <RotateCcw />
+                              </span>{" "}
+                              Regenerate
+                            </SplitButtonItem>
 
-                          {/* Right Dropdown Toggle */}
-                          <button
-                            onClick={() =>
-                              setOpenMenu(
-                                openMenu === o.orderId ? null : o.orderId,
-                              )
-                            }
-                            className="px-1 bg-blue-600 hover:bg-blue-700 border-l border-blue-500 rounded-r-lg text-white transition cursor-pointer"
-                          >
-                            ▼
-                          </button>
-
-                          {openMenu === o.orderId && (
-                            <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-gray-200 shadow-lg z-50 overflow-hidden">
-                              <button
-                                onClick={() => {
-                                  handleViewInvoice(o.id);
-                                  setOpenMenu(null);
-                                }}
-                                className="w-full px-1 py-2 text-sm text-left hover:bg-gray-50 transition"
-                              >
-                                ⬇ Download
-                              </button>
-
-                              <button
-                                onClick={() => {
-                                  handleDownloadInvoice(o.id);
-                                  setOpenMenu(null);
-                                }}
-                                className="w-full px-1 py-2 text-sm text-left hover:bg-gray-50 transition"
-                              >
-                                + Regenerate
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
+                            <SplitButtonItem
+                              onClick={() => handleDownloadInvoice(o.id)}
+                            >
+                              <span className="mr-2">
+                                <Download />
+                              </span>{" "}
+                              Download
+                            </SplitButtonItem>
+                          </>
+                        }
+                      >
+                        <span className="mr-3">
+                          <EyeIcon />
+                        </span>{" "}
+                        View
+                      </SplitButton>
+                    </td>
                   </tr>
                 ))
               )}
