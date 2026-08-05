@@ -91,7 +91,7 @@ export function SplitButtonItem({ children, onClick, destructive = false }) {
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center px-4 py-2 text-sm transition-colors hover:bg-gray-100 ${
+      className={`flex w-full items-center px-4 py-2 text-sm transition-colors cursor-pointer hover:bg-gray-100 ${
         destructive ? "text-red-600 hover:text-red-700" : "text-gray-700 hover:text-gray-900"
       }`}
     >
