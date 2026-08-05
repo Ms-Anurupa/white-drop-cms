@@ -457,8 +457,6 @@ const CorporateOrder = () => {
                     dots={PAYMENT_STATUS_DOT}
                   />
                 </div>
-
-                <td className="px-2 py-3.5 text-center">
                   <SplitButton
                     variant="primary"
                     onClick={() => handleViewInvoice(o.id)}
@@ -489,7 +487,7 @@ const CorporateOrder = () => {
                     </span>{" "}
                     View
                   </SplitButton>
-                </td>
+
               </div>
             ))
           )}
