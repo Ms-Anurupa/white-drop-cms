@@ -97,6 +97,7 @@ const CorporateOrder = () => {
   const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [openMenu, setOpenMenu] = useState(null);
 
   // client-side quick chip, layered on top of whatever the server returned
   // for the current page — mirrors the Order listing page behaviour
@@ -252,26 +253,38 @@ const CorporateOrder = () => {
     setPage(1);
   };
 
-  //download invoice 
+  //download invoice
+  const handleViewInvoice = async (orderId) => {
+    try {
+      const res = await getCorporateInvoice(orderId);
+
+      if (res?.signedUrl) {
+        window.open(res.signedUrl, "_blank");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleDownloadInvoice = async (orderId) => {
     try {
-      const data = await getCorporateInvoice(orderId);
+      const res = await getCorporateInvoice(orderId);
 
-      const url = window.URL.createObjectURL(data)
-      const link = document.createElement("a")
-
-      link.href = url;
-      link.download = `Invoice-${orderId}.pdf`
-
-      document.body.appendChild(link);
-      link.click()
-      link.remove();
-
-      window.URL.revokeObjectURL(url)
+      if (res?.signedUrl) {
+        const link = document.createElement("a");
+        link.href = res.signedUrl;
+        link.download = "";
+        link.click();
+      }
     } catch (error) {
-      toast.error("Failed to download invoice")
+      console.error(error);
     }
-  }
+  };
+
+  const handleRegenerateInvoice = (orderId) => {
+    // Integrate later
+    console.log("Regenerate", orderId);
+  };
 
   if (loading) return <Loader text="Loading corporate orders..." />;
 
@@ -442,54 +455,92 @@ const CorporateOrder = () => {
                   />
                 </div>
 
-                <button
-                  onClick={() => handleDownloadInvoice(o.id)}
-                  className="mt-3 w-full cursor-pointer py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
-                >
-                  <FileText size={13} />
-                  Download invoice
-                </button>
+                <td className="px-2 py-3.5 text-center">
+                  <div className="relative inline-flex rounded-lg shadow-sm">
+                    {/* Left Button */}
+                    <button
+                      onClick={() => handleRegenerateInvoice(o.orderId)}
+                      className="px-3 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-l-lg transition cursor-pointer"
+                    >
+                      Regenerate
+                    </button>
+
+                    {/* Right Dropdown Toggle */}
+                    <button
+                      onClick={() =>
+                        setOpenMenu(openMenu === o.orderId ? null : o.orderId)
+                      }
+                      className="px-2 bg-blue-600 hover:bg-blue-700 border-l border-blue-500 rounded-r-lg text-white transition cursor-pointer"
+                    >
+                      ▼
+                    </button>
+
+                    {openMenu === o.orderId && (
+                      <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-gray-200 shadow-lg z-50 overflow-hidden">
+                        <button
+                          onClick={() => {
+                            handleViewInvoice(o.id);
+                            setOpenMenu(null);
+                          }}
+                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 transition"
+                        >
+                          👁 View
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            handleDownloadInvoice(o.id);
+                            setOpenMenu(null);
+                          }}
+                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 transition"
+                        >
+                          ⬇ Download
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </div>
             ))
           )}
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="hidden sm:block">
+        <div className="hidden lg:block">
           <table className="w-full table-fixed text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="w-12 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Sl No.
                 </th>
-                <th className="w-28 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Order ID
                 </th>
-                <th className="w-44 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-40 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Company
                 </th>
-                <th className="w-36 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Product
                 </th>
-                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-14 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Quantity
                 </th>
-                <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Price/unit
                 </th>
                 <th className="w-20 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Total
                 </th>
-                <th className="w-28 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Delivery
                 </th>
-                <th className="w-26 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Payment
                 </th>
-                <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                   Created
                 </th>
-                <th className="w-12 px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                <th className="w-20 px-2 py-3 text-center text-xs font-semibold text-gray-500">
                   Action
                 </th>
               </tr>
@@ -580,16 +631,53 @@ const CorporateOrder = () => {
                     </td>
 
                     <td className="px-2 py-3.5 text-center">
-                      <button
-                        onClick={() => handleDownloadInvoice(o.id)}
-                        title="Download invoice"
-                        aria-label="Download invoice"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-md 
-                        border border-gray-200 bg-white hover:bg-gray-50 text-gray-600
-                        transition cursor-pointer"
-                      >
-                        <Download size={14} />
-                      </button>
+                      <td className="px-2 py-3.5 text-center">
+                        <div className="relative inline-flex rounded-lg shadow-sm">
+                          {/* Left Button */}
+                          <button
+                            onClick={() => handleRegenerateInvoice(o.orderId)}
+                            className="px-3 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-l-lg transition cursor-pointer"
+                          >
+                            View
+                          </button>
+
+                          {/* Right Dropdown Toggle */}
+                          <button
+                            onClick={() =>
+                              setOpenMenu(
+                                openMenu === o.orderId ? null : o.orderId,
+                              )
+                            }
+                            className="px-1 bg-blue-600 hover:bg-blue-700 border-l border-blue-500 rounded-r-lg text-white transition cursor-pointer"
+                          >
+                            ▼
+                          </button>
+
+                          {openMenu === o.orderId && (
+                            <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-gray-200 shadow-lg z-50 overflow-hidden">
+                              <button
+                                onClick={() => {
+                                  handleViewInvoice(o.id);
+                                  setOpenMenu(null);
+                                }}
+                                className="w-full px-1 py-2 text-sm text-left hover:bg-gray-50 transition"
+                              >
+                                ⬇ Download
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  handleDownloadInvoice(o.id);
+                                  setOpenMenu(null);
+                                }}
+                                className="w-full px-1 py-2 text-sm text-left hover:bg-gray-50 transition"
+                              >
+                                + Regenerate
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
                     </td>
                   </tr>
                 ))
