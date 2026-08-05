@@ -259,10 +259,7 @@ const CorporateOrder = () => {
   //download invoice
   const handleViewInvoice = async (orderId) => {
     try {
-      const blob = await getCorporateInvoice(orderId);
-
-      const text = await blob.text();
-      const data = JSON.parse(text);
+      const data = await getCorporateInvoice(orderId);
 
       window.open(data.signedUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
@@ -271,28 +268,37 @@ const CorporateOrder = () => {
   };
 
   const handleDownloadInvoice = async (orderId) => {
-    try {
-      const pdfBlob = await getCorporateInvoice(orderId);
+    console.log("TODO")
+    // try {
+    //   const data = await getCorporateInvoice(orderId);
 
-      const url = window.URL.createObjectURL(pdfBlob);
+    //   if (data?.signedUrl) {
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `invoice-${orderId}.pdf`;
+    //     const fileResponse = await fetch(data.signedUrl);
+    //     const pdfBlob = await fileResponse.blob();
 
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    //     const url = window.URL.createObjectURL(pdfBlob);
 
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-    }
+    //     const a = document.createElement("a");
+    //     a.href = url;
+    //     a.download = `invoice-${orderId}.pdf`;
+
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     document.body.removeChild(a);
+
+    //     window.URL.revokeObjectURL(url);
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
-  const handleRegenerateInvoice = (orderId) => {
+  const handleRegenerateInvoice =async (orderId) => {
     // Integrate later
     console.log("Regenerate", orderId);
+    const data = await getCorporateInvoice(orderId,true);
+
   };
 
   if (loading) return <Loader text="Loading corporate orders..." />;

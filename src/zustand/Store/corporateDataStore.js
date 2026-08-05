@@ -66,14 +66,14 @@ const corporateDataStore = create((set) => ({
     } 
   },
 
-   getCorporateInvoice: async (orderId) => {
+  getCorporateInvoice: async (orderId,regenerate=false) => {
     try {
       const res = await api.get("/admin/getCorporateInvoice", {
         params: {
           orderId,
+          regenerate
         },
         withAuth: true,
-        responseType: "blob", //for return pdf
       });
 
       return res.data;
