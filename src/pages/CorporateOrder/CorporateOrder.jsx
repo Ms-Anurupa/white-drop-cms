@@ -161,8 +161,8 @@ const CorporateOrder = () => {
 
       getCorporateOrders({
         search,
-        deliveryStatus,
-        paymentStatus,
+        deliStatus: deliveryStatus,
+        payStatus: paymentStatus,
         fromDate,
         toDate,
         page: 1,
@@ -187,8 +187,8 @@ const CorporateOrder = () => {
 
     getCorporateOrders({
       search,
-      deliveryStatus,
-      paymentStatus,
+      deliStatus: deliveryStatus,
+      payStatus: paymentStatus,
       fromDate,
       toDate,
       page,
