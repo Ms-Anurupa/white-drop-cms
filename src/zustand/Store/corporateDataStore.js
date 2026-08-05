@@ -21,6 +21,20 @@ const corporateDataStore = create((set) => ({
     }
   },
 
+
+  addCorporateAccount: async (payload) => {
+    try {
+      const res = await api.post("/admin/addCorporateAccount", payload, {
+        withAuth: true,
+    });
+
+      return res.data;
+    } catch (err) {
+      console.log("err", err);
+      throw err
+    }
+  },
+
    getCorporateAccounts: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
     try {
       const res = await api.get("/admin/getCorporateAccounts", {
