@@ -37,11 +37,11 @@ const corporateDataStore = create((set) => ({
   },
 
 
-   getCorporateOrders: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
+   getCorporateOrders: async ({payStatus, deliStatus, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
     try {
       const res = await api.get("/admin/getCorporateOrders", {
         withAuth: true,
-        params: { search, status, page, limit, fromDate, toDate },
+        params: { search, payStatus, deliStatus, page, limit, fromDate, toDate },
       });
 
       set({
