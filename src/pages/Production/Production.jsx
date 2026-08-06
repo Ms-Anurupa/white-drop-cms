@@ -81,7 +81,7 @@ const StatCard = ({ label, value, Icon, iconColor, bg }) => (
   </div>
 );
 
-export default function Inventory() {
+export default function Production() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("All");
@@ -109,13 +109,13 @@ export default function Inventory() {
   };
 
   return (
-    <div className="px-4 md:px-4 space-y-3">
+    <div className="p-6 md:p-6 space-y-2">
       {/* ── HEADER (LEFT) + TOOLBAR (RIGHT) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* LEFT */}
         <div>
           <h1 className="text-xl font-semibold text-gray-900">
-            Inventory Management
+            Production Management
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Track stock levels & product availability

@@ -263,7 +263,7 @@ const Order = () => {
   if (loading) return <Loader text="Loading order history lists..." />;
 
   return (
-    <div className="py-6 sm:px-2 lg:px-2 space-y-6 bg-gray-50">
+    <div className="p-6 sm:px-2 lg:p-6 space-y-6 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

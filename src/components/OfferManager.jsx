@@ -59,7 +59,7 @@ const OfferManager = () => {
   };
 
   return (
-    <div className="p-3 sm:p-4 space-y-4">
+    <div className="p-6 space-y-2">
       {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

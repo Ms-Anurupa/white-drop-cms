@@ -293,7 +293,7 @@ const Deliveries = () => {
   });
 
   return (
-    <div className=" px-4 md:px-4 space-y-2">
+    <div className="p-6 md:p-6 space-y-2">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>

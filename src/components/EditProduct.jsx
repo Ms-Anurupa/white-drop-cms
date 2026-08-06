@@ -190,7 +190,7 @@ const EditProduct = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full bg-gradient-to-br px-4">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-gradient-to-br p-6">
       <div className="max-w-9xl mx-auto">
         {/* HEADER */}
         <div className="mb-8 flex items-center gap-4">

@@ -307,7 +307,7 @@ const OrderViewDetails = () => {
   const isCancelled = order.orderStatus === "CANCELLED";
 
   return (
-    <div className="min-h-[85vh] w-full" style={pageStyle}>
+    <div className="min-h-[85vh] w-full p-6" style={pageStyle}>
       {fontImport}
 
       {/* Header */}

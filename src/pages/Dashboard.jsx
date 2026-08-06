@@ -66,7 +66,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-[85vh] bg-gradient-to-br ">
       {/* CONTENT */}
-      <div className="px-2 md:px-4 pb-4">
+      <div className="p-2 md:p-4 pb-4">
         {/* TOP BANNER */}
         <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
           <h2 className="text-2xl font-semibold">Welcome to CMS Admin Panel</h2>

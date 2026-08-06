@@ -586,7 +586,7 @@ const DeliveryPartnerDetails = () => {
   };
 
   return (
-    <div className="">
+    <div className="p-6">
       {/* action bar */}
       <div className="max-w-7xl mx-auto p-2 flex items-center justify-between">
         {/* Left - Back */}

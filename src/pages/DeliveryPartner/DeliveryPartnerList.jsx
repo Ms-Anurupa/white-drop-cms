@@ -256,7 +256,7 @@ const DeliveryPartnerList = () => {
   }
 
   return (
-    <div className="p-3 sm:p-4 space-y-4 bg-gray-50 min-h-screen">
+    <div className="p-6 sm:p-4 md:p-6 space-y-2 bg-gray-50 min-h-screen">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>

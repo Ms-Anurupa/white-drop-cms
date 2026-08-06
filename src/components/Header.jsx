@@ -18,7 +18,7 @@ const Header = ({ onLogOut }) => {
   }, []);
 
   return (
-    <header className="h-14 bg-white shadow px-3 sm:px-4 md:px-6 flex items-center justify-between relative">
+    <header className="h-14 bg-white shadow px-3 py-6 sm:px-4 md:px-6 flex items-center justify-between relative">
       {/* Title */}
       <div className="min-w-0">
         {/* <h2 className="text-base sm:text-lg font-semibold text-gray-700 truncate">

@@ -86,8 +86,7 @@ export default function Inventory() {
   };
 
   return (
-    <div className="px-4 space-y-3">
-      {/* ── HEADER + SEARCH (SAME ROW LIKE DELIVERIES) ── */}
+    <div className="lg:p-6 md:p-6 space-y-2">
       {/* ── HEADER (LEFT) + TOOLBAR (RIGHT) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* LEFT */}
@@ -133,58 +132,58 @@ export default function Inventory() {
         </div>
       </div>
 
-            {/* ── STATS STRIP ── */}
-<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      {/* ── STATS STRIP ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        {/* Total */}
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+              <Package size={18} className="text-slate-600" />
+            </div>
+            <p className="text-sm text-gray-600">Total Items</p>
+          </div>
+          <h3 className="text-xl font-semibold">{stats.total}</h3>
+        </div>
 
-  {/* Total */}
-  <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
-        <Package size={18} className="text-slate-600" />
+        {/* In Stock */}
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <CheckCircle2 size={18} className="text-green-600" />
+            </div>
+            <p className="text-sm text-gray-600">In Stock</p>
+          </div>
+          <h3 className="text-xl font-semibold text-green-600">
+            {stats.inStock}
+          </h3>
+        </div>
+
+        {/* Low Stock */}
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+              <AlertTriangle size={18} className="text-amber-600" />
+            </div>
+            <p className="text-sm text-gray-600">Low Stock</p>
+          </div>
+          <h3 className="text-xl font-semibold text-amber-600">
+            {stats.lowStock}
+          </h3>
+        </div>
+
+        {/* Out of Stock */}
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+              <XCircle size={18} className="text-red-600" />
+            </div>
+            <p className="text-sm text-gray-600">Out of Stock</p>
+          </div>
+          <h3 className="text-xl font-semibold text-red-600">
+            {stats.outStock}
+          </h3>
+        </div>
       </div>
-      <p className="text-sm text-gray-600">Total Items</p>
-    </div>
-    <h3 className="text-xl font-semibold">{stats.total}</h3>
-  </div>
-
-  {/* In Stock */}
-  <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-        <CheckCircle2 size={18} className="text-green-600" />
-      </div>
-      <p className="text-sm text-gray-600">In Stock</p>
-    </div>
-    <h3 className="text-xl font-semibold text-green-600">{stats.inStock}</h3>
-  </div>
-
-  {/* Low Stock */}
-  <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-        <AlertTriangle size={18} className="text-amber-600" />
-      </div>
-      <p className="text-sm text-gray-600">Low Stock</p>
-    </div>
-    <h3 className="text-xl font-semibold text-amber-600">
-      {stats.lowStock}
-    </h3>
-  </div>
-
-  {/* Out of Stock */}
-  <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
-        <XCircle size={18} className="text-red-600" />
-      </div>
-      <p className="text-sm text-gray-600">Out of Stock</p>
-    </div>
-    <h3 className="text-xl font-semibold text-red-600">
-      {stats.outStock}
-    </h3>
-  </div>
-
-</div>
 
       {/* ── FILTERS (LEFT SIDE LIKE YOU WANTED) ── */}
       <div className="flex gap-2 flex-wrap justify-start">
@@ -206,8 +205,6 @@ export default function Inventory() {
           </button>
         ))}
       </div>
-
-
 
       {/* ── TABLE ── */}
       <div className="hidden xl:block bg-white rounded-2xl border border-slate-100 overflow-hidden">

@@ -7,7 +7,7 @@ const Support = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="">
+    <div className="p-6">
       {/* Header */}
       <app-header />
 

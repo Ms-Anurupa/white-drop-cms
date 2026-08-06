@@ -199,7 +199,7 @@ const CorporateAccounts = () => {
   if (loading) return <Loader text="Loading corporate accounts..." />;
 
   return (
-    <div className="py-6 sm:px-2 lg:px-2 space-y-6 bg-gray-50">
+    <div className="py-6 sm:px-2 lg:p-6 space-y-2 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -287,14 +287,6 @@ const CorporateAccounts = () => {
                     Created {formatDate(account.createdAt)}
                   </p>
                 </div>
-
-                <button
-                  onClick={() => console.log(account)}
-                  className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
-                >
-                  <Eye size={13} />
-                  View details
-                </button>
               </div>
             ))
           )}
@@ -322,9 +314,6 @@ const CorporateAccounts = () => {
                 </th>
                 <th className="w-32 px-3 py-3 text-left text-xs font-semibold text-gray-500">
                   Created
-                </th>
-                <th className="w-20 px-3 py-3 text-center text-xs font-semibold text-gray-500">
-                  Action
                 </th>
               </tr>
             </thead>
@@ -399,16 +388,7 @@ const CorporateAccounts = () => {
                       {formatDate(account.createdAt)}
                     </td>
 
-                    <td className="px-4 py-3.5 text-center">
-                      <button
-                        onClick={() => console.log(account)}
-                        title="View details"
-                        aria-label="View details"
-                        className="inline-flex cursor-pointer items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 transition"
-                      >
-                        <Eye size={14} />
-                      </button>
-                    </td>
+                   
                   </tr>
                 ))
               )}

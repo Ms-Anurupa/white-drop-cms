@@ -21,7 +21,7 @@ import DateFilter from "../../components/DateFilter";
 import { toast } from "react-toastify";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
-const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
+const PAGE_SIZE_OPTIONS = [5, 10, 15, 25];
 
 const DELIVERY_STATUS_STYLES = {
   PLACED: "bg-blue-50 text-blue-700",
@@ -301,7 +301,7 @@ const CorporateOrder = () => {
   if (loading) return <Loader text="Loading corporate orders..." />;
 
   return (
-    <div className="py-6 sm:px-2 lg:px-2 space-y-2 bg-gray-50">
+    <div className="py-6 sm:px-2 lg:p-6 space-y-2 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <div>
@@ -406,114 +406,20 @@ const CorporateOrder = () => {
       </div>
 
       {/* ── TABLE CARD ── */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        {/* MOBILE VIEW */}
-        <div className="block lg:hidden divide-y divide-gray-100">
-          {!hasOrders ? (
-            <EmptyState
-              onCreate={() =>
-                navigate("/dashboard/corporate-orders/create-corporate-order")
-              }
-            />
-          ) : (
-            filteredOrders.map((o, idx) => (
-              <div key={o.id} className="p-4 hover:bg-slate-50">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400 shrink-0">
-                        #{start + idx + 1}
-                      </span>
-                      <h3 className="font-medium text-gray-900 truncate">
-                        {o.orderId}
-                      </h3>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                      <Building2 size={12} className="shrink-0" />
-                      <span className="truncate">
-                        {o.corpoAcc?.businessName}
-                      </span>
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formatDate(o.createdAt)}
-                    </p>
-                  </div>
-                  <span className="font-semibold text-sm text-gray-900 shrink-0">
-                    {formatCurrency(o.orderDetails?.orderTotal)}
-                  </span>
-                </div>
-
-                <div className="mt-3 text-xs text-gray-500 leading-relaxed">
-                  <p className="font-medium text-gray-700">
-                    {o.orderDetails?.productName}
-                  </p>
-                  <p className="line-clamp-1">{o.orderDetails?.description}</p>
-                  <p className="mt-1">
-                    {o.orderDetails?.qty} {o.orderDetails?.unit} ·{" "}
-                    {formatCurrency(o.orderDetails?.pricePerUnit)} / unit
-                  </p>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <StatusPill
-                    status={o.deliveryStatus}
-                    styles={DELIVERY_STATUS_STYLES}
-                    dots={DELIVERY_STATUS_DOT}
-                  />
-                  <StatusPill
-                    status={o.paymentStatus}
-                    styles={PAYMENT_STATUS_STYLES}
-                    dots={PAYMENT_STATUS_DOT}
-                  />
-                </div>
-                <SplitButton
-                  variant="primary"
-                  onClick={() => handleViewInvoice(o.id)}
-                  menuContent={
-                    <>
-                      <SplitButtonItem
-                        onClick={() => handleRegenerateInvoice(o.id)}
-                      >
-                        <span className="mr-2">
-                          <RotateCcw />
-                        </span>{" "}
-                        Regenerate
-                      </SplitButtonItem>
-
-                      <SplitButtonItem
-                        onClick={() => handleDownloadInvoice(o.id,o.orderId)}
-                      >
-                        <span className="mr-2">
-                          <Download />
-                        </span>{" "}
-                        Download
-                      </SplitButtonItem>
-                    </>
-                  }
-                >
-                  <span className="mr-3">
-                    <EyeIcon />
-                  </span>{" "}
-                  View
-                </SplitButton>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* DESKTOP TABLE */}
-        <div className="hidden lg:block">
-          <div className="w-full max-w-full overflow-x-auto">
-            <table className="text-sm">
+<div className="bg-white rounded-xl shadow-sm border border-gray-100">
+  {/* DESKTOP TABLE */}
+  <div className="hidden lg:block">
+    <div className="w-full overflow-x-auto overflow-y-hidden">
+      <table className="w-[1000px] table-fixed text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">
                     Sl No.
                   </th>
-                  <th className="w-16 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  <th className="w-40 px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">
                     Order ID
                   </th>
-                  <th className="w-30 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  <th className="w-44 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                     Company
                   </th>
                   <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
@@ -537,8 +443,8 @@ const CorporateOrder = () => {
                   <th className="w-26 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                     Created
                   </th>
-                  <th className="w-14 px-2 py-3 text-center text-xs font-semibold text-gray-500">
-                    Action
+                  <th className="w-12 px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                    Invoice
                   </th>
                 </tr>
               </thead>
@@ -563,7 +469,7 @@ const CorporateOrder = () => {
                         {start + idx + 1}
                       </td>
 
-                      <td className="px-4 py-3.5 font-medium text-gray-900 ">
+                      <td className="px-4 py-3.5 font-medium text-blue-900 ">
                         {o.orderId}
                       </td>
 
@@ -599,11 +505,11 @@ const CorporateOrder = () => {
                         {o.orderDetails?.qty} {o.orderDetails?.unit}
                       </td>
 
-                      <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                      <td className="px-2 py-3.5 text-green-600 whitespace-nowrap">
                         {formatCurrency(o.orderDetails?.pricePerUnit)}
                       </td>
 
-                      <td className="px-2 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                      <td className="px-2 py-3.5 font-semibold text-green-900 whitespace-nowrap">
                         {formatCurrency(o.orderDetails?.orderTotal)}
                       </td>
 
@@ -663,7 +569,7 @@ const CorporateOrder = () => {
                   ))
                 )}
               </tbody>
-            </table>
+          </table>
           </div>
         </div>
 
@@ -716,7 +622,7 @@ const CorporateOrder = () => {
           </div>
         </div>
       </div>
-
+ 
       {/* COMPANY DETAILS POPOVER */}
       {hoveredOrder && (
         <div

@@ -155,7 +155,7 @@ const CreateCorporateOrder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen p-6 bg-gray-50/50">
       <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate(-1)}
