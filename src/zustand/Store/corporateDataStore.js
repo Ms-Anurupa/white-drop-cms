@@ -130,6 +130,35 @@ const corporateDataStore = create((set) => ({
       throw error;
     }
   },
+
+    updateCorporateOrder: async (payload) => {
+    try {
+      const res = await api.post("/admin/updateCorporateOrder", payload, {
+        withAuth: true,
+      });
+
+      return res.data;
+    } catch (err) {
+      console.log("err", err);
+      throw err;
+    }
+  },
+
+  getCorporateOrderById: async (id) => {
+    try {
+      const res = await api.get("/admin/getCorporateOrderById", {
+        params: {
+          id: id,
+        },
+        withAuth: true,
+      });
+
+      return res.data;
+    } catch (err) {
+      console.log("err", err);
+      throw err;
+    }
+  },
 }));
 
 export default corporateDataStore;
