@@ -16,12 +16,7 @@ import {
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import { toast } from "react-toastify";
 
-const units = [
-  "L",
-  "mL",
-  "Kg",
-  "g",
-];
+const units = ["L", "mL", "Kg", "g"];
 
 const CreateCorporateOrder = () => {
   const navigate = useNavigate();
@@ -147,7 +142,7 @@ const CreateCorporateOrder = () => {
     };
     await createCorporateOrderAdmin(payload);
 
-    navigate(-1)
+    navigate(-1);
 
     setTimeout(() => {
       setLoading(false);
@@ -199,7 +194,7 @@ const CreateCorporateOrder = () => {
               </p>
             </div>
 
-            {/* Corporate Account / Product Name */}
+            {/* Corporate Account / Address */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Corporate Account */}
               <div>
@@ -244,6 +239,28 @@ const CreateCorporateOrder = () => {
                 </div>
               </div>
 
+              {/* Address */}
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Address
+                </label>
+
+                <textarea
+                  placeholder="Please select the Corporate Account to see the address"
+                  rows={2}
+                  readOnly
+                  value={
+                    corporateOrderAcc?.find(
+                      (acc) => acc.id === corporateData.corpoAccId,
+                    )?.address || ""
+                  }
+                  className="w-full pl-2 pr-2 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Product Name / Description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Product Name */}
               <div>
                 <label className="mb-2 block text-xs font-medium text-gray-700">
@@ -266,29 +283,29 @@ const CreateCorporateOrder = () => {
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Description */}
-            <div>
-              <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                Description
-              </label>
+              {/* Description */}
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Description
+                </label>
 
-              <div className="relative">
-                <FileText
-                  size={16}
-                  className="absolute left-3 top-4 text-gray-400"
-                />
+                <div className="relative">
+                  <FileText
+                    size={16}
+                    className="absolute left-3 top-3 text-gray-400"
+                  />
 
-                <textarea
-                  required
-                  placeholder="Add Product Description"
-                  rows={3}
-                  name="description"
-                  value={corporateData.description}
-                  onChange={handleChange}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
+                  <textarea
+                    required
+                    rows={2}
+                    placeholder="Add Product Description"
+                    name="description"
+                    value={corporateData.description}
+                    onChange={handleChange}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  />
+                </div>
               </div>
             </div>
 
