@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable no-unused-vars */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
@@ -14,6 +15,7 @@ import {
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -39,6 +41,12 @@ const STATUS_OPTIONS = [
   { value: "DEACTIVATED", label: "Deactivated" },
 ];
 
+const ACCOUNT_STATUS_OPTIONS = [
+  "APPROVED",
+  "INREVIEW",
+  "REJECTED",
+  "DEACTIVATED",
+];
 const formatDate = (value) => {
   if (!value) return "-";
   const date = new Date(value);
@@ -57,18 +65,25 @@ const CorporateAccounts = () => {
   const corporateOrderAcc = corporateDataStore(
     (state) => state.corporateOrderAcc,
   );
+  const updateCorporateStatus = corporateDataStore(
+    (state) => state.updateCorporateStatus,
+  );
   const loading = corporateDataStore((state) => state.loading);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [localAccounts, setLocalAccounts] = useState([]);
   const [hoveredAccount, setHoveredAccount] = useState(null); // { account, anchor }
   const [popoverPos, setPopoverPos] = useState(null);
   const popoverRef = useRef(null);
 
-  const accounts = corporateOrderAcc || [];
+  useEffect(() => {
+    setLocalAccounts(corporateOrderAcc || []);
+  }, [corporateOrderAcc]);
+
+  const accounts = localAccounts;
   const hasAccounts = accounts.length > 0;
   const start = (page - 1) * pageSize;
   const isLastPage = accounts.length < pageSize;
@@ -139,6 +154,42 @@ const CorporateAccounts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
+  const handleStatusChange = async (account, status) => {
+    // Save old status in case API fails
+    const previousStatus = account.status;
+
+    // Optimistic UI update
+    setLocalAccounts((prev) =>
+      prev.map((item) => (item.id === account.id ? { ...item, status } : item)),
+    );
+
+    try {
+      await updateCorporateStatus({
+        accountId: account.id,
+        status,
+      });
+
+      toast.success("Status updated");
+
+      // Optional: fetch latest data from server
+      getCorporateAccounts({
+        search,
+        status: "",
+        page,
+        limit: pageSize,
+      });
+    } catch (error) {
+      // Roll back on failure
+      setLocalAccounts((prev) =>
+        prev.map((item) =>
+          item.id === account.id ? { ...item, status: previousStatus } : item,
+        ),
+      );
+
+      toast.error("Failed to update status");
+    }
+  };
+
   const resetFilters = () => {
     setSearch("");
     setStatus("");
@@ -161,17 +212,17 @@ const CorporateAccounts = () => {
         </div>
 
         <button
-            onClick={() =>
-              navigate("/dashboard/corporate-accounts/create-corporate-account")
-            }
-            className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg shrink-0
+          onClick={() =>
+            navigate("/dashboard/corporate-accounts/create-corporate-account")
+          }
+          className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg shrink-0
               bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition 
               whitespace-nowrap cursor-pointer"
-          >
-            <Building2 size={16} />
-            Create Corporate Account
-            <Plus size={14} />
-          </button>
+        >
+          <Building2 size={16} />
+          Create Corporate Account
+          <Plus size={14} />
+        </button>
 
         <div className="relative w-full lg:w-80">
           <Search
@@ -187,33 +238,6 @@ const CorporateAccounts = () => {
               focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
           />
         </div>
-      </div>
-
-      {/* ── FILTERS ── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end">
-        <div className="w-full sm:w-56">
-          <label className="mb-1 block text-xs font-medium text-gray-500">
-            Status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full h-10 cursor-pointer rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          onClick={resetFilters}
-          className="h-10 px-4 cursor-pointer rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition sm:ml-auto"
-        >
-          Reset filters
-        </button>
       </div>
 
       {/* ── TABLE CARD ── */}
@@ -347,7 +371,28 @@ const CorporateAccounts = () => {
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <StatusPill status={account.status} />
+                      <select
+                        value={account.status}
+                        onChange={(e) =>
+                          handleStatusChange(account, e.target.value)
+                        }
+                        className={`rounded-lg border px-3 py-2 text-xs font-medium outline-none transition
+                              ${
+                                account.status === "APPROVED"
+                                  ? "border-green-200 bg-green-50 text-green-700"
+                                  : account.status === "INREVIEW"
+                                    ? "border-yellow-200 bg-yellow-50 text-yellow-700"
+                                    : account.status === "REJECTED"
+                                      ? "border-red-200 bg-red-50 text-red-700"
+                                      : "border-gray-200 bg-gray-50 text-gray-700"
+                              }`}
+                      >
+                        {ACCOUNT_STATUS_OPTIONS.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
                     </td>
 
                     <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
@@ -485,7 +530,9 @@ const StatusPill = ({ status }) => (
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
     <PackageSearch size={32} className="text-gray-300" />
-    <p className="text-sm font-medium text-gray-500">No corporate accounts found</p>
+    <p className="text-sm font-medium text-gray-500">
+      No corporate accounts found
+    </p>
     <p className="text-xs text-gray-400">
       Try adjusting your search or filters
     </p>

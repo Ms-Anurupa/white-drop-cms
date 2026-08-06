@@ -24,6 +24,7 @@ const CreateCorporateAccount = () => {
   const createCorporateAccount = corporateDataStore(
     (state) => state.createCorporateAccount,
   );
+
   const [corporateData, setCorporateData] = useState({
     businessName: "",
     gstNo: "",
