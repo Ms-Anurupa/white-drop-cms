@@ -6,6 +6,8 @@ import {
   Package,
   Users,
   ShoppingCart,
+  ClipboardList,
+  ReceiptText,
   Factory,
   Boxes,
   Truck,
@@ -23,12 +25,8 @@ const menu = [
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
   { name: "Orders", path: "orders", icon: ShoppingCart },
-  { name: "Corporate Orders", path: "corporate-orders", icon: ShoppingCart },
-  {
-    name: "Corporate Accounts",
-    path: "corporate-accounts",
-    icon: ShoppingCart,
-  },
+  { name: "Corporate Orders", path: "corporate-orders", icon: ClipboardList },
+  { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
   { name: "Production", path: "production", icon: Factory },
   { name: "Inventory", path: "inventory", icon: Boxes },
   { name: "Deliveries", path: "deliveries", icon: Truck },
@@ -128,7 +126,7 @@ const Sidebar = ({ onLogOut }) => {
         {menu.slice(0, 6).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
-
+        
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Delivery Executive Details

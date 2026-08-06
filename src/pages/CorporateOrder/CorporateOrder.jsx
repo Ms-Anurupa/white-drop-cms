@@ -13,6 +13,9 @@ import {
   FileText,
   RotateCcw,
   EyeIcon,
+  RefreshCw,
+  Undo2,
+  Pencil,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
@@ -87,6 +90,9 @@ const CorporateOrder = () => {
   const corporateOrderLists = corporateDataStore(
     (state) => state.corporateOrderLists,
   );
+  const corporateOrderPagination = corporateDataStore(
+    (state) => state.corporateOrderPagination,
+  );
   const getCorporateInvoice = corporateDataStore(
     (state) => state.getCorporateInvoice,
   );
@@ -101,11 +107,7 @@ const CorporateOrder = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [openMenu, setOpenMenu] = useState(null);
-
-  // client-side quick chip, layered on top of whatever the server returned
-  // for the current page — mirrors the Order listing page behaviour
   const [dateFilter, setDateFilter] = useState("all");
-
   const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
   const [popoverPos, setPopoverPos] = useState(null);
   const popoverRef = useRef(null);
@@ -256,6 +258,20 @@ const CorporateOrder = () => {
     setPage(1);
   };
 
+  const handleRefresh = async () => {
+    await getCorporateOrders({
+      search,
+      deliStatus: deliveryStatus,
+      payStatus: paymentStatus,
+      fromDate,
+      toDate,
+      page,
+      limit: pageSize,
+    });
+
+    toast.success("Orders refreshed");
+  };
+
   //download invoice
   const handleViewInvoice = async (orderId) => {
     try {
@@ -267,12 +283,11 @@ const CorporateOrder = () => {
     }
   };
 
-  const handleDownloadInvoice = async (id,orderId) => {
+  const handleDownloadInvoice = async (id, orderId) => {
     try {
       const data = await getCorporateInvoice(id);
 
       if (data?.signedUrl) {
-
         const fileResponse = await fetch(data.signedUrl);
         const pdfBlob = await fileResponse.blob();
 
@@ -293,26 +308,33 @@ const CorporateOrder = () => {
     }
   };
 
-  const handleRegenerateInvoice =async (orderId) => {
-    const data = await getCorporateInvoice(orderId,true);
+  const handleRegenerateInvoice = async (orderId) => {
+    const data = await getCorporateInvoice(orderId, true);
     //TODO add a toast here
   };
+
+  const handleView = (id) => {
+  navigate(`/dashboard/corporate-orders/${id}`);
+};
+
+const handleEdit = (id) => {
+  navigate(`/dashboard/corporate-orders/edit/${id}`);
+};
 
   if (loading) return <Loader text="Loading corporate orders..." />;
 
   return (
-    <div className="py-6 sm:px-2 lg:p-6 space-y-2 bg-gray-50">
+    <div className="px-6 py-6 sm:px-2 lg:px-6 lg:py-6 space-y-2 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Corporate Orders
           </h1>
-          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-sm text-gray-500 flex flex-wrap items-center gap-x-2">
             <span>View and manage all corporate orders</span>
             <span className="text-blue-600 font-medium">
-              {DATE_FILTERS.find((f) => f.key === dateFilter)?.label}:{" "}
-              {dateCounts[dateFilter]}
+              Total Orders: {corporateOrderPagination?.pagination?.totalCount}
             </span>
           </p>
         </div>
@@ -360,7 +382,10 @@ const CorporateOrder = () => {
       />
 
       {/* ── STATUS FILTERS ── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end">
+      <div
+        className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-2
+       flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end"
+      >
         <div className="w-full sm:w-48">
           <label className="mb-1 block text-xs font-medium text-gray-500">
             Delivery Status
@@ -397,22 +422,32 @@ const CorporateOrder = () => {
           </select>
         </div>
 
-        <button
-          onClick={resetFilters}
-          className="h-10 px-4 cursor-pointer rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition sm:ml-auto"
-        >
-          Reset filters
-        </button>
+        <div className="flex gap-2 sm:ml-auto">
+          <button
+            onClick={handleRefresh}
+            className="h-10 px-4 cursor-pointer rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+
+          <button
+            onClick={resetFilters}
+            className="h-10 px-4 cursor-pointer rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+          >
+            <Undo2 size={16} />
+            Reset Filters
+          </button>
+        </div>
       </div>
 
       {/* ── TABLE CARD ── */}
-<div className="bg-white rounded-xl shadow-sm border border-gray-100">
-  {/* DESKTOP TABLE */}
-  <div className="hidden lg:block">
-    <div className="w-full overflow-x-auto overflow-y-hidden">
-      <table className="w-[1000px] table-fixed text-sm">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+      <div className="bg-white rounded-xl border border-gray-100">
+        <div className="w-full overflow-x-auto">
+          <div className="max-h-[300px] overflow-y-auto">
+            <table className="min-w-[1350px] table-fixed text-sm">
+              <thead className="bg-gray-100">
+                <tr className=" border-b border-gray-400">
                   <th className="w-10 px-2 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">
                     Sl No.
                   </th>
@@ -440,16 +475,19 @@ const CorporateOrder = () => {
                   <th className="w-24 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                     Payment
                   </th>
-                  <th className="w-26 px-2 py-3 text-left text-xs font-semibold text-gray-500">
+                  <th className="w-28 px-2 py-3 text-left text-xs font-semibold text-gray-500">
                     Created
                   </th>
-                  <th className="w-12 px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                  <th className=" px-2 py-3 text-center text-xs font-semibold text-gray-500">
                     Invoice
+                  </th>
+                  <th className=" px-2 py-3 text-center text-xs font-semibold text-gray-500">
+                    Action
                   </th>
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="bg-white divide-y divide-gray-50">
                 {!hasOrders ? (
                   <tr>
                     <td colSpan={11}>
@@ -501,7 +539,7 @@ const CorporateOrder = () => {
                         </p>
                       </td>
 
-                      <td className="px-2 py-3.5 text-gray-600 whitespace-nowrap">
+                      <td className="px-2 py-3.5 text-gray-800 whitespace-nowrap">
                         {o.orderDetails?.qty} {o.orderDetails?.unit}
                       </td>
 
@@ -565,16 +603,39 @@ const CorporateOrder = () => {
                           View
                         </SplitButton>
                       </td>
+
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleView(o.id)}
+                            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-600 transition hover:bg-blue-100"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </button>
+
+                          <button
+                            onClick={() => handleEdit(o.id)}
+                            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 )}
               </tbody>
-          </table>
+            </table>
           </div>
         </div>
 
         {/* PAGINATION */}
-        <div className="border-t border-gray-100 px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div
+          className="border-t border-gray-100 px-4 sm:px-5 py-3.5 flex flex-col 
+        sm:flex-row items-center justify-between gap-3"
+        >
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>
               {filteredOrders.length === 0
@@ -622,7 +683,7 @@ const CorporateOrder = () => {
           </div>
         </div>
       </div>
- 
+
       {/* COMPANY DETAILS POPOVER */}
       {hoveredOrder && (
         <div

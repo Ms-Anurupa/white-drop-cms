@@ -202,6 +202,7 @@ const CorporateAccounts = () => {
     <div className="py-6 sm:px-2 lg:p-6 space-y-2 bg-gray-50">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        {/* Left */}
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Corporate Accounts
@@ -211,32 +212,35 @@ const CorporateAccounts = () => {
           </p>
         </div>
 
-        <button
-          onClick={() =>
-            navigate("/dashboard/corporate-accounts/create-corporate-account")
-          }
-          className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg shrink-0
-              bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition 
-              whitespace-nowrap cursor-pointer"
-        >
-          <Building2 size={16} />
-          Create Corporate Account
-          <Plus size={14} />
-        </button>
+        {/* Right */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:ml-auto">
+          <div className="relative w-full sm:w-72">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search business, GST, contact..."
+              className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
+        focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+            />
+          </div>
 
-        <div className="relative w-full lg:w-80">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search business, GST, contact..."
-            className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
-              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-          />
+          <button
+            onClick={() =>
+              navigate("/dashboard/corporate-accounts/create-corporate-account")
+            }
+            className="h-10 px-4 flex items-center justify-center gap-2 rounded-lg
+      bg-blue-600 text-white text-sm font-medium hover:bg-blue-700
+      transition whitespace-nowrap cursor-pointer shrink-0"
+          >
+            <Building2 size={16} />
+            Create Corporate Account
+            <Plus size={14} />
+          </button>
         </div>
       </div>
 
@@ -365,7 +369,7 @@ const CorporateAccounts = () => {
                         onChange={(e) =>
                           handleStatusChange(account, e.target.value)
                         }
-                        className={`rounded-lg border px-3 py-2 text-xs font-medium outline-none transition
+                        className={`rounded-lg cursor-pointer border px-3 py-2 text-xs font-medium outline-none transition
                               ${
                                 account.status === "APPROVED"
                                   ? "border-green-200 bg-green-50 text-green-700"
@@ -387,8 +391,6 @@ const CorporateAccounts = () => {
                     <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
                       {formatDate(account.createdAt)}
                     </td>
-
-                   
                   </tr>
                 ))
               )}

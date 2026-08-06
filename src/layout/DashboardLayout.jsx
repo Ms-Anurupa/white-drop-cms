@@ -19,17 +19,17 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden">
+    <div className="flex h-screen bg-slate-100">
       {/* Sidebar */}
       <Sidebar onLogOut={handleLogout} onNavClick={close}/>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col flex-1 min-w-0">
         {/* Header */}
         <Header onLogOut={handleLogout}/>
 
         {/* Page Content */}
-        <main className=" flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-auto min-w-0">
           <Outlet />
         </main>
       </div>

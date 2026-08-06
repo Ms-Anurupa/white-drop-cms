@@ -49,7 +49,10 @@ const Header = ({ onLogOut }) => {
             onClick={() => setOpen(!open)}
           /> */}
 
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm select-none">
+          <div
+          onClick={() => setOpen(!open)}
+          className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center
+           text-blue-700 font-semibold text-sm select-none cursor-pointer">
             {user?.first_name?.charAt(0)?.toUpperCase()}
           </div>
 
