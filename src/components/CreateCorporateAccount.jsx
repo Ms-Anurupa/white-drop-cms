@@ -25,14 +25,18 @@ const CreateCorporateAccount = () => {
     (state) => state.createCorporateAccount,
   );
   const [corporateData, setCorporateData] = useState({
-    accountId: "",
     businessName: "",
     gstNo: "",
-    address: "",
     contactNo: "",
+    addressDetails: {
+      houseNo: "",
+      street: "",
+      area: "",
+      city: "",
+      state: "",
+      pincode: "",
+    },
     location: {
-      lat: "",
-      lng: "",
       landmark: "",
     },
   });
@@ -53,18 +57,31 @@ const CreateCorporateAccount = () => {
       ...prev,
       location: {
         ...prev.location,
-        [name]: name === "lat" || name === "lng" ? value : value,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
+
+    setCorporateData((prev) => ({
+      ...prev,
+      addressDetails: {
+        ...prev.addressDetails,
+        [name]: value,
       },
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { houseNo, street, area, city, state, pincode } =
+      corporateData.addressDetails;
 
-    if (!corporateData.accountId.trim()) {
-      toast.error("Account ID is required.");
-      return;
-    }
+    const address = [houseNo, street, area, city, state, pincode]
+      .filter(Boolean)
+      .join(", ");
 
     if (!corporateData.businessName.trim()) {
       toast.error("Business name is required.");
@@ -76,7 +93,7 @@ const CreateCorporateAccount = () => {
       return;
     }
 
-    if (!corporateData.address.trim()) {
+    if (!address.trim()) {
       toast.error("Address is required.");
       return;
     }
@@ -89,14 +106,11 @@ const CreateCorporateAccount = () => {
     setLoading(true);
 
     const payload = {
-      accountId: corporateData.accountId,
       businessName: corporateData.businessName,
       gstNo: corporateData.gstNo,
-      address: corporateData.address,
       contactNo: corporateData.contactNo,
+      address,
       location: {
-        lat: Number(corporateData.location.lat),
-        lng: Number(corporateData.location.lng),
         landmark: corporateData.location.landmark,
       },
     };
@@ -142,7 +156,7 @@ const CreateCorporateAccount = () => {
             </div>
           </div>
 
-          <div className="px-4">
+          <div className="p-4">
             {/* Warning */}
             <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
               <AlertTriangle
@@ -156,40 +170,24 @@ const CreateCorporateAccount = () => {
             </div>
 
             {/* Account ID & Business Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Account ID
-                </label>
+            <div>
+              <label className="mb-2 block text-xs font-medium text-gray-700">
+                Business Name
+              </label>
+
+              <div className="relative">
+                <Building2
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
 
                 <input
-                  name="accountId"
-                  value={corporateData.accountId}
+                  name="businessName"
+                  value={corporateData.businessName}
                   onChange={handleChange}
-                  placeholder="Enter Account ID"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  placeholder="Enter Business Name"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
                 />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Business Name
-                </label>
-
-                <div className="relative">
-                  <Building2
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-
-                  <input
-                    name="businessName"
-                    value={corporateData.businessName}
-                    onChange={handleChange}
-                    placeholder="Enter Business Name"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                  />
-                </div>
               </div>
             </div>
 
@@ -225,68 +223,110 @@ const CreateCorporateAccount = () => {
             </div>
 
             {/* Address */}
-            <div>
-              <label className="mb-2 block text-xs font-medium text-gray-700">
-                Address
-              </label>
+            {/* Address */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    House / Flat No.
+                  </label>
 
-              <textarea
-                rows={3}
-                name="address"
-                value={corporateData.address}
-                onChange={handleChange}
-                placeholder="Enter Complete Address"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm resize-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-              />
+                  <input
+                    name="houseNo"
+                    value={corporateData.addressDetails.houseNo}
+                    onChange={handleAddressChange}
+                    placeholder="Flat 3A"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    Street / Road
+                  </label>
+
+                  <input
+                    name="street"
+                    value={corporateData.addressDetails.street}
+                    onChange={handleAddressChange}
+                    placeholder="MG Road"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-medium text-gray-700">
+                  Area / Locality
+                </label>
+
+                <input
+                  name="area"
+                  value={corporateData.addressDetails.area}
+                  onChange={handleAddressChange}
+                  placeholder="Salt Lake Sector V"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    City
+                  </label>
+
+                  <input
+                    name="city"
+                    value={corporateData.addressDetails.city}
+                    onChange={handleAddressChange}
+                    placeholder="Kolkata"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    State
+                  </label>
+
+                  <input
+                    name="state"
+                    value={corporateData.addressDetails.state}
+                    onChange={handleAddressChange}
+                    placeholder="West Bengal"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                    Pincode
+                  </label>
+
+                  <input
+                    name="pincode"
+                    value={corporateData.addressDetails.pincode}
+                    onChange={handleAddressChange}
+                    placeholder="700091"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Location */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Latitude
-                </label>
+            {/* Landmark */}
+            <div>
+              <label className="mb-2 block text-xs font-medium text-gray-700">
+                Landmark
+              </label>
 
-                <input
-                  type="number"
-                  step="any"
-                  name="lat"
-                  value={corporateData.location.lat}
-                  onChange={handleLocationChange}
-                  placeholder="22.5726"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Longitude
-                </label>
-
-                <input
-                  type="number"
-                  step="any"
-                  name="lng"
-                  value={corporateData.location.lng}
-                  onChange={handleLocationChange}
-                  placeholder="88.3639"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Landmark
-                </label>
-
-                <input
-                  name="landmark"
-                  value={corporateData.location.landmark}
-                  onChange={handleLocationChange}
-                  placeholder="Nearby Landmark"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
-              </div>
+              <input
+                name="landmark"
+                value={corporateData.location.landmark}
+                onChange={handleLocationChange}
+                placeholder="Near City Centre Mall"
+                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+              />
             </div>
 
             {/* Footer */}
@@ -301,7 +341,7 @@ const CreateCorporateAccount = () => {
 
               <button
                 type="submit"
-                disabled={loading}
+                onClick={handleSubmit}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition cursor-pointer"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
