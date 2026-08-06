@@ -31,6 +31,8 @@ import CreateCorporateOrder from "./components/CreateCorporateOrder";
 import CorporateOrder from "./pages/CorporateOrder/CorporateOrder";
 import CorporateAccounts from "./pages/CorporateAccounts/CorporateAccounts";
 import CreateCorporateAccount from "./components/CreateCorporateAccount";
+import CorporateOrderView from "./components/CorporateOrderView";
+import CorporateOrderEdit from "./components/CorporateOrderEdit";
 
 const App = () => {
   return (
@@ -68,6 +70,8 @@ const App = () => {
                 <Route path="customer" element={<Customer />} />
                 <Route path="orders" element={<Order />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
+                <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
+                <Route path="corporate-orders/edit/:id" element={<CorporateOrderEdit />} />
                 <Route path="corporate-accounts" element={<CorporateAccounts />} />
                 <Route path="corporate-orders/create-corporate-order" element={<CreateCorporateOrder />} />
                 <Route path="corporate-accounts/create-corporate-account" element={<CreateCorporateAccount />} />

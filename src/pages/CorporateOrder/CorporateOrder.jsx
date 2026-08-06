@@ -313,14 +313,6 @@ const CorporateOrder = () => {
     //TODO add a toast here
   };
 
-  const handleView = (id) => {
-  navigate(`/dashboard/corporate-orders/${id}`);
-};
-
-const handleEdit = (id) => {
-  navigate(`/dashboard/corporate-orders/edit/${id}`);
-};
-
   if (loading) return <Loader text="Loading corporate orders..." />;
 
   return (
@@ -607,16 +599,24 @@ const handleEdit = (id) => {
                       <td className="px-4 py-3.5">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => handleView(o.id)}
-                            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-600 transition hover:bg-blue-100"
+                            onClick={() =>
+                              navigate(
+                                `/dashboard/corporate-orders/view/${o.id}`,
+                              )
+                            }
+                            className="flex h-8 w-8 items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition cursor-pointer"
                             title="View"
                           >
                             <Eye size={16} />
                           </button>
 
                           <button
-                            onClick={() => handleEdit(o.id)}
-                            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100"
+                            onClick={() =>
+                              navigate(
+                                `/dashboard/corporate-orders/edit/${o.id}`,
+                              )
+                            }
+                            className="flex h-8 w-8 items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition cursor-pointer"
                             title="Edit"
                           >
                             <Pencil size={16} />
