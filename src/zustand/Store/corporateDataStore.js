@@ -8,6 +8,7 @@ const corporateDataStore = create((set) => ({
   corporateOrderAcc: [],
   corporateOrderLists: [],
   corporateOrderPagination: [],
+  currentCorporateOrder: null,
 
   createCorporateOrderAdmin: async (payload) => {
     try {
@@ -131,7 +132,7 @@ const corporateDataStore = create((set) => ({
     }
   },
 
-    updateCorporateOrder: async (payload) => {
+  updateCorporateOrder: async (payload) => {
     try {
       const res = await api.post("/admin/updateCorporateOrder", payload, {
         withAuth: true,
@@ -145,17 +146,47 @@ const corporateDataStore = create((set) => ({
   },
 
   getCorporateOrderById: async (id) => {
+    // console.log(id);
+
     try {
-      const res = await api.get("/admin/getCorporateOrderById", {
-        params: {
-          id: id,
-        },
+      const response = await api.get("/admin/getCorporateOrderById", {
+        params: { corpoOrderId: id },
         withAuth: true,
       });
 
-      return res.data;
+      return response.data?.corporateOrder;
+    } catch (error) {
+      console.error("Error fetching corporate order:", error);
+      throw error;
+    }
+  },
+
+  editCorporateOrderAdmin: async (payloadData) => {
+    try {
+      // 1. Send the data directly in req.body
+      const res = await api.post(
+        "/admin/editCorporateOrderAdmin",
+        payloadData,
+        {
+          withAuth: true,
+        },
+      );
+
+      const id = payloadData.corpOrderId;
+
+      set((state) => ({
+        currentCorporateOrder:
+          state.currentCorporateOrder?.id === id
+            ? res.data.data
+            : state.currentCorporateOrder,
+      }));
+
+      return res.data.data;
     } catch (err) {
-      console.log("err", err);
+      console.error(
+        "Error updating corporate order:",
+        err.response?.data || err.message,
+      );
       throw err;
     }
   },
