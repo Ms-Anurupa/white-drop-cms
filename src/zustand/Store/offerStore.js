@@ -72,7 +72,12 @@ const useOfferStore = create((set) => ({
         }
     },
 
-    getAllOfferTypes: async () => {
+    getAllOfferTypes: async ({
+        page = 1,
+        limit = 10,
+        search = "",
+        status = "",
+    }) => {
         try {
             set({
                 loading: true,
@@ -80,6 +85,12 @@ const useOfferStore = create((set) => ({
             });
 
             const res = await api.get("/admin/getAllOfferTypes", {
+                params: {
+                    page,
+                    limit,
+                    search,
+                    status,
+                },
                 withAuth: true,
             });
 
@@ -115,13 +126,9 @@ const useOfferStore = create((set) => ({
                 createError: null,
             });
 
-            const res = await api.post(
-                "/admin/createOffer",
-                payload,
-                {
-                    withAuth: true,
-                }
-            );
+            const res = await api.post("/admin/createOffer", payload, {
+                withAuth: true,
+            });
 
             set({
                 creating: false,
@@ -134,9 +141,100 @@ const useOfferStore = create((set) => ({
 
             set({
                 creating: false,
+                createError: error?.response?.data?.message || "Failed to create offer",
+            });
+
+            throw error;
+        }
+    },
+    deleteOfferType: async (payload) => {
+        try {
+            set({
+                creating: true,
+                createError: null,
+            });
+
+            const res = await api.post("/admin/deleteOfferType", payload, {
+                withAuth: true,
+            });
+
+            set({
+                creating: false,
+                createError: null,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to delete offer type:", error);
+
+            set({
+                creating: false,
+                createError:
+                    error?.response?.data?.message || "Failed to delete offer type",
+            });
+
+            throw error;
+        }
+    },
+
+    updateOfferTypeStatus: async (payload) => {
+        try {
+            console.log(payload);
+
+            set({
+                creating: true,
+                createError: null,
+            });
+
+            const res = await api.post("/admin/updateOfferTypeStatus", payload, {
+                withAuth: true,
+            });
+
+            set({
+                creating: false,
+                createError: null,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to update offer type status:", error);
+
+            set({
+                creating: false,
                 createError:
                     error?.response?.data?.message ||
-                    "Failed to create offer",
+                    "Failed to update offer type status",
+            });
+
+            throw error;
+        }
+    },
+    
+    deleteOffer: async (payload) => {
+        try {
+            set({
+                deleting: true,
+                deleteError: null,
+            });
+
+            const res = await api.post("/admin/deleteOffer", payload, {
+                withAuth: true,
+            });
+
+            set({
+                deleting: false,
+                deleteError: null,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to delete offer:", error);
+
+            set({
+                deleting: false,
+                deleteError:
+                    error?.response?.data?.message ||
+                    "Failed to delete offer",
             });
 
             throw error;

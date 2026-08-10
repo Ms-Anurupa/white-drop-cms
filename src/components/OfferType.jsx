@@ -1,107 +1,151 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Trash2,
-  Plus,
   X,
   Power,
   PowerOff,
   Tag,
   AlertCircle,
   Loader2,
-  ChevronDown,
   ListTree,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  CheckCircle2,
+  CircleOff,
+  Database,
 } from "lucide-react";
 
 import useOfferStore from "../zustand/Store/offerStore";
 
 /* ============================================================================
-   Design tokens — Clean Light Console Theme
+   DESIGN TOKENS
 ============================================================================ */
 
 const THEME_VARS = {
-  "--bg": "#F8FAFC",
+  "--bg": "#F7F8FC",
   "--panel": "#FFFFFF",
+  "--panel-soft": "#F8FAFC",
   "--panel-2": "#F1F5F9",
-  "--line": "#E2E8F0",
-  "--text": "#0F172A",
-  "--muted": "#475569",
-  "--muted-2": "#64748B",
-  "--primary": "#6366F1",
-  "--primary-soft": "rgba(99, 102, 241, 0.12)",
-  "--danger": "#EF4444",
-  "--success": "#10B981",
+  "--line": "#E7EAF0",
+  "--line-dark": "#D8DDE7",
+  "--text": "#111827",
+  "--muted": "#64748B",
+  "--muted-2": "#94A3B8",
+  "--primary": "#5B5BD6",
+  "--primary-dark": "#4848B8",
+  "--primary-soft": "rgba(91, 91, 214, 0.09)",
+  "--danger": "#E5484D",
+  "--danger-soft": "rgba(229, 72, 77, 0.08)",
+  "--success": "#159A72",
+  "--success-soft": "rgba(21, 154, 114, 0.09)",
+  "--warning": "#D97706",
 };
 
+/* ============================================================================
+   SCOPED CSS
+============================================================================ */
+
 const SCOPED_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-  #offer-type-root {
-    font-family: 'Inter', system-ui, sans-serif;
+#offer-type-root {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+#offer-type-root .display {
+  font-family: 'Manrope', sans-serif;
+}
+
+#offer-type-root .mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+#offer-type-root button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+#offer-type-root input {
+  font-family: inherit;
+}
+
+#offer-type-root .scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+#offer-type-root .scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+#offer-type-root .scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#offer-type-root .scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 10px;
+}
+
+#offer-type-root .fadein {
+  animation: offerFade 0.22s ease both;
+}
+
+@keyframes offerFade {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
   }
 
-  #offer-type-root .disp {
-    font-family: 'Space Grotesk', sans-serif;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  #offer-type-root .mono {
-    font-family: 'JetBrains Mono', monospace;
-  }
+#offer-type-root .card-hover {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
 
-  #offer-type-root .scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #CBD5E1 transparent;
-  }
+#offer-type-root .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.07),
+    0 3px 8px rgba(15, 23, 42, 0.04);
+  border-color: #D9DDF0 !important;
+}
 
-  #offer-type-root .scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+#offer-type-root .search-input:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
 
-  #offer-type-root .scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
+#offer-type-root .filter-pill {
+  transition: all 160ms ease;
+}
 
-  #offer-type-root .scrollbar::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 8px;
-  }
+#offer-type-root .filter-pill:hover {
+  transform: translateY(-1px);
+}
 
-  #offer-type-root button {
-    font-family: inherit;
-    cursor: pointer;
-  }
+#offer-type-root .property-row {
+  transition: background 150ms ease;
+}
 
-  #offer-type-root input,
-  #offer-type-root select {
-    font-family: inherit;
-  }
-
-  #offer-type-root .fadein {
-    animation: otFade 0.22s ease both;
-  }
-
-  @keyframes otFade {
-    from {
-      opacity: 0;
-      transform: translateY(4px);
-    }
-
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  #offer-type-root input:focus,
-  #offer-type-root select:focus {
-    outline: none;
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 3px var(--primary-soft);
-  }
+#offer-type-root .property-row:hover {
+  background: #EEF1F7 !important;
+}
 `;
 
 /* ============================================================================
-   Accent palette
+   ACCENT PALETTE
 ============================================================================ */
 
 const ACCENT_PALETTE = [
@@ -127,7 +171,7 @@ function accentFor(name = "") {
 }
 
 /* ============================================================================
-   Scoped styles
+   SCOPED STYLES
 ============================================================================ */
 
 function useScopedStyles() {
@@ -135,7 +179,6 @@ function useScopedStyles() {
     const style = document.createElement("style");
 
     style.innerHTML = SCOPED_CSS;
-
     document.head.appendChild(style);
 
     return () => {
@@ -145,19 +188,20 @@ function useScopedStyles() {
 }
 
 /* ============================================================================
-   Icon Badge
+   ICON BADGE
 ============================================================================ */
 
 function IconBadge({ Icon, color, size = 15 }) {
   return (
     <span
       style={{
-        width: size + 14,
-        height: size + 14,
-        background: `${color}1A`,
+        width: size + 18,
+        height: size + 18,
+        background: `${color}12`,
         color,
+        border: `1px solid ${color}20`,
       }}
-      className="inline-flex items-center justify-center rounded-lg shrink-0"
+      className="inline-flex shrink-0 items-center justify-center rounded-xl"
     >
       <Icon size={size} />
     </span>
@@ -165,7 +209,7 @@ function IconBadge({ Icon, color, size = 15 }) {
 }
 
 /* ============================================================================
-   Confirm Dialog
+   CONFIRM DIALOG
 ============================================================================ */
 
 function ConfirmDialog({
@@ -176,6 +220,7 @@ function ConfirmDialog({
   danger,
   onConfirm,
   onCancel,
+  loading = false,
 }) {
   if (!open) return null;
 
@@ -183,48 +228,59 @@ function ConfirmDialog({
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       style={{
-        background: "rgba(15,23,42,0.4)",
-        backdropFilter: "blur(2px)",
+        background: "rgba(15,23,42,0.42)",
+        backdropFilter: "blur(5px)",
       }}
     >
       <div
-        className="fadein w-[380px] rounded-2xl p-5 shadow-xl"
+        className="fadein w-full max-w-[410px] overflow-hidden rounded-2xl shadow-2xl"
         style={{
           background: "var(--panel)",
           border: "1px solid var(--line)",
         }}
       >
-        <div className="flex items-start gap-3">
-          <IconBadge
-            Icon={AlertCircle}
-            color={danger ? "#EF4444" : "#6366F1"}
-          />
+        <div className="p-6">
+          <div className="flex items-start gap-3">
+            <IconBadge
+              Icon={AlertCircle}
+              color={danger ? "#E5484D" : "#5B5BD6"}
+              size={18}
+            />
 
-          <div className="min-w-0">
-            <div
-              className="disp font-semibold text-[15px]"
-              style={{ color: "var(--text)" }}
-            >
-              {title}
-            </div>
+            <div className="min-w-0">
+              <div
+                className="display text-[15px] font-bold"
+                style={{ color: "var(--text)" }}
+              >
+                {title}
+              </div>
 
-            <div
-              className="text-sm mt-1 leading-5"
-              style={{ color: "var(--muted)" }}
-            >
-              {body}
+              <div
+                className="mt-1.5 text-[13px] leading-5"
+                style={{ color: "var(--muted)" }}
+              >
+                {body}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 flex justify-end gap-2">
+        <div
+          className="flex justify-end gap-2 px-6 py-4"
+          style={{
+            borderTop: "1px solid var(--line)",
+            background: "var(--panel-soft)",
+          }}
+        >
           <button
             type="button"
             onClick={onCancel}
-            className="px-3.5 py-2 rounded-lg text-sm font-medium"
+            disabled={loading}
+            className="rounded-lg px-4 py-2 text-[12px] font-semibold disabled:opacity-50"
             style={{
               color: "var(--muted)",
-              background: "var(--panel-2)",
+              background: "var(--panel)",
+              border: "1px solid var(--line)",
             }}
           >
             Cancel
@@ -233,12 +289,13 @@ function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            className="px-3.5 py-2 rounded-lg text-sm font-medium"
+            disabled={loading}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-[12px] font-semibold text-white disabled:opacity-60"
             style={{
               background: danger ? "var(--danger)" : "var(--primary)",
-              color: "#fff",
             }}
           >
+            {loading && <Loader2 size={14} className="animate-spin" />}
             {confirmLabel}
           </button>
         </div>
@@ -248,382 +305,304 @@ function ConfirmDialog({
 }
 
 /* ============================================================================
-   Property Configuration
+   SKELETON CARD
 ============================================================================ */
 
-const PROPERTY_TYPES = [
-  "string",
-  "number",
-  "integer",
-  "boolean",
-  "array",
-];
+function SkeletonCard() {
+  return (
+    <div
+      className="animate-pulse rounded-2xl p-5"
+      style={{
+        background: "var(--panel)",
+        border: "1px solid var(--line)",
+      }}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex gap-3">
+          <div className="h-11 w-11 rounded-xl bg-slate-100" />
 
-const createEmptyProperty = () => ({
-  key: "",
-  type: "string",
-  description: "",
-  minimum: "",
-  maximum: "",
-  enum: [],
-});
+          <div>
+            <div className="h-4 w-32 rounded bg-slate-100" />
+            <div className="mt-2 h-3 w-48 rounded bg-slate-100" />
+          </div>
+        </div>
+
+        <div className="h-7 w-16 rounded-full bg-slate-100" />
+      </div>
+
+      <div className="mt-6 space-y-2">
+        <div className="h-12 rounded-xl bg-slate-100" />
+        <div className="h-12 rounded-xl bg-slate-100" />
+        <div className="h-12 rounded-xl bg-slate-100" />
+      </div>
+    </div>
+  );
+}
 
 /* ============================================================================
-   Offer Type Component
+   OFFER TYPE COMPONENT
 ============================================================================ */
 
 const OfferType = () => {
+  useScopedStyles();
+
   // =========================================================
   // ZUSTAND
   // =========================================================
 
-  const getAllOfferTypes = useOfferStore(
-    (state) => state.getAllOfferTypes
+  const getAllOfferTypes = useOfferStore((state) => state.getAllOfferTypes);
+
+  const offerTypes = useOfferStore((state) => state.offerTypes);
+
+  const loading = useOfferStore((state) => state.loading);
+
+  const error = useOfferStore((state) => state.error);
+
+  const updateOfferTypeStatus = useOfferStore(
+    (state) => state.updateOfferTypeStatus,
   );
 
-  const createOfferType = useOfferStore(
-    (state) => state.createOfferType
-  );
+  const deleteOfferType = useOfferStore((state) => state.deleteOfferType);
 
-  const updateOfferType = useOfferStore(
-    (state) => state.updateOfferType
-  );
+  // =========================================================
+  // PAGINATION
+  // =========================================================
 
-  const offerTypes = useOfferStore(
-    (state) => state.offerTypes
-  );
+  const [page, setPage] = useState(1);
+  const [limit] = useState(9);
 
-  const loading = useOfferStore(
-    (state) => state.loading
-  );
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const error = useOfferStore(
-    (state) => state.error
-  );
+  const [status, setStatus] = useState("");
 
-  useScopedStyles();
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 9,
+    total: 0,
+    totalPages: 1,
+  });
 
   // =========================================================
   // LOCAL STATE
   // =========================================================
 
-  const [showCreate, setShowCreate] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [statusLoadingId, setStatusLoadingId] = useState(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    properties: [],
-    required: [],
-  });
+  // =========================================================
+  // SEARCH DEBOUNCE
+  // =========================================================
 
-  const [property, setProperty] = useState(
-    createEmptyProperty()
-  );
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 450);
 
-  const [formError, setFormError] = useState("");
-
-  const [saving, setSaving] = useState(false);
-
-  const [confirmDeactivate, setConfirmDeactivate] =
-    useState(null);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // =========================================================
   // FETCH OFFER TYPES
   // =========================================================
 
   useEffect(() => {
-    getAllOfferTypes();
-  }, [getAllOfferTypes]);
+    let cancelled = false;
 
-  // =========================================================
-  // FORM HANDLERS
-  // =========================================================
+    const fetchOfferTypes = async () => {
+      try {
+        const response = await getAllOfferTypes({
+          page,
+          limit,
+          search: debouncedSearch,
+          status,
+        });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+        if (cancelled) return;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+        /*
+         * Expected API response:
+         *
+         * {
+         *   offerTypes: [],
+         *   pagination: {
+         *     page,
+         *     limit,
+         *     total,
+         *     totalPages
+         *   }
+         * }
+         */
 
-    setFormError("");
-  };
-
-  const handlePropertyChange = (e) => {
-    const { name, value } = e.target;
-
-    setProperty((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setFormError("");
-  };
-
-  const handleEnumChange = (e) => {
-    const values = e.target.value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    setProperty((prev) => ({
-      ...prev,
-      enum: values,
-    }));
-  };
-
-  // =========================================================
-  // ADD PROPERTY
-  // =========================================================
-
-  const handleAddProperty = () => {
-    const key = property.key.trim();
-
-    if (!key) {
-      setFormError("Property key is required.");
-      return;
-    }
-
-    const exists = formData.properties.some(
-      (item) =>
-        item.key.toLowerCase() === key.toLowerCase()
-    );
-
-    if (exists) {
-      setFormError("Property key already exists.");
-      return;
-    }
-
-    const newProperty = {
-      key,
-      type: property.type,
+        if (response?.pagination) {
+          setPagination(response.pagination);
+        }
+      } catch (error) {
+        console.error("Failed to fetch offer types:", error);
+      }
     };
 
-    if (property.description.trim()) {
-      newProperty.description =
-        property.description.trim();
-    }
+    fetchOfferTypes();
 
-    if (
-      property.type === "number" ||
-      property.type === "integer"
-    ) {
-      if (property.minimum !== "") {
-        newProperty.minimum = Number(
-          property.minimum
-        );
-      }
-
-      if (property.maximum !== "") {
-        newProperty.maximum = Number(
-          property.maximum
-        );
-      }
-    }
-
-    if (property.enum.length > 0) {
-      newProperty.enum = property.enum;
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      properties: [
-        ...prev.properties,
-        newProperty,
-      ],
-    }));
-
-    setProperty(createEmptyProperty());
-    setFormError("");
-  };
-
-  // =========================================================
-  // REMOVE PROPERTY
-  // =========================================================
-
-  const handleRemoveProperty = (key) => {
-    setFormData((prev) => ({
-      ...prev,
-      properties: prev.properties.filter(
-        (item) => item.key !== key
-      ),
-      required: prev.required.filter(
-        (item) => item !== key
-      ),
-    }));
-  };
-
-  // =========================================================
-  // REQUIRED TOGGLE
-  // =========================================================
-
-  const handleRequiredToggle = (key) => {
-    setFormData((prev) => {
-      const exists = prev.required.includes(key);
-
-      return {
-        ...prev,
-        required: exists
-          ? prev.required.filter(
-              (item) => item !== key
-            )
-          : [...prev.required, key],
-      };
-    });
-  };
-
-  // =========================================================
-  // RESET FORM
-  // =========================================================
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      description: "",
-      properties: [],
-      required: [],
-    });
-
-    setProperty(createEmptyProperty());
-
-    setFormError("");
-  };
-
-  // =========================================================
-  // CREATE OFFER TYPE
-  // =========================================================
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.name.trim()) {
-      setFormError("Offer type name is required.");
-      return;
-    }
-
-    if (formData.properties.length === 0) {
-      setFormError(
-        "Add at least one rule property."
-      );
-      return;
-    }
-
-    const properties =
-      formData.properties.reduce(
-        (acc, item) => {
-          const { key, ...definition } = item;
-
-          acc[key] = definition;
-
-          return acc;
-        },
-        {}
-      );
-
-    const payload = {
-      name: formData.name.trim(),
-
-      description:
-        formData.description.trim() || null,
-
-      offerRule: {
-        properties,
-        required: formData.required,
-      },
+    return () => {
+      cancelled = true;
     };
-
-    try {
-      setSaving(true);
-      setFormError("");
-
-      await createOfferType(payload);
-
-      await getAllOfferTypes();
-
-      resetForm();
-
-      setShowCreate(false);
-    } catch (err) {
-      setFormError(
-        err?.response?.data?.message ||
-          "Failed to create offer type."
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
+  }, [getAllOfferTypes, page, limit, debouncedSearch, status]);
 
   // =========================================================
-  // TOGGLE STATUS
+  // RESET PAGE WHEN FILTER CHANGES
+  // =========================================================
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, status]);
+
+  // =========================================================
+  // STATUS COUNTERS
+  // =========================================================
+
+  const activeCount = useMemo(
+    () => offerTypes.filter((item) => item.isActive).length,
+    [offerTypes],
+  );
+
+  const inactiveCount = useMemo(
+    () => offerTypes.filter((item) => !item.isActive).length,
+    [offerTypes],
+  );
+
+  // =========================================================
+  // STATUS TOGGLE
   // =========================================================
 
   const handleToggleStatus = async (offerType) => {
+    if (statusLoadingId) return;
+
     const nextStatus = !offerType.isActive;
 
     try {
-      await updateOfferType(
-        offerType.offerTypeId,
-        {
-          isActive: nextStatus,
-        }
-      );
+      setStatusLoadingId(offerType.offerTypeId);
 
-      await getAllOfferTypes();
+      await updateOfferTypeStatus({
+        offerTypeId: offerType.offerTypeId,
+        status: nextStatus,
+      });
+
+      await getAllOfferTypes({
+        page,
+        limit,
+        search: debouncedSearch,
+        status,
+      });
     } catch (err) {
-      console.error(
-        "Failed to update offer type status:",
-        err
-      );
+      console.error("Failed to update offer type status:", err);
+    } finally {
+      setStatusLoadingId(null);
     }
   };
 
   // =========================================================
-  // SOFT DELETE / DEACTIVATE
+  // DELETE
   // =========================================================
 
-  const handleSoftDelete = (offerType) => {
-    if (!offerType.isActive) return;
-
-    setConfirmDeactivate(offerType);
+  const handlePermanentDelete = (offerType) => {
+    setConfirmDelete(offerType);
   };
 
-  const confirmSoftDelete = async () => {
-    const offerType = confirmDeactivate;
-
-    setConfirmDeactivate(null);
+  const confirmPermanentDelete = async () => {
+    const offerType = confirmDelete;
 
     if (!offerType) return;
 
     try {
-      await updateOfferType(
-        offerType.offerTypeId,
-        {
-          isActive: false,
-        }
-      );
+      setDeleteLoading(true);
 
-      await getAllOfferTypes();
+      await deleteOfferType({
+        offerTypeId: offerType.offerTypeId,
+      });
+
+      setConfirmDelete(null);
+
+      /*
+       * If deleting the last item from a page,
+       * move back one page.
+       */
+      if (offerTypes.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        await getAllOfferTypes({
+          page,
+          limit,
+          search: debouncedSearch,
+          status,
+        });
+      }
     } catch (err) {
-      console.error(
-        "Failed to deactivate offer type:",
-        err
-      );
+      console.error("Failed to permanently delete offer type:", err);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   // =========================================================
-  // STYLES
+  // FILTER
   // =========================================================
 
-  const inputStyle = {
-    background: "var(--panel)",
-    border: "1px solid var(--line)",
-    color: "var(--text)",
+  const handleStatusFilter = (value) => {
+    setStatus(value);
+    setPage(1);
   };
 
-  const label =
-    "mb-1.5 block text-[11px] font-medium";
+  // =========================================================
+  // PAGINATION
+  // =========================================================
+
+  const totalPages = Math.max(1, pagination?.totalPages || 1);
+
+  const totalItems = pagination?.total || 0;
+
+  const startItem = totalItems === 0 ? 0 : (page - 1) * limit + 1;
+
+  const endItem = Math.min(page * limit, totalItems);
+
+  // =========================================================
+  // FILTER BUTTON
+  // =========================================================
+
+  const FilterButton = ({ value, label, icon: Icon, count }) => {
+    const active = status === value;
+
+    return (
+      <button
+        type="button"
+        onClick={() => handleStatusFilter(value)}
+        className="filter-pill flex h-9 items-center gap-2 rounded-lg px-3 text-[12px] font-semibold"
+        style={{
+          background: active ? "var(--text)" : "var(--panel)",
+          color: active ? "#FFFFFF" : "var(--muted)",
+          border: active ? "1px solid var(--text)" : "1px solid var(--line)",
+          boxShadow: active ? "0 4px 12px rgba(15,23,42,0.12)" : "none",
+        }}
+      >
+        <Icon size={14} />
+
+        {label}
+
+        {typeof count === "number" && (
+          <span
+            className="rounded-md px-1.5 py-0.5 text-[10px]"
+            style={{
+              background: active ? "rgba(255,255,255,0.14)" : "var(--panel-2)",
+              color: active ? "#FFFFFF" : "var(--muted-2)",
+            }}
+          >
+            {count}
+          </span>
+        )}
+      </button>
+    );
+  };
 
   // =========================================================
   // UI
@@ -640,46 +619,148 @@ const OfferType = () => {
       }}
     >
       {/* =====================================================
-          HEADER
+          HEADER / HERO
       ====================================================== */}
 
       <div
-        className="sticky top-0 z-10"
         style={{
+          background: "linear-gradient(180deg, #FFFFFF 0%, #FBFCFE 100%)",
           borderBottom: "1px solid var(--line)",
-          background: "var(--panel)",
         }}
       >
-        <div className="flex items-center justify-between px-6 py-4">
-          <div>
-            <h1 className="disp text-[17px] font-semibold">
-              Offer Types
-            </h1>
+        <div className="mx-auto max-w-[1500px] px-6 pb-5 pt-7">
+          {/* TOP ROW */}
 
-            <p
-              className="mt-1 text-[12px]"
-              style={{ color: "var(--muted)" }}
-            >
-              Configure offer types and their dynamic
-              rule schemas.
-            </p>
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            {/* TITLE */}
+
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <span
+                  className="flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-[10px] font-bold uppercase tracking-[0.12em]"
+                  style={{
+                    background: "var(--primary-soft)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <Database size={12} />
+                  Configuration
+                </span>
+              </div>
+
+              <h1
+                className="display text-[28px] font-extrabold tracking-[-0.035em] md:text-[32px]"
+                style={{
+                  color: "var(--text)",
+                }}
+              >
+                Offer Types
+              </h1>
+
+              <p
+                className="mt-1.5 max-w-[600px] text-[13px] leading-5"
+                style={{
+                  color: "var(--muted)",
+                }}
+              >
+                Manage the reusable rule schemas that power your offer engine.
+              </p>
+            </div>
+
+            {/* SEARCH */}
+
+            <div className="w-full xl:w-[390px]">
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
+                  style={{
+                    color: "var(--muted-2)",
+                  }}
+                />
+
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name or description..."
+                  className="search-input h-11 w-full rounded-xl pl-10 pr-10 text-[12px]"
+                  style={{
+                    background: "var(--panel)",
+                    border: "1px solid var(--line)",
+                    color: "var(--text)",
+                    boxShadow: "0 3px 12px rgba(15,23,42,0.03)",
+                  }}
+                />
+
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{
+                      color: "var(--muted-2)",
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              resetForm();
-              setShowCreate(true);
-            }}
-            className="flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium shadow-sm transition-opacity hover:opacity-90"
-            style={{
-              background: "var(--primary)",
-              color: "#fff",
-            }}
-          >
-            <Plus size={16} />
-            Create offer type
-          </button>
+          {/* FILTER / META ROW */}
+
+          <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                className="mr-1 flex items-center gap-1.5 text-[11px] font-semibold"
+                style={{
+                  color: "var(--muted-2)",
+                }}
+              >
+                <SlidersHorizontal size={13} />
+                FILTER
+              </div>
+
+              <FilterButton value="" label="All" icon={ListTree} />
+
+              <FilterButton
+                value="active"
+                label="Active"
+                icon={CheckCircle2}
+                count={activeCount}
+              />
+
+              <FilterButton
+                value="inactive"
+                label="Inactive"
+                icon={CircleOff}
+                count={inactiveCount}
+              />
+            </div>
+
+            <div
+              className="text-[11px]"
+              style={{
+                color: "var(--muted-2)",
+              }}
+            >
+              {loading ? (
+                "Refreshing..."
+              ) : (
+                <>
+                  Showing{" "}
+                  <strong style={{ color: "var(--text)" }}>
+                    {startItem}-{endItem}
+                  </strong>{" "}
+                  of{" "}
+                  <strong style={{ color: "var(--text)" }}>{totalItems}</strong>{" "}
+                  offer types
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -687,977 +768,541 @@ const OfferType = () => {
           CONTENT
       ====================================================== */}
 
-      <div className="mx-auto max-w-[1400px] px-6 py-6">
+      <main className="mx-auto max-w-[1500px] px-6 py-6">
         {/* ERROR */}
+
         {error && (
           <div
-            className="mb-5 flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[12px]"
+            className="mb-5 flex items-center gap-2 rounded-xl px-4 py-3 text-[12px]"
             style={{
-              background:
-                "rgba(239,68,68,0.08)",
-              border:
-                "1px solid rgba(239,68,68,0.2)",
+              background: "var(--danger-soft)",
+              border: "1px solid rgba(229,72,77,0.16)",
               color: "var(--danger)",
             }}
           >
-            <AlertCircle size={14} />
+            <AlertCircle size={15} />
             {error}
           </div>
         )}
 
         {/* LOADING */}
-        {loading ? (
-          <div
-            className="flex min-h-[300px] items-center justify-center text-sm font-medium"
-            style={{
-              color: "var(--muted)",
-            }}
-          >
-            <Loader2
-              className="animate-spin mr-2"
-              size={18}
-            />
 
-            Loading offer types…
+        {loading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: limit }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
           </div>
         ) : offerTypes.length === 0 ? (
-          /* EMPTY STATE */
+          /* =================================================
+             EMPTY STATE
+          ================================================== */
+
           <div
-            className="rounded-xl p-12 text-center"
+            className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl px-6 text-center"
             style={{
               background: "var(--panel)",
               border: "1px solid var(--line)",
             }}
           >
-            <div className="disp text-sm font-semibold mb-1">
-              No offer types found
+            <div
+              className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+              style={{
+                background: "var(--panel-2)",
+                color: "var(--muted-2)",
+              }}
+            >
+              {search || status ? <Search size={23} /> : <Tag size={23} />}
             </div>
 
+            <h3
+              className="display text-[15px] font-bold"
+              style={{
+                color: "var(--text)",
+              }}
+            >
+              {search || status
+                ? "No matching offer types"
+                : "No offer types yet"}
+            </h3>
+
             <p
-              className="text-[12px]"
+              className="mt-1.5 max-w-[400px] text-[12px] leading-5"
               style={{
                 color: "var(--muted)",
               }}
             >
-              Create your first offer type to define
-              a rule schema.
+              {search || status
+                ? "Try changing your search term or selecting a different status filter."
+                : "Offer types will appear here once they are configured."}
             </p>
-          </div>
-        ) : (
-          /* OFFER TYPE CARDS */
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {offerTypes.map((item) => {
-              const properties =
-                item.offerRule?.properties || {};
 
-              const required =
-                item.offerRule?.required || [];
-
-              const isActive =
-                item.isActive !== false;
-
-              const accent = accentFor(
-                item.name?.trim() || "?"
-              );
-
-              return (
-                <div
-                  key={item.offerTypeId}
-                  className="rounded-xl shadow-sm"
-                  style={{
-                    background:
-                      "var(--panel)",
-                    border:
-                      "1px solid var(--line)",
-                    opacity: isActive
-                      ? 1
-                      : 0.65,
-                  }}
-                >
-                  {/* =================================================
-                      CARD HEADER
-                  ================================================== */}
-
-                  <div
-                    className="flex items-start justify-between gap-2 p-4"
-                    style={{
-                      borderBottom:
-                        "1px solid var(--line)",
-                    }}
-                  >
-                    <div className="flex items-start gap-3 min-w-0">
-                      <IconBadge
-                        Icon={Tag}
-                        color={accent}
-                      />
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="truncate text-[13px] font-semibold">
-                            {item.name?.trim()}
-                          </h2>
-
-                          <span
-                            className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                            style={{
-                              background:
-                                isActive
-                                  ? "rgba(16,185,129,0.12)"
-                                  : "var(--panel-2)",
-
-                              color:
-                                isActive
-                                  ? "var(--success)"
-                                  : "var(--muted-2)",
-                            }}
-                          >
-                            {isActive
-                              ? "Active"
-                              : "Inactive"}
-                          </span>
-                        </div>
-
-                        {item.description && (
-                          <p
-                            className="mt-1 text-[11px] leading-4"
-                            style={{
-                              color:
-                                "var(--muted)",
-                            }}
-                          >
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* =================================================
-                        TOP ACTIONS
-                        Delete -> Activate / Deactivate
-                    ================================================== */}
-
-                    <div className="flex shrink-0 items-center gap-1">
-                      {/* DELETE / DEACTIVATE */}
-                      {isActive && (
-                        <button
-                          type="button"
-                          title="Deactivate offer type"
-                          onClick={() =>
-                            handleSoftDelete(
-                              item
-                            )
-                          }
-                          className="flex h-7 w-7 items-center justify-center rounded-md hover:bg-slate-100"
-                          style={{
-                            color:
-                              "var(--muted-2)",
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-
-                      {/* ACTIVATE / DEACTIVATE */}
-                      <button
-                        type="button"
-                        title={
-                          isActive
-                            ? "Deactivate"
-                            : "Activate"
-                        }
-                        onClick={() =>
-                          handleToggleStatus(
-                            item
-                          )
-                        }
-                        className="flex h-7 w-7 items-center justify-center rounded-md hover:bg-slate-100"
-                        style={{
-                          color: isActive
-                            ? "var(--success)"
-                            : "var(--muted-2)",
-                        }}
-                      >
-                        {isActive ? (
-                          <Power size={14} />
-                        ) : (
-                          <PowerOff size={14} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* =================================================
-                      PROPERTIES
-                  ================================================== */}
-
-                  <div className="p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <p
-                        className="text-[10px] font-semibold uppercase tracking-wide flex items-center gap-1.5"
-                        style={{
-                          color:
-                            "var(--muted-2)",
-                        }}
-                      >
-                        <ListTree size={11} />
-
-                        Rule properties
-                      </p>
-
-                      <span
-                        className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                        style={{
-                          background:
-                            "var(--panel-2)",
-                          color:
-                            "var(--muted)",
-                        }}
-                      >
-                        {
-                          Object.keys(
-                            properties
-                          ).length
-                        }
-                      </span>
-                    </div>
-
-                    {Object.keys(properties)
-                      .length === 0 ? (
-                      <div
-                        className="rounded-lg p-4 text-center"
-                        style={{
-                          border:
-                            "1px dashed var(--line)",
-                        }}
-                      >
-                        <p
-                          className="text-[11px]"
-                          style={{
-                            color:
-                              "var(--muted-2)",
-                          }}
-                        >
-                          No rule properties
-                          configured.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {Object.entries(
-                          properties
-                        ).map(
-                          ([key, definition]) => (
-                            <div
-                              key={key}
-                              className="mono rounded-lg p-2.5"
-                              style={{
-                                background:
-                                  "var(--panel-2)",
-                                border:
-                                  "1px solid var(--line)",
-                              }}
-                            >
-                              {/* PROPERTY KEY ONLY */}
-                              <div>
-                                <span
-                                  className="text-[11px] font-medium"
-                                  style={{
-                                    color:
-                                      "var(--text)",
-                                  }}
-                                >
-                                  {key}
-                                </span>
-                              </div>
-
-                              {/* DESCRIPTION */}
-                              {definition.description && (
-                                <p
-                                  className="mt-1 text-[10px] leading-4"
-                                  style={{
-                                    color:
-                                      "var(--muted-2)",
-                                    fontFamily:
-                                      "'Inter', sans-serif",
-                                  }}
-                                >
-                                  {
-                                    definition.description
-                                  }
-                                </p>
-                              )}
-
-                              {/* ENUM OPTIONS */}
-                              {definition.enum
-                                ?.length > 0 && (
-                                <p
-                                  className="mt-1 text-[10px]"
-                                  style={{
-                                    color:
-                                      "var(--muted-2)",
-                                  }}
-                                >
-                                  Options:{" "}
-                                  {definition.enum.join(
-                                    ", "
-                                  )}
-                                </p>
-                              )}
-
-                              {/* REQUIRED */}
-                              {required.includes(
-                                key
-                              ) && (
-                                <span
-                                  className="mt-1 inline-block text-[9px] font-semibold uppercase tracking-wider"
-                                  style={{
-                                    color:
-                                      "var(--danger)",
-                                    fontFamily:
-                                      "'Inter', sans-serif",
-                                  }}
-                                >
-                                  Required
-                                </span>
-                              )}
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* =================================================
-                      CARD FOOTER
-                      Only required count
-                  ================================================== */}
-
-                  <div
-                    className="px-4 py-3"
-                    style={{
-                      borderTop:
-                        "1px solid var(--line)",
-                    }}
-                  >
-                    <span
-                      className="text-[10px]"
-                      style={{
-                        color:
-                          "var(--muted-2)",
-                      }}
-                    >
-                      {required.length} required
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* =====================================================
-          CREATE MODAL
-      ====================================================== */}
-
-      {showCreate && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{
-            background:
-              "rgba(15,23,42,0.4)",
-            backdropFilter: "blur(2px)",
-          }}
-        >
-          <div
-            className="fadein scrollbar max-h-[90vh] w-full max-w-[820px] overflow-y-auto rounded-2xl shadow-2xl"
-            style={{
-              background: "var(--panel)",
-              border:
-                "1px solid var(--line)",
-            }}
-          >
-            {/* =================================================
-                MODAL HEADER
-            ================================================== */}
-
-            <div
-              className="sticky top-0 z-10 flex items-center justify-between px-6 py-4"
-              style={{
-                background:
-                  "var(--panel)",
-                borderBottom:
-                  "1px solid var(--line)",
-              }}
-            >
-              <div>
-                <h2 className="disp text-[15px] font-semibold">
-                  Create Offer Type
-                </h2>
-
-                <p
-                  className="mt-1 text-[11px]"
-                  style={{
-                    color:
-                      "var(--muted)",
-                  }}
-                >
-                  Define the dynamic fields
-                  shown in the Rule Composer.
-                </p>
-              </div>
-
+            {(search || status) && (
               <button
                 type="button"
                 onClick={() => {
-                  setShowCreate(false);
-                  resetForm();
+                  setSearch("");
+                  setStatus("");
+                  setPage(1);
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-slate-100"
+                className="mt-5 rounded-lg px-4 py-2 text-[12px] font-semibold"
                 style={{
-                  color:
-                    "var(--muted)",
+                  background: "var(--text)",
+                  color: "#fff",
                 }}
               >
-                <X size={16} />
+                Clear filters
               </button>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* =================================================
+                OFFER TYPE GRID
+            ================================================== */}
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {offerTypes.map((item) => {
+                const properties = item.offerRule?.properties || {};
+
+                const required = item.offerRule?.required || [];
+
+                const isActive = item.isActive !== false;
+
+                const accent = accentFor(item.name?.trim() || "?");
+
+                const propertyCount = Object.keys(properties).length;
+
+                const isStatusUpdating = statusLoadingId === item.offerTypeId;
+
+                return (
+                  <div
+                    key={item.offerTypeId}
+                    className="card-hover overflow-hidden rounded-2xl"
+                    style={{
+                      background: "var(--panel)",
+                      border: "1px solid var(--line)",
+                    }}
+                  >
+                    {/* CARD TOP ACCENT */}
+
+                    <div
+                      style={{
+                        height: "3px",
+                        background: isActive
+                          ? `linear-gradient(90deg, ${accent}, ${accent}55)`
+                          : "var(--line-dark)",
+                      }}
+                    />
+
+                    {/* CARD HEADER */}
+
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 items-start gap-3">
+                          <IconBadge
+                            Icon={Tag}
+                            color={isActive ? accent : "#94A3B8"}
+                            size={17}
+                          />
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h2
+                                className="display truncate text-[14px] font-bold"
+                                style={{
+                                  color: "var(--text)",
+                                }}
+                                title={item.name}
+                              >
+                                {item.name?.trim()}
+                              </h2>
+                            </div>
+
+                            <div className="mt-1.5 flex items-center gap-2">
+                              <span
+                                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[9px] font-bold uppercase tracking-wide"
+                                style={{
+                                  background: isActive
+                                    ? "var(--success-soft)"
+                                    : "var(--panel-2)",
+                                  color: isActive
+                                    ? "var(--success)"
+                                    : "var(--muted-2)",
+                                }}
+                              >
+                                <span
+                                  className="h-1.5 w-1.5 rounded-full"
+                                  style={{
+                                    background: "currentColor",
+                                  }}
+                                />
+
+                                {isActive ? "Active" : "Inactive"}
+                              </span>
+
+                              <span
+                                className="text-[10px]"
+                                style={{
+                                  color: "var(--muted-2)",
+                                }}
+                              >
+                                {propertyCount}{" "}
+                                {propertyCount === 1
+                                  ? "property"
+                                  : "properties"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* ACTIONS */}
+
+                        <div className="flex shrink-0 items-center gap-1">
+                          <button
+                            type="button"
+                            title="Delete permanently"
+                            onClick={() => handlePermanentDelete(item)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-red-50"
+                            style={{
+                              color: "var(--danger)",
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+
+                          <button
+                            type="button"
+                            title={isActive ? "Deactivate" : "Activate"}
+                            disabled={isStatusUpdating}
+                            onClick={() => handleToggleStatus(item)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50"
+                            style={{
+                              color: isActive
+                                ? "var(--success)"
+                                : "var(--muted-2)",
+                            }}
+                          >
+                            {isStatusUpdating ? (
+                              <Loader2 size={14} className="animate-spin" />
+                            ) : isActive ? (
+                              <Power size={14} />
+                            ) : (
+                              <PowerOff size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* DESCRIPTION */}
+
+                      {item.description && (
+                        <p
+                          className="mt-4 line-clamp-2 text-[11px] leading-5"
+                          style={{
+                            color: "var(--muted)",
+                          }}
+                        >
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* PROPERTY SECTION */}
+
+                    <div className="px-5 pb-5">
+                      <div className="mb-2.5 flex items-center justify-between">
+                        <div
+                          className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.12em]"
+                          style={{
+                            color: "var(--muted-2)",
+                          }}
+                        >
+                          <ListTree size={11} />
+                          Rule Schema
+                        </div>
+
+                        <span
+                          className="rounded-md px-2 py-1 text-[9px] font-bold"
+                          style={{
+                            background: "var(--panel-2)",
+                            color: "var(--muted)",
+                          }}
+                        >
+                          {propertyCount}
+                        </span>
+                      </div>
+
+                      {propertyCount === 0 ? (
+                        <div
+                          className="rounded-xl p-4 text-center"
+                          style={{
+                            background: "var(--panel-soft)",
+                            border: "1px dashed var(--line-dark)",
+                          }}
+                        >
+                          <span
+                            className="text-[10px]"
+                            style={{
+                              color: "var(--muted-2)",
+                            }}
+                          >
+                            No properties configured
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {Object.entries(properties).map(
+                            ([key, definition]) => (
+                              <div
+                                key={key}
+                                className="property-row rounded-xl p-3"
+                                style={{
+                                  background: "var(--panel-soft)",
+                                  border: "1px solid var(--line)",
+                                }}
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div
+                                      className="mono truncate text-[10px] font-medium"
+                                      style={{
+                                        color: "var(--text)",
+                                      }}
+                                    >
+                                      {key}
+                                    </div>
+
+                                    {definition?.description && (
+                                      <div
+                                        className="mt-1 text-[10px] leading-4"
+                                        style={{
+                                          color: "var(--muted-2)",
+                                        }}
+                                      >
+                                        {definition.description}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <span
+                                    className="shrink-0 rounded-md px-1.5 py-1 text-[8px] font-bold uppercase"
+                                    style={{
+                                      background: "var(--panel-2)",
+                                      color: "var(--muted)",
+                                    }}
+                                  >
+                                    {definition?.type || "string"}
+                                  </span>
+                                </div>
+
+                                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                  {definition?.enum?.length > 0 && (
+                                    <span
+                                      className="rounded-md px-1.5 py-1 text-[9px]"
+                                      style={{
+                                        background: "var(--primary-soft)",
+                                        color: "var(--primary)",
+                                      }}
+                                    >
+                                      {definition.enum.join(" · ")}
+                                    </span>
+                                  )}
+
+                                  {(definition?.minimum !== undefined ||
+                                    definition?.maximum !== undefined) && (
+                                    <span
+                                      className="rounded-md px-1.5 py-1 text-[9px]"
+                                      style={{
+                                        background: "var(--panel-2)",
+                                        color: "var(--muted)",
+                                      }}
+                                    >
+                                      {definition.minimum ?? "−"} →{" "}
+                                      {definition.maximum ?? "∞"}
+                                    </span>
+                                  )}
+
+                                  {required.includes(key) && (
+                                    <span
+                                      className="rounded-md px-1.5 py-1 text-[8px] font-bold uppercase"
+                                      style={{
+                                        background: "var(--danger-soft)",
+                                        color: "var(--danger)",
+                                      }}
+                                    >
+                                      Required
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CARD FOOTER */}
+
+                    <div
+                      className="flex items-center justify-between px-5 py-3.5"
+                      style={{
+                        borderTop: "1px solid var(--line)",
+                        background: "rgba(248,250,252,0.55)",
+                      }}
+                    >
+                      <span
+                        className="text-[10px]"
+                        style={{
+                          color: "var(--muted-2)",
+                        }}
+                      >
+                        Schema configuration
+                      </span>
+
+                      <span
+                        className="text-[10px] font-semibold"
+                        style={{
+                          color: "var(--text)",
+                        }}
+                      >
+                        {required.length} required
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* =================================================
-                CREATE FORM
+                PAGINATION
             ================================================== */}
 
-            <form
-              onSubmit={handleSubmit}
-              className="p-6"
+            <div
+              className="mt-6 flex flex-col gap-3 rounded-2xl px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+              style={{
+                background: "var(--panel)",
+                border: "1px solid var(--line)",
+              }}
             >
-              {/* =================================================
-                  BASIC INFORMATION
-              ================================================== */}
-
-              <div className="mb-6">
-                <h3
-                  className="mb-3 text-[11px] font-semibold tracking-wide uppercase"
-                  style={{
-                    color:
-                      "var(--muted-2)",
-                  }}
-                >
-                  BASIC INFORMATION
-                </h3>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {/* NAME */}
-                  <div>
-                    <label
-                      className={label}
-                      style={{
-                        color:
-                          "var(--muted)",
-                      }}
-                    >
-                      Name{" "}
-                      <span
-                        style={{
-                          color:
-                            "var(--danger)",
-                        }}
-                      >
-                        *
-                      </span>
-                    </label>
-
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="e.g. Buy X Get Y"
-                      className="h-10 w-full rounded-lg px-3 text-[13px]"
-                      style={inputStyle}
-                    />
-                  </div>
-
-                  {/* DESCRIPTION */}
-                  <div>
-                    <label
-                      className={label}
-                      style={{
-                        color:
-                          "var(--muted)",
-                      }}
-                    >
-                      Description
-                    </label>
-
-                    <input
-                      type="text"
-                      name="description"
-                      value={
-                        formData.description
-                      }
-                      onChange={handleChange}
-                      placeholder="Describe this offer type"
-                      className="h-10 w-full rounded-lg px-3 text-[13px]"
-                      style={inputStyle}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* =================================================
-                  PROPERTY BUILDER
-              ================================================== */}
-
-              <div>
-                <div className="mb-3">
-                  <h3
-                    className="text-[11px] font-semibold tracking-wide uppercase"
-                    style={{
-                      color:
-                        "var(--muted-2)",
-                    }}
-                  >
-                    RULE PROPERTIES
-                  </h3>
-
-                  <p
-                    className="mt-1 text-[11px]"
-                    style={{
-                      color:
-                        "var(--muted)",
-                    }}
-                  >
-                    These fields will automatically
-                    appear in the Rule Composer.
-                  </p>
-                </div>
-
-                {/* =================================================
-                    PROPERTY INPUT
-                ================================================== */}
-
-                <div
-                  className="rounded-xl p-4"
-                  style={{
-                    background:
-                      "var(--panel-2)",
-                    border:
-                      "1px solid var(--line)",
-                  }}
-                >
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {/* PROPERTY KEY */}
-                    <div>
-                      <label
-                        className={label}
-                        style={{
-                          color:
-                            "var(--muted)",
-                        }}
-                      >
-                        Property key
-                      </label>
-
-                      <input
-                        type="text"
-                        name="key"
-                        value={property.key}
-                        onChange={
-                          handlePropertyChange
-                        }
-                        placeholder="e.g. paidDays"
-                        className="h-9 w-full rounded-lg px-3 text-[12px]"
-                        style={inputStyle}
-                      />
-                    </div>
-
-                    {/* TYPE
-                        Kept here because this is where
-                        the admin configures the schema.
-                    */}
-                    <div>
-                      <label
-                        className={label}
-                        style={{
-                          color:
-                            "var(--muted)",
-                        }}
-                      >
-                        Type
-                      </label>
-
-                      <div className="relative">
-                        <select
-                          name="type"
-                          value={
-                            property.type
-                          }
-                          onChange={
-                            handlePropertyChange
-                          }
-                          className="h-9 w-full appearance-none rounded-lg px-3 text-[12px]"
-                          style={
-                            inputStyle
-                          }
-                        >
-                          {PROPERTY_TYPES.map(
-                            (type) => (
-                              <option
-                                key={type}
-                                value={type}
-                              >
-                                {type}
-                              </option>
-                            )
-                          )}
-                        </select>
-
-                        <ChevronDown
-                          size={13}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                          style={{
-                            color:
-                              "var(--muted)",
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* DESCRIPTION */}
-                    <div className="md:col-span-2">
-                      <label
-                        className={label}
-                        style={{
-                          color:
-                            "var(--muted)",
-                        }}
-                      >
-                        Description
-                      </label>
-
-                      <input
-                        type="text"
-                        name="description"
-                        value={
-                          property.description
-                        }
-                        onChange={
-                          handlePropertyChange
-                        }
-                        placeholder="e.g. Days the user pays for"
-                        className="h-9 w-full rounded-lg px-3 text-[12px]"
-                        style={inputStyle}
-                      />
-                    </div>
-
-                    {/* MINIMUM / MAXIMUM */}
-                    {(property.type ===
-                      "number" ||
-                      property.type ===
-                        "integer") && (
-                      <>
-                        <div>
-                          <label
-                            className={
-                              label
-                            }
-                            style={{
-                              color:
-                                "var(--muted)",
-                            }}
-                          >
-                            Minimum
-                          </label>
-
-                          <input
-                            type="number"
-                            name="minimum"
-                            value={
-                              property.minimum
-                            }
-                            onChange={
-                              handlePropertyChange
-                            }
-                            placeholder="Optional"
-                            className="h-9 w-full rounded-lg px-3 text-[12px]"
-                            style={
-                              inputStyle
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            className={
-                              label
-                            }
-                            style={{
-                              color:
-                                "var(--muted)",
-                            }}
-                          >
-                            Maximum
-                          </label>
-
-                          <input
-                            type="number"
-                            name="maximum"
-                            value={
-                              property.maximum
-                            }
-                            onChange={
-                              handlePropertyChange
-                            }
-                            placeholder="Optional"
-                            className="h-9 w-full rounded-lg px-3 text-[12px]"
-                            style={
-                              inputStyle
-                            }
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {/* ENUM */}
-                    <div className="md:col-span-2">
-                      <label
-                        className={label}
-                        style={{
-                          color:
-                            "var(--muted)",
-                        }}
-                      >
-                        Enum Values
-                        <span className="ml-1 text-[10px] font-normal">
-                          (comma separated)
-                        </span>
-                      </label>
-
-                      <input
-                        type="text"
-                        value={
-                          property.enum.join(
-                            ", "
-                          )
-                        }
-                        onChange={
-                          handleEnumChange
-                        }
-                        placeholder="e.g. option1, option2"
-                        className="h-9 w-full rounded-lg px-3 text-[12px]"
-                        style={inputStyle}
-                      />
-                    </div>
-                  </div>
-
-                  {/* ADD PROPERTY */}
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={
-                        handleAddProperty
-                      }
-                      className="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[12px] font-medium"
-                      style={{
-                        background:
-                          "var(--panel)",
-                        border:
-                          "1px solid var(--line)",
-                        color:
-                          "var(--text)",
-                      }}
-                    >
-                      <Plus size={13} />
-
-                      Add Property
-                    </button>
-                  </div>
-                </div>
-
-                {/* =================================================
-                    ADDED PROPERTIES
-                ================================================== */}
-
-                {formData.properties.length >
-                  0 && (
-                  <div className="mt-4 space-y-2">
-                    <label
-                      className={label}
-                      style={{
-                        color:
-                          "var(--muted)",
-                      }}
-                    >
-                      Configured Properties (
-                      {
-                        formData
-                          .properties
-                          .length
-                      }
-                      )
-                    </label>
-
-                    {formData.properties.map(
-                      (item) => (
-                        <div
-                          key={item.key}
-                          className="flex items-center justify-between rounded-lg p-3"
-                          style={{
-                            background:
-                              "var(--panel)",
-                            border:
-                              "1px solid var(--line)",
-                          }}
-                        >
-                          {/* PROPERTY KEY
-                              Type is intentionally
-                              not displayed.
-                          */}
-                          <div className="flex items-center gap-3">
-                            <span className="mono text-[12px] font-medium">
-                              {item.key}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            {/* REQUIRED */}
-                            <label className="flex items-center gap-1.5 text-[12px]">
-                              <input
-                                type="checkbox"
-                                checked={formData.required.includes(
-                                  item.key
-                                )}
-                                onChange={() =>
-                                  handleRequiredToggle(
-                                    item.key
-                                  )
-                                }
-                                className="rounded border-slate-300"
-                              />
-
-                              Required
-                            </label>
-
-                            {/* REMOVE PROPERTY */}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleRemoveProperty(
-                                  item.key
-                                )
-                              }
-                              className="text-slate-400 hover:text-red-500"
-                              title="Remove property"
-                            >
-                              <Trash2
-                                size={14}
-                              />
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* =================================================
-                  FORM ERROR
-              ================================================== */}
-
-              {formError && (
-                <div
-                  className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-[12px]"
-                  style={{
-                    background:
-                      "rgba(239,68,68,0.08)",
-                    border:
-                      "1px solid rgba(239,68,68,0.2)",
-                    color:
-                      "var(--danger)",
-                  }}
-                >
-                  <AlertCircle size={14} />
-
-                  {formError}
-                </div>
-              )}
-
-              {/* =================================================
-                  MODAL FOOTER
-              ================================================== */}
-
               <div
-                className="mt-6 flex items-center justify-end gap-2 pt-4"
+                className="text-[11px]"
                 style={{
-                  borderTop:
-                    "1px solid var(--line)",
+                  color: "var(--muted)",
                 }}
               >
-                {/* CANCEL */}
+                Page <strong style={{ color: "var(--text)" }}>{page}</strong> of{" "}
+                <strong style={{ color: "var(--text)" }}>{totalPages}</strong>
+              </div>
+
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowCreate(false);
-                    resetForm();
-                  }}
-                  className="px-4 py-2 rounded-lg text-xs font-medium"
+                  disabled={page <= 1}
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg disabled:cursor-not-allowed disabled:opacity-35"
                   style={{
-                    color:
-                      "var(--muted)",
+                    background: "var(--panel)",
+                    border: "1px solid var(--line)",
+                    color: "var(--text)",
                   }}
                 >
-                  Cancel
+                  <ChevronLeft size={14} />
                 </button>
 
-                {/* SAVE */}
+                {Array.from({ length: totalPages }, (_, index) => index + 1)
+                  .filter((pageNumber) => {
+                    if (totalPages <= 5) return true;
+
+                    return (
+                      pageNumber === 1 ||
+                      pageNumber === totalPages ||
+                      Math.abs(pageNumber - page) <= 1
+                    );
+                  })
+                  .map((pageNumber, index, pages) => {
+                    const previousPage = pages[index - 1];
+
+                    const showEllipsis =
+                      previousPage && pageNumber - previousPage > 1;
+
+                    return (
+                      <React.Fragment key={pageNumber}>
+                        {showEllipsis && (
+                          <span
+                            className="flex h-8 w-8 items-center justify-center text-[11px]"
+                            style={{
+                              color: "var(--muted-2)",
+                            }}
+                          >
+                            …
+                          </span>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => setPage(pageNumber)}
+                          className="flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-[11px] font-semibold"
+                          style={{
+                            background:
+                              page === pageNumber
+                                ? "var(--text)"
+                                : "var(--panel)",
+                            color:
+                              page === pageNumber ? "#FFFFFF" : "var(--muted)",
+                            border:
+                              page === pageNumber
+                                ? "1px solid var(--text)"
+                                : "1px solid var(--line)",
+                          }}
+                        >
+                          {pageNumber}
+                        </button>
+                      </React.Fragment>
+                    );
+                  })}
+
                 <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium text-white shadow-sm disabled:opacity-60"
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() =>
+                    setPage((prev) => Math.min(totalPages, prev + 1))
+                  }
+                  className="flex h-8 w-8 items-center justify-center rounded-lg disabled:cursor-not-allowed disabled:opacity-35"
                   style={{
-                    background:
-                      "var(--primary)",
+                    background: "var(--panel)",
+                    border: "1px solid var(--line)",
+                    color: "var(--text)",
                   }}
                 >
-                  {saving && (
-                    <Loader2
-                      className="animate-spin"
-                      size={13}
-                    />
-                  )}
-
-                  Save Offer Type
+                  <ChevronRight size={14} />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+          </>
+        )}
+      </main>
 
       {/* =====================================================
-          CONFIRM DEACTIVATE DIALOG
+          DELETE CONFIRMATION
       ====================================================== */}
 
       <ConfirmDialog
-        open={Boolean(
-          confirmDeactivate
-        )}
-        title="Deactivate Offer Type"
-        body={`Are you sure you want to deactivate "${confirmDeactivate?.name}"?`}
-        confirmLabel="Deactivate"
+        open={Boolean(confirmDelete)}
+        title="Delete Offer Type Permanently"
+        body={`Are you sure you want to permanently delete "${confirmDelete?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete Permanently"
         danger
-        onConfirm={
-          confirmSoftDelete
-        }
-        onCancel={() =>
-          setConfirmDeactivate(null)
-        }
+        loading={deleteLoading}
+        onConfirm={confirmPermanentDelete}
+        onCancel={() => {
+          if (!deleteLoading) {
+            setConfirmDelete(null);
+          }
+        }}
       />
     </div>
   );
 };
 
 export default OfferType;
-
