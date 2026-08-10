@@ -33,6 +33,8 @@ import CorporateAccounts from "./pages/CorporateAccounts/CorporateAccounts";
 import CreateCorporateAccount from "./components/CreateCorporateAccount";
 import CorporateOrderView from "./components/CorporateOrderView";
 import CorporateOrderEdit from "./components/CorporateOrderEdit";
+import OfferList from "./pages/Offer/OfferList";
+import CreateOffer from "./components/CreateOffer";
 
 const App = () => {
   return (
@@ -107,6 +109,14 @@ const App = () => {
                 <Route
                   path="createDeliveryPartner"
                   element={<CreateDeliveryPartner />}
+                />
+                <Route
+                  path="offer"
+                  element={<OfferList />}
+                />
+                <Route
+                  path="offer/create"
+                  element={<CreateOffer />}
                 />
               </Route>
             </Route>

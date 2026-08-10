@@ -35,6 +35,7 @@ const menu = [
     path: "deliveryPartners",
     icon: PackageCheck,
   },
+  { name: "Offers", path: "offer", icon: HelpingHand },
   { name: "Customer Helpline", path: "customerHelpLine", icon: HelpingHand },
   { name: "Service Manager", path: "support", icon: Headset },
 ];
@@ -135,6 +136,17 @@ const Sidebar = ({ onLogOut }) => {
         {menu.slice(8, 10).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
+
+        {!collapsed && (
+          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            Offers
+          </p>
+        )}
+        {menu.slice(10, 11).map((item) => (
+          <NavItem key={item.path} item={item} onClick={onNavClick} />
+        ))}
+
+
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Operations
@@ -153,7 +165,7 @@ const Sidebar = ({ onLogOut }) => {
             Help
           </p>
         )}
-        {menu.slice(10, 12).map((item) => (
+        {menu.slice(11, 12).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
       </nav>
