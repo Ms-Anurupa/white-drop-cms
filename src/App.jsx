@@ -35,6 +35,7 @@ import CorporateOrderView from "./components/CorporateOrderView";
 import CorporateOrderEdit from "./components/CorporateOrderEdit";
 import OfferList from "./pages/Offer/OfferList";
 import CreateOffer from "./components/CreateOffer";
+import OfferType from "./components/OfferType";
 
 const App = () => {
   return (
@@ -111,12 +112,16 @@ const App = () => {
                   element={<CreateDeliveryPartner />}
                 />
                 <Route
-                  path="offer"
+                  path="offers"
                   element={<OfferList />}
                 />
                 <Route
-                  path="offer/create"
+                  path="offers/create"
                   element={<CreateOffer />}
+                />
+                <Route
+                  path="offerType"
+                  element={<OfferType />}
                 />
               </Route>
             </Route>

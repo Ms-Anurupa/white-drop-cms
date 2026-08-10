@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import api from "../axios";
 
-
 const useOfferStore = create((set) => ({
     offers: [],
     offerTypes: [],
@@ -73,10 +72,75 @@ const useOfferStore = create((set) => ({
         }
     },
 
+    getAllOfferTypes: async () => {
+        try {
+            set({
+                loading: true,
+                error: null,
+            });
+
+            const res = await api.get("/admin/getAllOfferTypes", {
+                withAuth: true,
+            });
+
+            set({
+                offerTypes: res.data?.offerTypes || [],
+                loading: false,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to fetch offer types:", error);
+
+            set({
+                offerTypes: [],
+                loading: false,
+                error: error?.response?.data?.message || "Failed to fetch offer types",
+            });
+
+            throw error;
+        }
+    },
+
     clearOfferError: () => {
         set({
             error: null,
         });
+    },
+
+    createOffer: async (payload) => {
+        try {
+            set({
+                creating: true,
+                createError: null,
+            });
+
+            const res = await api.post(
+                "/admin/createOffer",
+                payload,
+                {
+                    withAuth: true,
+                }
+            );
+
+            set({
+                creating: false,
+                createError: null,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to create offer:", error);
+
+            set({
+                creating: false,
+                createError:
+                    error?.response?.data?.message ||
+                    "Failed to create offer",
+            });
+
+            throw error;
+        }
     },
 }));
 
