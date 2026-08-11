@@ -48,8 +48,7 @@ const OfferHeader = () => {
                 >
                     <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                     <Sparkles size={14} strokeWidth={2.25} />
-                    <Plus size={14} strokeWidth={2.25} />
-                    New offer
+                    Create New offer
                 </button>
             </div>
         </div>
