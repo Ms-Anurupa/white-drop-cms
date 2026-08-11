@@ -19,10 +19,6 @@ import {
 
 import useOfferStore from "../zustand/Store/offerStore";
 
-/* ============================================================================
-   DESIGN TOKENS
-============================================================================ */
-
 const THEME_VARS = {
   "--bg": "#F7F8FC",
   "--panel": "#FFFFFF",
@@ -42,10 +38,6 @@ const THEME_VARS = {
   "--success-soft": "rgba(21, 154, 114, 0.09)",
   "--warning": "#D97706",
 };
-
-/* ============================================================================
-   SCOPED CSS
-============================================================================ */
 
 const SCOPED_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -144,10 +136,6 @@ const SCOPED_CSS = `
 }
 `;
 
-/* ============================================================================
-   ACCENT PALETTE
-============================================================================ */
-
 const ACCENT_PALETTE = [
   "#0284C7",
   "#D97706",
@@ -170,10 +158,6 @@ function accentFor(name = "") {
   return ACCENT_PALETTE[h % ACCENT_PALETTE.length];
 }
 
-/* ============================================================================
-   SCOPED STYLES
-============================================================================ */
-
 function useScopedStyles() {
   useEffect(() => {
     const style = document.createElement("style");
@@ -186,10 +170,6 @@ function useScopedStyles() {
     };
   }, []);
 }
-
-/* ============================================================================
-   ICON BADGE
-============================================================================ */
 
 function IconBadge({ Icon, color, size = 15 }) {
   return (
@@ -207,10 +187,6 @@ function IconBadge({ Icon, color, size = 15 }) {
     </span>
   );
 }
-
-/* ============================================================================
-   CONFIRM DIALOG
-============================================================================ */
 
 function ConfirmDialog({
   open,
@@ -304,10 +280,6 @@ function ConfirmDialog({
   );
 }
 
-/* ============================================================================
-   SKELETON CARD
-============================================================================ */
-
 function SkeletonCard() {
   return (
     <div
@@ -339,16 +311,12 @@ function SkeletonCard() {
   );
 }
 
-/* ============================================================================
-   OFFER TYPE COMPONENT
-============================================================================ */
-
 const OfferType = () => {
   useScopedStyles();
 
-  // =========================================================
+
   // ZUSTAND
-  // =========================================================
+
 
   const getAllOfferTypes = useOfferStore((state) => state.getAllOfferTypes);
 
@@ -364,9 +332,9 @@ const OfferType = () => {
 
   const deleteOfferType = useOfferStore((state) => state.deleteOfferType);
 
-  // =========================================================
+
   // PAGINATION
-  // =========================================================
+
 
   const [page, setPage] = useState(1);
   const [limit] = useState(9);
@@ -383,17 +351,17 @@ const OfferType = () => {
     totalPages: 1,
   });
 
-  // =========================================================
+
   // LOCAL STATE
-  // =========================================================
+
 
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [statusLoadingId, setStatusLoadingId] = useState(null);
 
-  // =========================================================
+
   // SEARCH DEBOUNCE
-  // =========================================================
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -403,9 +371,9 @@ const OfferType = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // =========================================================
+
   // FETCH OFFER TYPES
-  // =========================================================
+
 
   useEffect(() => {
     let cancelled = false;
@@ -420,20 +388,6 @@ const OfferType = () => {
         });
 
         if (cancelled) return;
-
-        /*
-         * Expected API response:
-         *
-         * {
-         *   offerTypes: [],
-         *   pagination: {
-         *     page,
-         *     limit,
-         *     total,
-         *     totalPages
-         *   }
-         * }
-         */
 
         if (response?.pagination) {
           setPagination(response.pagination);
@@ -450,17 +404,17 @@ const OfferType = () => {
     };
   }, [getAllOfferTypes, page, limit, debouncedSearch, status]);
 
-  // =========================================================
+
   // RESET PAGE WHEN FILTER CHANGES
-  // =========================================================
+
 
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, status]);
 
-  // =========================================================
+
   // STATUS COUNTERS
-  // =========================================================
+
 
   const activeCount = useMemo(
     () => offerTypes.filter((item) => item.isActive).length,
@@ -472,9 +426,9 @@ const OfferType = () => {
     [offerTypes],
   );
 
-  // =========================================================
+
   // STATUS TOGGLE
-  // =========================================================
+
 
   const handleToggleStatus = async (offerType) => {
     if (statusLoadingId) return;
@@ -501,10 +455,6 @@ const OfferType = () => {
       setStatusLoadingId(null);
     }
   };
-
-  // =========================================================
-  // DELETE
-  // =========================================================
 
   const handlePermanentDelete = (offerType) => {
     setConfirmDelete(offerType);
@@ -545,18 +495,12 @@ const OfferType = () => {
     }
   };
 
-  // =========================================================
-  // FILTER
-  // =========================================================
 
   const handleStatusFilter = (value) => {
     setStatus(value);
     setPage(1);
   };
 
-  // =========================================================
-  // PAGINATION
-  // =========================================================
 
   const totalPages = Math.max(1, pagination?.totalPages || 1);
 
@@ -566,9 +510,6 @@ const OfferType = () => {
 
   const endItem = Math.min(page * limit, totalItems);
 
-  // =========================================================
-  // FILTER BUTTON
-  // =========================================================
 
   const FilterButton = ({ value, label, icon: Icon, count }) => {
     const active = status === value;
@@ -604,10 +545,6 @@ const OfferType = () => {
     );
   };
 
-  // =========================================================
-  // UI
-  // =========================================================
-
   return (
     <div
       id="offer-type-root"
@@ -618,9 +555,6 @@ const OfferType = () => {
         color: "var(--text)",
       }}
     >
-      {/* =====================================================
-          HEADER / HERO
-      ====================================================== */}
 
       <div
         style={{
@@ -764,9 +698,9 @@ const OfferType = () => {
         </div>
       </div>
 
-      {/* =====================================================
+      {/* 
           CONTENT
-      ====================================================== */}
+       */}
 
       <main className="mx-auto max-w-[1500px] px-6 py-6">
         {/* ERROR */}
@@ -794,9 +728,6 @@ const OfferType = () => {
             ))}
           </div>
         ) : offerTypes.length === 0 ? (
-          /* =================================================
-             EMPTY STATE
-          ================================================== */
 
           <div
             className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl px-6 text-center"
@@ -857,9 +788,6 @@ const OfferType = () => {
           </div>
         ) : (
           <>
-            {/* =================================================
-                OFFER TYPE GRID
-            ================================================== */}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {offerTypes.map((item) => {
@@ -1111,17 +1039,17 @@ const OfferType = () => {
 
                                   {(definition?.minimum !== undefined ||
                                     definition?.maximum !== undefined) && (
-                                    <span
-                                      className="rounded-md px-1.5 py-1 text-[9px]"
-                                      style={{
-                                        background: "var(--panel-2)",
-                                        color: "var(--muted)",
-                                      }}
-                                    >
-                                      {definition.minimum ?? "−"} →{" "}
-                                      {definition.maximum ?? "∞"}
-                                    </span>
-                                  )}
+                                      <span
+                                        className="rounded-md px-1.5 py-1 text-[9px]"
+                                        style={{
+                                          background: "var(--panel-2)",
+                                          color: "var(--muted)",
+                                        }}
+                                      >
+                                        {definition.minimum ?? "−"} →{" "}
+                                        {definition.maximum ?? "∞"}
+                                      </span>
+                                    )}
 
                                   {required.includes(key) && (
                                     <span
@@ -1173,10 +1101,6 @@ const OfferType = () => {
                 );
               })}
             </div>
-
-            {/* =================================================
-                PAGINATION
-            ================================================== */}
 
             <div
               className="mt-6 flex flex-col gap-3 rounded-2xl px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between"
@@ -1282,10 +1206,6 @@ const OfferType = () => {
           </>
         )}
       </main>
-
-      {/* =====================================================
-          DELETE CONFIRMATION
-      ====================================================== */}
 
       <ConfirmDialog
         open={Boolean(confirmDelete)}

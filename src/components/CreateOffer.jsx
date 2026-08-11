@@ -433,7 +433,7 @@ const CreateOffer = () => {
             <button
               type="button"
               onClick={handleBack}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-[18px] text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+              className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-[18px] text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
             >
               ←
             </button>

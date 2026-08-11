@@ -10,13 +10,10 @@ import OfferFilters from "../../components/OfferFilter";
 import OfferTable from "../../components/OfferTable";
 import OfferPagination from "../../components/OfferPagination";
 import CreateOffer from "../../components/CreateOffer";
+import useDebounce from "../../utils/useDebounce";
 
 const OfferList = () => {
   const navigate = useNavigate();
-
-  /* =========================================================
-       ZUSTAND
-    ========================================================= */
 
   const offers = useOfferStore((state) => state.offers);
   const pagination = useOfferStore((state) => state.pagination);
@@ -26,10 +23,6 @@ const OfferList = () => {
   const getAllOffers = useOfferStore((state) => state.getAllOffers);
   const createOffer = useOfferStore((state) => state.createOffer);
   const clearOfferError = useOfferStore((state) => state.clearOfferError);
-
-  /* =========================================================
-       LOCAL STATE
-    ========================================================= */
 
   const [showCreateOffer, setShowCreateOffer] = useState(false);
 
@@ -42,20 +35,17 @@ const OfferList = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  /* =========================================================
-       OFFER TYPES
-    ========================================================= */
+
+  const debouncedSearch = useDebounce(search, 500);
+  const debouncedOfferType = useDebounce(offerType, 500);
+
 
   const offerTypes = [];
   const discountTypes = [];
 
-  /* =========================================================
-       FETCH OFFERS
-    ========================================================= */
   useEffect(() => {
     const hasBothDates = fromDate && toDate;
 
-    // Don't fetch when only one date is selected
     if ((fromDate && !toDate) || (!fromDate && toDate)) {
       return;
     }
@@ -63,16 +53,20 @@ const OfferList = () => {
     getAllOffers({
       page,
       limit,
-      search,
-      offerType,
+      search: debouncedSearch,
+      offerType: debouncedOfferType,
       fromDate: hasBothDates ? fromDate : "",
       toDate: hasBothDates ? toDate : "",
     });
-  }, [page, limit, search, offerType, fromDate, toDate, getAllOffers]);
-
-  /* =========================================================
-       EDIT OFFER
-    ========================================================= */
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    debouncedOfferType,
+    fromDate,
+    toDate,
+    getAllOffers,
+  ]);
 
   const handleEditOffer = (offer) => {
     if (!offer?.offerId) {
@@ -82,20 +76,12 @@ const OfferList = () => {
     navigate(`/dashboard/offers/edit/${offer.offerId}`);
   };
 
-  /* =========================================================
-       PROCESS OFFERS
-    ========================================================= */
-
   const processedOffers = useMemo(() => {
     return offers.map((offer) => ({
       ...offer,
       calculatedStatus: getOfferStatus(offer),
     }));
   }, [offers]);
-
-  /* =========================================================
-       STATUS FILTER
-    ========================================================= */
 
   const filteredOffers = useMemo(() => {
     if (activeTab === "ALL") {
@@ -106,10 +92,6 @@ const OfferList = () => {
       (offer) => offer.calculatedStatus === activeTab,
     );
   }, [processedOffers, activeTab]);
-
-  /* =========================================================
-       STATS
-    ========================================================= */
 
   const stats = useMemo(() => {
     let active = 0;
@@ -137,10 +119,6 @@ const OfferList = () => {
     };
   }, [processedOffers]);
 
-  /* =========================================================
-       CREATE OFFER
-    ========================================================= */
-
   const handleCreateOffer = async (payload) => {
     try {
       await createOffer(payload);
@@ -150,8 +128,8 @@ const OfferList = () => {
       await getAllOffers({
         page,
         limit,
-        search,
-        offerType,
+        search: debouncedSearch,
+        offerType: debouncedOfferType,
         fromDate,
         toDate,
       });
@@ -159,10 +137,6 @@ const OfferList = () => {
       console.error("Create offer failed:", error);
     }
   };
-
-  /* =========================================================
-       RESET FILTERS
-    ========================================================= */
 
   const handleResetFilters = () => {
     setSearch("");
@@ -175,57 +149,33 @@ const OfferList = () => {
     clearOfferError();
   };
 
-  /* =========================================================
-       SEARCH
-    ========================================================= */
-
   const handleSearch = (value) => {
     setSearch(value);
     setPage(1);
   };
-
-  /* =========================================================
-       STATUS
-    ========================================================= */
 
   const handleStatusChange = (value) => {
     setActiveTab(value);
     setPage(1);
   };
 
-  /* =========================================================
-       OFFER TYPE
-    ========================================================= */
-
   const handleOfferTypeChange = (value) => {
     setOfferType(value);
     setPage(1);
   };
-
-  /* =========================================================
-       FROM DATE
-    ========================================================= */
 
   const handleFromDateChange = (value) => {
     setFromDate(value);
     setPage(1);
   };
 
-  /* =========================================================
-       TO DATE
-    ========================================================= */
-
   const handleToDateChange = (value) => {
     setToDate(value);
     setPage(1);
   };
 
-  /* =========================================================
-       RENDER
-    ========================================================= */
-
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-[#F7F8FC]">
       <div className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-5 lg:px-6">
         <OfferHeader onCreateOffer={() => setShowCreateOffer(true)} />
 
@@ -247,12 +197,12 @@ const OfferList = () => {
           toDate={toDate}
           setToDate={handleToDateChange}
           onReset={handleResetFilters}
+          isSearching={search !== debouncedSearch}
         />
 
         {error && (
           <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2.5">
             <p className="text-[11px] text-red-600">{error}</p>
-
             <button
               type="button"
               onClick={clearOfferError}
@@ -263,7 +213,7 @@ const OfferList = () => {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-sm">
           <OfferTable
             offers={filteredOffers}
             loading={loading}
