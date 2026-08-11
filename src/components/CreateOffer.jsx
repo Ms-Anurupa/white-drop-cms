@@ -690,7 +690,7 @@ const CreateOffer = () => {
                   PRIORITY
               ================================================= */}
 
-              <div className="mb-4">
+              {/* <div className="mb-4">
 
                 <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
                   Priority
@@ -705,7 +705,7 @@ const CreateOffer = () => {
                   className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-[11px] text-slate-700 outline-none focus:border-[#6655df]"
                 />
 
-              </div>
+              </div> */}
 
               {/* =================================================
                   STATUS

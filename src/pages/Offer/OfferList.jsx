@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 import { getOfferStatus, getRedemptions } from "../../utils/offerUtils";
 import useOfferStore from "../../zustand/Store/offerStore";
+
 import OfferHeader from "../../components/OfferHeader";
 import OfferStats from "../../components/OfferStats";
 import OfferFilters from "../../components/OfferFilter";
@@ -10,74 +11,80 @@ import OfferTable from "../../components/OfferTable";
 import OfferPagination from "../../components/OfferPagination";
 import CreateOffer from "../../components/CreateOffer";
 
-const OfferList = ({ onEditOffer }) => {
+const OfferList = () => {
+  const navigate = useNavigate();
+
   /* =========================================================
-     ZUSTAND
-  ========================================================= */
+       ZUSTAND
+    ========================================================= */
 
   const offers = useOfferStore((state) => state.offers);
-
   const pagination = useOfferStore((state) => state.pagination);
-
   const loading = useOfferStore((state) => state.loading);
-
   const error = useOfferStore((state) => state.error);
 
   const getAllOffers = useOfferStore((state) => state.getAllOffers);
-
   const createOffer = useOfferStore((state) => state.createOffer);
-
   const clearOfferError = useOfferStore((state) => state.clearOfferError);
 
   /* =========================================================
-     LOCAL STATE
-  ========================================================= */
+       LOCAL STATE
+    ========================================================= */
 
   const [showCreateOffer, setShowCreateOffer] = useState(false);
 
   const [search, setSearch] = useState("");
-
   const [activeTab, setActiveTab] = useState("ALL");
-
   const [offerType, setOfferType] = useState("");
-
   const [fromDate, setFromDate] = useState("");
-
   const [toDate, setToDate] = useState("");
 
   const [page, setPage] = useState(1);
-
   const [limit, setLimit] = useState(10);
 
   /* =========================================================
-     OFFER TYPES
-
-     Replace this with your offerType Zustand store if you
-     already have one.
-  ========================================================= */
+       OFFER TYPES
+    ========================================================= */
 
   const offerTypes = [];
-
   const discountTypes = [];
 
   /* =========================================================
-     FETCH OFFERS
-  ========================================================= */
-
+       FETCH OFFERS
+    ========================================================= */
   useEffect(() => {
+    const hasBothDates = fromDate && toDate;
+
+    // Don't fetch when only one date is selected
+    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+      return;
+    }
+
     getAllOffers({
       page,
       limit,
       search,
       offerType,
-      fromDate,
-      toDate,
+      fromDate: hasBothDates ? fromDate : "",
+      toDate: hasBothDates ? toDate : "",
     });
   }, [page, limit, search, offerType, fromDate, toDate, getAllOffers]);
 
   /* =========================================================
-     PROCESS OFFERS
-  ========================================================= */
+       EDIT OFFER
+    ========================================================= */
+
+  const handleEditOffer = (offer) => {
+    if (!offer?.offerId) {
+      console.error("Offer ID is missing:", offer);
+      return;
+    }
+    navigate(`/dashboard/offers/edit/${offer.offerId}`);
+  };
+
+  /* =========================================================
+       PROCESS OFFERS
+    ========================================================= */
 
   const processedOffers = useMemo(() => {
     return offers.map((offer) => ({
@@ -87,8 +94,8 @@ const OfferList = ({ onEditOffer }) => {
   }, [offers]);
 
   /* =========================================================
-     STATUS FILTER
-  ========================================================= */
+       STATUS FILTER
+    ========================================================= */
 
   const filteredOffers = useMemo(() => {
     if (activeTab === "ALL") {
@@ -101,8 +108,8 @@ const OfferList = ({ onEditOffer }) => {
   }, [processedOffers, activeTab]);
 
   /* =========================================================
-     STATS
-  ========================================================= */
+       STATS
+    ========================================================= */
 
   const stats = useMemo(() => {
     let active = 0;
@@ -131,8 +138,8 @@ const OfferList = ({ onEditOffer }) => {
   }, [processedOffers]);
 
   /* =========================================================
-     CREATE OFFER
-  ========================================================= */
+       CREATE OFFER
+    ========================================================= */
 
   const handleCreateOffer = async (payload) => {
     try {
@@ -154,8 +161,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     RESET FILTERS
-  ========================================================= */
+       RESET FILTERS
+    ========================================================= */
 
   const handleResetFilters = () => {
     setSearch("");
@@ -169,8 +176,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     SEARCH
-  ========================================================= */
+       SEARCH
+    ========================================================= */
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -178,8 +185,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     STATUS
-  ========================================================= */
+       STATUS
+    ========================================================= */
 
   const handleStatusChange = (value) => {
     setActiveTab(value);
@@ -187,8 +194,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     OFFER TYPE
-  ========================================================= */
+       OFFER TYPE
+    ========================================================= */
 
   const handleOfferTypeChange = (value) => {
     setOfferType(value);
@@ -196,8 +203,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     FROM DATE
-  ========================================================= */
+       FROM DATE
+    ========================================================= */
 
   const handleFromDateChange = (value) => {
     setFromDate(value);
@@ -205,8 +212,8 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     TO DATE
-  ========================================================= */
+       TO DATE
+    ========================================================= */
 
   const handleToDateChange = (value) => {
     setToDate(value);
@@ -214,35 +221,19 @@ const OfferList = ({ onEditOffer }) => {
   };
 
   /* =========================================================
-     RENDER
-  ========================================================= */
+       RENDER
+    ========================================================= */
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      {/* =====================================================
-          PAGE CONTAINER
-      ===================================================== */}
-
       <div className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-5 lg:px-6">
-        {/* ===================================================
-            HEADER
-        =================================================== */}
-
         <OfferHeader onCreateOffer={() => setShowCreateOffer(true)} />
-
-        {/* ===================================================
-            STATS
-        =================================================== */}
 
         <OfferStats
           active={stats.active}
           scheduled={stats.scheduled}
           redemptions={stats.redemptions}
         />
-
-        {/* ===================================================
-            FILTERS
-        =================================================== */}
 
         <OfferFilters
           search={search}
@@ -258,10 +249,6 @@ const OfferList = ({ onEditOffer }) => {
           onReset={handleResetFilters}
         />
 
-        {/* ===================================================
-            ERROR
-        =================================================== */}
-
         {error && (
           <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2.5">
             <p className="text-[11px] text-red-600">{error}</p>
@@ -276,21 +263,13 @@ const OfferList = ({ onEditOffer }) => {
           </div>
         )}
 
-        {/* ===================================================
-            TABLE CARD
-        =================================================== */}
-
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <OfferTable
             offers={filteredOffers}
             loading={loading}
-            onEditOffer={onEditOffer}
+            onEditOffer={handleEditOffer}
           />
         </div>
-
-        {/* ===================================================
-            PAGINATION
-        =================================================== */}
 
         <OfferPagination
           pagination={pagination}
@@ -300,10 +279,6 @@ const OfferList = ({ onEditOffer }) => {
           setLimit={setLimit}
         />
       </div>
-
-      {/* =====================================================
-          CREATE OFFER
-      ===================================================== */}
 
       {showCreateOffer && (
         <CreateOffer

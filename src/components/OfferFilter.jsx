@@ -36,6 +36,31 @@ const OfferFilters = ({
     setActiveTab(status);
   };
 
+  const handleFromDateChange = (e) => {
+    const value = e.target.value;
+
+    // Allow clearing the date
+    if (!value) {
+      setFromDate("");
+      return;
+    }
+
+    // Store the date only
+    setFromDate(value);
+  };
+
+  const handleToDateChange = (e) => {
+    const value = e.target.value;
+
+    // Allow clearing the date
+    if (!value) {
+      setToDate("");
+      return;
+    }
+
+    setToDate(value);
+  };
+
   const getStatusIcon = (key) => {
     switch (key) {
       case "ACTIVE":
@@ -49,6 +74,8 @@ const OfferFilters = ({
     }
   };
 
+  const isDateRangeComplete = Boolean(fromDate && toDate);
+
   return (
     <div className="mb-5 space-y-3">
       {/* ================================================================
@@ -57,6 +84,7 @@ const OfferFilters = ({
 
       <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+
           {/* Search */}
 
           <div className="relative w-full lg:w-[320px]">
@@ -93,7 +121,6 @@ const OfferFilters = ({
                   }`}
                 >
                   {getStatusIcon(tab.key)}
-
                   {tab.label}
                 </button>
               );
@@ -107,6 +134,7 @@ const OfferFilters = ({
       ================================================================= */}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
+
         {/* Header */}
 
         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
@@ -132,7 +160,7 @@ const OfferFilters = ({
 
           {/* Active filter indicator */}
 
-          {(offerType || fromDate || toDate) && (
+          {(offerType || isDateRangeComplete) && (
             <span className="rounded-full bg-[#6655df]/10 px-2 py-1 text-[8px] font-semibold text-[#6655df]">
               Filters applied
             </span>
@@ -142,6 +170,7 @@ const OfferFilters = ({
         {/* Filter Controls */}
 
         <div className="flex flex-col gap-3 p-4 lg:flex-row lg:items-end">
+
           {/* Offer Type */}
 
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -168,7 +197,8 @@ const OfferFilters = ({
             <input
               type="date"
               value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
+              onChange={handleFromDateChange}
+              max={toDate || undefined}
               className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-[10px] font-medium text-slate-600 outline-none transition-all hover:border-slate-300 focus:border-[#6655df] focus:bg-white focus:ring-2 focus:ring-[#6655df]/10"
             />
           </div>
@@ -183,7 +213,8 @@ const OfferFilters = ({
             <input
               type="date"
               value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
+              onChange={handleToDateChange}
+              min={fromDate || undefined}
               className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-[10px] font-medium text-slate-600 outline-none transition-all hover:border-slate-300 focus:border-[#6655df] focus:bg-white focus:ring-2 focus:ring-[#6655df]/10"
             />
           </div>
@@ -199,6 +230,7 @@ const OfferFilters = ({
             Reset
           </button>
         </div>
+
       </div>
     </div>
   );

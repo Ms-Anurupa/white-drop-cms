@@ -23,7 +23,7 @@ const OfferHeader = () => {
             <button
                 type="button"
                 onClick={handleCreateOffer}
-                className="flex h-9 w-fit items-center gap-1.5 rounded-md bg-[#6655df] px-4 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#5746d2] active:scale-[0.98]"
+                className="cursor-pointer flex h-9 w-fit items-center gap-1.5 rounded-md bg-[#6655df] px-4 text-[11px] font-semibold text-white shadow-sm transition hover:bg-[#5746d2] active:scale-[0.98]"
             >
                 <span className="text-[16px] leading-none">+</span>
                 New offer

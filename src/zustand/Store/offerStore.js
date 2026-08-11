@@ -4,6 +4,8 @@ import api from "../axios";
 const useOfferStore = create((set) => ({
     offers: [],
     offerTypes: [],
+    updating: false,
+    updateError: null,
 
     pagination: {
         page: 1,
@@ -77,7 +79,7 @@ const useOfferStore = create((set) => ({
         limit = 10,
         search = "",
         status = "",
-    }) => {
+    } = {}) => {
         try {
             set({
                 loading: true,
@@ -240,6 +242,59 @@ const useOfferStore = create((set) => ({
             throw error;
         }
     },
+    editOffer: async (payload) => {
+        try {
+            set({
+                updating: true,
+                updateError: null,
+            });
+
+            const res = await api.post("/admin/editOfferById", payload, {
+                withAuth: true,
+            });
+
+            set({
+                updating: false,
+            });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to update offer:", error);
+
+            set({
+                updating: false,
+                updateError:
+                    error.response?.data?.message ||
+                    "Failed to update offer",
+            });
+
+            throw error;
+        }
+    },
+
+    getOfferById: async (offerId) => {
+        try {
+            set({ loading: true, error: null });
+
+            const res = await api.get("/admin/getOfferById", {
+                params: { offerId },
+                withAuth: true,
+            });
+
+            set({ loading: false });
+
+            return res.data;
+        } catch (error) {
+            console.error("Failed to fetch offer:", error);
+
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Failed to fetch offer",
+            });
+
+            throw error;
+        }
+},
 }));
 
 export default useOfferStore;

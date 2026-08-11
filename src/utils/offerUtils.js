@@ -8,14 +8,6 @@ export const STATUS_TABS = [
     label: "Active",
   },
   {
-    key: "SCHEDULED",
-    label: "Scheduled",
-  },
-  {
-    key: "PAUSED",
-    label: "Paused",
-  },
-  {
     key: "EXPIRED",
     label: "Expired",
   },

@@ -36,6 +36,7 @@ import CorporateOrderEdit from "./components/CorporateOrderEdit";
 import OfferList from "./pages/Offer/OfferList";
 import CreateOffer from "./components/CreateOffer";
 import OfferType from "./components/OfferType";
+import EditOffer from "./components/EditOffer";
 
 const App = () => {
   return (
@@ -122,6 +123,10 @@ const App = () => {
                 <Route
                   path="offerType"
                   element={<OfferType />}
+                />
+                <Route
+                  path="offers/edit/:offerId"
+                  element={<EditOffer />}
                 />
               </Route>
             </Route>
