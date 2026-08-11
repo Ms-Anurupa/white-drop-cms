@@ -450,7 +450,7 @@ const CreateCorporateOrder = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition"
+                className="cursor-pointer inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
 

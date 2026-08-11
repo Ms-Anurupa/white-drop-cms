@@ -1115,7 +1115,7 @@ const CreateOffer = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-9 items-center gap-1.5 rounded-md bg-[#6655df] px-5 text-[10px] font-semibold text-white transition hover:bg-[#5746d2] disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer flex h-9 items-center gap-1.5 rounded-md bg-[#6655df] px-5 text-[10px] font-semibold text-white transition hover:bg-[#5746d2] disabled:cursor-not-allowed disabled:opacity-60"
             >
 
               {loading ? (
