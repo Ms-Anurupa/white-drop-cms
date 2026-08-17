@@ -380,7 +380,7 @@ const CorporateAccounts = () => {
                       <AccountStatusSelect
                         account={account}
                         onChange={handleStatusChange}
-                        className="w-32"
+                        className="w-38"
                       />
                     </td>
 
