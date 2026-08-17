@@ -11,6 +11,8 @@ import {
   PackageSearch,
   Building2,
   Plus,
+  ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -21,15 +23,29 @@ import DateFilter from "../../components/DateFilter";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
+// Keep this in sync with the `deliveryStatus` enum in schema.prisma
+const ORDER_STATUSES = [
+  "PLACED",
+  "PROCESSING",
+  "INTRANSIT",
+  "DELIVERED",
+  "FAILED",
+  "CANCELLED",
+];
+
 const STATUS_STYLES = {
-  DELIVERED: "bg-emerald-50 text-emerald-700",
-  INTRANSIT: "bg-blue-50 text-blue-700",
-  PROCESSING: "bg-amber-50 text-amber-700",
-  CANCELLED: "bg-red-50 text-red-700",
-  FAILED: "bg-red-50 text-red-700",
+  PLACED: "bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300",
+  DELIVERED:
+    "bg-emerald-50 text-emerald-700 border-emerald-200 hover:border-emerald-300",
+  INTRANSIT: "bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300",
+  PROCESSING:
+    "bg-amber-50 text-amber-700 border-amber-200 hover:border-amber-300",
+  CANCELLED: "bg-red-50 text-red-700 border-red-200 hover:border-red-300",
+  FAILED: "bg-red-50 text-red-700 border-red-200 hover:border-red-300",
 };
 
 const STATUS_DOT = {
+  PLACED: "bg-gray-400",
   DELIVERED: "bg-emerald-500",
   INTRANSIT: "bg-blue-500",
   PROCESSING: "bg-amber-500",
@@ -55,6 +71,7 @@ const Order = () => {
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
   );
+  const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
   const orders = orderDataStore((state) => state.orders);
   const loading = orderDataStore((state) => state.loading);
   const [search, setSearch] = useState("");
@@ -67,6 +84,7 @@ const Order = () => {
   const popoverRef = useRef(null);
   const [toDate, setToDate] = useState("");
   const [fromDate, setFromDate] = useState("");
+  const [updatingId, setUpdatingId] = useState(null); // orderId currently being updated
 
   const navigate = useNavigate();
 
@@ -236,6 +254,37 @@ const Order = () => {
     }
   };
 
+  const handleStatusChange = async (order, newStatus) => {
+    if (!newStatus || newStatus === order.orderStatus) return;
+
+    setUpdatingId(order.id);
+
+    try {
+      await updateOrderStatus({
+        id: order.id,
+        status: newStatus,
+      });
+
+      toast.success(`Order ${order.orderId} marked as ${newStatus}`);
+
+      await getOrderListing({
+        status,
+        search,
+        page,
+        pageSize,
+        fromDate,
+        toDate,
+      });
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      toast.error(
+        error?.response?.data?.message || "Failed to update order status",
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const getPageNumbers = () => {
     const pages = [];
     const windowSize = 1;
@@ -281,7 +330,6 @@ const Order = () => {
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
           {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
-          
 
           {/* Export — pinned to the row's end via justify-between + shrink-0,
       so it never shifts regardless of what the left cluster does */}
@@ -335,7 +383,12 @@ const Order = () => {
                       <span className="font-semibold text-sm text-gray-900">
                         ₹{o.orderTotal}
                       </span>
-                      <StatusPill status={o.orderStatus} />
+                      <StatusSelect
+                        order={o}
+                        onChange={handleStatusChange}
+                        disabled={updatingId === o.id}
+                        className="min-w-[7rem]"
+                      />
                     </div>
                   </div>
                   <img
@@ -466,7 +519,12 @@ const Order = () => {
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <StatusPill status={o.orderStatus} />
+                      <StatusSelect
+                        order={o}
+                        onChange={handleStatusChange}
+                        disabled={updatingId === o.id}
+                        className="min-w-[7.5rem]"
+                      />
                     </td>
 
                     <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
@@ -635,19 +693,49 @@ const PageButton = ({ children, onClick, disabled, label }) => (
   </button>
 );
 
-const StatusPill = ({ status }) => (
-  <span
-    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-      STATUS_STYLES[status] || "bg-gray-100 text-gray-700"
-    }`}
-  >
-    <span
-      className={`w-1.5 h-1.5 rounded-full ${
-        STATUS_DOT[status] || "bg-gray-400"
+// Editable status control — a native <select> dressed up as a bordered pill
+// so it reads as "tap to change" rather than plain text, while staying a
+// real <select> for accessibility and mobile-friendly native pickers.
+// Fixed width keeps table rows from reflowing as the label text changes.
+const StatusSelect = ({ order, onChange, disabled, className = "" }) => (
+  <div className={`relative inline-flex ${className}`}>
+    <select
+      value={order.orderStatus}
+      disabled={disabled}
+      onChange={(e) => onChange(order, e.target.value)}
+      aria-label={`Change status for order ${order.orderId}`}
+      className={`peer w-full appearance-none cursor-pointer rounded-full border pl-6 pr-7 py-1.5 text-xs font-medium outline-none transition focus:ring-2 focus:ring-blue-500/30 disabled:cursor-wait disabled:opacity-60 ${
+        STATUS_STYLES[order.orderStatus] ||
+        "bg-gray-100 text-gray-700 border-gray-200"
       }`}
+    >
+      {ORDER_STATUSES.map((s) => (
+        <option key={s} value={s} className="bg-white text-gray-700">
+          {s}
+        </option>
+      ))}
+    </select>
+
+    {/* Status dot / spinner — swaps to a spinner while the update is in flight */}
+    <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+      {disabled ? (
+        <Loader2 size={11} className="animate-spin text-gray-500" />
+      ) : (
+        <span
+          className={`block w-1.5 h-1.5 rounded-full ${
+            STATUS_DOT[order.orderStatus] || "bg-gray-400"
+          }`}
+        />
+      )}
+    </span>
+
+    {/* Chevron affordance so it visibly reads as a dropdown, not a static pill */}
+    <ChevronDown
+      size={12}
+      strokeWidth={2.5}
+      className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-current opacity-50 peer-disabled:opacity-30"
     />
-    {status || "UNKNOWN"}
-  </span>
+  </div>
 );
 
 const EmptyState = () => (

@@ -64,6 +64,17 @@ const orderDataStore = create((set) => ({
       // throw error;
     }
   },
+
+  updateOrderStatus: async(payload) => {
+    try {
+      const res = await api.post("/admin/updateOrderStatus", payload, {
+        withAuth: true
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }));
 
 export default orderDataStore;
