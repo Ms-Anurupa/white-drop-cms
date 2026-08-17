@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { getProductUrl } from "../../utils/resolveProductUrl";
 import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -260,6 +261,7 @@ const Order = () => {
     setUpdatingId(order.id);
 
     try {
+
       await updateOrderStatus({
         id: order.id,
         status: newStatus,
@@ -697,46 +699,65 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 // so it reads as "tap to change" rather than plain text, while staying a
 // real <select> for accessibility and mobile-friendly native pickers.
 // Fixed width keeps table rows from reflowing as the label text changes.
-const StatusSelect = ({ order, onChange, disabled, className = "" }) => (
-  <div className={`relative inline-flex ${className}`}>
-    <select
-      value={order.orderStatus}
+const StatusSelect = ({ order, onChange, disabled, className = "" }) => {
+  const availableStatuses = ORDER_STATUSES;
+
+  return (
+    <SplitButton
+      variant="outline"
       disabled={disabled}
-      onChange={(e) => onChange(order, e.target.value)}
-      aria-label={`Change status for order ${order.orderId}`}
-      className={`peer w-full appearance-none cursor-pointer rounded-full border pl-6 pr-7 py-1.5 text-xs font-medium outline-none transition focus:ring-2 focus:ring-blue-500/30 disabled:cursor-wait disabled:opacity-60 ${
-        STATUS_STYLES[order.orderStatus] ||
-        "bg-gray-100 text-gray-700 border-gray-200"
-      }`}
+      className={className}
+      onClick={() => {}}
+      menuContent={
+        <>
+          {availableStatuses.map((status) => (
+            <SplitButtonItem
+              key={status}
+              onClick={() => onChange(order, status)}
+            >
+              <div className="flex w-full items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      STATUS_DOT[status] || "bg-gray-400"
+                    }`}
+                  />
+
+                  <span className="capitalize">
+                    {status.replaceAll("_", " ").toLowerCase()}
+                  </span>
+                </div>
+
+                {order.orderStatus === status && (
+                  <span className="text-blue-600">✓</span>
+                )}
+              </div>
+            </SplitButtonItem>
+          ))}
+        </>
+      }
     >
-      {ORDER_STATUSES.map((s) => (
-        <option key={s} value={s} className="bg-white text-gray-700">
-          {s}
-        </option>
-      ))}
-    </select>
+      <div className="flex items-center gap-2">
+        {disabled ? (
+          <Loader2 size={11} className="animate-spin text-gray-500" />
+        ) : (
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              STATUS_DOT[order.orderStatus] || "bg-gray-400"
+            }`}
+          />
+        )}
 
-    {/* Status dot / spinner — swaps to a spinner while the update is in flight */}
-    <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
-      {disabled ? (
-        <Loader2 size={11} className="animate-spin text-gray-500" />
-      ) : (
-        <span
-          className={`block w-1.5 h-1.5 rounded-full ${
-            STATUS_DOT[order.orderStatus] || "bg-gray-400"
-          }`}
-        />
-      )}
-    </span>
-
-    {/* Chevron affordance so it visibly reads as a dropdown, not a static pill */}
-    <ChevronDown
-      size={12}
-      strokeWidth={2.5}
-      className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-current opacity-50 peer-disabled:opacity-30"
-    />
-  </div>
-);
+        <span>
+          {order.orderStatus
+            ?.replaceAll("_", " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (c) => c.toUpperCase())}
+        </span>
+      </div>
+    </SplitButton>
+  );
+};
 
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
