@@ -389,7 +389,7 @@ const Order = () => {
                         order={o}
                         onChange={handleStatusChange}
                         disabled={updatingId === o.id}
-                        className="min-w-[7rem]"
+                        className="w-36"
                       />
                     </div>
                   </div>
@@ -525,7 +525,7 @@ const Order = () => {
                         order={o}
                         onChange={handleStatusChange}
                         disabled={updatingId === o.id}
-                        className="min-w-[7.5rem]"
+                        className="w-36"
                       />
                     </td>
 
@@ -558,9 +558,9 @@ const Order = () => {
               {filteredOrders.length === 0
                 ? "No results"
                 : `Showing ${start + 1}–${Math.min(
-                    start + pageSize,
-                    filteredOrders.length,
-                  )} of ${filteredOrders.length}`}
+                  start + pageSize,
+                  filteredOrders.length,
+                )} of ${filteredOrders.length}`}
             </span>
 
             <label className="flex items-center gap-1.5">
@@ -606,11 +606,10 @@ const Order = () => {
                     key={p}
                     onClick={() => setPage(p)}
                     aria-current={p === currentPage ? "page" : undefined}
-                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
-                      p === currentPage
+                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${p === currentPage
                         ? "bg-blue-600 text-white"
                         : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     {p}
                   </button>
@@ -699,7 +698,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 // so it reads as "tap to change" rather than plain text, while staying a
 // real <select> for accessibility and mobile-friendly native pickers.
 // Fixed width keeps table rows from reflowing as the label text changes.
-const StatusSelect = ({ order, onChange, disabled, className = "" }) => {
+const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
   const availableStatuses = ORDER_STATUSES;
 
   return (
@@ -707,7 +706,7 @@ const StatusSelect = ({ order, onChange, disabled, className = "" }) => {
       variant="outline"
       disabled={disabled}
       className={className}
-      onClick={() => {}}
+      onClick={() => { }}
       menuContent={
         <>
           {availableStatuses.map((status) => (
@@ -718,9 +717,8 @@ const StatusSelect = ({ order, onChange, disabled, className = "" }) => {
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      STATUS_DOT[status] || "bg-gray-400"
-                    }`}
+                    className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] || "bg-gray-400"
+                      }`}
                   />
 
                   <span className="capitalize">
@@ -742,9 +740,8 @@ const StatusSelect = ({ order, onChange, disabled, className = "" }) => {
           <Loader2 size={11} className="animate-spin text-gray-500" />
         ) : (
           <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              STATUS_DOT[order.orderStatus] || "bg-gray-400"
-            }`}
+            className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[order.orderStatus] || "bg-gray-400"
+              }`}
           />
         )}
 

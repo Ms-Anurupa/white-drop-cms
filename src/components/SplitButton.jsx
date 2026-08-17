@@ -10,6 +10,7 @@ export function SplitButton({
   align = "right", // "right" | "left" — which edge the menu hangs from
   menuWidth = "w-48",
   label, // optional aria-label for the trigger, if children isn't plain text
+  className = "", // width/spacing overrides for the outer wrapper, e.g. "w-36"
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -77,7 +78,12 @@ export function SplitButton({
   }, [isOpen]);
 
   const baseStyles =
-    "inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-all duration-150 focus:z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed active:scale-[0.98]";
+    "inline-flex items-center justify-center px-2 py-2 text-sm font-medium transition-all duration-150 focus:z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed active:scale-[0.98]";
+
+  // The trigger grows to fill whatever width the wrapper is given, and
+  // left-aligns its content — this is what keeps every row the same width
+  // instead of each button hugging its own label length.
+  const triggerStyles = "flex-1 justify-start truncate";
 
   const variants = {
     primary:
@@ -94,14 +100,17 @@ export function SplitButton({
       : "border-l-blue-500/60 border-l";
 
   return (
-    <div className="relative inline-flex rounded-lg" ref={dropdownRef}>
+    <div
+      className={`relative inline-flex rounded-lg ${className}`}
+      ref={dropdownRef}
+    >
       {/* Left / Primary Action Button */}
       <button
         type="button"
         disabled={disabled}
         onClick={onClick}
         aria-label={label}
-        className={`${baseStyles} ${variantStyle} rounded-l-lg -mr-px`}
+        className={`${baseStyles} ${triggerStyles} ${variantStyle} rounded-l-lg -mr-px`}
       >
         {children}
       </button>
