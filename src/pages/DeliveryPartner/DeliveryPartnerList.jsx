@@ -23,6 +23,8 @@ import Loader from "../../components/Loader";
 import useSignedImages from "../../hooks/useSignedImages";
 import { toast } from "react-toastify";
 import DateFilter from "../../components/DateFilter";
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
+
 
 const PAGE_LIMIT = 8;
 
@@ -443,23 +445,11 @@ const DeliveryPartnerList = () => {
                           {formatDate(p?.createdAt)}
                         </td>
                         <td className="p-3">
-                          <select
-                            value={p.active ? "true" : "false"}
-                            onChange={(e) =>
-                              handleStatusChange(
-                                e.target.value === "true",
-                                p.deliveryPersonId,
-                              )
-                            }
-                            className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium cursor-pointer outline-none transition ${
-                              p.active
-                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                : "border-red-200 bg-red-50 text-red-700"
-                            }`}
-                          >
-                            <option value="true">● Active</option>
-                            <option value="false">● Inactive</option>
-                          </select>
+                          <DeliveryStatusSelect
+                            person={p}
+                            onChange={handleStatusChange}
+                            className="w-28"
+                          />
                         </td>
                         <td className="p-3 text-sm text-black bg-white">
                           <AreaCoverCell text={p?.areaCovered} />
@@ -631,6 +621,57 @@ const DeliveryPartnerList = () => {
         </>
       )}
     </div>
+  );
+};
+
+const DeliveryStatusSelect = ({
+  person,
+  onChange,
+  disabled,
+  className = "w-28",
+}) => {
+  const isActive = person.active;
+
+  return (
+    <SplitButton
+      variant={isActive ? "success" : "danger"}
+      disabled={disabled}
+      className={className}
+      onClick={() => {}}
+      menuContent={
+        <>
+          <SplitButtonItem
+            onClick={() => onChange(true, person.deliveryPersonId)}
+          >
+            <div className="flex w-full items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Active</span>
+              </div>
+              {isActive && <span className="text-blue-600">✓</span>}
+            </div>
+          </SplitButtonItem>
+          <SplitButtonItem
+            onClick={() => onChange(false, person.deliveryPersonId)}
+          >
+            <div className="flex w-full items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                <span>Inactive</span>
+              </div>
+              {!isActive && <span className="text-blue-600">✓</span>}
+            </div>
+          </SplitButtonItem>
+        </>
+      }
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-red-500"}`}
+        />
+        <span>{isActive ? "Active" : "Inactive"}</span>
+      </div>
+    </SplitButton>
   );
 };
 

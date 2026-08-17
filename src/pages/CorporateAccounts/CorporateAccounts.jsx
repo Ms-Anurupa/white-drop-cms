@@ -16,6 +16,19 @@ import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton"; 
+
+const ACCOUNT_STATUS_VARIANT = {
+  APPROVED: "success",
+  INREVIEW: "warning",
+  REJECTED: "danger",
+};
+
+const ACCOUNT_STATUS_DOT = {
+  APPROVED: "bg-green-500",
+  INREVIEW: "bg-yellow-500",
+  REJECTED: "bg-red-500",
+};
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -364,28 +377,11 @@ const CorporateAccounts = () => {
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <select
-                        value={account.status}
-                        onChange={(e) =>
-                          handleStatusChange(account, e.target.value)
-                        }
-                        className={`rounded-lg cursor-pointer border px-3 py-2 text-xs font-medium outline-none transition
-                              ${
-                                account.status === "APPROVED"
-                                  ? "border-green-200 bg-green-50 text-green-700"
-                                  : account.status === "INREVIEW"
-                                    ? "border-yellow-200 bg-yellow-50 text-yellow-700"
-                                    : account.status === "REJECTED"
-                                      ? "border-red-200 bg-red-50 text-red-700"
-                                      : "border-gray-200 bg-gray-50 text-gray-700"
-                              }`}
-                      >
-                        {ACCOUNT_STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
+                      <AccountStatusSelect
+                        account={account}
+                        onChange={handleStatusChange}
+                        className="w-32"
+                      />
                     </td>
 
                     <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
@@ -520,5 +516,54 @@ const EmptyState = () => (
     </p>
   </div>
 );
+
+
+const AccountStatusSelect = ({
+  account,
+  onChange,
+  disabled,
+  className = "w-32",
+}) => {
+  const variant = ACCOUNT_STATUS_VARIANT[account.status] || "neutral";
+  const dot = ACCOUNT_STATUS_DOT[account.status] || "bg-gray-400";
+
+  return (
+    <SplitButton
+      variant={variant}
+      disabled={disabled}
+      className={className}
+      onClick={() => {}}
+      menuContent={
+        <>
+          {ACCOUNT_STATUS_OPTIONS.map((status) => (
+            <SplitButtonItem
+              key={status}
+              onClick={() => onChange(account, status)}
+            >
+              <div className="flex w-full items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      ACCOUNT_STATUS_DOT[status] || "bg-gray-400"
+                    }`}
+                  />
+                  <span>{status}</span>
+                </div>
+                {account.status === status && (
+                  <span className="text-blue-600">✓</span>
+                )}
+              </div>
+            </SplitButtonItem>
+          ))}
+        </>
+      }
+    >
+      <div className="flex items-center gap-2">
+        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+        <span>{account.status}</span>
+      </div>
+    </SplitButton>
+  );
+};
 
 export default CorporateAccounts;

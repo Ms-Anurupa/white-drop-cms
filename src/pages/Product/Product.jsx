@@ -20,6 +20,22 @@ import { getProductUrl } from "../../utils/resolveProductUrl";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton"; // adjust path
+
+const PRODUCT_STATUSES = ["ACTIVE", "INACTIVE", "COMING_SOON"];
+
+const PRODUCT_STATUS_LABEL = {
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
+  COMING_SOON: "Coming soon",
+};
+
+const PRODUCT_STATUS_DOT = {
+  ACTIVE: "bg-emerald-500",
+  INACTIVE: "bg-gray-400",
+  COMING_SOON: "bg-blue-500",
+};
+
 const Product = () => {
   const navigate = useNavigate();
   const { confirm } = useConfirm();
@@ -299,7 +315,10 @@ const Product = () => {
                 </tr>
               ) : (
                 paginated.map((item, index) => (
-                  <tr key={item.product_id} className="hover:bg-slate-50 transition">
+                  <tr
+                    key={item.product_id}
+                    className="hover:bg-slate-50 transition"
+                  >
                     <td className="px-4 py-3.5 text-gray-400">
                       {start + index + 1}
                     </td>
@@ -333,17 +352,12 @@ const Product = () => {
                     </td>
 
                     <td className="px-4 py-3.5">
-                      <select
-                        value={item.status ?? "ACTIVE"}
-                        onChange={(e) =>
-                          handleStatusChange(item.product_id, e.target.value)
+                      <ProductStatusSelect
+                        status={item.status}
+                        onChange={(newStatus) =>
+                          handleStatusChange(item.product_id, newStatus)
                         }
-                        className="px-2 py-1.5 cursor-pointer text-xs border border-gray-200 rounded-md bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                      >
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
-                        <option value="COMING_SOON">Coming soon</option>
-                      </select>
+                      />
                     </td>
 
                     <td className="px-4 py-3.5">
@@ -521,4 +535,46 @@ const StatCard = ({ label, value, valueClass = "text-gray-900", dotClass }) => (
   </div>
 );
 
+
+const ProductStatusSelect = ({
+  status,
+  onChange,
+  disabled,
+  className = "w-32",
+}) => {
+  const current = status ?? "ACTIVE";
+
+  return (
+    <SplitButton
+      variant="outline"
+      disabled={disabled}
+      className={className}
+      onClick={() => {}}
+      menuContent={
+        <>
+          {PRODUCT_STATUSES.map((s) => (
+            <SplitButtonItem key={s} onClick={() => onChange(s)}>
+              <div className="flex w-full items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${PRODUCT_STATUS_DOT[s]}`}
+                  />
+                  <span>{PRODUCT_STATUS_LABEL[s]}</span>
+                </div>
+                {current === s && <span className="text-blue-600">✓</span>}
+              </div>
+            </SplitButtonItem>
+          ))}
+        </>
+      }
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${PRODUCT_STATUS_DOT[current]}`}
+        />
+        <span>{PRODUCT_STATUS_LABEL[current]}</span>
+      </div>
+    </SplitButton>
+  );
+};
 export default Product;
