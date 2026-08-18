@@ -8,4 +8,12 @@ const getProductUrl = (fileName) => {
   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
 };
 
-export { getProductUrl };
+
+const getIconUrl = (fileName) =>{
+  if (!fileName) return null;
+
+  const encodedPath = encodeURIComponent(`public/${fileName}`);
+
+  return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
+}
+export { getProductUrl, getIconUrl };
