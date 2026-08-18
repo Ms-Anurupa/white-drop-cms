@@ -449,6 +449,9 @@ const DeliveryJob = () => {
                                     e.stopPropagation();
                                     navigate(
                                       `/dashboard/delivery-job/${job.id}/add-orders`,
+                                      {
+                                        state: { job },
+                                      },
                                     );
                                   }}
                                   className="

@@ -14,9 +14,10 @@ import {
   ShoppingBag,
   UserRound,
   X,
+  Phone
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import deliveryJobStore from "../zustand/Store/deliveryJobStore";
 import orderDataStore from "../zustand/Store/orderDataStore";
@@ -82,6 +83,9 @@ const AssignOrderToDeliveryJob = () => {
   const navigate = useNavigate();
   const { id: deliveryJobId } = useParams();
 
+  const location = useLocation();
+  const job = location.state?.job;
+  console.log(job)
   const associateOrderToDeliveryJob = deliveryJobStore(
     (state) => state.associateOrderToDeliveryJob,
   );
@@ -389,16 +393,16 @@ const AssignOrderToDeliveryJob = () => {
               Delivery Jobs
             </button>
 
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white shrink-0">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white shrink-0 mt-1">
                   <Package size={22} />
                 </div>
 
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      Add Orders
+                      {job?.name || "Add Orders"}
                     </h1>
 
                     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] font-semibold text-blue-100">
@@ -407,14 +411,40 @@ const AssignOrderToDeliveryJob = () => {
                     </span>
                   </div>
 
-                  <p className="text-sm text-blue-100 mt-1">
-                    Select orders to include in this delivery job
-                  </p>
+                  {/* Metadata Row: Area, Partner Name, Phone */}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-blue-100">
+                    {job?.area && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin size={14} className="text-blue-200" />
+                        {job.area}
+                      </span>
+                    )}
+
+                    {job?.deliveryPartner && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
+                        <span className="inline-flex items-center gap-1.5">
+                          <UserRound size={14} className="text-blue-200" />
+                          {job.deliveryPartner.firstName} {job.deliveryPartner.lastName}
+                        </span>
+                        
+                        {job.deliveryPartner.phoneNo && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
+                            <span className="inline-flex items-center gap-1.5">
+                              <Phone size={14} className="text-blue-200" />
+                              {job.deliveryPartner.phoneNo}
+                            </span>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {hasAssociationChanges && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-white/15">
                     <p className="text-[10px] uppercase tracking-wide text-blue-100">
                       Changes
@@ -837,26 +867,26 @@ const AssignOrderToDeliveryJob = () => {
                   const isSelected = selectedOrders.includes(orderId);
 
                   /*
-                  * Original backend state.
-                  */
+                   * Original backend state.
+                   */
                   const isOriginallyAssociated =
                     initialAssociatedSet.has(orderId);
 
                   /*
-                  * Current backend association.
-                  */
+                   * Current backend association.
+                   */
                   const isAssociated = isOrderAssociated(order, deliveryJobId);
 
                   /*
-                  * Existing associated order
-                  * that user unchecked.
-                  */
+                   * Existing associated order
+                   * that user unchecked.
+                   */
                   const isMarkedForRemoval =
                     isOriginallyAssociated && !isSelected;
 
                   /*
-                  * New order user selected.
-                  */
+                   * New order user selected.
+                   */
                   const isMarkedForAssociation =
                     !isOriginallyAssociated && isSelected;
 
@@ -1033,7 +1063,7 @@ const AssignOrderToDeliveryJob = () => {
 
                             {getOrderAddress(order) && (
                               <span
-                                className="inline-flex items-center gap-1.5 text-xs text-slate-400 max-w-[420px]"
+                                className="inline-flex items-center gap-1.5 text-xs text-slate-400 max-w-105"
                                 title={getOrderAddress(order)}
                               >
                                 <MapPin size={12} className="shrink-0" />
