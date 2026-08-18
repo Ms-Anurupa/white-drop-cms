@@ -427,19 +427,51 @@ const DeliveryJob = () => {
                           </div>
 
                           {/* Orders */}
-                          <div className="flex items-start gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-                              <Package size={17} className="text-slate-500" />
+                          {/* Orders */}
+                          <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 transition-colors">
+                            <div className="w-9 h-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
+                              <Package size={16} className="text-slate-500" />
                             </div>
 
-                            <div>
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
                                 Orders
                               </p>
 
-                              <p className="text-sm font-medium text-slate-800 mt-0.5">
-                                {job.orders?.length || 0} Orders
-                              </p>
+                              <div className="flex items-center justify-between gap-2 mt-1">
+                                <p className="text-sm font-semibold text-slate-800">
+                                  {job.orders?.length || 0}
+                                </p>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(
+                                      `/dashboard/delivery-job/${job.id}/add-orders`,
+                                    );
+                                  }}
+                                  className="
+          inline-flex items-center gap-1
+          px-2 py-1
+          rounded-lg
+          bg-blue-50
+          border border-blue-100
+          text-blue-600
+          hover:bg-blue-100
+          hover:border-blue-200
+          text-[10px]
+          font-bold
+          transition-all
+          cursor-pointer
+        "
+                                >
+                                  <span className="text-sm leading-none">
+                                    +
+                                  </span>
+                                  Add
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -477,7 +509,9 @@ const DeliveryJob = () => {
                           <button
                             type="button"
                             onClick={() =>
-                              navigate(`/dashboard/delivery-job/${job.id}/assign-partner`)
+                              navigate(
+                                `/dashboard/delivery-job/${job.id}/assign-partner`,
+                              )
                             }
                             className="
                               w-full

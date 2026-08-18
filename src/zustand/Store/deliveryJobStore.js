@@ -18,6 +18,17 @@ const deliveryJobStore = create((set) => ({
     }
   },
 
+  associateOrderToDeliveryJob: async (payload) => {
+    try {
+      const res = await api.post("/admin/associateOrderToDeliveryJob", payload, {
+        withAuth: true,
+      });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   assignDeliveryJob: async (payload) => {
     try {
       const res = await api.post("/admin/assignDeliveryJob", payload, {

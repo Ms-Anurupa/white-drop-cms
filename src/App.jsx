@@ -40,6 +40,7 @@ import EditOffer from "./components/EditOffer";
 import AddDeliveryJob from "./components/AddDeliveryJob";
 import DeliveryJob from "./pages/DeliveryJob/DeliveryJob";
 import AssignDeliveryPartner from "./components/AssignDeliveryPartner";
+import AssignOrderToDeliveryJob from "./components/AssignOrderToDeliveryJob";
 
 const App = () => {
   return (
@@ -92,6 +93,7 @@ const App = () => {
                 <Route path="delivery-job" element={<DeliveryJob />} />
                 <Route path="delivery-job/add-delivery-job" element={<AddDeliveryJob />} />
                 <Route path="delivery-job/:id/assign-partner" element={<AssignDeliveryPartner />} />
+                <Route path="delivery-job/:id/add-orders" element={<AssignOrderToDeliveryJob />} />
                 <Route
                   path="deliveryPartners"
                   element={<DeliveryPartnerList />}
