@@ -86,11 +86,11 @@ const AssignOrderToDeliveryJob = () => {
     (state) => state.associateOrderToDeliveryJob,
   );
 
-  const getOrderListing = orderDataStore((state) => state.getOrderListing);
+  const getAssignableOrders = orderDataStore(
+    (state) => state.getAssignableOrders
+  );
 
   const orders = orderDataStore((state) => state.orders);
-
-  const meta = orderDataStore((state) => state.meta);
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -105,16 +105,12 @@ const AssignOrderToDeliveryJob = () => {
   const [associationFilter, setAssociationFilter] = useState("all");
   const hydratedOrders = Array.isArray(orders) ? orders : [];
 
+  // Fetch orders specifically for this delivery job using the new API
   useEffect(() => {
-    getOrderListing({
-      status,
-      search,
-      page,
-      pageSize,
-      fromDate,
-      toDate,
-    });
-  }, [getOrderListing, search, status, page, pageSize, toDate]);
+    if (deliveryJobId) {
+      getAssignableOrders({ deliJobId: deliveryJobId });
+    }
+  }, [getAssignableOrders, deliveryJobId]);
 
   useEffect(() => {
     if (!hydratedOrders.length) {
@@ -147,21 +143,55 @@ const AssignOrderToDeliveryJob = () => {
     });
   }, [hydratedOrders, deliveryJobId]);
 
-  const filteredOrders = useMemo(() => {
-    if (associationFilter === "associated") {
-      return hydratedOrders.filter((order) =>
-        isOrderAssociated(order, deliveryJobId),
+  // Client-side filtering logic to replace backend filters without changing the UI
+  const baseFilteredOrders = useMemo(() => {
+    let result = hydratedOrders;
+
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      result = result.filter(
+        (order) =>
+          order.orderId?.toLowerCase().includes(lowerSearch) ||
+          order.user?.customer_name?.toLowerCase().includes(lowerSearch)
       );
     }
 
-    if (associationFilter === "non-associated") {
-      return hydratedOrders.filter(
+    if (status) {
+      result = result.filter((order) => order.orderStatus === status);
+    }
+
+    if (fromDate) {
+      const from = new Date(fromDate);
+      from.setHours(0, 0, 0, 0);
+      result = result.filter((order) => new Date(order.createdAt) >= from);
+    }
+
+    if (toDate) {
+      const to = new Date(toDate);
+      to.setHours(23, 59, 59, 999);
+      result = result.filter((order) => new Date(order.createdAt) <= to);
+    }
+
+    if (associationFilter === "associated") {
+      result = result.filter((order) =>
+        isOrderAssociated(order, deliveryJobId),
+      );
+    } else if (associationFilter === "non-associated") {
+      result = result.filter(
         (order) => !isOrderAssociated(order, deliveryJobId),
       );
     }
 
-    return hydratedOrders;
-  }, [hydratedOrders, associationFilter, deliveryJobId]);
+    return result;
+  }, [hydratedOrders, search, status, fromDate, toDate, associationFilter, deliveryJobId]);
+
+  // Client-side pagination logic
+  const totalPages = Math.ceil(baseFilteredOrders.length / pageSize) || 1;
+  
+  const filteredOrders = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return baseFilteredOrders.slice(startIndex, startIndex + pageSize);
+  }, [baseFilteredOrders, page, pageSize]);
 
   const associatedCount = useMemo(
     () =>
@@ -258,57 +288,23 @@ const AssignOrderToDeliveryJob = () => {
     try {
       setIsAssociating(true);
 
-      if (ordersToAssociate.length > 0) {
-        await associateOrderToDeliveryJob({
-          deliveryJobId,
-          orderIds: ordersToAssociate,
-        });
-      }
-
-      if (ordersToRemove.length > 0) {
-        await associateOrderToDeliveryJob({
-          deliveryJobId,
-          orderIds: ordersToRemove,
-        });
-      }
-
-      setInitialAssociatedOrders((prev) => {
-        const next = new Set(prev);
-
-        ordersToAssociate.forEach((id) => {
-          next.add(id);
-        });
-
-        ordersToRemove.forEach((id) => {
-          next.delete(id);
-        });
-
-        return [...next];
+      // Send the absolute final list of checked order IDs 
+      // for the backend to run a complete replace operation
+      await associateOrderToDeliveryJob({
+        deliveryJobId,
+        orderIds: selectedOrders,
       });
 
-      setSelectedOrders((prev) => {
-        const next = new Set(prev);
+      // Update our baseline reference to match what we just saved
+      setInitialAssociatedOrders([...selectedOrders]);
+      
+      // No need to update setSelectedOrders here because it already 
+      // holds the correct state (the user's final selections)
 
-        ordersToAssociate.forEach((id) => {
-          next.add(id);
-        });
+      // Refetch the unified list to ensure UI is perfectly synced with the DB
+      await getAssignableOrders({ deliJobId: deliveryJobId });
 
-        ordersToRemove.forEach((id) => {
-          next.delete(id);
-        });
-
-        return [...next];
-      });
-
-      await getOrderListing({
-        status,
-        search,
-        page,
-        pageSize,
-        fromDate,
-        toDate,
-      });
-
+      // Keep the granular success messages for good UX
       if (ordersToAssociate.length > 0 && ordersToRemove.length > 0) {
         toast.success(
           `${ordersToAssociate.length} order${
@@ -332,7 +328,6 @@ const AssignOrderToDeliveryJob = () => {
       }
     } catch (error) {
       console.error("Failed to update delivery job orders:", error);
-
       toast.error("Failed to update delivery job orders");
     } finally {
       setIsAssociating(false);
@@ -356,8 +351,6 @@ const AssignOrderToDeliveryJob = () => {
     Boolean(fromDate) ||
     Boolean(toDate) ||
     associationFilter !== "all";
-
-  const totalPages = meta?.totalPages ?? 1;
 
   const hasNextPage = page < totalPages;
 
@@ -639,7 +632,7 @@ const AssignOrderToDeliveryJob = () => {
                     </h2>
 
                     <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
-                      {filteredOrders.length}
+                      {baseFilteredOrders.length}
                     </span>
                   </div>
 
@@ -844,26 +837,26 @@ const AssignOrderToDeliveryJob = () => {
                   const isSelected = selectedOrders.includes(orderId);
 
                   /*
-                   * Original backend state.
-                   */
+                  * Original backend state.
+                  */
                   const isOriginallyAssociated =
                     initialAssociatedSet.has(orderId);
 
                   /*
-                   * Current backend association.
-                   */
+                  * Current backend association.
+                  */
                   const isAssociated = isOrderAssociated(order, deliveryJobId);
 
                   /*
-                   * Existing associated order
-                   * that user unchecked.
-                   */
+                  * Existing associated order
+                  * that user unchecked.
+                  */
                   const isMarkedForRemoval =
                     isOriginallyAssociated && !isSelected;
 
                   /*
-                   * New order user selected.
-                   */
+                  * New order user selected.
+                  */
                   const isMarkedForAssociation =
                     !isOriginallyAssociated && isSelected;
 

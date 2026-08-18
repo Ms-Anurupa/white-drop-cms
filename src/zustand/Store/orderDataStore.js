@@ -74,7 +74,25 @@ const orderDataStore = create((set) => ({
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  getAssignableOrders: async ({deliJobId}) => {
+    try {
+      set({ loading: true });
+      const res = await api.get("/admin/getAssignableOrders", {
+        withAuth: true,
+        params: { deliJobId },
+      });
+
+      set({
+        orders: res.data?.orders,
+      });
+    } catch (error) {
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default orderDataStore;
