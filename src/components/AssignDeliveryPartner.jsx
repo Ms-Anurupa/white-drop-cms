@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import resolveUrl from "../utils/resolveUrl";
 import deliveryJobStore from "../zustand/Store/deliveryJobStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import deliveryPartnerAssignStore from "../zustand/Store/deliveryPartnerAssignStore";
 import { toast } from "react-toastify";
+import { getIconUrl } from "../utils/resolveProductUrl";
 
 const PARTNER_STATUS_STYLES = {
   AVAILABLE: {
@@ -105,7 +105,6 @@ const AssignDeliveryPartner = () => {
     (state) => state.getDeliveryPersons,
   );
   const deliveryPartners = deliveryPartnerStore((state) => state.partners);
-
   const [search, setSearch] = useState("");
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isAssigning, setIsAssigning] = useState(false);
@@ -133,6 +132,7 @@ const AssignDeliveryPartner = () => {
   }, [deliveryJobs]);
 
   const currentPartner = deliveryJob?.deliveryPartner || null;
+  const isAlreadyAssigned = Boolean(deliveryJob?.deliveryPartnerId);
 
   useEffect(() => {
     if (!currentPartner) return;
@@ -269,13 +269,15 @@ const AssignDeliveryPartner = () => {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-xl sm:text-2xl font-bold text-white">
-                      Assign Delivery Partner
+                      {isAlreadyAssigned
+                        ? "Reassign Delivery Partner"
+                        : "Assign Delivery Partner"}
                     </h1>
 
                     {deliveryJob.deliveryPartnerId ? (
                       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-200 bg-emerald-400/10 border border-emerald-300/20 px-2 py-1 rounded-full">
                         <CheckCircle2 size={12} />
-                        Assigned
+                        Currently Assigned
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-200 bg-amber-400/10 border border-amber-300/20 px-2 py-1 rounded-full">
@@ -286,7 +288,9 @@ const AssignDeliveryPartner = () => {
                   </div>
 
                   <p className="text-sm text-blue-100 mt-1">
-                    Select a delivery partner for this delivery job
+                    {isAlreadyAssigned
+                      ? "Change the delivery partner assigned to this delivery job"
+                      : "Select a delivery partner for this delivery job"}
                   </p>
                 </div>
               </div>
@@ -365,10 +369,7 @@ const AssignDeliveryPartner = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                 {deliveryJob.slot?.icon ? (
                   <img
-                    src={resolveUrl({
-                      folderName: "public",
-                      fileName: deliveryJob.slot.icon,
-                    })}
+                    src={getIconUrl(deliveryJob.slot.icon)}
                     alt={deliveryJob.slot.name}
                     className="w-6 h-6 object-contain"
                   />
@@ -573,13 +574,20 @@ const AssignDeliveryPartner = () => {
                               </span>
                             )}
 
-                            {getVehicleNumber(partner) && (
-                              <span className="text-xs text-slate-400 flex items-center gap-1">
-                                <Truck size={12} />
+                            <div className="flex flex-col gap-1 mt-1">
+                              {getVehicleNumber(partner) && (
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                  <Truck size={12} className="shrink-0" />
+                                  {getVehicleNumber(partner)}
+                                </span>
+                              )}
 
-                                {getVehicleNumber(partner)}
-                              </span>
-                            )}
+                              {partner.areaCovered && (
+                                <span className="text-xs text-slate-400 truncate">
+                                  {partner.areaCovered}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -614,11 +622,13 @@ const AssignDeliveryPartner = () => {
             <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100">
                 <h2 className="text-base font-semibold text-slate-900">
-                  Assignment
+                  {isAlreadyAssigned ? "Reassignment" : "Assignment"}
                 </h2>
 
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Review the selected delivery partner
+                  {isAlreadyAssigned
+                    ? "Review and change the delivery partner"
+                    : "Review the selected delivery partner"}
                 </p>
               </div>
 
@@ -632,10 +642,21 @@ const AssignDeliveryPartner = () => {
                         {getInitials(selectedPartner)}
                       </div>
 
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 truncate">
-                          {getPartnerName(selectedPartner)}
-                        </p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-semibold text-slate-900 truncate">
+                            {getPartnerName(selectedPartner)}
+                          </p>
+
+                          {isAlreadyAssigned &&
+                            getPartnerId(selectedPartner) ===
+                              deliveryJob.deliveryPartnerId && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-semibold text-emerald-700">
+                                <CheckCircle2 size={11} />
+                                Current
+                              </span>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-1.5 mt-1">
                           <span
@@ -689,7 +710,7 @@ const AssignDeliveryPartner = () => {
                       </span>
 
                       <span className="text-xs font-semibold text-slate-700 text-right">
-                        {deliveryJob.area || "—"}
+                        {selectedPartner.areaCovered || "—"}
                       </span>
                     </div>
 
@@ -720,8 +741,9 @@ const AssignDeliveryPartner = () => {
                       />
 
                       <p className="text-xs leading-5 text-slate-500">
-                        Assigning this partner will make them responsible for
-                        the orders included in this delivery job.
+                        {isAlreadyAssigned
+                          ? "Reassigning this delivery job will replace the currently assigned partner with the selected partner."
+                          : "Assigning this partner will make them responsible for the orders included in this delivery job."}
                       </p>
                     </div>
                   </div>
@@ -758,12 +780,14 @@ const AssignDeliveryPartner = () => {
                     {isAssigning ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                        Assigning...
+                        {isAlreadyAssigned ? "Reassigning..." : "Assigning..."}
                       </>
                     ) : (
                       <>
                         <Check size={17} strokeWidth={2.5} />
-                        Assign Delivery Partner
+                        {isAlreadyAssigned
+                          ? "Reassign Delivery Partner"
+                          : "Assign Delivery Partner"}
                       </>
                     )}
                   </button>

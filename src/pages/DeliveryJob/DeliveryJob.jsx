@@ -11,7 +11,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import deliveryJobStore from "../../zustand/Store/deliveryJobStore";
-import resolveUrl from "../../utils/resolveUrl";
+import { getIconUrl } from "../../utils/resolveProductUrl";
 
 const STATUS_FILTERS = [
   "ALL",
@@ -207,7 +207,7 @@ const DeliveryJob = () => {
               "
             >
               <Truck size={18} />
-              Add Delivery Job
+              Create New Delivery Job
             </button>
           </div>
         </div>
@@ -400,10 +400,7 @@ const DeliveryJob = () => {
                             <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                               {job.slot?.icon ? (
                                 <img
-                                  src={resolveUrl({
-                                    folderName: "public",
-                                    fileName: job.slot.icon,
-                                  })}
+                                  src={getIconUrl(job.slot.icon)}
                                   alt={job.slot.name}
                                   className="w-6 h-6 object-contain"
                                 />
