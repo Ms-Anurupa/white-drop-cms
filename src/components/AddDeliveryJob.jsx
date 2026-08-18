@@ -13,7 +13,7 @@ import {
   Truck,
 } from "lucide-react";
 import deliveryJobStore from "../zustand/Store/deliveryJobStore";
-import resolveUrl from "../utils/resolveUrl";
+import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const AddDeliveryJob = () => {
   const navigate = useNavigate();
@@ -331,103 +331,97 @@ const AddDeliveryJob = () => {
                     </label>
 
                     <div className="relative">
-                      <Clock3
-                        size={16}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsSlotOpen((prev) => !prev)}
+                        className={`w-full h-11 rounded-lg border px-3 text-sm bg-white text-slate-800 flex items-center justify-between outline-none transition-all ${
+                          errors.deliverySlot
+                            ? "border-red-300"
+                            : "border-slate-200 hover:border-slate-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          {selectedSlot ? (
+                            <>
+                              <img
+                                src={resolveFirebaseUrl({
+                                  folderName: "public",
+                                  fileName: selectedSlot.icon,
+                                })}
+                                alt={selectedSlot.name}
+                                className="w-6 h-6 object-contain shrink-0"
+                              />
 
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setIsSlotOpen((prev) => !prev)}
-                          className={`w-full h-11 rounded-lg border px-3 text-sm bg-white text-slate-800 flex items-center justify-between outline-none transition-all ${
-                            errors.deliverySlot
-                              ? "border-red-300"
-                              : "border-slate-200 hover:border-slate-300"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Clock3
-                              size={16}
-                              className="text-slate-400 shrink-0"
-                            />
-
-                            {selectedSlot ? (
-                              <>
-                                <img
-                                  src={resolveUrl({
-                                    folderName: "public",
-                                    fileName: selectedSlot.icon,
-                                  })}
-                                  alt={selectedSlot.name}
-                                  className="w-6 h-6 object-contain shrink-0"
-                                />
-
-                                <span className="truncate">
-                                  {selectedSlot.name} — {selectedSlot.from} to{" "}
-                                  {selectedSlot.to}
-                                </span>
-                              </>
-                            ) : (
+                              <span className="truncate">
+                                {selectedSlot.name} — {selectedSlot.from} to{" "}
+                                {selectedSlot.to}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <Clock3
+                                size={16}
+                                className="text-slate-400 shrink-0"
+                              />
                               <span className="text-slate-400">
                                 Select delivery slot
                               </span>
-                            )}
-                          </div>
+                            </>
+                          )}
+                        </div>
 
-                          <ChevronDown
-                            size={16}
-                            className={`text-slate-400 shrink-0 transition-transform ${
-                              isSlotOpen ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
+                        <ChevronDown
+                          size={16}
+                          className={`text-slate-400 shrink-0 transition-transform ${
+                            isSlotOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
 
-                        {isSlotOpen && (
-                          <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
-                            {deliverySlots.map((slot) => (
-                              <button
-                                key={slot.id}
-                                type="button"
-                                onClick={() => {
-                                  updateField("deliverySlot", slot.id);
-                                  setIsSlotOpen(false);
-                                }}
-                                className={`w-full px-3 py-2.5 flex items-center gap-3 text-left hover:bg-slate-50 transition-colors ${
-                                  deliveryJobData.deliverySlot === slot.id
-                                    ? "bg-blue-50"
-                                    : ""
-                                }`}
-                              >
-                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                                  <img
-                                    src={resolveUrl({
-                                      folderName: "public",
-                                      fileName: slot.icon,
-                                    })}
-                                    alt={slot.name}
-                                    className="w-6 h-6 object-contain"
-                                  />
-                                </div>
+                      {isSlotOpen && (
+                        <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+                          {deliverySlots.map((slot) => (
+                            <button
+                              key={slot.id}
+                              type="button"
+                              onClick={() => {
+                                updateField("deliverySlot", slot.id);
+                                setIsSlotOpen(false);
+                              }}
+                              className={`w-full px-3 py-2.5 flex items-center gap-3 text-left hover:bg-slate-50 transition-colors ${
+                                deliveryJobData.deliverySlot === slot.id
+                                  ? "bg-blue-50"
+                                  : ""
+                              }`}
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                                <img
+                                  src={resolveFirebaseUrl({
+                                    folderName: "public",
+                                    fileName: slot.icon,
+                                  })}
+                                  alt={slot.name}
+                                  className="w-6 h-6 object-contain"
+                                />
+                              </div>
 
-                                <div className="min-w-0">
-                                  <p className="text-sm font-medium text-slate-800">
-                                    {slot.name}
-                                  </p>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-slate-800">
+                                  {slot.name}
+                                </p>
 
-                                  <p className="text-xs text-slate-400 mt-0.5">
-                                    {slot.from} — {slot.to}
-                                  </p>
-                                </div>
+                                <p className="text-xs text-slate-400 mt-0.5">
+                                  {slot.from} — {slot.to}
+                                </p>
+                              </div>
 
-                                {deliveryJobData.deliverySlot === slot.id && (
-                                  <div className="ml-auto w-2 h-2 rounded-full bg-blue-600 shrink-0" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                              {deliveryJobData.deliverySlot === slot.id && (
+                                <div className="ml-auto w-2 h-2 rounded-full bg-blue-600 shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {errors.deliverySlot && (
