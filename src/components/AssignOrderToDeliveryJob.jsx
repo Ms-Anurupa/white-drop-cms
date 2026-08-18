@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 import {
   ArrowLeft,
@@ -113,7 +114,7 @@ const AssignOrderToDeliveryJob = () => {
       fromDate,
       toDate,
     });
-  }, [getOrderListing, search, status, page, pageSize, fromDate, toDate]);
+  }, [getOrderListing, search, status, page, pageSize, toDate]);
 
   useEffect(() => {
     if (!hydratedOrders.length) {
