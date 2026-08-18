@@ -29,9 +29,10 @@ const deliveryJobStore = create((set) => ({
     }
   },
 
-  getDeliveryJobs: async () => {
+  getDeliveryJobs: async (id) => {
     try {
       const res = await api.get("/admin/getDeliveryJobs", {
+        params: { id },
         withAuth: true,
       });
 

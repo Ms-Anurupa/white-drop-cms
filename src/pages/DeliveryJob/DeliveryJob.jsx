@@ -469,8 +469,8 @@ const DeliveryJob = () => {
 
                               <p className="text-sm font-medium text-slate-800 truncate mt-0.5">
                                 {job.deliveryPartner
-                                  ? `${job.deliveryPartner.first_name || ""} ${
-                                      job.deliveryPartner.last_name || ""
+                                  ? `${job.deliveryPartner.firstName || ""} ${
+                                      job.deliveryPartner.lastName || ""
                                     }`.trim() || "Assigned"
                                   : "Not Assigned"}
                               </p>
@@ -480,7 +480,7 @@ const DeliveryJob = () => {
                           <button
                             type="button"
                             onClick={() =>
-                              navigate(`/dashboard/delivery-job/${job.id}`)
+                              navigate(`/dashboard/delivery-job/${job.id}/assign-partner`)
                             }
                             className="
                               w-full

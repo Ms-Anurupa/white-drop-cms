@@ -39,6 +39,7 @@ import OfferType from "./components/OfferType";
 import EditOffer from "./components/EditOffer";
 import AddDeliveryJob from "./components/AddDeliveryJob";
 import DeliveryJob from "./pages/DeliveryJob/DeliveryJob";
+import AssignDeliveryPartner from "./components/AssignDeliveryPartner";
 
 const App = () => {
   return (
@@ -90,6 +91,7 @@ const App = () => {
                 <Route path="delivery-tracking" element={<Deliveries />} />
                 <Route path="delivery-job" element={<DeliveryJob />} />
                 <Route path="delivery-job/add-delivery-job" element={<AddDeliveryJob />} />
+                <Route path="delivery-job/:id/assign-partner" element={<AssignDeliveryPartner />} />
                 <Route
                   path="deliveryPartners"
                   element={<DeliveryPartnerList />}
