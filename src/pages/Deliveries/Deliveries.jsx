@@ -255,7 +255,7 @@ const StatCard = ({ label, value, Icon, iconClass, bgClass }) => (
   </div>
 );
 
-/* ── Deliveries (main) ───────────────────────────────────────────────────── */
+/* ── Deliveries ───────────────────────────────────────────────────── */
 const Deliveries = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);

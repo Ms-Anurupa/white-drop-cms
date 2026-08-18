@@ -29,7 +29,8 @@ const menu = [
   { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
   { name: "Production", path: "production", icon: Factory },
   { name: "Inventory", path: "inventory", icon: Boxes },
-  { name: "Deliveries", path: "deliveries", icon: Truck },
+  { name: "Delivery Job", path: "delivery-job", icon: Truck },
+  { name: "Delivery Tracking", path: "delivery-tracking", icon: Truck },
   {
     name: "Delivery Partner List",
     path: "deliveryPartners",
@@ -134,7 +135,7 @@ const Sidebar = ({ onLogOut }) => {
             Delivery Executive Details
           </p>
         )}
-        {menu.slice(8, 10).map((item) => (
+        {menu.slice(8, 11).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 
@@ -143,7 +144,7 @@ const Sidebar = ({ onLogOut }) => {
             Offers
           </p>
         )}
-        {menu.slice(10, 12).map((item) => (
+        {menu.slice(11, 12).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 

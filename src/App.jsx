@@ -37,6 +37,8 @@ import OfferList from "./pages/Offer/OfferList";
 import CreateOffer from "./components/CreateOffer";
 import OfferType from "./components/OfferType";
 import EditOffer from "./components/EditOffer";
+import AddDeliveryJob from "./components/AddDeliveryJob";
+import DeliveryJob from "./pages/DeliveryJob/DeliveryJob";
 
 const App = () => {
   return (
@@ -85,7 +87,9 @@ const App = () => {
                 />
                 <Route path="production" element={<Production />} />
                 <Route path="inventory" element={<Inventory />} />
-                <Route path="deliveries" element={<Deliveries />} />
+                <Route path="delivery-tracking" element={<Deliveries />} />
+                <Route path="delivery-job" element={<DeliveryJob />} />
+                <Route path="delivery-job/add-delivery-job" element={<AddDeliveryJob />} />
                 <Route
                   path="deliveryPartners"
                   element={<DeliveryPartnerList />}
