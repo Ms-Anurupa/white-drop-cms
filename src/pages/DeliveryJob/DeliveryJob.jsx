@@ -11,7 +11,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import deliveryJobStore from "../../zustand/Store/deliveryJobStore";
-import { getIconUrl } from "../../utils/resolveProductUrl";
+import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
 const STATUS_FILTERS = [
   "ALL",
@@ -393,7 +393,10 @@ const DeliveryJob = () => {
                             <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                               {job.slot?.icon ? (
                                 <img
-                                  src={getIconUrl(job.slot.icon)}
+                                  src={resolveFirebaseUrl({
+                                  folderName: "public",
+                                  fileName: job.slot.icon,
+                                })}
                                   alt={job.slot.name}
                                   className="w-6 h-6 object-contain"
                                 />

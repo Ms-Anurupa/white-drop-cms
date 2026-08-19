@@ -20,7 +20,7 @@ import deliveryJobStore from "../zustand/Store/deliveryJobStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import deliveryPartnerAssignStore from "../zustand/Store/deliveryPartnerAssignStore";
 import { toast } from "react-toastify";
-import { getIconUrl } from "../utils/resolveProductUrl";
+import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const PARTNER_STATUS_STYLES = {
   AVAILABLE: {
@@ -369,7 +369,10 @@ const AssignDeliveryPartner = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                 {deliveryJob.slot?.icon ? (
                   <img
-                    src={getIconUrl(deliveryJob.slot.icon)}
+                    src={resolveFirebaseUrl({
+                      folderName: "public",
+                      fileName: deliveryJob.slot.icon,
+                    })}
                     alt={deliveryJob.slot.name}
                     className="w-6 h-6 object-contain"
                   />
