@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import deliveryJobStore from "../../zustand/Store/deliveryJobStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
+import Loader from "../../components/Loader";
 
 const STATUS_FILTERS = [
   "ALL",
@@ -79,9 +80,20 @@ const DeliveryJob = () => {
   const deliveryJobs = deliveryJobStore((state) => state.deliveryJobs);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDeliveryJobs();
+    const load = async () => {
+      try {
+        setLoading(true);
+        await getDeliveryJobs();
+      } catch (error) {
+        console.error("Failed to load delivery jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [getDeliveryJobs]);
 
   const filteredJobs = useMemo(() => {
@@ -131,6 +143,10 @@ const DeliveryJob = () => {
       chip: "bg-emerald-50",
     },
   ];
+
+  if (loading) {
+    return <Loader text="Loading Delivery Jobs..." />;
+  }
 
   return (
     <div className="w-full min-h-full bg-slate-50 p-4 sm:p-4 lg:p-4">
@@ -394,9 +410,9 @@ const DeliveryJob = () => {
                               {job.slot?.icon ? (
                                 <img
                                   src={resolveFirebaseUrl({
-                                  folderName: "public",
-                                  fileName: job.slot.icon,
-                                })}
+                                    folderName: "public",
+                                    fileName: job.slot.icon,
+                                  })}
                                   alt={job.slot.name}
                                   className="w-6 h-6 object-contain"
                                 />
