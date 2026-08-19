@@ -17,10 +17,10 @@ import {
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
-import { getProductUrl } from "../../utils/resolveProductUrl";
 import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
+import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -410,9 +410,11 @@ const Order = () => {
                     </div>
                   </div>
                   <img
-                    src={getProductUrl(
-                      o?.orderItems?.[0]?.product?.product_images?.[0],
-                    )}
+                    src={resolveFirebaseUrl({
+                      folderName: "productImages",
+                      fileName:
+                        o?.orderItems?.[0]?.product?.product_images?.[0],
+                    })}
                     alt="Product"
                     className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
                   />
@@ -503,9 +505,10 @@ const Order = () => {
 
                     <td className="px-4 py-3.5">
                       <img
-                        src={getProductUrl(
-                          o?.orderItems?.[0]?.product?.product_images?.[0],
-                        )}
+                        src={resolveFirebaseUrl({
+                          folderName: "productImages",
+                          fileName: o?.orderItems?.[0]?.product?.product_images?.[0],
+                        })}
                         alt="Product"
                         className="w-11 h-11 rounded-lg object-cover border border-gray-100"
                       />

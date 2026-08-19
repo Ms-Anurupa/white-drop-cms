@@ -19,10 +19,10 @@ import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import orderDataStore from "../zustand/Store/orderDataStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
-import { getProductUrl } from "../utils/resolveProductUrl";
 import { useConfirm } from "./ConfirmProvider";
 import Loader from "./Loader";
 import { createPortal } from "react-dom";
+import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const STATUS_TOKENS = {
   DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
@@ -458,7 +458,7 @@ const OrderViewDetails = () => {
                     }
                   >
                     <img
-                      src={getProductUrl(item.product?.product_images?.[0])}
+                      src={resolveFirebaseUrl({folderName:"productImages", fileName: item.product?.product_images?.[0]})}
                       alt={item.product?.product_name}
                       className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
                       style={{ border: "1px solid #E4E1D6" }}
