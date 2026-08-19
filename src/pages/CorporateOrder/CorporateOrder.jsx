@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -130,7 +131,6 @@ const CorporateOrder = () => {
   const getCorporateInvoice = corporateDataStore(
     (state) => state.getCorporateInvoice,
   );
-  const loading = corporateDataStore((state) => state.loading);
 
   // ── search + filters (all sent to the server as search params) ──
   const [search, setSearch] = useState("");
@@ -145,7 +145,7 @@ const CorporateOrder = () => {
   const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
   const [popoverPos, setPopoverPos] = useState(null);
   const popoverRef = useRef(null);
-
+  const [loading, setLoading] = useState(true);
   const orders = corporateOrderLists || [];
 
   const showCompanyPopover = (e, order) => {
@@ -200,47 +200,62 @@ const CorporateOrder = () => {
 
   // debounced fetch whenever search / filters / pageSize change — resets to page 1
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if ((fromDate && !toDate) || (!fromDate && toDate)) return;
+    if ((fromDate && !toDate) || (!fromDate && toDate)) return;
 
-      setPage(1);
+    setLoading(true);
 
-      getCorporateOrders({
-        search,
-        deliStatus: deliveryStatus,
-        payStatus: paymentStatus,
-        fromDate,
-        toDate,
-        page: 1,
-        limit: pageSize,
-      });
+    const timer = setTimeout(async () => {
+      try {
+        setPage(1);
+
+        await getCorporateOrders({
+          search,
+          deliStatus: deliveryStatus,
+          payStatus: paymentStatus,
+          fromDate,
+          toDate,
+          page: 1,
+          limit: pageSize,
+        });
+      } catch (error) {
+        console.error("Failed to load corporate orders:", error);
+        toast.error("Failed to load corporate orders");
+      } finally {
+        setLoading(false);
+      }
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [
-    getCorporateOrders,
-    search,
-    deliveryStatus,
-    paymentStatus,
-    fromDate,
-    toDate,
-    pageSize,
-  ]);
+  }, [search, deliveryStatus, paymentStatus, fromDate, toDate, pageSize]);
 
   // plain page-change fetch (no debounce, no reset)
   useEffect(() => {
+    if (page === 1) return;
+
     if ((fromDate && !toDate) || (!fromDate && toDate)) return;
 
-    getCorporateOrders({
-      search,
-      deliStatus: deliveryStatus,
-      payStatus: paymentStatus,
-      fromDate,
-      toDate,
-      page,
-      limit: pageSize,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadPage = async () => {
+      try {
+        setLoading(true);
+
+        await getCorporateOrders({
+          search,
+          deliStatus: deliveryStatus,
+          payStatus: paymentStatus,
+          fromDate,
+          toDate,
+          page,
+          limit: pageSize,
+        });
+      } catch (error) {
+        console.error("Failed to load corporate orders:", error);
+        toast.error("Failed to load corporate orders");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPage();
   }, [page]);
 
   const handleFromDateChange = (value) => setFromDate(value);
@@ -303,17 +318,26 @@ const CorporateOrder = () => {
   };
 
   const handleRefresh = async () => {
-    await getCorporateOrders({
-      search,
-      deliStatus: deliveryStatus,
-      payStatus: paymentStatus,
-      fromDate,
-      toDate,
-      page,
-      limit: pageSize,
-    });
+    try {
+      setLoading(true);
 
-    toast.success("Orders refreshed");
+      await getCorporateOrders({
+        search,
+        deliStatus: deliveryStatus,
+        payStatus: paymentStatus,
+        fromDate,
+        toDate,
+        page,
+        limit: pageSize,
+      });
+
+      toast.success("Orders refreshed");
+    } catch (error) {
+      console.error("Failed to refresh orders:", error);
+      toast.error("Failed to refresh orders");
+    } finally {
+      setLoading(false);
+    }
   };
 
   //download invoice
