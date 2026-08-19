@@ -16,7 +16,7 @@ import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { SplitButton, SplitButtonItem } from "../../components/SplitButton"; 
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
 const ACCOUNT_STATUS_VARIANT = {
   APPROVED: "success",
@@ -81,10 +81,11 @@ const CorporateAccounts = () => {
   const updateCorporateStatus = corporateDataStore(
     (state) => state.updateCorporateStatus,
   );
-  const loading = corporateDataStore((state) => state.loading);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [localAccounts, setLocalAccounts] = useState([]);
@@ -142,29 +143,57 @@ const CorporateAccounts = () => {
   }, [hoveredAccount]);
 
   // debounced fetch on search / status / pageSize change — resets to page 1
+  // Initial load + search/status/pageSize changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPage(1);
-      getCorporateAccounts({
-        search,
-        status,
-        page: 1,
-        limit: pageSize,
-      });
+    const timer = setTimeout(async () => {
+      try {
+        setLoading(true);
+
+        setPage(1);
+
+        await getCorporateAccounts({
+          search,
+          status,
+          page: 1,
+          limit: pageSize,
+        });
+      } catch (error) {
+        console.error("Failed to load corporate accounts:", error);
+        toast.error("Failed to load corporate accounts");
+      } finally {
+        setLoading(false);
+        setHasLoadedOnce(true);
+      }
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [getCorporateAccounts, search, status, pageSize]);
+  }, [search, status, pageSize, getCorporateAccounts]);
 
-  // plain page-change fetch
+  // Page change
   useEffect(() => {
-    getCorporateAccounts({
-      search,
-      status,
-      page,
-      limit: pageSize,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Page 1 is already handled by the effect above
+    if (page === 1) return;
+
+    const loadPage = async () => {
+      try {
+        setLoading(true);
+
+        await getCorporateAccounts({
+          search,
+          status,
+          page,
+          limit: pageSize,
+        });
+      } catch (error) {
+        console.error("Failed to load corporate accounts:", error);
+        toast.error("Failed to load corporate accounts");
+      } finally {
+        setLoading(false);
+        setHasLoadedOnce(true);
+      }
+    };
+
+    loadPage();
   }, [page]);
 
   const handleStatusChange = async (account, status) => {
@@ -209,7 +238,9 @@ const CorporateAccounts = () => {
     setPage(1);
   };
 
-  if (loading) return <Loader text="Loading corporate accounts..." />;
+  if (loading && !hasLoadedOnce) {
+    return <Loader text="Loading corporate accounts..." />;
+  }
 
   return (
     <div className="py-6 sm:px-2 lg:p-6 space-y-2 bg-gray-50">
@@ -516,7 +547,6 @@ const EmptyState = () => (
     </p>
   </div>
 );
-
 
 const AccountStatusSelect = ({
   account,
