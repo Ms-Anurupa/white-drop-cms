@@ -98,8 +98,8 @@ const DeliveryJob = () => {
   }, [deliveryJobs, statusFilter, query]);
 
   const totalJobs = deliveryJobs?.length || 0;
-  const createdCount =
-    deliveryJobs?.filter((job) => job.status === "CREATED").length || 0;
+  // const createdCount =
+  //   deliveryJobs?.filter((job) => job.status === "CREATED").length || 0;
   const assignedCount =
     deliveryJobs?.filter((job) => job.deliveryPartner).length || 0;
   const totalOrders =
@@ -117,21 +117,14 @@ const DeliveryJob = () => {
       chip: "bg-slate-100",
     },
     {
-      label: "Created",
-      value: createdCount,
-      icon: Clock3,
-      tint: "text-blue-600",
-      chip: "bg-blue-50",
-    },
-    {
-      label: "Assigned",
+      label: "Total Assigned Delivery Partner",
       value: assignedCount,
       icon: UserRound,
       tint: "text-violet-600",
       chip: "bg-violet-50",
     },
     {
-      label: "Total Orders",
+      label: "Total Assigned Orders",
       value: totalOrders,
       icon: Package,
       tint: "text-emerald-600",
@@ -213,7 +206,7 @@ const DeliveryJob = () => {
         </div>
 
         {/* ================= SUMMARY ================= */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-2">
           {stats.map(({ label, value, icon: Icon, tint, chip }) => (
             <div
               key={label}
@@ -426,7 +419,6 @@ const DeliveryJob = () => {
                             </div>
                           </div>
 
-                          {/* Orders */}
                           {/* Orders */}
                           <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 transition-colors">
                             <div className="w-9 h-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
