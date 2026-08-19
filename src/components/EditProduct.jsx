@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
-import { getProductUrl } from "../utils/resolveProductUrl";
+import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -252,7 +252,10 @@ const EditProduct = () => {
                         <img
                           src={
                             typeof img === "string"
-                              ? getProductUrl(img)
+                              ? resolveFirebaseUrl({
+                                folderName: "productImages",
+                                fileName: img
+                              })
                               : URL.createObjectURL(img)
                           }
                           className="w-full h-full object-cover"

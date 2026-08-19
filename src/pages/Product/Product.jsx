@@ -16,12 +16,12 @@ import {
 import productDataStore from "../../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
-import { getProductUrl } from "../../utils/resolveProductUrl";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton"; // adjust path
 import Loader from "../../components/Loader";
+import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
 const PRODUCT_STATUSES = ["ACTIVE", "INACTIVE", "COMING_SOON"];
 
@@ -265,7 +265,10 @@ const Product = () => {
                     </div>
                   </div>
                   <img
-                    src={getProductUrl(item?.product_images?.[0])}
+                    src={resolveFirebaseUrl({
+                      folderName: "productImages",
+                      fileName: item?.product_images?.[0],
+                    })}
                     alt={item.product_name}
                     className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
                   />
@@ -349,7 +352,10 @@ const Product = () => {
 
                     <td className="px-4 py-3.5">
                       <img
-                        src={getProductUrl(item?.product_images?.[0])}
+                        src={resolveFirebaseUrl({
+                          folderName: "productImages",
+                          fileName: item?.product_images?.[0],
+                        })}
                         alt={item.product_name}
                         className="w-11 h-11 rounded-lg object-cover border border-gray-100"
                       />

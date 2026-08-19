@@ -17,10 +17,10 @@ import {
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
 import { useNavigate } from "react-router-dom";
-import { getProductUrl } from "../../utils/resolveProductUrl";
 import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
+import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -394,9 +394,11 @@ const Order = () => {
                     </div>
                   </div>
                   <img
-                    src={getProductUrl(
-                      o?.orderItems?.[0]?.product?.product_images?.[0],
-                    )}
+                    src={resolveFirebaseUrl({
+                      folderName: "productImages",
+                      fileName:
+                        o?.orderItems?.[0]?.product?.product_images?.[0],
+                    })}
                     alt="Product"
                     className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
                   />
@@ -487,9 +489,10 @@ const Order = () => {
 
                     <td className="px-4 py-3.5">
                       <img
-                        src={getProductUrl(
-                          o?.orderItems?.[0]?.product?.product_images?.[0],
-                        )}
+                        src={resolveFirebaseUrl({
+                          folderName: "productImages",
+                          fileName: o?.orderItems?.[0]?.product?.product_images?.[0],
+                        })}
                         alt="Product"
                         className="w-11 h-11 rounded-lg object-cover border border-gray-100"
                       />
@@ -558,9 +561,9 @@ const Order = () => {
               {filteredOrders.length === 0
                 ? "No results"
                 : `Showing ${start + 1}–${Math.min(
-                  start + pageSize,
-                  filteredOrders.length,
-                )} of ${filteredOrders.length}`}
+                    start + pageSize,
+                    filteredOrders.length,
+                  )} of ${filteredOrders.length}`}
             </span>
 
             <label className="flex items-center gap-1.5">
@@ -606,10 +609,11 @@ const Order = () => {
                     key={p}
                     onClick={() => setPage(p)}
                     aria-current={p === currentPage ? "page" : undefined}
-                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${p === currentPage
+                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
+                      p === currentPage
                         ? "bg-blue-600 text-white"
                         : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                    }`}
                   >
                     {p}
                   </button>
