@@ -32,6 +32,7 @@ const STATUS_STYLES = {
   CANCELLED: "bg-rose-50 text-rose-700 border-rose-100",
   FAILED: "bg-red-50 text-red-700 border-red-100",
 };
+const MAX_ORDERS = 20;
 
 const getStatusStyle = (status) =>
   STATUS_STYLES[status] || "bg-slate-50 text-slate-600 border-slate-200";
@@ -239,8 +240,15 @@ const AssignOrderToDeliveryJob = () => {
     if (!orderId) return;
 
     setSelectedOrders((prev) => {
+      // Allow deselection
       if (prev.includes(orderId)) {
         return prev.filter((id) => id !== orderId);
+      }
+
+      // Prevent selecting more than 20 orders
+      if (prev.length >= MAX_ORDERS) {
+        toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
+        return prev;
       }
 
       return [...prev, orderId];
@@ -266,6 +274,26 @@ const AssignOrderToDeliveryJob = () => {
         prev.filter((id) => !visibleSelectableOrderIds.includes(id)),
       );
 
+      return;
+    }
+
+    // Select All is only allowed when visible orders are <= 20
+    if (visibleSelectableOrderIds.length > MAX_ORDERS) {
+      toast.warning(
+        `Select All is available only when there are ${MAX_ORDERS} or fewer orders.`,
+      );
+      return;
+    }
+
+    const availableSlots = MAX_ORDERS - selectedOrders.length;
+
+    if (availableSlots <= 0) {
+      toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
+      return;
+    }
+
+    if (visibleSelectableOrderIds.length > availableSlots) {
+      toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
       return;
     }
 
@@ -425,9 +453,10 @@ const AssignOrderToDeliveryJob = () => {
                         <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
                         <span className="inline-flex items-center gap-1.5">
                           <UserRound size={14} className="text-blue-200" />
-                          {job.deliveryPartner.firstName} {job.deliveryPartner.lastName}
+                          {job.deliveryPartner.firstName}{" "}
+                          {job.deliveryPartner.lastName}
                         </span>
-                        
+
                         {job.deliveryPartner.phoneNo && (
                           <>
                             <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
@@ -672,22 +701,28 @@ const AssignOrderToDeliveryJob = () => {
                   </p>
                 </div>
 
-                {filteredOrders.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={toggleSelectAll}
-                    disabled={!visibleSelectableOrderIds.length}
-                    className="
-                      inline-flex items-center gap-2
-                      text-xs font-semibold
-                      text-blue-600 hover:text-blue-700
-                      disabled:text-slate-400
-                      disabled:cursor-not-allowed
-                      cursor-pointer
-                    "
-                  >
-                    <span
+                {filteredOrders.length > 0 &&
+                  visibleSelectableOrderIds.length <= MAX_ORDERS && (
+                    <button
+                      type="button"
+                      onClick={toggleSelectAll}
                       className={`
+                      inline-flex items-center gap-2
+                      px-3 py-2
+                      rounded-lg
+                      border
+                      text-xs font-semibold
+                      cursor-pointer
+                      transition-all
+                      ${
+                        allVisibleSelected
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                      }
+                    `}
+                    >
+                      <span
+                        className={`
                         w-4 h-4 rounded border flex items-center justify-center
                         ${
                           allVisibleSelected
@@ -695,15 +730,15 @@ const AssignOrderToDeliveryJob = () => {
                             : "border-slate-300 bg-white"
                         }
                       `}
-                    >
-                      {allVisibleSelected && (
-                        <Check size={11} strokeWidth={3} />
-                      )}
-                    </span>
+                      >
+                        {allVisibleSelected && (
+                          <Check size={11} strokeWidth={3} />
+                        )}
+                      </span>
 
-                    {allVisibleSelected ? "Deselect All" : "Select All"}
-                  </button>
-                )}
+                      {allVisibleSelected ? "Deselect All" : "Select All"}
+                    </button>
+                  )}
               </div>
 
               {/* Association Filter */}
