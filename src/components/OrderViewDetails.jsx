@@ -1,19 +1,16 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Package,
   MapPin,
   Truck,
   Check,
-  Loader2,
   Clock,
   Search,
   Receipt,
-  Phone,
   Navigation,
   CircleDot,
-  Home,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,7 +18,6 @@ import orderDataStore from "../zustand/Store/orderDataStore";
 import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import { useConfirm } from "./ConfirmProvider";
 import Loader from "./Loader";
-import { createPortal } from "react-dom";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const STATUS_TOKENS = {
@@ -52,71 +48,6 @@ const StatusPill = ({ status }) => {
 };
 
 const STAGES = ["PROCESSING", "SHIPPED", "DELIVERED"];
-
-// truncated area-covered line for the assigned delivery partner address card
-const AreaCoveredHover = ({ text }) => {
-  const [isTruncated, setIsTruncated] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
-  const textRef = useRef(null);
-
-  useEffect(() => {
-    if (textRef.current) {
-      setIsTruncated(textRef.current.scrollWidth > textRef.current.clientWidth);
-    }
-  }, [text]);
-
-  if (!text) {
-    return (
-      <p className="text-xs italic mt-0.5" style={{ color: "#B4B2A9" }}>
-        Area not assigned
-      </p>
-    );
-  }
-
-  const handleMouseEnter = () => {
-    if (!isTruncated || !textRef.current) return;
-    const rect = textRef.current.getBoundingClientRect();
-    const tooltipWidth = 256; // fixed tooltip width
-    const left = Math.min(rect.left, window.innerWidth - tooltipWidth - 16);
-    setTooltipPos({ top: rect.bottom + 8, left: Math.max(left, 8) });
-    setShowTooltip(true);
-  };
-
-  return (
-    <>
-      <p
-        className="flex items-center gap-1 mt-0.5 text-xs"
-        style={{ color: "#8A8778" }}
-      >
-        <Home size={11} className="shrink-0" />
-        <span
-          ref={textRef}
-          className="truncate"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          {text}
-        </span>
-      </p>
-      {showTooltip &&
-        isTruncated &&
-        createPortal(
-          <div
-            style={{
-              top: tooltipPos.top,
-              left: tooltipPos.left,
-            }}
-            className="fixed z-50 w-64 text-gray-950 bg-white text-xs 
-            rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none break-words"
-          >
-            {text}
-          </div>,
-          document.body,
-        )}
-    </>
-  );
-};
 
 const initials = (name = "") =>
   name
@@ -199,20 +130,6 @@ const OrderViewDetails = () => {
         .includes(dpSearch.trim().toLowerCase()),
     );
   }, [partners, dpSearch]);
-
-  const assignedDp = useMemo(() => {
-    const deliveryAgent = orderDetails?.orderItems?.[0]?.deliveryAgent;
-
-    if (deliveryAgent) {
-      return deliveryAgent;
-    }
-
-    if (!assignedDpId) return null;
-
-    return partners?.find(
-      (p) => p.deliveryPersonId === assignedDpId || p.id === assignedDpId,
-    );
-  }, [assignedDpId, partners, orderDetails]);
 
   const handleAssign = async (dp) => {
     if (!dp || assigning || !orderDetails) return;
@@ -458,7 +375,10 @@ const OrderViewDetails = () => {
                     }
                   >
                     <img
-                      src={resolveFirebaseUrl({folderName:"productImages", fileName: item.product?.product_images?.[0]})}
+                      src={resolveFirebaseUrl({
+                        folderName: "productImages",
+                        fileName: item.product?.product_images?.[0],
+                      })}
                       alt={item.product?.product_name}
                       className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
                       style={{ border: "1px solid #E4E1D6" }}
@@ -629,81 +549,27 @@ const OrderViewDetails = () => {
                 className="font-semibold text-sm"
                 style={{ color: "#14213D" }}
               >
-                Delivery partner
+                Manage Delivery
               </h2>
             </div>
 
             <div className="p-5">
-              {assignedDp ? (
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center
-                     font-semibold text-sm flex-shrink-0"
-                    style={{
-                      background: avatarStyle(
-                        `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
-                      ).bg,
-                      color: avatarStyle(
-                        `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
-                      ).text,
-                    }}
-                  >
-                    {initials(
-                      `${assignedDp.firstName || ""} ${assignedDp.lastName || ""}`,
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      className="font-medium text-sm"
-                      style={{ color: "#14213D" }}
-                    >
-                      {assignedDp.firstName} {assignedDp.lastName}
-                    </h3>
-                    {assignedDp.phoneNo && (
-                      <p
-                        className="mono text-xs flex items-center gap-1 mt-0.5"
-                        style={{ color: "#8A8778" }}
-                      >
-                        <Phone size={11} />
-                        {assignedDp.phoneNo}
-                      </p>
-                    )}
-
-                    <AreaCoveredHover text={assignedDp.areaCovered} />
-                  </div>
-                  <button
-                    onClick={() => setDpMenuOpen(!dpMenuOpen)}
-                    className="text-xs font-medium cursor-pointer flex-shrink-0"
-                    style={{ color: "#C65D2E" }}
-                  >
-                    Change
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setDpMenuOpen(!dpMenuOpen)}
-                  disabled={assigning}
-                  className="w-full rounded-xl p-4 text-sm font-medium cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{ border: "1.5px dashed #D3D1C7", color: "#8A8778" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#C65D2E";
-                    e.currentTarget.style.color = "#C65D2E";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#D3D1C7";
-                    e.currentTarget.style.color = "#8A8778";
-                  }}
-                >
-                  {assigning ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 size={14} className="animate-spin" />
-                      Assigning…
-                    </span>
-                  ) : (
-                    "Assign delivery partner"
-                  )}
-                </button>
-              )}
+              <button
+                onClick={() => navigate("/dashboard/delivery-job")}
+                disabled={assigning}
+                className="w-full rounded-xl p-4 text-sm font-medium cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                style={{ border: "1.5px dashed #D3D1C7", color: "#8A8778" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#C65D2E";
+                  e.currentTarget.style.color = "#C65D2E";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#D3D1C7";
+                  e.currentTarget.style.color = "#8A8778";
+                }}
+              >
+                Manage delivery
+              </button>
 
               {dpMenuOpen && (
                 <div
