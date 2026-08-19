@@ -36,7 +36,7 @@ const ORDER_STATUSES = [
 ];
 
 const STATUS_STYLES = {
-  PLACED: "bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300",
+  PLACED: "bg-green-100 text-green-700 border-green-200 hover:border-green-300",
   DELIVERED:
     "bg-emerald-50 text-emerald-700 border-emerald-200 hover:border-emerald-300",
   INTRANSIT: "bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300",
@@ -47,7 +47,7 @@ const STATUS_STYLES = {
 };
 
 const STATUS_DOT = {
-  PLACED: "bg-gray-400",
+  PLACED: "bg-green-400",
   DELIVERED: "bg-emerald-500",
   INTRANSIT: "bg-blue-500",
   PROCESSING: "bg-amber-500",
@@ -482,7 +482,7 @@ const Order = () => {
 
       {/* ── TABLE CARD ── the card itself scopes horizontal overflow now,
           so a wide table can never push the whole page sideways */}
-      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-vissible">
         {/* MOBILE VIEW */}
         <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
           {paginated.length === 0 ? (
@@ -653,7 +653,7 @@ const Order = () => {
                       </p>
                     </td>
 
-                    <td className="px-2.5 py-2.5">
+                    <td className="px-4 py-3.5 ">
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
@@ -871,7 +871,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 // so it reads as "tap to change" rather than plain text, while staying a
 // real <select> for accessibility and mobile-friendly native pickers.
 // Fixed width keeps table rows from reflowing as the label text changes.
-const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
+const StatusSelect = ({ order, onChange, disabled, className = "w-36 z-[999]" }) => {
   const availableStatuses = ORDER_STATUSES;
 
   return (
@@ -887,7 +887,7 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
               key={status}
               onClick={() => onChange(order, status)}
             >
-              <div className="flex w-full items-center justify-between gap-3">
+              <div className="flex w-full h-full items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${

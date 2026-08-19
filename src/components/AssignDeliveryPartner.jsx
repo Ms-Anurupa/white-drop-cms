@@ -21,6 +21,7 @@ import deliveryPartnerStore from "../zustand/Store/deliveryPartnerStore";
 import deliveryPartnerAssignStore from "../zustand/Store/deliveryPartnerAssignStore";
 import { toast } from "react-toastify";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
+import Loader from "./Loader";
 
 const PARTNER_STATUS_STYLES = {
   AVAILABLE: {
@@ -108,22 +109,46 @@ const AssignDeliveryPartner = () => {
   const [search, setSearch] = useState("");
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isAssigning, setIsAssigning] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    let mounted = true;
 
-    getDeliveryJobs(id);
-  }, [id, getDeliveryJobs]);
+    const loadData = async () => {
+      if (!id) {
+        if (mounted) setLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    getDeliveryPersons({
-      page: 1,
-      limit: 1000,
-      search: "",
-      fromDate: "",
-      toDate: "",
-    });
-  }, [getDeliveryPersons]);
+      try {
+        setLoading(true);
+
+        await Promise.all([
+          getDeliveryJobs(id),
+          getDeliveryPersons({
+            page: 1,
+            limit: 1000,
+            search: "",
+            fromDate: "",
+            toDate: "",
+          }),
+        ]);
+      } catch (error) {
+        console.error("Failed to load delivery assignment data:", error);
+        toast.error("Failed to load delivery job details");
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id, getDeliveryJobs, getDeliveryPersons]);
 
   const deliveryJob = useMemo(() => {
     if (!deliveryJobs) return null;
@@ -197,6 +222,10 @@ const AssignDeliveryPartner = () => {
   // =========================================================
   // LOADING / NOT FOUND
   // =========================================================
+
+  if (loading) {
+    return <Loader text="Loading delivery job details..." />;
+  }
 
   if (!deliveryJob) {
     return (

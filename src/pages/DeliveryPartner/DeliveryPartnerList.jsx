@@ -25,7 +25,6 @@ import { toast } from "react-toastify";
 import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
-
 const PAGE_LIMIT = 8;
 
 const getFullName = (p) => {
@@ -171,14 +170,13 @@ const DeliveryPartnerList = () => {
   const updateStatusDelPerson = deliveryPartnerStore(
     (state) => state.updateStatusDelPerson,
   );
-  const loading = deliveryPartnerStore((state) => state.loading);
   const imageUrls = useSignedImages(
     partners,
     "photo",
     "delPersonDocs",
     "deliveryPersonId",
   );
-
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [joinFilter, setJoinFilter] = useState("all");
@@ -213,21 +211,40 @@ const DeliveryPartnerList = () => {
     toDate,
   });
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, fromDate, toDate, joinFilter]);
+  // useEffect(() => {
+  //   setPage(1);
+  // }, [search, fromDate, toDate, joinFilter]);
 
   useEffect(() => {
-    // If only one date is provided (partial range), DO NOT invoke the API.
     const isPartialDate = Boolean(fromDate) !== Boolean(toDate);
-    if (isPartialDate) return;
 
-    const timer = setTimeout(() => {
-      getDeliveryPersons(buildQueryParams());
+    if (isPartialDate) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        await getDeliveryPersons({
+          search: search.trim(),
+          page,
+          limit: PAGE_LIMIT,
+          fromDate,
+          toDate,
+        });
+      } catch (error) {
+        console.error("Failed to load delivery partners:", error);
+        toast.error("Failed to load delivery partners");
+      } finally {
+        setLoading(false);
+      }
     }, 400);
 
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      clearTimeout(timer);
+    };
   }, [search, page, fromDate, toDate, getDeliveryPersons]);
 
   const handleStatusChange = async (active, deliveryPersonId) => {

@@ -47,7 +47,7 @@ const Dashboard = () => {
       title: "Track Deliveries",
       img: mapImg,
       gradient: "from-blue-500 to-indigo-500",
-      onClick: () => navigate("/dashboard/deliveries"),
+      onClick: () => navigate("/dashboard/delivery-tracking"),
     },
     {
       title: "Customer Helpline",
