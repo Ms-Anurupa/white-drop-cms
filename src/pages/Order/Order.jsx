@@ -13,6 +13,7 @@ import {
   Plus,
   ChevronDown,
   Loader2,
+  Clock3,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -66,6 +67,107 @@ const formatDate = (value) => {
     minute: "2-digit",
   });
 };
+
+// Split date/time so the "Created At" column can stack two short lines
+// instead of one long one — same trick as the Delivery Slot column,
+// and it's what buys back the horizontal space.
+const formatDateOnly = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const formatTimeOnly = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+// ── Scoped styles for the scrollbar + sticky header glass effect.
+// Rendered once at the top of the page so nothing else needs to import CSS.
+const PageStyles = () => (
+  <style>{`
+    .futuristic-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #6366f1 rgba(241, 245, 249, 0.6);
+    }
+
+    .futuristic-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .futuristic-scroll::-webkit-scrollbar-track {
+      background: linear-gradient(180deg, #f8fafc 0%, #eef1f6 100%);
+      border-radius: 999px;
+      margin: 4px 0;
+    }
+
+    .futuristic-scroll::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: linear-gradient(180deg, #818cf8 0%, #6366f1 45%, #06b6d4 100%);
+      background-size: 100% 200%;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        0 0 6px rgba(99, 102, 241, 0.45);
+      transition: box-shadow 0.25s ease, background-position 0.6s ease;
+    }
+
+    .futuristic-scroll::-webkit-scrollbar-thumb:hover {
+      background-position: 0 30%;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+        0 0 14px rgba(6, 182, 212, 0.65);
+    }
+
+    .futuristic-scroll::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(180deg, #6366f1 0%, #06b6d4 100%);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+        0 0 18px rgba(6, 182, 212, 0.85);
+    }
+
+    .futuristic-scroll::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    .order-table-card {
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 0 0 1px rgba(99, 102, 241, 0.06),
+        0 12px 32px -16px rgba(99, 102, 241, 0.18);
+    }
+
+    .order-table-head {
+      background: linear-gradient(180deg, rgba(249, 250, 251, 0.96) 0%, rgba(249, 250, 251, 0.88) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .order-table-head::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.35), rgba(6, 182, 212, 0.35), transparent);
+    }
+
+    .order-row {
+      transition: background-color 0.15s ease;
+    }
+  `}</style>
+);
 
 const Order = () => {
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
@@ -314,7 +416,9 @@ const Order = () => {
   if (loading) return <Loader text="Loading order history lists..." />;
 
   return (
-    <div className="p-6 sm:px-2 lg:p-6 space-y-6 bg-gray-50">
+    <div className="p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
+      <PageStyles />
+
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -375,10 +479,12 @@ const Order = () => {
         onToDateChange={handleToDateChange}
         onClear={clearDates}
       />
-      {/* ── TABLE CARD — no inner scroll, the page itself scrolls ── */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+      {/* ── TABLE CARD ── the card itself scopes horizontal overflow now,
+          so a wide table can never push the whole page sideways */}
+      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-hidden">
         {/* MOBILE VIEW */}
-        <div className="block sm:hidden divide-y divide-gray-100">
+        <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
           {paginated.length === 0 ? (
             <EmptyState />
           ) : (
@@ -446,40 +552,47 @@ const Order = () => {
           )}
         </div>
 
-        {/* DESKTOP TABLE */}
-        <div className="hidden sm:block">
+        {/* DESKTOP TABLE — overflow-x-auto contains any residual horizontal
+            overflow to just the table card; overflow-y-auto + max-h maximizes
+            visible rows. Column widths below are trimmed to real content need
+            so the table fits without side-scrolling on most screens. */}
+        <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="w-14 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+            <thead className="order-table-head sticky top-0 z-10 relative">
+              <tr className="border-b border-transparent">
+                <th className="w-10 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Sl No.
                 </th>
 
-                <th className="w-40 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Order ID
                 </th>
 
-                <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-14 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Image
                 </th>
 
-                <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Total
                 </th>
 
-                <th className="w-56 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-44 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Customer
                 </th>
 
-                <th className="w-36 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Status
                 </th>
 
-                <th className="w-44 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-28 pl-5 pr-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
+                  Delivery Slot
+                </th>
+
+                <th className="w-24 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Created At
                 </th>
 
-                <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Action
                 </th>
               </tr>
@@ -488,38 +601,39 @@ const Order = () => {
             <tbody className="divide-y divide-gray-50">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={9}>
                     <EmptyState />
                   </td>
                 </tr>
               ) : (
                 paginated.map((o, idx) => (
-                  <tr key={o.orderId} className="hover:bg-slate-50 transition">
-                    <td className="w-16 px-4 py-3.5 text-gray-400">
+                  <tr key={o.orderId} className="order-row hover:bg-slate-50">
+                    <td className="px-2.5 py-2.5 text-gray-400">
                       {start + idx + 1}
                     </td>
 
-                    <td className="w-36 px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                    <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                       {o.orderId}
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-2.5 py-2.5">
                       <img
                         src={resolveFirebaseUrl({
                           folderName: "productImages",
-                          fileName: o?.orderItems?.[0]?.product?.product_images?.[0],
+                          fileName:
+                            o?.orderItems?.[0]?.product?.product_images?.[0],
                         })}
                         alt="Product"
-                        className="w-11 h-11 rounded-lg object-cover border border-gray-100"
+                        className="w-9 h-9 rounded-lg object-cover border border-gray-100"
                       />
                     </td>
 
-                    <td className="px-4 py-3.5 font-medium text-gray-900 whitespace-nowrap">
+                    <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap">
                       ₹{o.orderTotal}
                     </td>
 
                     <td
-                      className="px-4 py-3.5 text-gray-600 max-w-64 cursor-default"
+                      className="px-2.5 py-2.5 text-gray-600 cursor-default"
                       onMouseEnter={(e) => showAddressPopover(e, o)}
                       onMouseLeave={hideAddressPopover}
                     >
@@ -539,27 +653,66 @@ const Order = () => {
                       </p>
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-2.5 py-2.5">
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
                         disabled={updatingId === o.id}
-                        className="w-36"
+                        className="w-32"
                       />
                     </td>
 
-                    <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
-                      {formatDate(o.createdAt)}
+                    <td className="pl-5 pr-2.5 py-2.5">
+                      {o.deliverySlot?.name ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
+                            {o.deliverySlot?.icon ? (
+                              <img
+                                src={resolveFirebaseUrl({
+                                  folderName: "public",
+                                  fileName: o.deliverySlot.icon,
+                                })}
+                                alt={o.deliverySlot.name}
+                                className="w-3.5 h-3.5 object-contain"
+                              />
+                            ) : (
+                              <Clock3 size={11} className="text-blue-600" />
+                            )}
+                          </span>
+
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-gray-800 truncate">
+                              {o.deliverySlot.name}
+                            </p>
+                            {o.deliverySlot?.from && o.deliverySlot?.to && (
+                              <p className="text-[10px] text-gray-400 truncate">
+                                {o.deliverySlot.from}-{o.deliverySlot.to}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-2.5 py-2.5 whitespace-nowrap">
+                      <p className="text-xs text-gray-700">
+                        {formatDateOnly(o.createdAt)}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        {formatTimeOnly(o.createdAt)}
+                      </p>
+                    </td>
+
+                    <td className="px-2.5 py-2.5">
                       <button
                         onClick={() =>
                           navigate(`/dashboard/orders/orderDetails/${o.id}`)
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
                       >
-                        <Eye size={13} />
+                        <Eye size={12} />
                         View
                       </button>
                     </td>
@@ -571,7 +724,7 @@ const Order = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="border-t border-gray-100 px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="border-t border-gray-100 px-4 sm:px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>
               {filteredOrders.length === 0

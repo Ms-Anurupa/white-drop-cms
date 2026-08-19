@@ -21,6 +21,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import deliveryJobStore from "../zustand/Store/deliveryJobStore";
 import orderDataStore from "../zustand/Store/orderDataStore";
+import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const STATUS_STYLES = {
   PLACED: "bg-blue-50 text-blue-700 border-blue-100",
@@ -927,6 +928,8 @@ const AssignOrderToDeliveryJob = () => {
 
                   const orderStatus = getOrderStatus(order);
 
+                  
+
                   return (
                     <button
                       key={orderId}
@@ -1073,6 +1076,35 @@ const AssignOrderToDeliveryJob = () => {
                               >
                                 <Check size={10} />
                                 Will be assigned
+                              </span>
+                            )}
+
+                            {/* Delivery Slot */}
+                            {order?.deliverySlot?.name && (
+                              <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+                                <span className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden">
+                                  {order.deliverySlot?.icon ? (
+                                    <img
+                                      src={resolveFirebaseUrl({
+                                        folderName: "public",
+                                        fileName: order.deliverySlot.icon,
+                                      })}
+                                      alt={order.deliverySlot.name}
+                                      className="w-4 h-4 object-contain"
+                                    />
+                                  ) : (
+                                    <Clock3 size={12} />
+                                  )}
+                                </span>
+
+                                {order.deliverySlot.name}
+                                {order.deliverySlot?.from &&
+                                  order.deliverySlot?.to && (
+                                    <span className="text-slate-400">
+                                      ({order.deliverySlot.from} -{" "}
+                                      {order.deliverySlot.to})
+                                    </span>
+                                  )}
                               </span>
                             )}
                           </div>
