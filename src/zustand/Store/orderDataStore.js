@@ -6,18 +6,62 @@ const orderDataStore = create((set) => ({
   orders: [],
   orderDetails: [],
   loading: false,
+  meta: {
+    totalItems: 0,
+    totalPages: 0,
+    currentPage: 1,
+    itemsPerPage: 10,
+  },
+  orderSummary: {
+    allOrders: 0,
+    todayOrders: 0,
+    thisWeekOrders: 0,
+    thisMonthOrders: 0,
+  },
 
-  getOrderListing: async ({status, search = "", page = 1, limit = 10, fromDate = "", toDate = "" }) => {
+  getOrderListing: async ({
+    status = "",
+    search = "",
+    page = 1,
+    limit = 10,
+    fromDate = "",
+    toDate = "",
+  } = {}) => {
     try {
       set({ loading: true });
+
       const res = await api.get("/admin/getOrderListing", {
         withAuth: true,
-        params: { search, status, page, limit, fromDate, toDate },
+        params: {
+          search,
+          status,
+          page,
+          limit,
+          fromDate,
+          toDate,
+        },
       });
 
+      const { data = [], meta = {} } = res.data || {};
+
+      const { summary = {}, ...paginationMeta } = meta;
+
       set({
-        orders: res.data?.data,
-        orderTotal: res.data?.meta,
+        orders: data,
+
+        meta: {
+          totalItems: paginationMeta.totalItems ?? 0,
+          totalPages: paginationMeta.totalPages ?? 0,
+          currentPage: paginationMeta.currentPage ?? page,
+          itemsPerPage: paginationMeta.itemsPerPage ?? limit,
+        },
+
+        orderSummary: {
+          allOrders: summary.allOrders ?? 0,
+          todayOrders: summary.todayOrders ?? 0,
+          thisWeekOrders: summary.thisWeekOrders ?? 0,
+          thisMonthOrders: summary.thisMonthOrders ?? 0,
+        },
       });
     } catch (error) {
       throw error;
@@ -38,9 +82,8 @@ const orderDataStore = create((set) => ({
       });
     } catch (error) {
       throw error;
-    } 
+    }
   },
-
 
   associateOrderToDelPerson: async (payload) => {
     try {
@@ -66,10 +109,10 @@ const orderDataStore = create((set) => ({
     }
   },
 
-  updateOrderStatus: async(payload) => {
+  updateOrderStatus: async (payload) => {
     try {
       const res = await api.post("/admin/updateOrderStatus", payload, {
-        withAuth: true
+        withAuth: true,
       });
       return res.data;
     } catch (error) {
@@ -77,7 +120,7 @@ const orderDataStore = create((set) => ({
     }
   },
 
-  getAssignableOrders: async ({deliJobId}) => {
+  getAssignableOrders: async ({ deliJobId }) => {
     try {
       set({ loading: true });
       const res = await api.get("/admin/getAssignableOrders", {

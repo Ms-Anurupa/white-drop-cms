@@ -23,6 +23,7 @@ import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
+
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
 // Keep this in sync with the `deliveryStatus` enum in schema.prisma
@@ -68,9 +69,6 @@ const formatDate = (value) => {
   });
 };
 
-// Split date/time so the "Created At" column can stack two short lines
-// instead of one long one — same trick as the Delivery Slot column,
-// and it's what buys back the horizontal space.
 const formatDateOnly = (value) => {
   if (!value) return "-";
   const date = new Date(value);
@@ -92,8 +90,6 @@ const formatTimeOnly = (value) => {
   });
 };
 
-// ── Scoped styles for the scrollbar + sticky header glass effect.
-// Rendered once at the top of the page so nothing else needs to import CSS.
 const PageStyles = () => (
   <style>{`
     .futuristic-scroll {
@@ -176,25 +172,27 @@ const Order = () => {
   );
   const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
   const orders = orderDataStore((state) => state.orders);
-  const orderTotal = orderDataStore((state) => state.orderTotal);
+  const meta = orderDataStore((state) => state.meta);
+  const orderSummary = orderDataStore((state) => state.orderSummary);
   const loading = orderDataStore((state) => state.loading);
+
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
   const [dateFilter, setDateFilter] = useState("all");
-  const [hoveredOrder, setHoveredOrder] = useState(null); // { order, anchor }
-  const [popoverPos, setPopoverPos] = useState(null); // { top, left } — set once measured
+  const [hoveredOrder, setHoveredOrder] = useState(null);
+  const [popoverPos, setPopoverPos] = useState(null);
   const popoverRef = useRef(null);
   const [toDate, setToDate] = useState("");
   const [fromDate, setFromDate] = useState("");
-  const [updatingId, setUpdatingId] = useState(null); // orderId currently being updated
+  const [updatingId, setUpdatingId] = useState(null);
 
   const navigate = useNavigate();
 
   const showAddressPopover = (e, order) => {
     const anchor = e.currentTarget.getBoundingClientRect();
-    setPopoverPos(null); // reset so it doesn't flash the previous row's position
+    setPopoverPos(null);
     setHoveredOrder({ order, anchor });
   };
 
@@ -203,9 +201,6 @@ const Order = () => {
     setPopoverPos(null);
   };
 
-  // Position the popover only after it has rendered, using its real measured
-  // size — this is what makes the above/below flip and edge-clamping accurate,
-  // rather than guessing at a fixed height.
   useLayoutEffect(() => {
     if (!hoveredOrder || !popoverRef.current) return;
 
@@ -225,11 +220,9 @@ const Order = () => {
 
     let top;
     if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
-      // enough room below (or more room below than above) — show under the row
       top = anchor.bottom + gap;
       top = Math.min(top, window.innerHeight - margin - height);
     } else {
-      // not enough room below — flip above the row
       top = anchor.top - height - gap;
     }
     top = Math.max(top, margin);
@@ -239,7 +232,6 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Wait until both dates are selected
       if ((fromDate && !toDate) || (!fromDate && toDate)) {
         return;
       }
@@ -274,67 +266,74 @@ const Order = () => {
     });
   }, [page]);
 
-  const handleFromDateChange = (value) => {
-    setFromDate(value);
-  };
-  const handleToDateChange = (value) => {
-    setToDate(value);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const range = getDateRange(dateFilter);
+
+      getOrderListing({
+        status,
+        search,
+        page,
+        limit: pageSize,
+        fromDate: range.fromDate,
+        toDate: range.toDate,
+      });
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [getOrderListing, search, status, page, pageSize, dateFilter]);
+
+  const handleFromDateChange = (value) => setFromDate(value);
+  const handleToDateChange = (value) => setToDate(value);
   const clearDates = () => {
     setFromDate("");
     setToDate("");
   };
 
-  const matchesDateFilter = (order, filter) => {
-    if (filter === "all") return true;
+  // const matchesDateFilter = (order, filter) => {
+  //   if (filter === "all") return true;
 
-    const orderDate = new Date(order.createdAt);
-    const now = new Date();
+  //   const orderDate = new Date(order.createdAt);
+  //   const now = new Date();
 
-    if (filter === "today") {
-      return orderDate.toDateString() === now.toDateString();
-    }
+  //   if (filter === "today") {
+  //     return orderDate.toDateString() === now.toDateString();
+  //   }
 
-    if (filter === "week") {
-      const weekAgo = new Date();
-      weekAgo.setDate(now.getDate() - 7);
-      return orderDate >= weekAgo;
-    }
+  //   if (filter === "week") {
+  //     const weekAgo = new Date();
+  //     weekAgo.setDate(now.getDate() - 7);
+  //     return orderDate >= weekAgo;
+  //   }
 
-    if (filter === "month") {
-      return (
-        orderDate.getMonth() === now.getMonth() &&
-        orderDate.getFullYear() === now.getFullYear()
-      );
-    }
+  //   if (filter === "month") {
+  //     return (
+  //       orderDate.getMonth() === now.getMonth() &&
+  //       orderDate.getFullYear() === now.getFullYear()
+  //     );
+  //   }
 
-    return true;
+  //   return true;
+  // };
+
+  const dateCounts = {
+    all: orderSummary?.allOrders ?? 0,
+    today: orderSummary?.todayOrders ?? 0,
+    week: orderSummary?.thisWeekOrders ?? 0,
+    month: orderSummary?.thisMonthOrders ?? 0,
   };
-
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => matchesDateFilter(order, dateFilter));
-  }, [orders, dateFilter]);
-
-  const dateCounts = useMemo(
-    () => ({
-      all: orders.length,
-      today: orders.filter((o) => matchesDateFilter(o, "today")).length,
-      week: orders.filter((o) => matchesDateFilter(o, "week")).length,
-      month: orders.filter((o) => matchesDateFilter(o, "month")).length,
-    }),
-    [orders],
-  );
-
   const DATE_FILTERS = [
     { key: "today", label: "Today" },
     { key: "week", label: "This week" },
     { key: "month", label: "This month" },
   ];
 
-  const totalItems = Number(orderTotal?.totalItems ?? 0);
-  const totalPages = Math.max(Number(orderTotal?.totalPages));
+  const totalItems = Number(meta?.totalItems ?? 0);
+  const totalPages = Math.max(1, Number(meta?.totalPages ?? 1));
+
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * pageSize;
+
   const paginated = orders;
 
   const handleExport = async () => {
@@ -356,6 +355,62 @@ const Order = () => {
     } catch {
       toast.error("Failed to export order details");
     }
+  };
+
+  const getDateRange = (filter) => {
+    const now = new Date();
+
+    if (filter === "all") {
+      return {
+        fromDate: "",
+        toDate: "",
+      };
+    }
+
+    if (filter === "today") {
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+
+      return {
+        fromDate: start.toISOString(),
+        toDate: end.toISOString(),
+      };
+    }
+
+    if (filter === "week") {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+
+      return {
+        fromDate: start.toISOString(),
+        toDate: end.toISOString(),
+      };
+    }
+
+    if (filter === "month") {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
+
+      return {
+        fromDate: start.toISOString(),
+        toDate: end.toISOString(),
+      };
+    }
+
+    return {
+      fromDate: "",
+      toDate: "",
+    };
   };
 
   const handleStatusChange = async (order, newStatus) => {
@@ -419,7 +474,7 @@ const Order = () => {
     <div className="p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
       <PageStyles />
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
@@ -428,15 +483,13 @@ const Order = () => {
           <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>Track orders, delivery &amp; status:</span>
             <span className="text-blue-600 font-medium">
-              Total Order Count: {orderTotal?.totalItems}
+              Total Order Count: {dateCounts.all}
             </span>
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
-          {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
+        <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-            {/* Search */}
             <div className="w-full sm:w-64 lg:w-72">
               <div className="relative">
                 <Search
@@ -447,18 +500,15 @@ const Order = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search orders..."
-                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
-          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
                 />
               </div>
             </div>
           </div>
-          {/* Export — pinned to the row's end via justify-between + shrink-0,
-      so it never shifts regardless of what the left cluster does */}
+
           <button
             onClick={handleExport}
-            className="h-10 px-4 flex items-center gap-2 rounded-lg shrink-0
-    bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
+            className="h-10 px-4 flex items-center gap-2 rounded-lg shrink-0 bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
           >
             <Download size={16} />
             Export
@@ -467,10 +517,15 @@ const Order = () => {
       </div>
 
       <DateFilter
-        filters={DATE_FILTERS.map((f) => ({ ...f, count: dateCounts[f.key] }))}
+        filters={DATE_FILTERS.map((f) => ({
+          ...f,
+          count: dateCounts[f.key], // global counts
+        }))}
         activeFilter={dateFilter}
         onFilterChange={(key) => {
           setDateFilter(key);
+          setFromDate("");
+          setToDate("");
           setPage(1);
         }}
         fromDate={fromDate}
@@ -480,8 +535,7 @@ const Order = () => {
         onClear={clearDates}
       />
 
-      {/* ── TABLE CARD ── the card itself scopes horizontal overflow now,
-          so a wide table can never push the whole page sideways */}
+      {/* TABLE CARD */}
       <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-vissible">
         {/* MOBILE VIEW */}
         <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
@@ -504,9 +558,9 @@ const Order = () => {
                       {formatDate(o.createdAt)}
                     </p>
                     <div className="mt-2 flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-sm text-gray-900">
+                      {/* <span className="font-semibold text-sm text-gray-900">
                         ₹{o.orderTotal}
-                      </span>
+                      </span> */}
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
@@ -552,10 +606,7 @@ const Order = () => {
           )}
         </div>
 
-        {/* DESKTOP TABLE — overflow-x-auto contains any residual horizontal
-            overflow to just the table card; overflow-y-auto + max-h maximizes
-            visible rows. Column widths below are trimmed to real content need
-            so the table fits without side-scrolling on most screens. */}
+        {/* DESKTOP TABLE */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
             <thead className="order-table-head sticky top-0 z-10 relative">
@@ -563,35 +614,27 @@ const Order = () => {
                 <th className="w-10 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Sl No.
                 </th>
-
                 <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Order ID
                 </th>
-
                 <th className="w-14 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Image
                 </th>
-
                 <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Total
                 </th>
-
                 <th className="w-44 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Customer
                 </th>
-
                 <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Status
                 </th>
-
                 <th className="w-28 pl-5 pr-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Delivery Slot
                 </th>
-
                 <th className="w-24 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Created At
                 </th>
-
                 <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Action
                 </th>
@@ -611,11 +654,9 @@ const Order = () => {
                     <td className="px-2.5 py-2.5 text-gray-400">
                       {start + idx + 1}
                     </td>
-
                     <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                       {o.orderId}
                     </td>
-
                     <td className="px-2.5 py-2.5">
                       <img
                         src={resolveFirebaseUrl({
@@ -627,11 +668,9 @@ const Order = () => {
                         className="w-9 h-9 rounded-lg object-cover border border-gray-100"
                       />
                     </td>
-
                     <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap">
                       ₹{o.orderTotal}
                     </td>
-
                     <td
                       className="px-2.5 py-2.5 text-gray-600 cursor-default"
                       onMouseEnter={(e) => showAddressPopover(e, o)}
@@ -652,8 +691,7 @@ const Order = () => {
                           .join(", ")}
                       </p>
                     </td>
-
-                    <td className="px-4 py-3.5 ">
+                    <td className="px-4 py-3.5">
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
@@ -661,7 +699,6 @@ const Order = () => {
                         className="w-32"
                       />
                     </td>
-
                     <td className="pl-5 pr-2.5 py-2.5">
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
@@ -679,7 +716,6 @@ const Order = () => {
                               <Clock3 size={11} className="text-blue-600" />
                             )}
                           </span>
-
                           <div className="min-w-0">
                             <p className="text-xs font-medium text-gray-800 truncate">
                               {o.deliverySlot.name}
@@ -695,7 +731,6 @@ const Order = () => {
                         <span className="text-xs text-gray-400">—</span>
                       )}
                     </td>
-
                     <td className="px-2.5 py-2.5 whitespace-nowrap">
                       <p className="text-xs text-gray-700">
                         {formatDateOnly(o.createdAt)}
@@ -704,7 +739,6 @@ const Order = () => {
                         {formatTimeOnly(o.createdAt)}
                       </p>
                     </td>
-
                     <td className="px-2.5 py-2.5">
                       <button
                         onClick={() =>
@@ -727,16 +761,17 @@ const Order = () => {
         <div className="border-t border-gray-100 px-4 sm:px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>
-              {filteredOrders.length === 0
+              {totalItems === 0
                 ? "No results"
                 : `Showing ${start + 1}–${Math.min(
-                    start + pageSize,
-                    filteredOrders.length,
-                  )} of ${filteredOrders.length}`}
+                    start + paginated.length,
+                    totalItems,
+                  )} of ${totalItems}`}
             </span>
 
             <label className="flex items-center gap-1.5">
               <span className="hidden md:inline">Rows per page</span>
+
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -816,8 +851,7 @@ const Order = () => {
         </div>
       </div>
 
-      {/* CUSTOMER ADDRESS POPOVER — fixed positioned so it escapes any overflow/scroll
-          container, and positioned only after measuring its real rendered size */}
+      {/* ADDRESS POPOVER */}
       {hoveredOrder && (
         <div
           ref={popoverRef}
@@ -867,11 +901,12 @@ const PageButton = ({ children, onClick, disabled, label }) => (
   </button>
 );
 
-// Editable status control — a native <select> dressed up as a bordered pill
-// so it reads as "tap to change" rather than plain text, while staying a
-// real <select> for accessibility and mobile-friendly native pickers.
-// Fixed width keeps table rows from reflowing as the label text changes.
-const StatusSelect = ({ order, onChange, disabled, className = "w-36 z-[999]" }) => {
+const StatusSelect = ({
+  order,
+  onChange,
+  disabled,
+  className = "w-36 z-[999]",
+}) => {
   const availableStatuses = ORDER_STATUSES;
 
   return (
@@ -894,12 +929,10 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36 z-[999]" })
                       STATUS_DOT[status] || "bg-gray-400"
                     }`}
                   />
-
                   <span className="capitalize">
                     {status.replaceAll("_", " ").toLowerCase()}
                   </span>
                 </div>
-
                 {order.orderStatus === status && (
                   <span className="text-blue-600">✓</span>
                 )}
@@ -919,7 +952,6 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36 z-[999]" })
             }`}
           />
         )}
-
         <span>
           {order.orderStatus
             ?.replaceAll("_", " ")
