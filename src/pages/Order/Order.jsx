@@ -262,7 +262,6 @@ const Order = () => {
     setUpdatingId(order.id);
 
     try {
-
       await updateOrderStatus({
         id: order.id,
         status: newStatus,
@@ -332,7 +331,24 @@ const Order = () => {
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end ">
           {/* Left cluster: Search + From/To — grows/shrinks together, Export never moves because of it */}
-
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+            {/* Search */}
+            <div className="w-full sm:w-64 lg:w-72">
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search orders..."
+                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200
+          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+              </div>
+            </div>
+          </div>
           {/* Export — pinned to the row's end via justify-between + shrink-0,
       so it never shifts regardless of what the left cluster does */}
           <button
@@ -558,9 +574,9 @@ const Order = () => {
               {filteredOrders.length === 0
                 ? "No results"
                 : `Showing ${start + 1}–${Math.min(
-                  start + pageSize,
-                  filteredOrders.length,
-                )} of ${filteredOrders.length}`}
+                    start + pageSize,
+                    filteredOrders.length,
+                  )} of ${filteredOrders.length}`}
             </span>
 
             <label className="flex items-center gap-1.5">
@@ -606,10 +622,11 @@ const Order = () => {
                     key={p}
                     onClick={() => setPage(p)}
                     aria-current={p === currentPage ? "page" : undefined}
-                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${p === currentPage
+                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
+                      p === currentPage
                         ? "bg-blue-600 text-white"
                         : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                    }`}
                   >
                     {p}
                   </button>
@@ -706,7 +723,7 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
       variant="outline"
       disabled={disabled}
       className={className}
-      onClick={() => { }}
+      onClick={() => {}}
       menuContent={
         <>
           {availableStatuses.map((status) => (
@@ -717,8 +734,9 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] || "bg-gray-400"
-                      }`}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      STATUS_DOT[status] || "bg-gray-400"
+                    }`}
                   />
 
                   <span className="capitalize">
@@ -740,8 +758,9 @@ const StatusSelect = ({ order, onChange, disabled, className = "w-36" }) => {
           <Loader2 size={11} className="animate-spin text-gray-500" />
         ) : (
           <span
-            className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[order.orderStatus] || "bg-gray-400"
-              }`}
+            className={`h-1.5 w-1.5 rounded-full ${
+              STATUS_DOT[order.orderStatus] || "bg-gray-400"
+            }`}
           />
         )}
 
