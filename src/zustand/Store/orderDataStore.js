@@ -17,6 +17,7 @@ const orderDataStore = create((set) => ({
 
       set({
         orders: res.data?.data,
+        orderTotal: res.data?.meta,
       });
     } catch (error) {
       throw error;

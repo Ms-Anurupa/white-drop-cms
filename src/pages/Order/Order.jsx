@@ -74,6 +74,7 @@ const Order = () => {
   );
   const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
   const orders = orderDataStore((state) => state.orders);
+  const orderTotal = orderDataStore((state) => state.orderTotal);
   const loading = orderDataStore((state) => state.loading);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -223,16 +224,16 @@ const Order = () => {
   );
 
   const DATE_FILTERS = [
-    { key: "all", label: "All orders" },
     { key: "today", label: "Today" },
     { key: "week", label: "This week" },
     { key: "month", label: "This month" },
   ];
 
-  const totalPages = Math.max(Math.ceil(filteredOrders.length / pageSize), 1);
+  const totalItems = Number(orderTotal?.totalItems ?? 0);
+  const totalPages = Math.max(Number(orderTotal?.totalPages));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * pageSize;
-  const paginated = filteredOrders.slice(start, start + pageSize);
+  const paginated = orders;
 
   const handleExport = async () => {
     try {
@@ -322,10 +323,9 @@ const Order = () => {
             Order Management
           </h1>
           <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span>Track orders, delivery &amp; status</span>
+            <span>Track orders, delivery &amp; status:</span>
             <span className="text-blue-600 font-medium">
-              {DATE_FILTERS.find((f) => f.key === dateFilter)?.countLabel}:{" "}
-              {dateCounts[dateFilter]}
+              Total Order Count: {orderTotal?.totalItems}
             </span>
           </p>
         </div>
