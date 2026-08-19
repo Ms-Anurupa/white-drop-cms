@@ -21,6 +21,7 @@ import { getProductUrl } from "../../utils/resolveProductUrl";
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton"; // adjust path
+import Loader from "../../components/Loader";
 
 const PRODUCT_STATUSES = ["ACTIVE", "INACTIVE", "COMING_SOON"];
 
@@ -49,10 +50,21 @@ const Product = () => {
     hardDeleteProduct,
     exportProductDetails,
   } = productDataStore();
+  const [loading, setLoading] = useState(false);
 
   // fetch data
   useEffect(() => {
-    getAllProducts();
+    const load = async () => {
+      try {
+        setLoading(true);
+        await getAllProducts();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [getAllProducts]);
 
   const filtered = useMemo(
@@ -151,6 +163,10 @@ const Product = () => {
 
     return pages;
   };
+
+  if (loading) {
+    return <Loader text="Loading Product Details..." />;
+  }
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
@@ -534,7 +550,6 @@ const StatCard = ({ label, value, valueClass = "text-gray-900", dotClass }) => (
     <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
   </div>
 );
-
 
 const ProductStatusSelect = ({
   status,
