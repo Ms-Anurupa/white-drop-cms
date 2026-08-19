@@ -475,7 +475,7 @@ const AddDeliveryJob = () => {
                   <div className="flex items-center justify-end gap-2 order-1 sm:order-2">
                     <button
                       type="button"
-                      onClick={() => navigate("/dashboard/deliveries")}
+                      onClick={() => navigate("/dashboard/delivery-job")}
                       disabled={isSaving}
                       className="h-10 px-4 cursor-pointer rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-50"
                     >
