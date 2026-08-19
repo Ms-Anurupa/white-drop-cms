@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { useConfirm } from "../../components/ConfirmProvider";
 import useDebounce from "../../utils/useDebounce";
 import DateFilter from "../../components/DateFilter";
+import Loader from "../../components/Loader";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
@@ -23,7 +24,7 @@ const JOIN_FILTERS = [
   { key: "all", label: "All time", countLabel: "Total customers" },
   { key: "today", label: "Today", countLabel: "Joined today" },
   { key: "week", label: "This week", countLabel: "Joined this week" },
-  { key: "month", label: "This month", countLabel: "Joined this month" }
+  { key: "month", label: "This month", countLabel: "Joined this month" },
 ];
 
 const formatDate = (value) => {
@@ -84,7 +85,7 @@ const Customer = () => {
   const deleteCustomerDetails = customerStore(
     (state) => state.deleteCustomerDetails,
   );
-
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
@@ -102,9 +103,18 @@ const Customer = () => {
 
   useEffect(() => {
     if (isPartialDateRange) return; // wait for the second date before calling
-
-    getAllCustomers(buildQueryParams());
-    setPage(1);
+    const load = async () => {
+      try {
+        setLoading(true);
+        await getAllCustomers(buildQueryParams());
+        setPage(1);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, fromDate, toDate, getAllCustomers]);
 
@@ -201,6 +211,10 @@ const Customer = () => {
 
     return pages;
   };
+
+  if (loading) {
+    return <Loader text="Loading Customer Details..." />;
+  }
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 space-y-6 bg-gray-50 min-h-full">
