@@ -558,9 +558,9 @@ const CorporateOrder = () => {
                 <th className="w-14 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
                   Qty
                 </th>
-                <th className="w-16 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                {/* <th className="w-16 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
                   Price/unit
-                </th>
+                </th> */}
                 <th className="w-20 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
                   Total
                 </th>
@@ -635,15 +635,16 @@ const CorporateOrder = () => {
                     </td>
 
                     <td className="px-2 py-1.5 text-gray-800 whitespace-nowrap">
-                      {o.orderDetails?.qty} {o.orderDetails?.unit}
+                      {o.orderDetails?.receivedQuantity}{" "}
+                      {o.orderDetails?.receivedUnit}
                     </td>
 
-                    <td className="px-2 py-1.5 text-green-600 whitespace-nowrap">
+                    {/* <td className="px-2 py-1.5 text-green-600 whitespace-nowrap">
                       {formatCurrency(o.orderDetails?.pricePerUnit)}
-                    </td>
+                    </td> */}
 
                     <td className="px-2 py-1.5 font-semibold text-green-900 whitespace-nowrap">
-                      {formatCurrency(o.orderDetails?.orderTotal)}
+                      {formatCurrency(o.orderDetails?.receivedTotalPrice)}
                     </td>
 
                     <td className="px-2 py-1.5">
