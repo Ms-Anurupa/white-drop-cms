@@ -230,28 +230,11 @@ const Order = () => {
     setPopoverPos({ top, left });
   }, [hoveredOrder]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if ((fromDate && !toDate) || (!fromDate && toDate)) {
-        return;
-      }
+useEffect(() => {
+  const timer = setTimeout(() => {
+    const range = getDateRange(dateFilter);
 
-      setPage(1);
-
-      getOrderListing({
-        status,
-        search,
-        page: 1,
-        pageSize,
-        fromDate,
-        toDate,
-      });
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [getOrderListing, search, status, pageSize, fromDate, toDate]);
-
-  useEffect(() => {
+    // Don't fetch if only one custom date is selected
     if ((fromDate && !toDate) || (!fromDate && toDate)) {
       return;
     }
@@ -260,28 +243,14 @@ const Order = () => {
       status,
       search,
       page,
-      pageSize,
-      fromDate,
-      toDate,
+      limit: pageSize,
+      fromDate: dateFilter === "all" ? "" : range.fromDate,
+      toDate: dateFilter === "all" ? "" : range.toDate,
     });
-  }, [page]);
+  }, 400);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const range = getDateRange(dateFilter);
-
-      getOrderListing({
-        status,
-        search,
-        page,
-        limit: pageSize,
-        fromDate: range.fromDate,
-        toDate: range.toDate,
-      });
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [getOrderListing, search, status, page, pageSize, dateFilter]);
+  return () => clearTimeout(timer);
+}, [getOrderListing, search, status, page, pageSize, dateFilter]);
 
   const handleFromDateChange = (value) => setFromDate(value);
   const handleToDateChange = (value) => setToDate(value);
@@ -289,32 +258,6 @@ const Order = () => {
     setFromDate("");
     setToDate("");
   };
-
-  // const matchesDateFilter = (order, filter) => {
-  //   if (filter === "all") return true;
-
-  //   const orderDate = new Date(order.createdAt);
-  //   const now = new Date();
-
-  //   if (filter === "today") {
-  //     return orderDate.toDateString() === now.toDateString();
-  //   }
-
-  //   if (filter === "week") {
-  //     const weekAgo = new Date();
-  //     weekAgo.setDate(now.getDate() - 7);
-  //     return orderDate >= weekAgo;
-  //   }
-
-  //   if (filter === "month") {
-  //     return (
-  //       orderDate.getMonth() === now.getMonth() &&
-  //       orderDate.getFullYear() === now.getFullYear()
-  //     );
-  //   }
-
-  //   return true;
-  // };
 
   const dateCounts = {
     all: orderSummary?.allOrders ?? 0,
@@ -382,7 +325,11 @@ const Order = () => {
 
     if (filter === "week") {
       const start = new Date(now);
-      start.setDate(now.getDate() - 6);
+
+      const day = start.getDay();
+      const distanceToMonday = (day + 6) % 7;
+
+      start.setDate(start.getDate() - distanceToMonday);
       start.setHours(0, 0, 0, 0);
 
       const end = new Date(now);
@@ -395,10 +342,9 @@ const Order = () => {
     }
 
     if (filter === "month") {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      start.setHours(0, 0, 0, 0);
+      const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const end = new Date(now);
       end.setHours(23, 59, 59, 999);
 
       return {
@@ -426,13 +372,13 @@ const Order = () => {
 
       toast.success(`Order ${order.orderId} marked as ${newStatus}`);
 
-      await getOrderListing({
+      getOrderListing({
         status,
         search,
         page,
-        pageSize,
-        fromDate,
-        toDate,
+        limit: pageSize,
+        fromDate: range.fromDate,
+        toDate: range.toDate,
       });
     } catch (error) {
       console.error("Failed to update order status:", error);
