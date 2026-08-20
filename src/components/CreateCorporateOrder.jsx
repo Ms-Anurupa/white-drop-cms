@@ -1,22 +1,39 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Loader2,
   Package,
-  FileText,
   IndianRupee,
   StickyNote,
   ShoppingCart,
   AlertTriangle,
   Building2,
   Boxes,
+  Plus,
+  Trash2,
+  CalendarDays,
+  FilePlus2,
+  ClipboardList,
+  Truck,
+  PackageCheck,
+  Calculator,
+  Minus,
+  CheckCircle2,
+  Clock3,
 } from "lucide-react";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import { toast } from "react-toastify";
 
-const units = ["L", "mL", "Kg", "g"];
+const units = ["L", "ML", "KG", "G"];
+
+const createEmptyItem = () => ({
+  unit: "L",
+  qty: "",
+  pricePerUnit: "",
+  orderDate: new Date().toISOString().split("T")[0],
+});
 
 const CreateCorporateOrder = () => {
   const navigate = useNavigate();
@@ -26,16 +43,7 @@ const CreateCorporateOrder = () => {
   const createCorporateOrderAdmin = corporateDataStore(
     (state) => state.createCorporateOrderAdmin,
   );
-  const [corporateData, setCorporateData] = useState({
-    corpoAccId: "",
-    productName: "",
-    description: "",
-    unit: "L",
-    qty: "",
-    pricePerUnit: "",
-    orderTotal: 0,
-    notes: "",
-  });
+
   const getCorporateAccounts = corporateDataStore(
     (state) => state.getCorporateAccounts,
   );
@@ -43,6 +51,24 @@ const CreateCorporateOrder = () => {
   const corporateOrderAcc = corporateDataStore(
     (state) => state.corporateOrderAcc,
   );
+
+  const [corporateData, setCorporateData] = useState({
+    corpoAccId: "",
+    productName: "",
+    notes: "",
+    deliveryStatus: "PROCESSING",
+    receivedStatus: "PENDING",
+  });
+
+  const [items, setItems] = useState([createEmptyItem()]);
+
+  const [receivedData, setReceivedData] = useState({
+    quantity: "",
+    unit: "L",
+    totalPrice: "",
+  });
+
+  const [discountReason, setDiscountReason] = useState("");
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -59,24 +85,105 @@ const CreateCorporateOrder = () => {
     });
   }, [getCorporateAccounts, search, status, page]);
 
-  useEffect(() => {
-    console.log(corporateOrderAcc);
-  }, [corporateOrderAcc]);
-
-  const handleChange = (e) => {
+  const handleCorporateChange = (e) => {
     const { name, value } = e.target;
 
-    setCorporateData((prev) => {
-      const updated = {
-        ...prev,
-        [name]: name === "qty" || name === "pricePerUnit" ? value : value,
-      };
+    setCorporateData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-      updated.orderTotal =
-        (Number(updated.qty) || 0) * (Number(updated.pricePerUnit) || 0);
+  const handleItemChange = (index, e) => {
+    const { name, value } = e.target;
 
-      return updated;
-    });
+    setItems((prev) =>
+      prev.map((item, itemIndex) =>
+        itemIndex === index
+          ? {
+              ...item,
+              [name]: value,
+            }
+          : item,
+      ),
+    );
+  };
+
+  const addItem = () => {
+    setItems((prev) => [...prev, createEmptyItem()]);
+  };
+
+  const removeItem = (index) => {
+    if (items.length === 1) {
+      toast.info("At least one order item is required.");
+      return;
+    }
+
+    setItems((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+  };
+
+  const handleReceivedChange = (e) => {
+    const { name, value } = e.target;
+
+    setReceivedData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const totalSentQuantity = useMemo(() => {
+    return items.reduce((total, item) => total + (Number(item.qty) || 0), 0);
+  }, [items]);
+
+  const totalSentPrice = useMemo(() => {
+    return items.reduce(
+      (total, item) =>
+        total + (Number(item.qty) || 0) * (Number(item.pricePerUnit) || 0),
+      0,
+    );
+  }, [items]);
+
+  const receivedQuantity = Number(receivedData.quantity) || 0;
+
+  const receivedUnit = receivedData.unit;
+
+  const receivedTotalPrice = Number(receivedData.totalPrice) || 0;
+
+  const receivedPricePerUnit =
+    receivedQuantity > 0 ? receivedTotalPrice / receivedQuantity : 0;
+
+  const discount = Math.max(totalSentPrice - receivedTotalPrice, 0);
+
+  const grandTotal = receivedTotalPrice;
+
+  const validateItems = () => {
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+
+      if (!item.unit) {
+        toast.error(`Unit is required for item ${index + 1}.`);
+        return false;
+      }
+
+      if (!item.qty || Number(item.qty) <= 0) {
+        toast.error(`Quantity must be greater than 0 for item ${index + 1}.`);
+        return false;
+      }
+
+      if (!item.pricePerUnit || Number(item.pricePerUnit) <= 0) {
+        toast.error(
+          `Price per unit must be greater than 0 for item ${index + 1}.`,
+        );
+        return false;
+      }
+
+      if (!item.orderDate) {
+        toast.error(`Order date is required for item ${index + 1}.`);
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -92,357 +199,814 @@ const CreateCorporateOrder = () => {
       return;
     }
 
-    if (!corporateData.description.trim()) {
-      toast.error("Description is required.");
-      return;
-    }
-
-    if (!corporateData.unit) {
-      toast.error("Please select a unit.");
-      return;
-    }
-
-    if (!corporateData.qty || Number(corporateData.qty) <= 0) {
-      toast.error("Quantity must be greater than 0.");
-      return;
-    }
-
-    if (!Number.isInteger(Number(corporateData.qty))) {
-      toast.error("Quantity must be a whole number.");
-      return;
-    }
-
-    if (
-      !corporateData.pricePerUnit ||
-      Number(corporateData.pricePerUnit) <= 0
-    ) {
-      toast.error("Price per unit must be greater than 0.");
-      return;
-    }
-
     if (!corporateData.notes.trim()) {
       toast.error("Delivery notes are required.");
       return;
     }
 
+    if (!validateItems()) {
+      return;
+    }
+
+    if (
+      corporateData.receivedStatus === "RECEIVED" &&
+      (!receivedData.quantity || Number(receivedData.quantity) <= 0)
+    ) {
+      toast.error("Received quantity must be greater than 0.");
+      return;
+    }
+
+    if (corporateData.receivedStatus === "RECEIVED" && !receivedData.unit) {
+      toast.error("Please select received unit.");
+      return;
+    }
+
+    if (
+      corporateData.receivedStatus === "RECEIVED" &&
+      (!receivedData.totalPrice || Number(receivedData.totalPrice) < 0)
+    ) {
+      toast.error("Received total is required.");
+      return;
+    }
+
     setLoading(true);
 
-    const payload = {
-      corpoAccId: corporateData.corpoAccId,
-      orderDetails: {
-        productName: corporateData.productName,
-        description: corporateData.description,
-        unit: corporateData.unit,
-        qty: Number(corporateData.qty),
-        pricePerUnit: Number(corporateData.pricePerUnit),
-        orderTotal:
-          Number(corporateData.qty) * Number(corporateData.pricePerUnit),
-        notes: corporateData.notes,
-      },
-    };
-    await createCorporateOrderAdmin(payload);
+    try {
+      const finalReceivedQuantity = receivedQuantity;
 
-    navigate(-1);
+      const finalReceivedUnit = receivedData.unit;
 
-    setTimeout(() => {
+      const finalReceivedTotal = receivedTotalPrice;
+
+      const finalReceivedPricePerUnit =
+        finalReceivedQuantity > 0
+          ? finalReceivedTotal / finalReceivedQuantity
+          : 0;
+
+      const finalDiscount = Math.max(totalSentPrice - finalReceivedTotal, 0);
+
+      const finalGrandTotal =
+        finalReceivedTotal > 0 ? finalReceivedTotal : totalSentPrice;
+
+      const payload = {
+        corpoAccId: corporateData.corpoAccId,
+
+        deliveryStatus: corporateData.deliveryStatus,
+
+        paymentStatus: corporateData.receivedStatus,
+
+        orderDetails: {
+          productName: corporateData.productName.trim(),
+
+          deliveryNote: corporateData.notes.trim(),
+
+          sentTotalPrice: totalSentPrice,
+
+          receivedQuantity: finalReceivedQuantity,
+
+          receivedUnit: finalReceivedUnit,
+
+          receivedTotalPrice: finalReceivedTotal,
+
+          receivedPricePerUnit: finalReceivedPricePerUnit,
+
+          grandTotal: finalGrandTotal,
+
+          discountValue: finalDiscount,
+
+          discountReason: finalDiscount > 0 ? discountReason.trim() : "",
+
+          items: items.map((item) => ({
+            qty: Number(item.qty),
+            unit: item.unit,
+
+            itemTotalPrice: Number(item.qty) * Number(item.pricePerUnit),
+
+            orderDate: new Date(item.orderDate).toISOString(),
+
+            pricePerUnit: Number(item.pricePerUnit),
+          })),
+        },
+      };
+
+      // console.log("Corporate Order Payload:", payload);
+
+      await createCorporateOrderAdmin(payload);
+
+      toast.success("Corporate order created successfully.");
+
+      navigate(-1);
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to create corporate order.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
+  const selectedAccount = corporateOrderAcc?.find(
+    (acc) => acc.id === corporateData.corpoAccId,
+  );
+
   return (
-    <div className="min-h-screen p-6 bg-gray-50/50">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50/60 p-4 sm:p-6">
+      <div className="mx-auto max-w-7xl">
+        {/* BACK */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition mb-6 cursor-pointer group"
+          className="group mb-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-900"
         >
           <ArrowLeft
             size={16}
-            className="group-hover:-translate-x-0.5 transition-transform"
+            className="transition-transform group-hover:-translate-x-0.5"
           />
           Back to Corporate Orders
         </button>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {/* Header */}
-          <div className="px-6 sm:px-8 pt-2 pb-2 border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
-                <ShoppingCart size={20} className="text-blue-600" />
+        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+          {/* HEADER */}
+          <div className="border-b border-gray-100 px-5 py-5 sm:px-7">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                  <ShoppingCart size={20} className="text-blue-600" />
+                </div>
+
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">
+                    Create Corporate Order
+                  </h1>
+
+                  <p className="mt-0.5 text-sm text-gray-500">
+                    Create and manage corporate purchase items
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  Create Corporate Order
-                </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Add a new corporate purchase order
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={addItem}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <FilePlus2 size={16} />
+
+                <span className="hidden sm:inline">Add Corporate Invoice</span>
+
+                <span className="sm:hidden">Add</span>
+              </button>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-4 space-y-2">
-            {/* Warning */}
-            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
+          <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
+            {/* WARNING */}
+            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
               <AlertTriangle
-                size={16}
-                className="text-amber-500 mt-0.5 shrink-0"
+                size={17}
+                className="mt-0.5 shrink-0 text-amber-500"
               />
-              <p className="text-xs text-amber-800 leading-relaxed">
-                Verify the quantity and pricing before creating the order.
-              </p>
+
+              <div>
+                <p className="text-xs font-semibold text-amber-900">
+                  Verify order information
+                </p>
+
+                <p className="mt-0.5 text-xs leading-relaxed text-amber-800">
+                  Verify quantity, pricing, delivery status, received status and
+                  received quantity before creating the corporate order.
+                </p>
+              </div>
             </div>
 
-            {/* Corporate Account / Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Corporate Account */}
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
+            {/* ACCOUNT */}
+            <section>
+              <div className="mb-3 flex items-center gap-2">
+                <Building2 size={17} className="text-blue-600" />
+
+                <h2 className="text-sm font-semibold text-gray-900">
                   Corporate Account
-                </label>
+                </h2>
+              </div>
 
-                <div className="relative">
-                  <Building2
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                  />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Corporate Account
+                  </label>
 
-                  <select
-                    name="corpoAccId"
-                    value={corporateData.corpoAccId}
-                    onChange={handleChange}
-                    className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
-                  >
-                    <option value="">Select Corporate Account</option>
-
-                    {corporateOrderAcc?.map((account) => (
-                      <option key={account.id} value={account.id}>
-                        {account.businessName}
-                      </option>
-                    ))}
-                  </select>
-
-                  <svg
-                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
+                  <div className="relative">
+                    <Building2
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
-                  </svg>
+
+                    <select
+                      name="corpoAccId"
+                      value={corporateData.corpoAccId}
+                      onChange={handleCorporateChange}
+                      className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    >
+                      <option value="">Select Corporate Account</option>
+
+                      {corporateOrderAcc?.map((account) => (
+                        <option key={account.id} value={account.id}>
+                          {account.businessName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              {/* Address */}
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Address
-                </label>
-
-                <textarea
-                  placeholder="Please select the Corporate Account to see the address"
-                  rows={2}
-                  readOnly
-                  value={
-                    corporateOrderAcc?.find(
-                      (acc) => acc.id === corporateData.corpoAccId,
-                    )?.address || ""
-                  }
-                  className="w-full pl-2 pr-2 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 resize-none"
-                />
-              </div>
-            </div>
-
-            {/* Product Name / Description */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Product Name */}
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Product Name
-                </label>
-
-                <div className="relative">
-                  <Package
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-
-                  <input
-                    required
-                    placeholder="Add Product Name"
-                    name="productName"
-                    value={corporateData.productName}
-                    onChange={handleChange}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Description
-                </label>
-
-                <div className="relative">
-                  <FileText
-                    size={16}
-                    className="absolute left-3 top-3 text-gray-400"
-                  />
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Delivery Address
+                  </label>
 
                   <textarea
-                    required
                     rows={2}
-                    placeholder="Add Product Description"
-                    name="description"
-                    value={corporateData.description}
-                    onChange={handleChange}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                    readOnly
+                    value={selectedAccount?.address || ""}
+                    placeholder="Select a corporate account to see the address"
+                    className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none"
                   />
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Unit / Qty */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                  Unit
-                </label>
+            {/* PRODUCT / NOTES / STATUS */}
+            <section>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Product Name
+                  </label>
 
-                <div className="relative">
-                  <Package
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                  />
-
-                  <select
-                    required
-                    name="unit"
-                    value={corporateData.unit}
-                    onChange={handleChange}
-                    className="w-full appearance-none pl-9 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm outline-none bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition cursor-pointer"
-                  >
-                    {units.map((unit) => (
-                      <option key={unit} value={unit}>
-                        {unit}
-                      </option>
-                    ))}
-                  </select>
-
-                  <svg
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
+                  <div className="relative">
+                    <Package
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
-                  </svg>
+
+                    <input
+                      required
+                      name="productName"
+                      value={corporateData.productName}
+                      onChange={handleCorporateChange}
+                      placeholder="Enter product name"
+                      className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Delivery Notes
+                  </label>
+
+                  <div className="relative">
+                    <StickyNote
+                      size={16}
+                      className="absolute left-3 top-3.5 text-gray-400"
+                    />
+
+                    <textarea
+                      required
+                      rows={3}
+                      name="notes"
+                      value={corporateData.notes}
+                      onChange={handleCorporateChange}
+                      placeholder="Example: Please ensure delivery is completed before 7:00 AM at the rear entrance."
+                      className="w-full resize-none rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                {/* DELIVERY STATUS */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Delivery Status
+                  </label>
+
+                  <div className="relative">
+                    {corporateData.deliveryStatus === "DELIVERED" ? (
+                      <CheckCircle2
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500"
+                      />
+                    ) : (
+                      <Clock3
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+                      />
+                    )}
+
+                    <select
+                      name="deliveryStatus"
+                      value={corporateData.deliveryStatus}
+                      onChange={handleCorporateChange}
+                      className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    >
+                      <option value="PROCESSING">Processing</option>
+
+                      <option value="DELIVERED">Delivered</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* RECEIVED STATUS */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Payment Status
+                  </label>
+
+                  <div className="relative">
+                    {corporateData.receivedStatus === "RECEIVED" ? (
+                      <PackageCheck
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500"
+                      />
+                    ) : (
+                      <Clock3
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+                      />
+                    )}
+
+                    <select
+                      name="receivedStatus"
+                      value={corporateData.receivedStatus}
+                      onChange={handleCorporateChange}
+                      className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                    >
+                      <option value="PENDING">Pending</option>
+
+                      <option value="RECEIVED">Complete</option>
+                    </select>
+                  </div>
                 </div>
               </div>
+            </section>
 
-              <div>
-                <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                  Quantity
-                </label>
+            {/* ORDER ITEMS */}
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ClipboardList size={17} className="text-blue-600" />
 
-                <div className="relative">
-                  <Boxes
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
+                  <div>
+                    <h2 className="text-sm font-semibold text-gray-900">
+                      Order Items
+                    </h2>
 
-                  <input
-                    type="number"
-                    placeholder="Enter quantity"
-                    name="qty"
-                    value={corporateData.qty}
-                    onChange={handleChange}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
+                    <p className="text-xs text-gray-500">
+                      Add one or multiple products to this corporate order
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Price / Total */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                  Price Per Unit
-                </label>
-
-                <div className="relative">
-                  <IndianRupee
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-
-                  <input
-                    type="number"
-                    placeholder="Enter price"
-                    name="pricePerUnit"
-                    value={corporateData.pricePerUnit}
-                    onChange={handleChange}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                  {items.length} {items.length === 1 ? "Item" : "Items"}
+                </span>
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                  Order Total
-                </label>
-
-                <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 to-slate-50 px-3 py-2.5">
-                  <IndianRupee size={16} className="text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-700">
-                    {corporateData.orderTotal || 0}
+              <div className="overflow-x-auto rounded-2xl border border-gray-200">
+                <div className="hidden min-w-[900px] grid-cols-[120px_140px_160px_160px_160px_50px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 md:grid">
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Unit
                   </span>
+
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Quantity
+                  </span>
+
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Price / Unit
+                  </span>
+
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Order Total
+                  </span>
+
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Order Date
+                  </span>
+
+                  <span />
+                </div>
+
+                <div className="divide-y divide-gray-100">
+                  {items.map((item, index) => {
+                    const itemTotal =
+                      (Number(item.qty) || 0) *
+                      (Number(item.pricePerUnit) || 0);
+
+                    return (
+                      <div
+                        key={index}
+                        className="grid min-w-[900px] gap-3 bg-white p-4 md:grid-cols-[120px_140px_160px_160px_160px_50px] md:items-center"
+                      >
+                        {/* UNIT */}
+                        <div>
+                          <select
+                            name="unit"
+                            value={item.unit}
+                            onChange={(e) => handleItemChange(index, e)}
+                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-300"
+                          >
+                            {units.map((unit) => (
+                              <option key={unit} value={unit}>
+                                {unit}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* QUANTITY */}
+                        <div className="relative">
+                          <Boxes
+                            size={15}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                          />
+
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            name="qty"
+                            value={item.qty}
+                            onChange={(e) => handleItemChange(index, e)}
+                            placeholder="Qty"
+                            className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300"
+                          />
+                        </div>
+
+                        {/* PRICE */}
+                        <div className="relative">
+                          <IndianRupee
+                            size={15}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                          />
+
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            name="pricePerUnit"
+                            value={item.pricePerUnit}
+                            onChange={(e) => handleItemChange(index, e)}
+                            placeholder="Price"
+                            className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300"
+                          />
+                        </div>
+
+                        {/* TOTAL */}
+                        <div className="flex items-center gap-1.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
+                          <IndianRupee size={14} className="text-blue-600" />
+
+                          <span className="text-sm font-semibold text-blue-700">
+                            {itemTotal.toLocaleString("en-IN", {
+                              maximumFractionDigits: 2,
+                            })}
+                          </span>
+                        </div>
+
+                        {/* DATE */}
+                        <input
+                          type="date"
+                          name="orderDate"
+                          value={item.orderDate}
+                          onChange={(e) => handleItemChange(index, e)}
+                          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-xs outline-none focus:border-blue-300"
+                        />
+
+                        {/* DELETE */}
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          disabled={items.length === 1}
+                          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="border-t border-gray-200 bg-gray-50/70 p-3">
+                  <button
+                    type="button"
+                    onClick={addItem}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                  >
+                    <Plus size={16} />
+                    Add Another Item
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* SUMMARY */}
+            <section>
+              <div className="mb-4 flex items-center gap-2">
+                <Calculator size={17} className="text-blue-600" />
+
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    Order Summary
+                  </h2>
+
+                  <p className="text-xs text-gray-500">
+                    Compare sent order with the quantity actually received
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* SENT */}
+                <div className="overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/40">
+                  <div className="flex items-center justify-between border-b border-blue-100 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Truck size={16} className="text-blue-600" />
+
+                      <p className="text-sm font-semibold text-gray-900">
+                        Total Sent Order
+                      </p>
+                    </div>
+
+                    <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+                      SENT
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 p-4">
+                    <div className="rounded-xl border border-blue-100 bg-white p-3">
+                      <p className="text-[11px] text-gray-500">Quantity</p>
+
+                      <p className="mt-1 text-lg font-bold text-gray-900">
+                        {totalSentQuantity.toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-blue-100 bg-white p-3">
+                      <p className="text-[11px] text-gray-500">Unit</p>
+
+                      <p className="mt-1 text-lg font-bold text-gray-900">
+                        {items.length === 1 ? items[0].unit : "Mixed"}
+                      </p>
+                    </div>
+
+                    <div className="col-span-2 rounded-xl border border-blue-100 bg-white p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-500">
+                          Total Sent Price
+                        </span>
+
+                        <span className="flex items-center gap-1 text-base font-bold text-blue-700">
+                          <IndianRupee size={15} />
+
+                          {totalSentPrice.toLocaleString("en-IN", {
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RECEIVED */}
+                <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50/40">
+                  <div className="flex items-center justify-between border-b border-emerald-100 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <PackageCheck size={16} className="text-emerald-600" />
+
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">
+                          Total Received Order
+                        </p>
+
+                        <p className="text-[11px] text-gray-500">
+                          Admin enters quantity, unit and total only
+                        </p>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                        corporateData.receivedStatus === "RECEIVED"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {corporateData.receivedStatus}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 p-4">
+                    {/* RECEIVED QUANTITY - EDITABLE */}
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
+                        Received Quantity
+                      </label>
+
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        name="quantity"
+                        value={receivedData.quantity}
+                        onChange={handleReceivedChange}
+                        placeholder="17.14"
+                        className="w-full rounded-xl border border-emerald-100 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:bg-gray-100"
+                      />
+                    </div>
+
+                    {/* RECEIVED UNIT - EDITABLE */}
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
+                        Unit
+                      </label>
+
+                      <select
+                        name="unit"
+                        value={receivedData.unit}
+                        onChange={handleReceivedChange}
+                        className="w-full cursor-pointer rounded-xl border border-emerald-100 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:bg-gray-100"
+                      >
+                        {units.map((unit) => (
+                          <option key={unit} value={unit}>
+                            {unit}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* PRICE / UNIT - AUTO CALCULATED + NON EDITABLE */}
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
+                        Price / Unit
+                        <span className="ml-1 text-emerald-600">(Auto)</span>
+                      </label>
+
+                      <div className="flex items-center rounded-xl border border-emerald-100 bg-gray-100 px-3 py-2.5">
+                        <IndianRupee size={14} className="mr-1 text-gray-400" />
+
+                        <span className="text-sm font-semibold text-gray-700">
+                          {receivedPricePerUnit.toLocaleString("en-IN", {
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* RECEIVED TOTAL - EDITABLE */}
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
+                        Received Total
+                        <span className="ml-1 text-emerald-600">(Input)</span>
+                      </label>
+
+                      <div className="relative">
+                        <IndianRupee
+                          size={15}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        />
+
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          name="totalPrice"
+                          value={receivedData.totalPrice}
+                          onChange={handleReceivedChange}
+                          placeholder="1200"
+                          className="w-full rounded-xl border border-emerald-100 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:bg-gray-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ADJUSTMENT */}
+            <section className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Minus size={16} className="text-orange-500" />
+
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    Discount / Adjustment
+                  </h2>
+
+                  <p className="text-[11px] text-gray-500">
+                    Automatically calculated from sent total and received total
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* AUTO DISCOUNT */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Discount / Adjustment
+                    <span className="ml-1 text-orange-500">(Auto)</span>
+                  </label>
+
+                  <div className="flex items-center rounded-xl border border-gray-200 bg-gray-100 px-3 py-2.5">
+                    <IndianRupee size={15} className="mr-1 text-gray-400" />
+
+                    <span className="text-sm font-semibold text-gray-700">
+                      {discount.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* REASON - EDITABLE */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                    Adjustment Reason
+                  </label>
+
+                  <input
+                    type="text"
+                    value={discountReason}
+                    onChange={(e) => setDiscountReason(e.target.value)}
+                    placeholder="Less quantity received"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-500/20"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* GRAND TOTAL */}
+            <div className="overflow-hidden rounded-2xl border border-gray-200">
+              <div className="bg-gray-900 px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-gray-400">
+                      Final Amount
+                    </p>
+
+                    <p className="mt-0.5 text-sm font-semibold text-white">
+                      Corporate Order Grand Total
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-2xl font-bold text-white">
+                    <IndianRupee size={21} />
+
+                    {grandTotal.toLocaleString("en-IN", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 divide-x divide-gray-200 bg-white">
+                <div className="p-4">
+                  <p className="text-[11px] text-gray-500">Sent Total</p>
+
+                  <p className="mt-1 text-sm font-semibold">
+                    ₹
+                    {totalSentPrice.toLocaleString("en-IN", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+
+                <div className="p-4">
+                  <p className="text-[11px] text-gray-500">Received Total</p>
+
+                  <p className="mt-1 text-sm font-semibold text-emerald-600">
+                    ₹
+                    {receivedTotalPrice.toLocaleString("en-IN", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+
+                <div className="p-4">
+                  <p className="text-[11px] text-gray-500">Adjustment</p>
+
+                  <p className="mt-1 text-sm font-semibold text-orange-600">
+                    - ₹
+                    {discount.toLocaleString("en-IN", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Notes */}
-            <div>
-              <label className="text-xs font-medium text-gray-700 mb-1.5 block">
-                Delivery Notes
-              </label>
-
-              <div className="relative">
-                <StickyNote
-                  size={16}
-                  className="absolute left-3 top-4 text-gray-400"
-                />
-
-                <textarea
-                  required
-                  placeholder="Add Delivery Notes"
-                  rows={4}
-                  name="notes"
-                  value={corporateData.notes}
-                  onChange={handleChange}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
-                />
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+            {/* FOOTER */}
+            <div className="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-4 py-2.5 cursor-pointer rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+                className="cursor-pointer rounded-xl px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
               >
                 Cancel
               </button>
@@ -450,11 +1014,11 @@ const CreateCorporateOrder = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="cursor-pointer inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60 transition"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
 
-                {loading ? "Creating..." : "Create Order"}
+                {loading ? "Creating..." : "Create Corporate Order"}
               </button>
             </div>
           </form>
