@@ -14,7 +14,8 @@ import {
   ShoppingBag,
   UserRound,
   X,
-  Phone
+  Phone,
+  Clock3
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
