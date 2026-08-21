@@ -11,11 +11,17 @@ const DateFilter = ({
   onToDateChange,
   onClear,
   rangeLabel, // e.g. "Joined date" — shows a label+icon instead of pills
+  bare = false,
+  className = "",
 }) => {
   const hasPills = filters.length > 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-wrap items-end gap-3">
+    <div
+      className={`${className} ${
+        !bare ? "bg-white rounded-2xl border border-gray-100 shadow-sm p-3" : ""
+      } flex flex-wrap items-end gap-3`}
+    >
       {/* Filter Pills */}
       {hasPills && (
         <div className="flex flex-wrap items-center gap-2 pb-0.5">

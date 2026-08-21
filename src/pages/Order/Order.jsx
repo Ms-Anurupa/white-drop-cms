@@ -90,13 +90,6 @@ const formatTimeOnly = (value) => {
   });
 };
 
-/**
- * Returns API-ready date range.
- *
- * Important:
- * We calculate dates using the user's local timezone first
- * and only then convert them to ISO strings.
- */
 const getDateRange = (filter) => {
   const now = new Date();
 
@@ -146,15 +139,7 @@ const getDateRange = (filter) => {
 
   // THIS MONTH - first day to today
   if (filter === "month") {
-    const from = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      1,
-      0,
-      0,
-      0,
-      0,
-    );
+    const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 
     const to = new Date(now);
     to.setHours(23, 59, 59, 999);
@@ -271,23 +256,17 @@ const PageStyles = () => (
 );
 
 const Order = () => {
-  const getOrderListing = orderDataStore(
-    (state) => state.getOrderListing,
-  );
+  const getOrderListing = orderDataStore((state) => state.getOrderListing);
 
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
   );
 
-  const updateOrderStatus = orderDataStore(
-    (state) => state.updateOrderStatus,
-  );
+  const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
 
   const orders = orderDataStore((state) => state.orders);
   const meta = orderDataStore((state) => state.meta);
-  const orderSummary = orderDataStore(
-    (state) => state.orderSummary,
-  );
+  const orderSummary = orderDataStore((state) => state.orderSummary);
   const loading = orderDataStore((state) => state.loading);
 
   const [search, setSearch] = useState("");
@@ -313,12 +292,6 @@ const Order = () => {
 
   const navigate = useNavigate();
 
-  /*
-   * ---------------------------------------------------------
-   * ADDRESS POPOVER
-   * ---------------------------------------------------------
-   */
-
   const showAddressPopover = (e, order) => {
     const anchor = e.currentTarget.getBoundingClientRect();
 
@@ -342,10 +315,7 @@ const Order = () => {
 
     const { anchor } = hoveredOrder;
 
-    const {
-      width,
-      height,
-    } = popoverRef.current.getBoundingClientRect();
+    const { width, height } = popoverRef.current.getBoundingClientRect();
 
     const margin = 12;
     const gap = 8;
@@ -363,16 +333,10 @@ const Order = () => {
 
     let top;
 
-    if (
-      spaceBelow >= height + gap + margin ||
-      spaceBelow >= spaceAbove
-    ) {
+    if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
       top = anchor.bottom + gap;
 
-      top = Math.min(
-        top,
-        window.innerHeight - margin - height,
-      );
+      top = Math.min(top, window.innerHeight - margin - height);
     } else {
       top = anchor.top - height - gap;
     }
@@ -384,12 +348,6 @@ const Order = () => {
       left,
     });
   }, [hoveredOrder]);
-
-  /*
-   * ---------------------------------------------------------
-   * FETCH ORDERS
-   * ---------------------------------------------------------
-   */
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -416,12 +374,6 @@ const Order = () => {
     appliedToDate,
   ]);
 
-  /*
-   * ---------------------------------------------------------
-   * DATE FILTER
-   * ---------------------------------------------------------
-   */
-
   const handlePillFilterChange = (key) => {
     const range = getDateRange(key);
 
@@ -439,19 +391,9 @@ const Order = () => {
     setPage(1);
   };
 
-  /*
-   * ---------------------------------------------------------
-   * CUSTOM FROM DATE
-   * ---------------------------------------------------------
-   */
-
   const handleFromDateChange = (value) => {
     setFromDate(value);
 
-    /*
-     * If user has not selected To Date yet,
-     * don't send an incomplete date range to API.
-     */
     if (!value || !toDate) {
       setDateFilter("custom");
 
@@ -461,13 +403,8 @@ const Order = () => {
       return;
     }
 
-    /*
-     * Validate range
-     */
     if (value > toDate) {
-      toast.error(
-        "From Date cannot be after To Date.",
-      );
+      toast.error("From Date cannot be after To Date.");
 
       setFromDate("");
       setAppliedFromDate("");
@@ -478,13 +415,9 @@ const Order = () => {
       return;
     }
 
-    const from = new Date(
-      `${value}T00:00:00`,
-    );
+    const from = new Date(`${value}T00:00:00`);
 
-    const to = new Date(
-      `${toDate}T23:59:59.999`,
-    );
+    const to = new Date(`${toDate}T23:59:59.999`);
 
     setAppliedFromDate(from.toISOString());
     setAppliedToDate(to.toISOString());
@@ -494,19 +427,9 @@ const Order = () => {
     setPage(1);
   };
 
-  /*
-   * ---------------------------------------------------------
-   * CUSTOM TO DATE
-   * ---------------------------------------------------------
-   */
-
   const handleToDateChange = (value) => {
     setToDate(value);
 
-    /*
-     * If From Date is not selected yet,
-     * don't send incomplete range.
-     */
     if (!value || !fromDate) {
       setDateFilter("custom");
 
@@ -516,13 +439,8 @@ const Order = () => {
       return;
     }
 
-    /*
-     * Validate range
-     */
     if (fromDate > value) {
-      toast.error(
-        "To Date cannot be before From Date.",
-      );
+      toast.error("To Date cannot be before From Date.");
 
       setToDate("");
       setAppliedFromDate("");
@@ -533,13 +451,9 @@ const Order = () => {
       return;
     }
 
-    const from = new Date(
-      `${fromDate}T00:00:00`,
-    );
+    const from = new Date(`${fromDate}T00:00:00`);
 
-    const to = new Date(
-      `${value}T23:59:59.999`,
-    );
+    const to = new Date(`${value}T23:59:59.999`);
 
     setAppliedFromDate(from.toISOString());
     setAppliedToDate(to.toISOString());
@@ -548,12 +462,6 @@ const Order = () => {
 
     setPage(1);
   };
-
-  /*
-   * ---------------------------------------------------------
-   * CLEAR CUSTOM DATES
-   * ---------------------------------------------------------
-   */
 
   const clearDates = () => {
     setFromDate("");
@@ -567,26 +475,14 @@ const Order = () => {
     setPage(1);
   };
 
-  /*
-   * ---------------------------------------------------------
-   * DATE COUNTS
-   * ---------------------------------------------------------
-   */
-
   const dateCounts = {
     all: Number(orderSummary?.allOrders ?? 0),
 
-    today: Number(
-      orderSummary?.todayOrders ?? 0,
-    ),
+    today: Number(orderSummary?.todayOrders ?? 0),
 
-    week: Number(
-      orderSummary?.thisWeekOrders ?? 0,
-    ),
+    week: Number(orderSummary?.thisWeekOrders ?? 0),
 
-    month: Number(
-      orderSummary?.thisMonthOrders ?? 0,
-    ),
+    month: Number(orderSummary?.thisMonthOrders ?? 0),
   };
 
   const DATE_FILTERS = [
@@ -608,48 +504,23 @@ const Order = () => {
     },
   ];
 
-  /*
-   * ---------------------------------------------------------
-   * PAGINATION
-   * ---------------------------------------------------------
-   */
+  const totalItems = Number(meta?.totalItems ?? 0);
 
-  const totalItems = Number(
-    meta?.totalItems ?? 0,
-  );
+  const totalPages = Math.max(1, Number(meta?.totalPages ?? 1));
 
-  const totalPages = Math.max(
-    1,
-    Number(meta?.totalPages ?? 1),
-  );
+  const currentPage = Math.min(page, totalPages);
 
-  const currentPage = Math.min(
-    page,
-    totalPages,
-  );
+  const start = (currentPage - 1) * pageSize;
 
-  const start =
-    (currentPage - 1) * pageSize;
-
-  const paginated = Array.isArray(orders)
-    ? orders
-    : [];
-
-  /*
-   * ---------------------------------------------------------
-   * EXPORT
-   * ---------------------------------------------------------
-   */
+  const paginated = Array.isArray(orders) ? orders : [];
 
   const handleExport = async () => {
     try {
       const file = await exportOrderDetails();
 
-      const url =
-        window.URL.createObjectURL(file);
+      const url = window.URL.createObjectURL(file);
 
-      const link =
-        document.createElement("a");
+      const link = document.createElement("a");
 
       link.href = url;
       link.download = "orders.xlsx";
@@ -662,35 +533,16 @@ const Order = () => {
 
       window.URL.revokeObjectURL(url);
 
-      toast.success(
-        "Order data exported successfully",
-      );
+      toast.success("Order data exported successfully");
     } catch (error) {
-      console.error(
-        "Failed to export orders:",
-        error,
-      );
+      console.error("Failed to export orders:", error);
 
-      toast.error(
-        "Failed to export order details",
-      );
+      toast.error("Failed to export order details");
     }
   };
 
-  /*
-   * ---------------------------------------------------------
-   * STATUS UPDATE
-   * ---------------------------------------------------------
-   */
-
-  const handleStatusChange = async (
-    order,
-    newStatus,
-  ) => {
-    if (
-      !newStatus ||
-      newStatus === order.orderStatus
-    ) {
+  const handleStatusChange = async (order, newStatus) => {
+    if (!newStatus || newStatus === order.orderStatus) {
       return;
     }
 
@@ -702,13 +554,8 @@ const Order = () => {
         status: newStatus,
       });
 
-      toast.success(
-        `Order ${order.orderId} marked as ${newStatus}`,
-      );
+      toast.success(`Order ${order.orderId} marked as ${newStatus}`);
 
-      /*
-       * Refresh current filtered page.
-       */
       await getOrderListing({
         status: status || "",
         search: search || "",
@@ -718,25 +565,15 @@ const Order = () => {
         toDate: appliedToDate || "",
       });
     } catch (error) {
-      console.error(
-        "Failed to update order status:",
-        error,
-      );
+      console.error("Failed to update order status:", error);
 
       toast.error(
-        error?.response?.data?.message ||
-          "Failed to update order status",
+        error?.response?.data?.message || "Failed to update order status",
       );
     } finally {
       setUpdatingId(null);
     }
   };
-
-  /*
-   * ---------------------------------------------------------
-   * PAGE NUMBERS
-   * ---------------------------------------------------------
-   */
 
   const getPageNumbers = () => {
     const pages = [];
@@ -757,15 +594,9 @@ const Order = () => {
 
     pages.push(1);
 
-    const left = Math.max(
-      2,
-      currentPage - windowSize,
-    );
+    const left = Math.max(2, currentPage - windowSize);
 
-    const right = Math.min(
-      totalPages - 1,
-      currentPage + windowSize,
-    );
+    const right = Math.min(totalPages - 1, currentPage + windowSize);
 
     if (left > 2) {
       pages.push("ellipsis-left");
@@ -782,23 +613,9 @@ const Order = () => {
     return pages;
   };
 
-  /*
-   * ---------------------------------------------------------
-   * LOADING
-   * ---------------------------------------------------------
-   */
-
   if (loading) {
-    return (
-      <Loader text="Loading order history lists..." />
-    );
+    return <Loader text="Loading order history lists..." />;
   }
-
-  /*
-   * ---------------------------------------------------------
-   * UI
-   * ---------------------------------------------------------
-   */
 
   return (
     <div className="p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
@@ -812,9 +629,7 @@ const Order = () => {
           </h1>
 
           <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span>
-              Track orders, delivery &amp; status:
-            </span>
+            <span>Track orders, delivery &amp; status:</span>
 
             <span className="text-blue-600 font-medium">
               Total Order Count: {dateCounts.all}
@@ -849,67 +664,110 @@ const Order = () => {
             className="h-10 px-4 flex items-center gap-2 rounded-lg shrink-0 bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
           >
             <Download size={16} />
-
             Export
           </button>
         </div>
       </div>
 
       {/* DATE FILTER + STATUS */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex items-center gap-3 overflow-x-auto futuristic-scroll">
-        <DateFilter
-          filters={DATE_FILTERS.map((f) => ({
-            ...f,
-            count: dateCounts[f.key],
-          }))}
-          activeFilter={dateFilter}
-          onFilterChange={handlePillFilterChange}
-          fromDate={fromDate}
-          toDate={toDate}
-          onFromDateChange={
-            handleFromDateChange
-          }
-          onToDateChange={
-            handleToDateChange
-          }
-          onClear={
-            fromDate || toDate
-              ? clearDates
-              : undefined
-          }
-          bare
-        />
+      <div className="relative z-40 bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+        <div className="flex items-center gap-3 futuristic-scroll">
+          <DateFilter
+            filters={DATE_FILTERS.map((f) => ({
+              ...f,
+              count: dateCounts[f.key],
+            }))}
+            activeFilter={dateFilter}
+            onFilterChange={handlePillFilterChange}
+            fromDate={fromDate}
+            toDate={toDate}
+            onFromDateChange={handleFromDateChange}
+            onToDateChange={handleToDateChange}
+            onClear={fromDate || toDate ? clearDates : undefined}
+            bare
+          />
 
-        <div className="w-px h-8 shrink-0 bg-gray-100" />
+          <div className="w-px h-8 shrink-0 bg-gray-100" />
 
-        {/* STATUS FILTER */}
-        <select
-          value={status}
-          onChange={(e) => {
-            setStatus(e.target.value);
-            setPage(1);
-          }}
-          className="h-9 px-3 shrink-0 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-        >
-          <option value="">
-            All Statuses
-          </option>
+          {/* STATUS FILTER */}
+          <div className="relative z-100 shrink-0" style={{ top: "8px" }}>
+            <SplitButton
+              variant="outline"
+              className="w-40"
+              onClick={() => {}}
+              menuContent={
+                <>
+                  <SplitButtonItem
+                    onClick={() => {
+                      setStatus("");
+                      setPage(1);
+                    }}
+                  >
+                    <div className="flex w-full h-full items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
 
-          {ORDER_STATUSES.map((item) => (
-            <option
-              key={item}
-              value={item}
+                        <span>All Statuses</span>
+                      </div>
+
+                      {status === "" && (
+                        <span className="text-blue-600">✓</span>
+                      )}
+                    </div>
+                  </SplitButtonItem>
+
+                  {ORDER_STATUSES.map((item) => (
+                    <SplitButtonItem
+                      key={item}
+                      onClick={() => {
+                        setStatus(item);
+                        setPage(1);
+                      }}
+                    >
+                      <div className="flex w-full h-full items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              STATUS_DOT[item] || "bg-gray-400"
+                            }`}
+                          />
+
+                          <span>
+                            {item
+                              .replaceAll("_", " ")
+                              .toLowerCase()
+                              .replace(/\b\w/g, (c) => c.toUpperCase())}
+                          </span>
+                        </div>
+
+                        {status === item && (
+                          <span className="text-blue-600">✓</span>
+                        )}
+                      </div>
+                    </SplitButtonItem>
+                  ))}
+                </>
+              }
             >
-              {item
-                .replaceAll("_", " ")
-                .toLowerCase()
-                .replace(
-                  /\b\w/g,
-                  (c) => c.toUpperCase(),
-                )}
-            </option>
-          ))}
-        </select>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    status ? STATUS_DOT[status] || "bg-gray-400" : "bg-gray-400"
+                  }`}
+                />
+
+                <span>
+                  {status
+                    ? status
+                        .replaceAll("_", " ")
+                        .toLowerCase()
+                        .replace(/\b\w/g, (c) => c.toUpperCase())
+                    : "All Statuses"}
+                </span>
+              </div>
+            </SplitButton>
+          </div>
+        </div>
       </div>
 
       {/* TABLE CARD */}
@@ -920,10 +778,7 @@ const Order = () => {
             <EmptyState />
           ) : (
             paginated.map((o, idx) => (
-              <div
-                key={o.orderId}
-                className="p-4 hover:bg-slate-50"
-              >
+              <div key={o.orderId} className="p-4 hover:bg-slate-50">
                 <div className="flex justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -943,12 +798,8 @@ const Order = () => {
                     <div className="mt-2 flex items-center gap-2 flex-wrap">
                       <StatusSelect
                         order={o}
-                        onChange={
-                          handleStatusChange
-                        }
-                        disabled={
-                          updatingId === o.id
-                        }
+                        onChange={handleStatusChange}
+                        disabled={updatingId === o.id}
                         className="w-36"
                       />
                     </div>
@@ -956,12 +807,9 @@ const Order = () => {
 
                   <img
                     src={resolveFirebaseUrl({
-                      folderName:
-                        "productImages",
+                      folderName: "productImages",
                       fileName:
-                        o?.orderItems?.[0]
-                          ?.product
-                          ?.product_images?.[0],
+                        o?.orderItems?.[0]?.product?.product_images?.[0],
                     })}
                     alt="Product"
                     className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
@@ -973,17 +821,10 @@ const Order = () => {
                     {o.user?.customer_name}
                   </p>
 
-                  <p>
-                    {o.user?.phone_num}
-                  </p>
+                  <p>{o.user?.phone_num}</p>
 
                   <p>
-                    {[
-                      o.shippingAddress
-                        ?.apartment,
-                      o.shippingAddress
-                        ?.locality,
-                    ]
+                    {[o.shippingAddress?.apartment, o.shippingAddress?.locality]
                       .filter(Boolean)
                       .join(", ")}
                   </p>
@@ -991,14 +832,11 @@ const Order = () => {
 
                 <button
                   onClick={() =>
-                    navigate(
-                      `/dashboard/orders/orderDetails/${o.id}`,
-                    )
+                    navigate(`/dashboard/orders/orderDetails/${o.id}`)
                   }
                   className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
                 >
                   <Eye size={13} />
-
                   View details
                 </button>
               </div>
@@ -1058,10 +896,7 @@ const Order = () => {
                 </tr>
               ) : (
                 paginated.map((o, idx) => (
-                  <tr
-                    key={o.orderId}
-                    className="order-row hover:bg-slate-50"
-                  >
+                  <tr key={o.orderId} className="order-row hover:bg-slate-50">
                     <td className="px-2.5 py-2.5 text-gray-400">
                       {start + idx + 1}
                     </td>
@@ -1073,12 +908,9 @@ const Order = () => {
                     <td className="px-2.5 py-2.5">
                       <img
                         src={resolveFirebaseUrl({
-                          folderName:
-                            "productImages",
+                          folderName: "productImages",
                           fileName:
-                            o?.orderItems?.[0]
-                              ?.product
-                              ?.product_images?.[0],
+                            o?.orderItems?.[0]?.product?.product_images?.[0],
                         })}
                         alt="Product"
                         className="w-9 h-9 rounded-lg object-cover border border-gray-100"
@@ -1091,15 +923,8 @@ const Order = () => {
 
                     <td
                       className="px-2.5 py-2.5 text-gray-600 cursor-default"
-                      onMouseEnter={(e) =>
-                        showAddressPopover(
-                          e,
-                          o,
-                        )
-                      }
-                      onMouseLeave={
-                        hideAddressPopover
-                      }
+                      onMouseEnter={(e) => showAddressPopover(e, o)}
+                      onMouseLeave={hideAddressPopover}
                     >
                       <p className="font-medium text-gray-800 truncate">
                         {o.user?.customer_name}
@@ -1111,10 +936,8 @@ const Order = () => {
 
                       <p className="text-xs text-gray-400 truncate">
                         {[
-                          o.shippingAddress
-                            ?.apartment,
-                          o.shippingAddress
-                            ?.locality,
+                          o.shippingAddress?.apartment,
+                          o.shippingAddress?.locality,
                         ]
                           .filter(Boolean)
                           .join(", ")}
@@ -1124,12 +947,8 @@ const Order = () => {
                     <td className="px-2.5 py-2.5 align-middle">
                       <StatusSelect
                         order={o}
-                        onChange={
-                          handleStatusChange
-                        }
-                        disabled={
-                          updatingId === o.id
-                        }
+                        onChange={handleStatusChange}
+                        disabled={updatingId === o.id}
                         className="w-36"
                       />
                     </td>
@@ -1138,95 +957,55 @@ const Order = () => {
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
                           <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
-                            {o.deliverySlot
-                              ?.icon ? (
+                            {o.deliverySlot?.icon ? (
                               <img
-                                src={resolveFirebaseUrl(
-                                  {
-                                    folderName:
-                                      "public",
-                                    fileName:
-                                      o
-                                        .deliverySlot
-                                        .icon,
-                                  },
-                                )}
-                                alt={
-                                  o
-                                    .deliverySlot
-                                    .name
-                                }
+                                src={resolveFirebaseUrl({
+                                  folderName: "public",
+                                  fileName: o.deliverySlot.icon,
+                                })}
+                                alt={o.deliverySlot.name}
                                 className="w-3.5 h-3.5 object-contain"
                               />
                             ) : (
-                              <Clock3
-                                size={11}
-                                className="text-blue-600"
-                              />
+                              <Clock3 size={11} className="text-blue-600" />
                             )}
                           </span>
 
                           <div className="min-w-0">
                             <p className="text-xs font-medium text-gray-800 truncate">
-                              {
-                                o
-                                  .deliverySlot
-                                  .name
-                              }
+                              {o.deliverySlot.name}
                             </p>
 
-                            {o.deliverySlot
-                              ?.from &&
-                              o.deliverySlot
-                                ?.to && (
-                                <p className="text-[10px] text-gray-400 truncate">
-                                  {
-                                    o
-                                      .deliverySlot
-                                      .from
-                                  }
-                                  -
-                                  {
-                                    o
-                                      .deliverySlot
-                                      .to
-                                  }
-                                </p>
-                              )}
+                            {o.deliverySlot?.from && o.deliverySlot?.to && (
+                              <p className="text-[10px] text-gray-400 truncate">
+                                {o.deliverySlot.from}-{o.deliverySlot.to}
+                              </p>
+                            )}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400">
-                          —
-                        </span>
+                        <span className="text-xs text-gray-400">—</span>
                       )}
                     </td>
 
                     <td className="px-2.5 py-2.5 whitespace-nowrap">
                       <p className="text-xs text-gray-700">
-                        {formatDateOnly(
-                          o.createdAt,
-                        )}
+                        {formatDateOnly(o.createdAt)}
                       </p>
 
                       <p className="text-[10px] text-gray-400">
-                        {formatTimeOnly(
-                          o.createdAt,
-                        )}
+                        {formatTimeOnly(o.createdAt)}
                       </p>
                     </td>
 
                     <td className="px-2.5 py-2.5">
                       <button
                         onClick={() =>
-                          navigate(
-                            `/dashboard/orders/orderDetails/${o.id}`,
-                          )
+                          navigate(`/dashboard/orders/orderDetails/${o.id}`)
                         }
                         className="inline-flex items-center gap-1 px-2 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
                       >
                         <Eye size={12} />
-
                         View
                       </button>
                     </td>
@@ -1244,38 +1023,28 @@ const Order = () => {
               {totalItems === 0
                 ? "No results"
                 : `Showing ${start + 1}–${Math.min(
-                    start +
-                      paginated.length,
+                    start + paginated.length,
                     totalItems,
                   )} of ${totalItems}`}
             </span>
 
             <label className="flex items-center gap-1.5">
-              <span className="hidden md:inline">
-                Rows per page
-              </span>
+              <span className="hidden md:inline">Rows per page</span>
 
               <select
                 value={pageSize}
                 onChange={(e) => {
-                  setPageSize(
-                    Number(e.target.value),
-                  );
+                  setPageSize(Number(e.target.value));
 
                   setPage(1);
                 }}
                 className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
-                {PAGE_SIZE_OPTIONS.map(
-                  (size) => (
-                    <option
-                      key={size}
-                      value={size}
-                    >
-                      {size}
-                    </option>
-                  ),
-                )}
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
@@ -1290,11 +1059,7 @@ const Order = () => {
             </PageButton>
 
             <PageButton
-              onClick={() =>
-                setPage((p) =>
-                  Math.max(1, p - 1),
-                )
-              }
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               label="Previous page"
             >
@@ -1302,63 +1067,42 @@ const Order = () => {
             </PageButton>
 
             <div className="flex items-center gap-1 mx-1">
-              {getPageNumbers().map(
-                (p, i) =>
-                  typeof p === "number" ? (
-                    <button
-                      key={p}
-                      onClick={() =>
-                        setPage(p)
-                      }
-                      aria-current={
-                        p === currentPage
-                          ? "page"
-                          : undefined
-                      }
-                      className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
-                        p ===
-                        currentPage
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ) : (
-                    <span
-                      key={`${p}-${i}`}
-                      className="w-8 h-8 flex items-center justify-center text-gray-300 text-xs"
-                    >
-                      …
-                    </span>
-                  ),
+              {getPageNumbers().map((p, i) =>
+                typeof p === "number" ? (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    aria-current={p === currentPage ? "page" : undefined}
+                    className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
+                      p === currentPage
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ) : (
+                  <span
+                    key={`${p}-${i}`}
+                    className="w-8 h-8 flex items-center justify-center text-gray-300 text-xs"
+                  >
+                    …
+                  </span>
+                ),
               )}
             </div>
 
             <PageButton
-              onClick={() =>
-                setPage((p) =>
-                  Math.min(
-                    totalPages,
-                    p + 1,
-                  ),
-                )
-              }
-              disabled={
-                currentPage >= totalPages
-              }
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
               label="Next page"
             >
               <ChevronRight size={14} />
             </PageButton>
 
             <PageButton
-              onClick={() =>
-                setPage(totalPages)
-              }
-              disabled={
-                currentPage >= totalPages
-              }
+              onClick={() => setPage(totalPages)}
+              disabled={currentPage >= totalPages}
               label="Last page"
             >
               <ChevronsRight size={14} />
@@ -1391,40 +1135,24 @@ const Order = () => {
           </p>
 
           <p className="text-sm font-medium text-gray-900">
-            {
-              hoveredOrder.order.user
-                ?.customer_name
-            }
+            {hoveredOrder.order.user?.customer_name}
           </p>
 
           <p className="text-sm text-gray-500 mt-0.5">
-            {
-              hoveredOrder.order.user
-                ?.phone_num
-            }
+            {hoveredOrder.order.user?.phone_num}
           </p>
 
           <p className="text-sm text-gray-600 mt-2 leading-relaxed">
             {[
-              hoveredOrder.order
-                .shippingAddress
-                ?.apartment,
-              hoveredOrder.order
-                .shippingAddress
-                ?.locality,
-              hoveredOrder.order
-                .shippingAddress
-                ?.landmark,
-              hoveredOrder.order
-                .shippingAddress?.city,
-              hoveredOrder.order
-                .shippingAddress?.state,
-              hoveredOrder.order
-                .shippingAddress?.pincode,
+              hoveredOrder.order.shippingAddress?.apartment,
+              hoveredOrder.order.shippingAddress?.locality,
+              hoveredOrder.order.shippingAddress?.landmark,
+              hoveredOrder.order.shippingAddress?.city,
+              hoveredOrder.order.shippingAddress?.state,
+              hoveredOrder.order.shippingAddress?.pincode,
             ]
               .filter(Boolean)
-              .join(", ") ||
-              "No address details available"}
+              .join(", ") || "No address details available"}
           </p>
         </div>
       )}
@@ -1438,12 +1166,7 @@ const Order = () => {
  * ---------------------------------------------------------
  */
 
-const PageButton = ({
-  children,
-  onClick,
-  disabled,
-  label,
-}) => (
+const PageButton = ({ children, onClick, disabled, label }) => (
   <button
     onClick={onClick}
     disabled={disabled}
@@ -1475,64 +1198,40 @@ const StatusSelect = ({
       onClick={() => {}}
       menuContent={
         <>
-          {ORDER_STATUSES.map(
-            (status) => (
-              <SplitButtonItem
-                key={status}
-                onClick={() =>
-                  onChange(
-                    order,
-                    status,
-                  )
-                }
-              >
-                <div className="flex w-full h-full items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        STATUS_DOT[
-                          status
-                        ] ||
-                        "bg-gray-400"
-                      }`}
-                    />
+          {ORDER_STATUSES.map((status) => (
+            <SplitButtonItem
+              key={status}
+              onClick={() => onChange(order, status)}
+            >
+              <div className="flex w-full h-full items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      STATUS_DOT[status] || "bg-gray-400"
+                    }`}
+                  />
 
-                    <span className="capitalize">
-                      {status
-                        .replaceAll(
-                          "_",
-                          " ",
-                        )
-                        .toLowerCase()}
-                    </span>
-                  </div>
-
-                  {order.orderStatus ===
-                    status && (
-                    <span className="text-blue-600">
-                      ✓
-                    </span>
-                  )}
+                  <span className="capitalize">
+                    {status.replaceAll("_", " ").toLowerCase()}
+                  </span>
                 </div>
-              </SplitButtonItem>
-            ),
-          )}
+
+                {order.orderStatus === status && (
+                  <span className="text-blue-600">✓</span>
+                )}
+              </div>
+            </SplitButtonItem>
+          ))}
         </>
       }
     >
       <div className="flex items-center gap-2">
         {disabled ? (
-          <Loader2
-            size={11}
-            className="animate-spin text-gray-500"
-          />
+          <Loader2 size={11} className="animate-spin text-gray-500" />
         ) : (
           <span
             className={`h-1.5 w-1.5 rounded-full ${
-              STATUS_DOT[
-                order.orderStatus
-              ] ||
-              "bg-gray-400"
+              STATUS_DOT[order.orderStatus] || "bg-gray-400"
             }`}
           />
         )}
@@ -1541,10 +1240,7 @@ const StatusSelect = ({
           {order.orderStatus
             ?.replaceAll("_", " ")
             .toLowerCase()
-            .replace(
-              /\b\w/g,
-              (c) => c.toUpperCase(),
-            )}
+            .replace(/\b\w/g, (c) => c.toUpperCase())}
         </span>
       </div>
     </SplitButton>
@@ -1559,14 +1255,9 @@ const StatusSelect = ({
 
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
-    <PackageSearch
-      size={32}
-      className="text-gray-300"
-    />
+    <PackageSearch size={32} className="text-gray-300" />
 
-    <p className="text-sm font-medium text-gray-500">
-      No orders found
-    </p>
+    <p className="text-sm font-medium text-gray-500">No orders found</p>
 
     <p className="text-xs text-gray-400">
       Try adjusting your search or filters
