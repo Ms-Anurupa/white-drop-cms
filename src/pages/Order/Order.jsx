@@ -359,7 +359,7 @@ const Order = () => {
         fromDate: appliedFromDate || "",
         toDate: appliedToDate || "",
       });
-    }, 400);
+    }, 600);
 
     return () => {
       clearTimeout(timer);
