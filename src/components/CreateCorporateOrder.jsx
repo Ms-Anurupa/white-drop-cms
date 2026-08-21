@@ -398,7 +398,7 @@ const CreateCorporateOrder = () => {
                 <Building2 size={17} className="text-blue-600" />
 
                 <h2 className="text-sm font-semibold text-gray-900">
-                  Corporate Account
+                  Corporate Account 
                 </h2>
               </div>
 
@@ -406,7 +406,7 @@ const CreateCorporateOrder = () => {
                 {/* CORPORATE ACCOUNT */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Corporate Account
+                    Corporate Account <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -435,7 +435,7 @@ const CreateCorporateOrder = () => {
                 {/* ADDRESS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Delivery Address
+                    Delivery Address <span className="text-red-500">*</span>
                   </label>
 
                   <textarea
@@ -455,7 +455,7 @@ const CreateCorporateOrder = () => {
                 {/* PRODUCT */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Product Name
+                    Product Name <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -478,7 +478,7 @@ const CreateCorporateOrder = () => {
                 {/* NOTES */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Delivery Notes
+                    Delivery Notes 
                   </label>
 
                   <div className="relative">
@@ -501,7 +501,7 @@ const CreateCorporateOrder = () => {
                 {/* DELIVERY STATUS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Delivery Status
+                    Delivery Status <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -533,7 +533,7 @@ const CreateCorporateOrder = () => {
                 {/* PAYMENT STATUS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Payment Status
+                    Payment Status <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -572,7 +572,7 @@ const CreateCorporateOrder = () => {
 
                   <div>
                     <h2 className="text-sm font-semibold text-gray-900">
-                      Order Items
+                      Order Items <span className="text-red-500">*</span>
                     </h2>
 
                     <p className="text-xs text-gray-500">
