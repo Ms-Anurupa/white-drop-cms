@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import { toast } from "react-toastify";
+import { useConfirm } from "./ConfirmProvider";
 
 const units = ["L", "ML", "KG", "G"];
 
@@ -35,7 +36,7 @@ const createEmptyItem = (unit = "L") => ({
 
 const CreateCorporateOrder = () => {
   const navigate = useNavigate();
-
+  const { confirm } = useConfirm();
   const [loading, setLoading] = useState(false);
 
   const createCorporateOrderAdmin = corporateDataStore(
@@ -83,12 +84,6 @@ const CreateCorporateOrder = () => {
     });
   }, [getCorporateAccounts, search, status, page]);
 
-  /*
-   * ------------------------------------------------------------
-   * CORPORATE DATA
-   * ------------------------------------------------------------
-   */
-
   const handleCorporateChange = (e) => {
     const { name, value } = e.target;
 
@@ -98,19 +93,10 @@ const CreateCorporateOrder = () => {
     }));
   };
 
-  /*
-   * ------------------------------------------------------------
-   * ORDER ITEMS
-   * ------------------------------------------------------------
-   */
-
   const handleItemChange = (index, e) => {
     const { name, value } = e.target;
 
     setItems((prev) => {
-      /*
-       * FIRST ITEM UNIT CONTROLS ALL OTHER ITEM UNITS
-       */
       if (index === 0 && name === "unit") {
         return prev.map((item) => ({
           ...item,
@@ -118,9 +104,6 @@ const CreateCorporateOrder = () => {
         }));
       }
 
-      /*
-       * Other item fields
-       */
       return prev.map((item, itemIndex) =>
         itemIndex === index
           ? {
@@ -147,17 +130,7 @@ const CreateCorporateOrder = () => {
     setItems((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   };
 
-  /*
-   * ------------------------------------------------------------
-   * RECEIVED DATA
-   * ------------------------------------------------------------
-   */
-
   const handleReceivedChange = (e) => {
-    /*
-     * If delivery is still PROCESSING, received values are
-     * automatically calculated from order items.
-     */
     if (corporateData.deliveryStatus === "PROCESSING") {
       return;
     }
@@ -170,12 +143,6 @@ const CreateCorporateOrder = () => {
     }));
   };
 
-  /*
-   * ------------------------------------------------------------
-   * SENT ORDER CALCULATIONS
-   * ------------------------------------------------------------
-   */
-
   const totalSentQuantity = useMemo(() => {
     return items.reduce((total, item) => total + (Number(item.qty) || 0), 0);
   }, [items]);
@@ -187,18 +154,6 @@ const CreateCorporateOrder = () => {
       0,
     );
   }, [items]);
-
-  /*
-   * ------------------------------------------------------------
-   * RECEIVED ORDER CALCULATIONS
-   *
-   * PROCESSING:
-   *   Received = Sent order values
-   *
-   * DELIVERED:
-   *   Received = Admin entered values
-   * ------------------------------------------------------------
-   */
 
   const isDeliveryPending = corporateData.deliveryStatus === "PROCESSING";
 
@@ -219,21 +174,9 @@ const CreateCorporateOrder = () => {
       ? calculatedReceivedTotalPrice / calculatedReceivedQuantity
       : 0;
 
-  /*
-   * Discount / adjustment
-   */
   const discount = Math.max(totalSentPrice - calculatedReceivedTotalPrice, 0);
 
-  /*
-   * Final grand total
-   */
   const grandTotal = calculatedReceivedTotalPrice;
-
-  /*
-   * ------------------------------------------------------------
-   * VALIDATION
-   * ------------------------------------------------------------
-   */
 
   const validateItems = () => {
     for (let index = 0; index < items.length; index++) {
@@ -265,12 +208,6 @@ const CreateCorporateOrder = () => {
     return true;
   };
 
-  /*
-   * ------------------------------------------------------------
-   * SUBMIT
-   * ------------------------------------------------------------
-   */
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -288,10 +225,6 @@ const CreateCorporateOrder = () => {
       return;
     }
 
-    /*
-     * Only validate manually entered received values
-     * when delivery is DELIVERED.
-     */
     if (!isDeliveryPending) {
       if (!receivedData.quantity || Number(receivedData.quantity) <= 0) {
         toast.error("Received quantity must be greater than 0.");
@@ -312,10 +245,6 @@ const CreateCorporateOrder = () => {
       }
     }
 
-    /*
-     * Discount reason is required only when there is
-     * an actual discount.
-     */
     if (discount > 0 && !discountReason.trim()) {
       toast.error("Discount reason is required.");
       return;
@@ -324,6 +253,13 @@ const CreateCorporateOrder = () => {
     setLoading(true);
 
     try {
+      const confirmMessage = await confirm({
+        title: "Create Corporate Order",
+        message: "Are you want to create the order?",
+      });
+
+      if (!confirmMessage) return;
+
       const finalReceivedQuantity = calculatedReceivedQuantity;
 
       const finalReceivedUnit = calculatedReceivedUnit;
@@ -349,9 +285,6 @@ const CreateCorporateOrder = () => {
         orderDetails: {
           productName: corporateData.productName.trim(),
 
-          /*
-           * Delivery notes are optional.
-           */
           deliveryNote: corporateData.notes.trim(),
 
           sentTotalPrice: totalSentPrice,
@@ -384,8 +317,6 @@ const CreateCorporateOrder = () => {
         },
       };
 
-      console.log("Corporate Order Payload:", payload);
-
       await createCorporateOrderAdmin(payload);
 
       toast.success("Corporate order created successfully.");
@@ -400,21 +331,9 @@ const CreateCorporateOrder = () => {
     }
   };
 
-  /*
-   * ------------------------------------------------------------
-   * SELECTED CORPORATE ACCOUNT
-   * ------------------------------------------------------------
-   */
-
   const selectedAccount = corporateOrderAcc?.find(
     (acc) => acc.id === corporateData.corpoAccId,
   );
-
-  /*
-   * ------------------------------------------------------------
-   * UI
-   * ------------------------------------------------------------
-   */
 
   return (
     <div className="min-h-screen bg-gray-50/60 p-4 sm:p-6">
