@@ -849,7 +849,7 @@ const Order = () => {
           <table className="w-full table-fixed text-sm">
             <thead className="order-table-head sticky top-0 z-10 relative">
               <tr className="border-b border-transparent">
-                <th className="w-10 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
+                <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
                   Sl No.
                 </th>
 
