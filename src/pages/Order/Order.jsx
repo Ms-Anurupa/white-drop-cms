@@ -372,16 +372,19 @@ useEffect(() => {
 
       toast.success(`Order ${order.orderId} marked as ${newStatus}`);
 
-      getOrderListing({
+      const range = getDateRange(dateFilter);
+
+      await getOrderListing({
         status,
         search,
         page,
         limit: pageSize,
-        fromDate: range.fromDate,
-        toDate: range.toDate,
+        fromDate: dateFilter === "all" ? "" : range.fromDate,
+        toDate: dateFilter === "all" ? "" : range.toDate,
       });
     } catch (error) {
       console.error("Failed to update order status:", error);
+
       toast.error(
         error?.response?.data?.message || "Failed to update order status",
       );
