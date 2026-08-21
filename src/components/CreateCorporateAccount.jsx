@@ -75,54 +75,120 @@ const CreateCorporateAccount = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { houseNo, street, area, city, state, pincode } =
-      corporateData.addressDetails;
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const address = [houseNo, street, area, city, state, pincode]
-      .filter(Boolean)
-      .join(", ");
+  const {
+    businessName,
+    gstNo,
+    contactNo,
+    addressDetails,
+    location,
+  } = corporateData;
 
-    if (!corporateData.businessName.trim()) {
-      toast.error("Business name is required.");
-      return;
-    }
+  const {
+    houseNo,
+    street,
+    area,
+    city,
+    state,
+    pincode,
+  } = addressDetails;
 
-    if (!corporateData.gstNo.trim()) {
-      toast.error("GST number is required.");
-      return;
-    }
+  // Business Name
+  if (!businessName.trim()) {
+    toast.error("Business name is required.");
+    return;
+  }
 
-    if (!address.trim()) {
-      toast.error("Address is required.");
-      return;
-    }
+  // GST Number
+  if (!gstNo.trim()) {
+    toast.error("GST number is required.");
+    return;
+  }
 
-    if (!corporateData.contactNo.trim()) {
-      toast.error("Contact number is required.");
-      return;
-    }
+  // Contact Number
+  if (!contactNo.trim()) {
+    toast.error("Contact number is required.");
+    return;
+  }
 
-    setLoading(true);
+  // House / Flat No.
+  if (!houseNo.trim()) {
+    toast.error("House / Flat number is required.");
+    return;
+  }
 
+  // Street / Road
+  if (!street.trim()) {
+    toast.error("Street / Road is required.");
+    return;
+  }
+
+  // Area / Locality
+  if (!area.trim()) {
+    toast.error("Area / Locality is required.");
+    return;
+  }
+
+  // City
+  if (!city.trim()) {
+    toast.error("City is required.");
+    return;
+  }
+
+  // State
+  if (!state.trim()) {
+    toast.error("State is required.");
+    return;
+  }
+
+  // Pincode
+  if (!pincode.trim()) {
+    toast.error("Pincode is required.");
+    return;
+  }
+
+  // Landmark
+  if (!location.landmark.trim()) {
+    toast.error("Landmark is required.");
+    return;
+  }
+
+  const address = [
+    houseNo,
+    street,
+    area,
+    city,
+    state,
+    pincode,
+  ]
+    .map((value) => value.trim())
+    .join(", ");
+
+  setLoading(true);
+
+  try {
     const payload = {
-      businessName: corporateData.businessName,
-      gstNo: corporateData.gstNo,
-      contactNo: corporateData.contactNo,
+      businessName: businessName.trim(),
+      gstNo: gstNo.trim(),
+      contactNo: contactNo.trim(),
       address,
       location: {
-        landmark: corporateData.location.landmark,
+        landmark: location.landmark.trim(),
       },
     };
+
     await createCorporateAccount(payload);
 
     navigate(-1);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  };
+  } catch (error) {
+    console.error("Failed to create corporate account:", error);
+    toast.error("Failed to create corporate account.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
