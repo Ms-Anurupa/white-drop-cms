@@ -721,6 +721,7 @@ const CorporateOrder = () => {
                       </div>
                     </td>
 
+{/* actions */}
                     <td className="px-2 py-1.5">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
