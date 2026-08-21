@@ -396,6 +396,13 @@ const CorporateOrder = () => {
           <span className="text-xs text-blue-600 font-medium">
             Total: {corporateOrderPagination?.pagination?.totalCount ?? 0}
           </span>
+           <button
+            onClick={handleRefresh}
+            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
+          >
+            <RefreshCw size={14} />
+            Refresh
+          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap gap-2 items-stretch sm:items-center">
@@ -519,14 +526,7 @@ const CorporateOrder = () => {
             <option value="FAILED">Failed</option>
           </select>
 
-          <button
-            onClick={handleRefresh}
-            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
-          >
-            <RefreshCw size={14} />
-            Refresh
-          </button>
-
+        
           <button
             onClick={resetFilters}
             className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
