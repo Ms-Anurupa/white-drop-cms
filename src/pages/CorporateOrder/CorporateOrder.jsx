@@ -576,9 +576,6 @@ const CorporateOrder = () => {
                 <th className="w-24 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
                   Invoice
                 </th>
-                <th className="w-16 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
-                  Action
-                </th>
               </tr>
             </thead>
 
@@ -718,30 +715,6 @@ const CorporateOrder = () => {
                             </button>
                           </div>
                         )}
-                      </div>
-                    </td>
-
-                    <td className="px-2 py-1.5">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() =>
-                            navigate(`/dashboard/corporate-orders/view/${o.id}`)
-                          }
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition cursor-pointer"
-                          title="View"
-                        >
-                          <Eye size={14} />
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            navigate(`/dashboard/corporate-orders/edit/${o.id}`)
-                          }
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition cursor-pointer"
-                          title="Edit"
-                        >
-                          <Pencil size={14} />
-                        </button>
                       </div>
                     </td>
                   </tr>
