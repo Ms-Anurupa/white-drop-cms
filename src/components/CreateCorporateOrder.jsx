@@ -57,7 +57,6 @@ const CreateCorporateOrder = () => {
     notes: "",
     deliveryStatus: "PROCESSING",
     paymentStatus: "PENDING",
-    paymentStatus: "PENDING",
   });
 
   const [items, setItems] = useState([createEmptyItem("L")]);
@@ -249,13 +248,6 @@ const CreateCorporateOrder = () => {
     if (discount > 0 && !discountReason.trim()) {
       toast.error("Discount reason is required.");
       return;
-    }
-
-    if (corporateData.paymentStatus === "COMPLETE") {
-      if (totalSentPrice > receivedTotalPrice && !discountReason.trim()) {
-        toast.error("Discount reason is required.");
-        return;
-      }
     }
 
     setLoading(true);
@@ -813,7 +805,7 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* COMPLETE */}
+                {/* RECEIVED */}
                 <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50/40">
                   <div className="flex items-center justify-between border-b border-emerald-100 px-4 py-3">
                     <div className="flex items-center gap-2">

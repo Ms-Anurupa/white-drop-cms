@@ -667,6 +667,9 @@ const CorporateOrder = () => {
                 <th className="w-24 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
                   Invoice
                 </th>
+                <th className="w-16 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
+                  Action
+                </th>
               </tr>
             </thead>
 
