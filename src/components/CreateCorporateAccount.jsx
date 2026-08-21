@@ -77,51 +77,103 @@ const CreateCorporateAccount = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { houseNo, street, area, city, state, pincode } =
-      corporateData.addressDetails;
 
-    const address = [houseNo, street, area, city, state, pincode]
-      .filter(Boolean)
-      .join(", ");
+    const { businessName, gstNo, contactNo, addressDetails, location } =
+      corporateData;
 
-    if (!corporateData.businessName.trim()) {
+    const { houseNo, street, area, city, state, pincode } = addressDetails;
+
+    // Business Name
+    if (!businessName.trim()) {
       toast.error("Business name is required.");
       return;
     }
 
-    if (!corporateData.gstNo.trim()) {
+    // GST Number
+    if (!gstNo.trim()) {
       toast.error("GST number is required.");
       return;
     }
 
-    if (!address.trim()) {
-      toast.error("Address is required.");
-      return;
-    }
-
-    if (!corporateData.contactNo.trim()) {
+    // Contact Number
+    if (!contactNo.trim()) {
       toast.error("Contact number is required.");
       return;
     }
 
+    // House / Flat No.
+    if (!houseNo.trim()) {
+      toast.error("House / Flat number is required.");
+      return;
+    }
+
+    // Street / Road
+    if (!street.trim()) {
+      toast.error("Street / Road is required.");
+      return;
+    }
+
+    // Area / Locality
+    if (!area.trim()) {
+      toast.error("Area / Locality is required.");
+      return;
+    }
+
+    // City
+    if (!city.trim()) {
+      toast.error("City is required.");
+      return;
+    }
+
+    // State
+    if (!state.trim()) {
+      toast.error("State is required.");
+      return;
+    }
+
+    //pincode
+    if (!pincode.trim()) {
+      toast.error("Pincode is required.");
+      return;
+    }
+
+    if (!/^[1-9][0-9]{5}$/.test(pincode.trim())) {
+      toast.error("Please enter a valid 6-digit pincode.");
+      return;
+    }
+
+    // Landmark
+    if (!location.landmark.trim()) {
+      toast.error("Landmark is required.");
+      return;
+    }
+
+    const address = [houseNo, street, area, city, state, pincode]
+      .map((value) => value.trim())
+      .join(", ");
+
     setLoading(true);
 
-    const payload = {
-      businessName: corporateData.businessName,
-      gstNo: corporateData.gstNo,
-      contactNo: corporateData.contactNo,
-      address,
-      location: {
-        landmark: corporateData.location.landmark,
-      },
-    };
-    await createCorporateAccount(payload);
+    try {
+      const payload = {
+        businessName: businessName.trim(),
+        gstNo: gstNo.trim(),
+        contactNo: contactNo.trim(),
+        address,
+        location: {
+          landmark: location.landmark.trim(),
+        },
+      };
 
-    navigate(-1);
+      await createCorporateAccount(payload);
 
-    setTimeout(() => {
+      navigate(-1);
+    } catch (error) {
+      console.error("Failed to create corporate account:", error);
+      toast.error("Failed to create corporate account.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -308,7 +360,10 @@ const CreateCorporateAccount = () => {
                     name="pincode"
                     value={corporateData.addressDetails.pincode}
                     onChange={handleAddressChange}
+                    maxLength={6}
+                    inputMode="numeric"
                     placeholder="700091"
+                    pattern="[1-9][0-9]{5}"
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
                   />
                 </div>

@@ -57,7 +57,7 @@ const CreateCorporateOrder = () => {
     productName: "",
     notes: "",
     deliveryStatus: "PROCESSING",
-    receivedStatus: "PENDING",
+    paymentStatus: "PENDING",
   });
 
   const [items, setItems] = useState([createEmptyItem()]);
@@ -199,34 +199,36 @@ const CreateCorporateOrder = () => {
       return;
     }
 
-    if (!corporateData.notes.trim()) {
-      toast.error("Delivery notes are required.");
-      return;
-    }
-
     if (!validateItems()) {
       return;
     }
 
     if (
-      corporateData.receivedStatus === "RECEIVED" &&
+      corporateData.paymentStatus === "COMPLETE" &&
       (!receivedData.quantity || Number(receivedData.quantity) <= 0)
     ) {
       toast.error("Received quantity must be greater than 0.");
       return;
     }
 
-    if (corporateData.receivedStatus === "RECEIVED" && !receivedData.unit) {
+    if (corporateData.paymentStatus === "COMPLETE" && !receivedData.unit) {
       toast.error("Please select received unit.");
       return;
     }
 
     if (
-      corporateData.receivedStatus === "RECEIVED" &&
+      corporateData.paymentStatus === "COMPLETE" &&
       (!receivedData.totalPrice || Number(receivedData.totalPrice) < 0)
     ) {
       toast.error("Received total is required.");
       return;
+    }
+
+    if (corporateData.paymentStatus === "COMPLETE") {
+      if (totalSentPrice > receivedTotalPrice && !discountReason.trim()) {
+        toast.error("Discount reason is required.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -253,7 +255,7 @@ const CreateCorporateOrder = () => {
 
         deliveryStatus: corporateData.deliveryStatus,
 
-        paymentStatus: corporateData.receivedStatus,
+        paymentStatus: corporateData.paymentStatus,
 
         orderDetails: {
           productName: corporateData.productName.trim(),
@@ -343,18 +345,6 @@ const CreateCorporateOrder = () => {
                   </p>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={addItem}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
-              >
-                <FilePlus2 size={16} />
-
-                <span className="hidden sm:inline">Add Corporate Invoice</span>
-
-                <span className="sm:hidden">Add</span>
-              </button>
             </div>
           </div>
 
@@ -470,7 +460,6 @@ const CreateCorporateOrder = () => {
                     />
 
                     <textarea
-                      required
                       rows={3}
                       name="notes"
                       value={corporateData.notes}
@@ -520,7 +509,7 @@ const CreateCorporateOrder = () => {
                   </label>
 
                   <div className="relative">
-                    {corporateData.receivedStatus === "RECEIVED" ? (
+                    {corporateData.paymentStatus === "COMPLETE" ? (
                       <PackageCheck
                         size={16}
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500"
@@ -533,14 +522,14 @@ const CreateCorporateOrder = () => {
                     )}
 
                     <select
-                      name="receivedStatus"
-                      value={corporateData.receivedStatus}
+                      name="paymentStatus"
+                      value={corporateData.paymentStatus}
                       onChange={handleCorporateChange}
                       className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
                     >
                       <option value="PENDING">Pending</option>
 
-                      <option value="RECEIVED">Complete</option>
+                      <option value="COMPLETE">Complete</option>
                     </select>
                   </div>
                 </div>
@@ -572,6 +561,10 @@ const CreateCorporateOrder = () => {
               <div className="overflow-x-auto rounded-2xl border border-gray-200">
                 <div className="hidden min-w-[900px] grid-cols-[120px_140px_160px_160px_160px_50px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 md:grid">
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
+                    Order Date
+                  </span>
+
+                  <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Unit
                   </span>
 
@@ -585,10 +578,6 @@ const CreateCorporateOrder = () => {
 
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Order Total
-                  </span>
-
-                  <span className="text-[11px] font-semibold uppercase text-gray-500">
-                    Order Date
                   </span>
 
                   <span />
@@ -605,6 +594,15 @@ const CreateCorporateOrder = () => {
                         key={index}
                         className="grid min-w-[900px] gap-3 bg-white p-4 md:grid-cols-[120px_140px_160px_160px_160px_50px] md:items-center"
                       >
+                        {/* DATE */}
+                        <input
+                          type="date"
+                          name="orderDate"
+                          value={item.orderDate}
+                          onChange={(e) => handleItemChange(index, e)}
+                          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-xs outline-none focus:border-blue-300"
+                        />
+
                         {/* UNIT */}
                         <div>
                           <select
@@ -669,15 +667,6 @@ const CreateCorporateOrder = () => {
                             })}
                           </span>
                         </div>
-
-                        {/* DATE */}
-                        <input
-                          type="date"
-                          name="orderDate"
-                          value={item.orderDate}
-                          onChange={(e) => handleItemChange(index, e)}
-                          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-xs outline-none focus:border-blue-300"
-                        />
 
                         {/* DELETE */}
                         <button
@@ -774,7 +763,7 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* RECEIVED */}
+                {/* COMPLETE */}
                 <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50/40">
                   <div className="flex items-center justify-between border-b border-emerald-100 px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -793,17 +782,17 @@ const CreateCorporateOrder = () => {
 
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                        corporateData.receivedStatus === "RECEIVED"
+                        corporateData.paymentStatus === "COMPLETE"
                           ? "bg-emerald-100 text-emerald-700"
                           : "bg-orange-100 text-orange-700"
                       }`}
                     >
-                      {corporateData.receivedStatus}
+                      {corporateData.paymentStatus}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 p-4">
-                    {/* RECEIVED QUANTITY - EDITABLE */}
+                    {/* COMPLETE QUANTITY - EDITABLE */}
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
                         Received Quantity
