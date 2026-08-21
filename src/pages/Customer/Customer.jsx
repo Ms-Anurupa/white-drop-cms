@@ -399,13 +399,6 @@ const Customer = () => {
                         >
                           <Eye size={15} />
                         </button>
-                        <button
-                          title="Delete customer"
-                          onClick={() => handleCustomerDelete(c?.userUid)}
-                          className="p-2 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50 transition"
-                        >
-                          <Trash2 size={15} />
-                        </button>
                       </div>
                     </td>
                   </tr>
