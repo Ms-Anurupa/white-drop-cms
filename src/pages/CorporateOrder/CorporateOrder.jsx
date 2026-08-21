@@ -721,7 +721,6 @@ const CorporateOrder = () => {
                       </div>
                     </td>
 
-{/* actions */}
                     <td className="px-2 py-1.5">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
@@ -734,15 +733,6 @@ const CorporateOrder = () => {
                           <Eye size={14} />
                         </button>
 
-                        <button
-                          onClick={() =>
-                            navigate(`/dashboard/corporate-orders/edit/${o.id}`)
-                          }
-                          className="flex h-7 w-7 items-center justify-center rounded-md border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition cursor-pointer"
-                          title="Edit"
-                        >
-                          <Pencil size={14} />
-                        </button>
                       </div>
                     </td>
                   </tr>

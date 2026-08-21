@@ -345,18 +345,6 @@ const CreateCorporateOrder = () => {
                   </p>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={addItem}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
-              >
-                <FilePlus2 size={16} />
-
-                <span className="hidden sm:inline">Add Corporate Invoice</span>
-
-                <span className="sm:hidden">Add</span>
-              </button>
             </div>
           </div>
 

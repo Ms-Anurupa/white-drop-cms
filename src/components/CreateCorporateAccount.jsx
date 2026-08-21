@@ -143,11 +143,16 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  // Pincode
+  //pincode
   if (!pincode.trim()) {
-    toast.error("Pincode is required.");
-    return;
-  }
+  toast.error("Pincode is required.");
+  return;
+}
+
+if (!/^[1-9][0-9]{5}$/.test(pincode.trim())) {
+  toast.error("Please enter a valid 6-digit pincode.");
+  return;
+}
 
   // Landmark
   if (!location.landmark.trim()) {
@@ -374,7 +379,10 @@ const handleSubmit = async (e) => {
                     name="pincode"
                     value={corporateData.addressDetails.pincode}
                     onChange={handleAddressChange}
+                    maxLength={6}
+                    inputMode="numeric"
                     placeholder="700091"
+                    pattern="[1-9][0-9]{5}"
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
                   />
                 </div>
