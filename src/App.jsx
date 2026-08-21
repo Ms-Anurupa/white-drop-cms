@@ -41,6 +41,7 @@ import AddDeliveryJob from "./components/AddDeliveryJob";
 import DeliveryJob from "./pages/DeliveryJob/DeliveryJob";
 import AssignDeliveryPartner from "./components/AssignDeliveryPartner";
 import AssignOrderToDeliveryJob from "./components/AssignOrderToDeliveryJob";
+import CustomerDetails from "./components/CustomerDetails";
 
 const App = () => {
   return (
@@ -76,6 +77,7 @@ const App = () => {
                   element={<EditProduct />}
                 />
                 <Route path="customer" element={<Customer />} />
+                <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
                 <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
