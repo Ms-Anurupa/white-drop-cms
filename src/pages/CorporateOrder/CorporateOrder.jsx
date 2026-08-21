@@ -117,6 +117,29 @@ const ScrollbarStyle = () => (
   `}</style>
 );
 
+// ── quick-range date helpers (pure, no component state needed) ──
+const toYMD = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const getQuickRangeDates = (filter) => {
+  const now = new Date();
+
+  if (filter === "today") {
+    const ymd = toYMD(now);
+    return { from: ymd, to: ymd };
+  }
+  if (filter === "week") {
+    const weekAgo = new Date();
+    weekAgo.setDate(now.getDate() - 6); // inclusive of today = 7 days
+    return { from: toYMD(weekAgo), to: toYMD(now) };
+  }
+  if (filter === "month") {
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { from: toYMD(monthStart), to: toYMD(now) };
+  }
+  return { from: "", to: "" };
+};
+
 const CorporateOrder = () => {
   const navigate = useNavigate();
 
@@ -132,6 +155,15 @@ const CorporateOrder = () => {
   const getCorporateInvoice = corporateDataStore(
     (state) => state.getCorporateInvoice,
   );
+  const corporateOrderMeta = corporateDataStore(
+    (state) => state.corporateOrderMeta,
+  );
+  const dateCounts = corporateOrderMeta?.dateCounts ?? {
+    all: 0,
+    today: 0,
+    week: 0,
+    month: 0,
+  };
 
   // ── search + filters (all sent to the server as search params) ──
   const [search, setSearch] = useState("");
@@ -206,7 +238,12 @@ const CorporateOrder = () => {
 
   // debounced fetch whenever search / filters / pageSize change — resets to page 1
   useEffect(() => {
-    if ((fromDate && !toDate) || (!fromDate && toDate)) return;
+    const { from, to } =
+      dateFilter !== "all"
+        ? getQuickRangeDates(dateFilter)
+        : { from: fromDate, to: toDate };
+
+    if ((from && !to) || (!from && to)) return;
 
     setLoading(true);
 
@@ -218,8 +255,8 @@ const CorporateOrder = () => {
           search,
           deliStatus: deliveryStatus,
           payStatus: paymentStatus,
-          fromDate,
-          toDate,
+          fromDate: from,
+          toDate: to,
           page: 1,
           limit: pageSize,
         });
@@ -232,13 +269,26 @@ const CorporateOrder = () => {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [search, deliveryStatus, paymentStatus, fromDate, toDate, pageSize]);
+  }, [
+    search,
+    deliveryStatus,
+    paymentStatus,
+    fromDate,
+    toDate,
+    dateFilter,
+    pageSize,
+  ]);
 
   // plain page-change fetch (no debounce, no reset)
   useEffect(() => {
     if (page === 1) return;
 
-    if ((fromDate && !toDate) || (!fromDate && toDate)) return;
+    const { from, to } =
+      dateFilter !== "all"
+        ? getQuickRangeDates(dateFilter)
+        : { from: fromDate, to: toDate };
+
+    if ((from && !to) || (!from && to)) return;
 
     const loadPage = async () => {
       try {
@@ -248,8 +298,8 @@ const CorporateOrder = () => {
           search,
           deliStatus: deliveryStatus,
           payStatus: paymentStatus,
-          fromDate,
-          toDate,
+          fromDate: from,
+          toDate: to,
           page,
           limit: pageSize,
         });
@@ -264,52 +314,28 @@ const CorporateOrder = () => {
     loadPage();
   }, [page]);
 
-  const handleFromDateChange = (value) => setFromDate(value);
-  const handleToDateChange = (value) => setToDate(value);
+  const handlePillClick = (key) => {
+    setDateFilter(key);
+    setFromDate("");
+    setToDate("");
+  };
+
+  const handleFromDateChange = (value) => {
+    setFromDate(value);
+    setDateFilter("all");
+  };
+
+  const handleToDateChange = (value) => {
+    setToDate(value);
+    setDateFilter("all");
+  };
+
   const clearDates = () => {
     setFromDate("");
     setToDate("");
   };
 
-  const matchesDateFilter = (order, filter) => {
-    if (filter === "all") return true;
-
-    const orderDate = new Date(order.createdAt);
-    const now = new Date();
-
-    if (filter === "today") {
-      return orderDate.toDateString() === now.toDateString();
-    }
-    if (filter === "week") {
-      const weekAgo = new Date();
-      weekAgo.setDate(now.getDate() - 7);
-      return orderDate >= weekAgo;
-    }
-    if (filter === "month") {
-      return (
-        orderDate.getMonth() === now.getMonth() &&
-        orderDate.getFullYear() === now.getFullYear()
-      );
-    }
-    return true;
-  };
-
-  const filteredOrders = useMemo(
-    () => orders.filter((order) => matchesDateFilter(order, dateFilter)),
-    [orders, dateFilter],
-  );
-
-  const dateCounts = useMemo(
-    () => ({
-      all: orders.length,
-      today: orders.filter((o) => matchesDateFilter(o, "today")).length,
-      week: orders.filter((o) => matchesDateFilter(o, "week")).length,
-      month: orders.filter((o) => matchesDateFilter(o, "month")).length,
-    }),
-    [orders],
-  );
-
-  const hasOrders = filteredOrders.length > 0;
+  const hasOrders = orders.length > 0;
   const start = (page - 1) * pageSize;
   const isLastPage = orders.length < pageSize;
 
@@ -327,12 +353,17 @@ const CorporateOrder = () => {
     try {
       setLoading(true);
 
+      const { from, to } =
+        dateFilter !== "all"
+          ? getQuickRangeDates(dateFilter)
+          : { from: fromDate, to: toDate };
+
       await getCorporateOrders({
         search,
         deliStatus: deliveryStatus,
         payStatus: paymentStatus,
-        fromDate,
-        toDate,
+        fromDate: from,
+        toDate: to,
         page,
         limit: pageSize,
       });
@@ -505,7 +536,7 @@ const CorporateOrder = () => {
             return (
               <button
                 key={f.key}
-                onClick={() => setDateFilter(f.key)}
+                onClick={() => handlePillClick(f.key)}
                 className={`h-8 px-3 flex items-center gap-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition cursor-pointer ${
                   active
                     ? "bg-blue-600 text-white"
@@ -656,7 +687,7 @@ const CorporateOrder = () => {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((o, idx) => (
+                orders.map((o, idx) => (
                   <tr key={o.id} className="hover:bg-slate-50 transition">
                     <td className="px-2 py-1.5 text-gray-400">
                       {start + idx + 1}
@@ -829,9 +860,9 @@ const CorporateOrder = () => {
         <div className="shrink-0 border-t border-gray-100 px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>
-              {filteredOrders.length === 0
+              {orders.length === 0
                 ? "No results"
-                : `Showing ${start + 1}–${start + filteredOrders.length}`}
+                : `Showing ${start + 1}–${start + orders.length}`}
             </span>
 
             <label className="flex items-center gap-1.5">
