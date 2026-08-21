@@ -95,9 +95,23 @@ const CreateCorporateAccount = () => {
       return;
     }
 
+    if (
+      !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
+        gstNo.trim().toUpperCase(),
+      )
+    ) {
+      toast.error("Please enter a valid 15-character GST number.");
+      return;
+    }
+
     // Contact Number
     if (!contactNo.trim()) {
       toast.error("Contact number is required.");
+      return;
+    }
+
+    if (!/^[6-9][0-9]{9}$/.test(contactNo.trim())) {
+      toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
 
@@ -174,7 +188,7 @@ const CreateCorporateAccount = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };;
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
@@ -257,7 +271,8 @@ const CreateCorporateAccount = () => {
                   name="gstNo"
                   value={corporateData.gstNo}
                   onChange={handleChange}
-                  placeholder="Enter GST Number"
+                  placeholder="22AAAAA0000A1Z5"
+                  maxLength={15}
                   className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
                 />
               </div>
@@ -272,7 +287,10 @@ const CreateCorporateAccount = () => {
                   name="contactNo"
                   value={corporateData.contactNo}
                   onChange={handleChange}
-                  placeholder="Enter Contact Number"
+                  placeholder="9876543210"
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[6-9][0-9]{9}"
                   className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
                 />
               </div>
