@@ -54,9 +54,9 @@ const DateFilter = ({
         </div>
       )}
 
-      {hasPills && showRange && (
+      {/* {hasPills && showRange && (
         <div className="hidden sm:block w-px self-stretch bg-gray-100 mx-6" />
-      )}
+      )} */}
 
       {/* Date Range */}
       {showRange && (
