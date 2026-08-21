@@ -75,125 +75,106 @@ const CreateCorporateAccount = () => {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const {
-    businessName,
-    gstNo,
-    contactNo,
-    addressDetails,
-    location,
-  } = corporateData;
+    const { businessName, gstNo, contactNo, addressDetails, location } =
+      corporateData;
 
-  const {
-    houseNo,
-    street,
-    area,
-    city,
-    state,
-    pincode,
-  } = addressDetails;
+    const { houseNo, street, area, city, state, pincode } = addressDetails;
 
-  // Business Name
-  if (!businessName.trim()) {
-    toast.error("Business name is required.");
-    return;
-  }
+    // Business Name
+    if (!businessName.trim()) {
+      toast.error("Business name is required.");
+      return;
+    }
 
-  // GST Number
-  if (!gstNo.trim()) {
-    toast.error("GST number is required.");
-    return;
-  }
+    // GST Number
+    if (!gstNo.trim()) {
+      toast.error("GST number is required.");
+      return;
+    }
 
-  // Contact Number
-  if (!contactNo.trim()) {
-    toast.error("Contact number is required.");
-    return;
-  }
+    // Contact Number
+    if (!contactNo.trim()) {
+      toast.error("Contact number is required.");
+      return;
+    }
 
-  // House / Flat No.
-  if (!houseNo.trim()) {
-    toast.error("House / Flat number is required.");
-    return;
-  }
+    // House / Flat No.
+    if (!houseNo.trim()) {
+      toast.error("House / Flat number is required.");
+      return;
+    }
 
-  // Street / Road
-  if (!street.trim()) {
-    toast.error("Street / Road is required.");
-    return;
-  }
+    // Street / Road
+    if (!street.trim()) {
+      toast.error("Street / Road is required.");
+      return;
+    }
 
-  // Area / Locality
-  if (!area.trim()) {
-    toast.error("Area / Locality is required.");
-    return;
-  }
+    // Area / Locality
+    if (!area.trim()) {
+      toast.error("Area / Locality is required.");
+      return;
+    }
 
-  // City
-  if (!city.trim()) {
-    toast.error("City is required.");
-    return;
-  }
+    // City
+    if (!city.trim()) {
+      toast.error("City is required.");
+      return;
+    }
 
-  // State
-  if (!state.trim()) {
-    toast.error("State is required.");
-    return;
-  }
+    // State
+    if (!state.trim()) {
+      toast.error("State is required.");
+      return;
+    }
 
-  //pincode
-  if (!pincode.trim()) {
-  toast.error("Pincode is required.");
-  return;
-}
+    //pincode
+    if (!pincode.trim()) {
+      toast.error("Pincode is required.");
+      return;
+    }
 
-if (!/^[1-9][0-9]{5}$/.test(pincode.trim())) {
-  toast.error("Please enter a valid 6-digit pincode.");
-  return;
-}
+    if (!/^[1-9][0-9]{5}$/.test(pincode.trim())) {
+      toast.error("Please enter a valid 6-digit pincode.");
+      return;
+    }
 
-  // Landmark
-  if (!location.landmark.trim()) {
-    toast.error("Landmark is required.");
-    return;
-  }
+    // Landmark
+    if (!location.landmark.trim()) {
+      toast.error("Landmark is required.");
+      return;
+    }
 
-  const address = [
-    houseNo,
-    street,
-    area,
-    city,
-    state,
-    pincode,
-  ]
-    .map((value) => value.trim())
-    .join(", ");
+    const address = [houseNo, street, area, city, state, pincode]
+      .map((value) => value.trim())
+      .join(", ");
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const payload = {
-      businessName: businessName.trim(),
-      gstNo: gstNo.trim(),
-      contactNo: contactNo.trim(),
-      address,
-      location: {
-        landmark: location.landmark.trim(),
-      },
-    };
+    try {
+      const payload = {
+        businessName: businessName.trim(),
+        gstNo: gstNo.trim(),
+        contactNo: contactNo.trim(),
+        address,
+        location: {
+          landmark: location.landmark.trim(),
+        },
+      };
 
-    await createCorporateAccount(payload);
+      await createCorporateAccount(payload);
 
-    navigate(-1);
-  } catch (error) {
-    console.error("Failed to create corporate account:", error);
-    toast.error("Failed to create corporate account.");
-  } finally {
-    setLoading(false);
-  }
-};
+      navigate(-1);
+    } catch (error) {
+      console.error("Failed to create corporate account:", error);
+      toast.error("Failed to create corporate account.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
