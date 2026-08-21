@@ -18,6 +18,7 @@ import {
   Undo2,
   Pencil,
   X,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
@@ -147,6 +148,11 @@ const CorporateOrder = () => {
   const popoverRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const orders = corporateOrderLists || [];
+  const [invoiceLoading, setInvoiceLoading] = useState({
+    view: null,
+    download: null,
+    regenerate: null,
+  });
 
   const showCompanyPopover = (e, order) => {
     const anchor = e.currentTarget.getBoundingClientRect();
@@ -342,43 +348,98 @@ const CorporateOrder = () => {
 
   //download invoice
   const handleViewInvoice = async (orderId) => {
+    if (invoiceLoading.view === orderId) return;
+
+    // Open tab immediately while still inside the click event
+    const newTab = window.open("", "_blank");
+
+    if (!newTab) {
+      toast.error("Please allow popups to view the invoice");
+      return;
+    }
+
     try {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        view: orderId,
+      }));
+
       const data = await getCorporateInvoice(orderId);
 
-      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      // Navigate the already-open tab to the invoice
+      newTab.location.href = data.signedUrl;
     } catch (err) {
-      console.error(err);
+      console.error("Failed to view invoice:", err);
+      newTab.close();
+      toast.error("Failed to view invoice");
+    } finally {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        view: null,
+      }));
     }
   };
 
   const handleDownloadInvoice = async (id, orderId) => {
+    if (invoiceLoading.download === id) return;
+
     try {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        download: id,
+      }));
+
       const data = await getCorporateInvoice(id);
 
-      if (data?.signedUrl) {
-        const fileResponse = await fetch(data.signedUrl);
-        const pdfBlob = await fileResponse.blob();
+      const fileResponse = await fetch(data.signedUrl);
 
-        const url = window.URL.createObjectURL(pdfBlob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `invoice-${orderId}.pdf`;
-
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        window.URL.revokeObjectURL(url);
+      if (!fileResponse.ok) {
+        throw new Error("Failed to download invoice");
       }
+
+      const pdfBlob = await fileResponse.blob();
+
+      const url = window.URL.createObjectURL(pdfBlob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${orderId}.pdf`;
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(err);
+      toast.error("Failed to download invoice");
+    } finally {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        download: null,
+      }));
     }
   };
 
   const handleRegenerateInvoice = async (orderId) => {
-    const data = await getCorporateInvoice(orderId, true);
-    //TODO add a toast here
+    if (invoiceLoading.regenerate === orderId) return;
+
+    try {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        regenerate: orderId,
+      }));
+
+      await getCorporateInvoice(orderId, true);
+
+      toast.success("Invoice regenerated successfully");
+    } catch (err) {
+      toast.error("Failed to regenerate invoice");
+    } finally {
+      setInvoiceLoading((prev) => ({
+        ...prev,
+        regenerate: null,
+      }));
+    }
   };
 
   if (loading) return <Loader text="Loading corporate orders..." />;
@@ -396,7 +457,7 @@ const CorporateOrder = () => {
           <span className="text-xs text-blue-600 font-medium">
             Total: {corporateOrderPagination?.pagination?.totalCount ?? 0}
           </span>
-           <button
+          <button
             onClick={handleRefresh}
             className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
           >
@@ -526,7 +587,6 @@ const CorporateOrder = () => {
             <option value="FAILED">Failed</option>
           </select>
 
-        
           <button
             onClick={resetFilters}
             className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
@@ -677,11 +737,19 @@ const CorporateOrder = () => {
                         <div className="inline-flex rounded-md overflow-hidden shadow-sm">
                           <button
                             onClick={() => handleViewInvoice(o.id)}
-                            className="h-7 pl-2 pr-2 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium hover:bg-blue-700 transition cursor-pointer"
+                            disabled={invoiceLoading.view === o.id}
+                            className="h-7 pl-2 pr-2 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium hover:bg-blue-700 transition cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                             title="View invoice"
                           >
-                            <EyeIcon size={12} />
-                            View
+                            {invoiceLoading.view === o.id ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <EyeIcon size={12} />
+                            )}
+
+                            {invoiceLoading.view === o.id
+                              ? "Loading..."
+                              : "View"}
                           </button>
                           <button
                             onClick={() =>
@@ -697,24 +765,40 @@ const CorporateOrder = () => {
                         {openMenu === o.id && (
                           <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left">
                             <button
+                              disabled={invoiceLoading.regenerate === o.id}
                               onClick={() => {
                                 handleRegenerateInvoice(o.id);
                                 setOpenMenu(null);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                             >
-                              <RotateCcw size={12} />
-                              Regenerate
+                              {invoiceLoading.regenerate === o.id ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <RotateCcw size={12} />
+                              )}
+
+                              {invoiceLoading.regenerate === o.id
+                                ? "Regenerating..."
+                                : "Regenerate"}
                             </button>
                             <button
+                              disabled={invoiceLoading.download === o.id}
                               onClick={() => {
                                 handleDownloadInvoice(o.id, o.orderId);
                                 setOpenMenu(null);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                             >
-                              <Download size={12} />
-                              Download
+                              {invoiceLoading.download === o.id ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <Download size={12} />
+                              )}
+
+                              {invoiceLoading.download === o.id
+                                ? "Downloading..."
+                                : "Download"}
                             </button>
                           </div>
                         )}
@@ -732,7 +816,6 @@ const CorporateOrder = () => {
                         >
                           <Eye size={14} />
                         </button>
-
                       </div>
                     </td>
                   </tr>
