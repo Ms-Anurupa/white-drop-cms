@@ -224,8 +224,9 @@ const CreateCorporateAccount = () => {
 
             {/* Account ID & Business Name */}
             <div>
+              {/* Business Name */}
               <label className="mb-2 block text-xs font-medium text-gray-700">
-                Business Name
+                Business Name <span className="text-red-500">*</span>
               </label>
 
               <div className="relative">
@@ -247,8 +248,9 @@ const CreateCorporateAccount = () => {
             {/* GST & Contact */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                {/* GST Number */}
                 <label className="mb-2 block text-xs font-medium text-gray-700">
-                  GST Number
+                  GST Number <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -261,8 +263,9 @@ const CreateCorporateAccount = () => {
               </div>
 
               <div>
+                {/* Contact Number */}
                 <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Contact Number
+                  Contact Number <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -280,8 +283,9 @@ const CreateCorporateAccount = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                  {/* House / Flat No. */}
                   <label className="mb-2 block text-xs font-medium text-gray-700">
-                    House / Flat No.
+                    House / Flat No. <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -294,8 +298,9 @@ const CreateCorporateAccount = () => {
                 </div>
 
                 <div>
+                  {/* Street / Road */}
                   <label className="mb-2 block text-xs font-medium text-gray-700">
-                    Street / Road
+                    Street / Road <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -309,8 +314,9 @@ const CreateCorporateAccount = () => {
               </div>
 
               <div>
+                {/* Area / Locality */}
                 <label className="mb-2 block text-xs font-medium text-gray-700">
-                  Area / Locality
+                  Area / Locality <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -324,8 +330,9 @@ const CreateCorporateAccount = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
+                  {/* City */}
                   <label className="mb-2 block text-xs font-medium text-gray-700">
-                    City
+                    City <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -338,8 +345,9 @@ const CreateCorporateAccount = () => {
                 </div>
 
                 <div>
+                  {/* State */}
                   <label className="mb-2 block text-xs font-medium text-gray-700">
-                    State
+                    State <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -352,8 +360,9 @@ const CreateCorporateAccount = () => {
                 </div>
 
                 <div>
+                  {/* Pincode */}
                   <label className="mb-2 block text-xs font-medium text-gray-700">
-                    Pincode
+                    Pincode <span className="text-red-500">*</span>
                   </label>
 
                   <input
@@ -372,8 +381,9 @@ const CreateCorporateAccount = () => {
 
             {/* Landmark */}
             <div>
+              {/* Landmark */}
               <label className="mb-2 block text-xs font-medium text-gray-700">
-                Landmark
+                Landmark <span className="text-red-500">*</span>
               </label>
 
               <input
