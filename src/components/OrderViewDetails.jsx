@@ -47,7 +47,7 @@ const StatusPill = ({ status }) => {
   );
 };
 
-const STAGES = ["PROCESSING", "SHIPPED", "DELIVERED"];
+const STAGES = ["PROCESSING", "INTRANSIT", "DELIVERED"];
 
 const initials = (name = "") =>
   name
