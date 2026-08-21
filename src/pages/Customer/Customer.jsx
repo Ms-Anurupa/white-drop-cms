@@ -8,15 +8,14 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Eye,
-  Trash2,
   Users,
 } from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
-import { useConfirm } from "../../components/ConfirmProvider";
 import useDebounce from "../../utils/useDebounce";
 import DateFilter from "../../components/DateFilter";
 import Loader from "../../components/Loader";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
@@ -71,19 +70,16 @@ const matchesJoinFilter = (customer, filter) => {
 };
 
 const Customer = () => {
+  const navigate = useNavigate()
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [joinFilter, setJoinFilter] = useState("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const { confirm } = useConfirm();
   const getAllCustomers = customerStore((state) => state.getAllCustomers);
   const customers = customerStore((state) => state.customers);
   const exportCustomerDetails = customerStore(
     (state) => state.exportCustomerDetails,
-  );
-  const deleteCustomerDetails = customerStore(
-    (state) => state.deleteCustomerDetails,
   );
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -165,26 +161,6 @@ const Customer = () => {
       toast.success("Customer data exported successfully");
     } catch {
       toast.error("Failed to export customer details");
-    }
-  };
-
-  const handleCustomerDelete = async (customerId) => {
-    try {
-      const confirmMessage = await confirm({
-        title: "Delete customer",
-        message: "This will permanently delete the customer. Continue?",
-      });
-
-      if (!confirmMessage) return;
-
-      await deleteCustomerDetails({ id: customerId });
-      if (!isPartialDateRange) {
-        await getAllCustomers(buildQueryParams());
-      }
-
-      toast.success("Customer deleted");
-    } catch {
-      toast.error("Failed to delete customer");
     }
   };
 
@@ -314,16 +290,16 @@ const Customer = () => {
                 </div>
 
                 <div className="flex gap-2 mt-3">
-                  <button className="flex-1 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5">
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/customer/customerDetails/${c?.userUid}`,
+                      )
+                    }
+                    className="flex-1 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
+                  >
                     <Eye size={13} />
                     View
-                  </button>
-                  <button
-                    onClick={() => handleCustomerDelete(c?.userUid)}
-                    className="flex-1 py-2 text-xs font-medium rounded-lg border border-red-100 text-red-600 hover:bg-red-50 inline-flex items-center justify-center gap-1.5"
-                  >
-                    <Trash2 size={13} />
-                    Delete
                   </button>
                 </div>
               </div>
@@ -394,17 +370,15 @@ const Customer = () => {
                     <td className="px-4 py-3.5">
                       <div className="flex gap-2">
                         <button
+                          onClick={() =>
+                            navigate(
+                              `/dashboard/customer/customerDetails/${c?.userUid}`,
+                            )
+                          }
                           title="View customer"
                           className="p-2 cursor-pointer rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
                         >
                           <Eye size={15} />
-                        </button>
-                        <button
-                          title="Delete customer"
-                          onClick={() => handleCustomerDelete(c?.userUid)}
-                          className="p-2 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50 transition"
-                        >
-                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>

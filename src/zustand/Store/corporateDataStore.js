@@ -9,6 +9,7 @@ const corporateDataStore = create((set) => ({
   corporateOrderLists: [],
   corporateOrderPagination: [],
   currentCorporateOrder: null,
+  corporateOrderMeta: null,
 
   createCorporateOrderAdmin: async (payload) => {
     try {
@@ -110,6 +111,7 @@ const corporateDataStore = create((set) => ({
       set({
         corporateOrderLists: res.data?.orders,
         corporateOrderPagination: res.data,
+        corporateOrderMeta: res.data.meta,
       });
     } catch (error) {
       throw error;

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Search,
   Download,
@@ -9,9 +9,6 @@ import {
   ChevronsRight,
   Eye,
   PackageSearch,
-  Building2,
-  Plus,
-  ChevronDown,
   Loader2,
   Clock3,
 } from "lucide-react";
@@ -23,10 +20,9 @@ import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 
-
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
-// Keep this in sync with the `deliveryStatus` enum in schema.prisma
+// Keep this in sync with deliveryStatus enum in schema.prisma
 const ORDER_STATUSES = [
   "PLACED",
   "PROCESSING",
@@ -35,17 +31,6 @@ const ORDER_STATUSES = [
   "FAILED",
   "CANCELLED",
 ];
-
-const STATUS_STYLES = {
-  PLACED: "bg-green-100 text-green-700 border-green-200 hover:border-green-300",
-  DELIVERED:
-    "bg-emerald-50 text-emerald-700 border-emerald-200 hover:border-emerald-300",
-  INTRANSIT: "bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300",
-  PROCESSING:
-    "bg-amber-50 text-amber-700 border-amber-200 hover:border-amber-300",
-  CANCELLED: "bg-red-50 text-red-700 border-red-200 hover:border-red-300",
-  FAILED: "bg-red-50 text-red-700 border-red-200 hover:border-red-300",
-};
 
 const STATUS_DOT = {
   PLACED: "bg-green-400",
@@ -58,8 +43,13 @@ const STATUS_DOT = {
 
 const formatDate = (value) => {
   if (!value) return "-";
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
   return date.toLocaleString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -71,8 +61,13 @@ const formatDate = (value) => {
 
 const formatDateOnly = (value) => {
   if (!value) return "-";
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
   return date.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -82,12 +77,83 @@ const formatDateOnly = (value) => {
 
 const formatTimeOnly = (value) => {
   if (!value) return "";
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
   return date.toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+const getDateRange = (filter) => {
+  const now = new Date();
+
+  // ALL
+  if (filter === "all") {
+    return {
+      fromDate: "",
+      toDate: "",
+    };
+  }
+
+  // TODAY
+  if (filter === "today") {
+    const from = new Date(now);
+    from.setHours(0, 0, 0, 0);
+
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+
+    return {
+      fromDate: from.toISOString(),
+      toDate: to.toISOString(),
+    };
+  }
+
+  // THIS WEEK - Monday to today
+  if (filter === "week") {
+    const from = new Date(now);
+
+    const day = from.getDay();
+
+    // Sunday = 0
+    // Monday = 1
+    const distanceToMonday = day === 0 ? 6 : day - 1;
+
+    from.setDate(from.getDate() - distanceToMonday);
+    from.setHours(0, 0, 0, 0);
+
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+
+    return {
+      fromDate: from.toISOString(),
+      toDate: to.toISOString(),
+    };
+  }
+
+  // THIS MONTH - first day to today
+  if (filter === "month") {
+    const from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+
+    return {
+      fromDate: from.toISOString(),
+      toDate: to.toISOString(),
+    };
+  }
+
+  return {
+    fromDate: "",
+    toDate: "",
+  };
 };
 
 const PageStyles = () => (
@@ -110,12 +176,19 @@ const PageStyles = () => (
 
     .futuristic-scroll::-webkit-scrollbar-thumb {
       border-radius: 999px;
-      background: linear-gradient(180deg, #818cf8 0%, #6366f1 45%, #06b6d4 100%);
+      background: linear-gradient(
+        180deg,
+        #818cf8 0%,
+        #6366f1 45%,
+        #06b6d4 100%
+      );
       background-size: 100% 200%;
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.6) inset,
         0 0 6px rgba(99, 102, 241, 0.45);
-      transition: box-shadow 0.25s ease, background-position 0.6s ease;
+      transition:
+        box-shadow 0.25s ease,
+        background-position 0.6s ease;
     }
 
     .futuristic-scroll::-webkit-scrollbar-thumb:hover {
@@ -126,7 +199,12 @@ const PageStyles = () => (
     }
 
     .futuristic-scroll::-webkit-scrollbar-thumb:active {
-      background: linear-gradient(180deg, #6366f1 0%, #06b6d4 100%);
+      background: linear-gradient(
+        180deg,
+        #6366f1 0%,
+        #06b6d4 100%
+      );
+
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.8) inset,
         0 0 18px rgba(6, 182, 212, 0.85);
@@ -144,7 +222,12 @@ const PageStyles = () => (
     }
 
     .order-table-head {
-      background: linear-gradient(180deg, rgba(249, 250, 251, 0.96) 0%, rgba(249, 250, 251, 0.88) 100%);
+      background: linear-gradient(
+        180deg,
+        rgba(249, 250, 251, 0.96) 0%,
+        rgba(249, 250, 251, 0.88) 100%
+      );
+
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
@@ -156,7 +239,14 @@ const PageStyles = () => (
       right: 0;
       bottom: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.35), rgba(6, 182, 212, 0.35), transparent);
+
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(99, 102, 241, 0.35),
+        rgba(6, 182, 212, 0.35),
+        transparent
+      );
     }
 
     .order-row {
@@ -167,10 +257,13 @@ const PageStyles = () => (
 
 const Order = () => {
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
+
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
   );
+
   const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
+
   const orders = orderDataStore((state) => state.orders);
   const meta = orderDataStore((state) => state.meta);
   const orderSummary = orderDataStore((state) => state.orderSummary);
@@ -178,22 +271,36 @@ const Order = () => {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
+
   const [dateFilter, setDateFilter] = useState("all");
+
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const [appliedFromDate, setAppliedFromDate] = useState("");
+  const [appliedToDate, setAppliedToDate] = useState("");
+
+  const [updatingId, setUpdatingId] = useState(null);
+
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null);
+
   const popoverRef = useRef(null);
-  const [toDate, setToDate] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [updatingId, setUpdatingId] = useState(null);
 
   const navigate = useNavigate();
 
   const showAddressPopover = (e, order) => {
     const anchor = e.currentTarget.getBoundingClientRect();
+
     setPopoverPos(null);
-    setHoveredOrder({ order, anchor });
+
+    setHoveredOrder({
+      order,
+      anchor,
+    });
   };
 
   const hideAddressPopover = () => {
@@ -202,165 +309,242 @@ const Order = () => {
   };
 
   useLayoutEffect(() => {
-    if (!hoveredOrder || !popoverRef.current) return;
+    if (!hoveredOrder || !popoverRef.current) {
+      return;
+    }
 
     const { anchor } = hoveredOrder;
+
     const { width, height } = popoverRef.current.getBoundingClientRect();
+
     const margin = 12;
     const gap = 8;
 
     let left = anchor.left;
+
     if (left + width + margin > window.innerWidth) {
       left = window.innerWidth - width - margin;
     }
+
     left = Math.max(left, margin);
 
     const spaceBelow = window.innerHeight - anchor.bottom;
     const spaceAbove = anchor.top;
 
     let top;
+
     if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
       top = anchor.bottom + gap;
+
       top = Math.min(top, window.innerHeight - margin - height);
     } else {
       top = anchor.top - height - gap;
     }
+
     top = Math.max(top, margin);
 
-    setPopoverPos({ top, left });
+    setPopoverPos({
+      top,
+      left,
+    });
   }, [hoveredOrder]);
 
-useEffect(() => {
-  const timer = setTimeout(() => {
-    const range = getDateRange(dateFilter);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getOrderListing({
+        status: status || "",
+        search: search || "",
+        page,
+        limit: pageSize,
+        fromDate: appliedFromDate || "",
+        toDate: appliedToDate || "",
+      });
+    }, 400);
 
-    // Don't fetch if only one custom date is selected
-    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [
+    getOrderListing,
+    search,
+    status,
+    page,
+    pageSize,
+    appliedFromDate,
+    appliedToDate,
+  ]);
+
+  const handlePillFilterChange = (key) => {
+    const range = getDateRange(key);
+
+    setDateFilter(key);
+
+    // Clear custom date inputs
+    setFromDate("");
+    setToDate("");
+
+    // Apply selected predefined date range
+    setAppliedFromDate(range.fromDate);
+    setAppliedToDate(range.toDate);
+
+    // Reset pagination
+    setPage(1);
+  };
+
+  const handleFromDateChange = (value) => {
+    setFromDate(value);
+
+    if (!value || !toDate) {
+      setDateFilter("custom");
+
+      setAppliedFromDate("");
+      setAppliedToDate("");
+
       return;
     }
 
-    getOrderListing({
-      status,
-      search,
-      page,
-      limit: pageSize,
-      fromDate: dateFilter === "all" ? "" : range.fromDate,
-      toDate: dateFilter === "all" ? "" : range.toDate,
-    });
-  }, 400);
+    if (value > toDate) {
+      toast.error("From Date cannot be after To Date.");
 
-  return () => clearTimeout(timer);
-}, [getOrderListing, search, status, page, pageSize, dateFilter]);
+      setFromDate("");
+      setAppliedFromDate("");
+      setAppliedToDate("");
+      setDateFilter("all");
+      setPage(1);
 
-  const handleFromDateChange = (value) => setFromDate(value);
-  const handleToDateChange = (value) => setToDate(value);
+      return;
+    }
+
+    const from = new Date(`${value}T00:00:00`);
+
+    const to = new Date(`${toDate}T23:59:59.999`);
+
+    setAppliedFromDate(from.toISOString());
+    setAppliedToDate(to.toISOString());
+
+    setDateFilter("custom");
+
+    setPage(1);
+  };
+
+  const handleToDateChange = (value) => {
+    setToDate(value);
+
+    if (!value || !fromDate) {
+      setDateFilter("custom");
+
+      setAppliedFromDate("");
+      setAppliedToDate("");
+
+      return;
+    }
+
+    if (fromDate > value) {
+      toast.error("To Date cannot be before From Date.");
+
+      setToDate("");
+      setAppliedFromDate("");
+      setAppliedToDate("");
+      setDateFilter("all");
+      setPage(1);
+
+      return;
+    }
+
+    const from = new Date(`${fromDate}T00:00:00`);
+
+    const to = new Date(`${value}T23:59:59.999`);
+
+    setAppliedFromDate(from.toISOString());
+    setAppliedToDate(to.toISOString());
+
+    setDateFilter("custom");
+
+    setPage(1);
+  };
+
   const clearDates = () => {
     setFromDate("");
     setToDate("");
+
+    setAppliedFromDate("");
+    setAppliedToDate("");
+
+    setDateFilter("all");
+
+    setPage(1);
   };
 
   const dateCounts = {
-    all: orderSummary?.allOrders ?? 0,
-    today: orderSummary?.todayOrders ?? 0,
-    week: orderSummary?.thisWeekOrders ?? 0,
-    month: orderSummary?.thisMonthOrders ?? 0,
+    all: Number(orderSummary?.allOrders ?? 0),
+
+    today: Number(orderSummary?.todayOrders ?? 0),
+
+    week: Number(orderSummary?.thisWeekOrders ?? 0),
+
+    month: Number(orderSummary?.thisMonthOrders ?? 0),
   };
+
   const DATE_FILTERS = [
-    { key: "today", label: "Today" },
-    { key: "week", label: "This week" },
-    { key: "month", label: "This month" },
+    {
+      key: "all",
+      label: "All",
+    },
+    {
+      key: "today",
+      label: "Today",
+    },
+    {
+      key: "week",
+      label: "This week",
+    },
+    {
+      key: "month",
+      label: "This month",
+    },
   ];
 
   const totalItems = Number(meta?.totalItems ?? 0);
+
   const totalPages = Math.max(1, Number(meta?.totalPages ?? 1));
 
   const currentPage = Math.min(page, totalPages);
+
   const start = (currentPage - 1) * pageSize;
 
-  const paginated = orders;
+  const paginated = Array.isArray(orders) ? orders : [];
 
   const handleExport = async () => {
     try {
       const file = await exportOrderDetails();
+
       const url = window.URL.createObjectURL(file);
 
       const link = document.createElement("a");
+
       link.href = url;
       link.download = "orders.xlsx";
 
       document.body.appendChild(link);
+
       link.click();
 
       document.body.removeChild(link);
+
       window.URL.revokeObjectURL(url);
 
       toast.success("Order data exported successfully");
-    } catch {
+    } catch (error) {
+      console.error("Failed to export orders:", error);
+
       toast.error("Failed to export order details");
     }
   };
 
-  const getDateRange = (filter) => {
-    const now = new Date();
-
-    if (filter === "all") {
-      return {
-        fromDate: "",
-        toDate: "",
-      };
-    }
-
-    if (filter === "today") {
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-
-      const end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-
-      return {
-        fromDate: start.toISOString(),
-        toDate: end.toISOString(),
-      };
-    }
-
-    if (filter === "week") {
-      const start = new Date(now);
-
-      const day = start.getDay();
-      const distanceToMonday = (day + 6) % 7;
-
-      start.setDate(start.getDate() - distanceToMonday);
-      start.setHours(0, 0, 0, 0);
-
-      const end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-
-      return {
-        fromDate: start.toISOString(),
-        toDate: end.toISOString(),
-      };
-    }
-
-    if (filter === "month") {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-
-      const end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-
-      return {
-        fromDate: start.toISOString(),
-        toDate: end.toISOString(),
-      };
-    }
-
-    return {
-      fromDate: "",
-      toDate: "",
-    };
-  };
-
   const handleStatusChange = async (order, newStatus) => {
-    if (!newStatus || newStatus === order.orderStatus) return;
+    if (!newStatus || newStatus === order.orderStatus) {
+      return;
+    }
 
     setUpdatingId(order.id);
 
@@ -372,16 +556,17 @@ useEffect(() => {
 
       toast.success(`Order ${order.orderId} marked as ${newStatus}`);
 
-      getOrderListing({
-        status,
-        search,
-        page,
+      await getOrderListing({
+        status: status || "",
+        search: search || "",
+        page: currentPage,
         limit: pageSize,
-        fromDate: range.fromDate,
-        toDate: range.toDate,
+        fromDate: appliedFromDate || "",
+        toDate: appliedToDate || "",
       });
     } catch (error) {
       console.error("Failed to update order status:", error);
+
       toast.error(
         error?.response?.data?.message || "Failed to update order status",
       );
@@ -392,29 +577,45 @@ useEffect(() => {
 
   const getPageNumbers = () => {
     const pages = [];
+
     const windowSize = 1;
+
     const addRange = (from, to) => {
-      for (let i = from; i <= to; i++) pages.push(i);
+      for (let i = from; i <= to; i++) {
+        pages.push(i);
+      }
     };
 
     if (totalPages <= 7) {
       addRange(1, totalPages);
+
       return pages;
     }
 
     pages.push(1);
+
     const left = Math.max(2, currentPage - windowSize);
+
     const right = Math.min(totalPages - 1, currentPage + windowSize);
 
-    if (left > 2) pages.push("ellipsis-left");
+    if (left > 2) {
+      pages.push("ellipsis-left");
+    }
+
     addRange(left, right);
-    if (right < totalPages - 1) pages.push("ellipsis-right");
+
+    if (right < totalPages - 1) {
+      pages.push("ellipsis-right");
+    }
+
     pages.push(totalPages);
 
     return pages;
   };
 
-  if (loading) return <Loader text="Loading order history lists..." />;
+  if (loading) {
+    return <Loader text="Loading order history lists..." />;
+  }
 
   return (
     <div className="p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
@@ -426,8 +627,10 @@ useEffect(() => {
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Order Management
           </h1>
+
           <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>Track orders, delivery &amp; status:</span>
+
             <span className="text-blue-600 font-medium">
               Total Order Count: {dateCounts.all}
             </span>
@@ -442,9 +645,13 @@ useEffect(() => {
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                 />
+
                 <input
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
                   placeholder="Search orders..."
                   className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
                 />
@@ -462,27 +669,109 @@ useEffect(() => {
         </div>
       </div>
 
-      <DateFilter
-        filters={DATE_FILTERS.map((f) => ({
-          ...f,
-          count: dateCounts[f.key], // global counts
-        }))}
-        activeFilter={dateFilter}
-        onFilterChange={(key) => {
-          setDateFilter(key);
-          setFromDate("");
-          setToDate("");
-          setPage(1);
-        }}
-        fromDate={fromDate}
-        toDate={toDate}
-        onFromDateChange={handleFromDateChange}
-        onToDateChange={handleToDateChange}
-        onClear={clearDates}
-      />
+      {/* DATE FILTER + STATUS */}
+      <div className="relative z-40 bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+        <div className="flex items-center gap-3 futuristic-scroll">
+          <DateFilter
+            filters={DATE_FILTERS.map((f) => ({
+              ...f,
+              count: dateCounts[f.key],
+            }))}
+            activeFilter={dateFilter}
+            onFilterChange={handlePillFilterChange}
+            fromDate={fromDate}
+            toDate={toDate}
+            onFromDateChange={handleFromDateChange}
+            onToDateChange={handleToDateChange}
+            onClear={fromDate || toDate ? clearDates : undefined}
+            bare
+          />
+
+          <div className="w-px h-8 shrink-0 bg-gray-100" />
+
+          {/* STATUS FILTER */}
+          <div className="relative z-100 shrink-0" style={{ top: "8px" }}>
+            <SplitButton
+              variant="outline"
+              className="w-40"
+              onClick={() => {}}
+              menuContent={
+                <>
+                  <SplitButtonItem
+                    onClick={() => {
+                      setStatus("");
+                      setPage(1);
+                    }}
+                  >
+                    <div className="flex w-full h-full items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+
+                        <span>All Statuses</span>
+                      </div>
+
+                      {status === "" && (
+                        <span className="text-blue-600">✓</span>
+                      )}
+                    </div>
+                  </SplitButtonItem>
+
+                  {ORDER_STATUSES.map((item) => (
+                    <SplitButtonItem
+                      key={item}
+                      onClick={() => {
+                        setStatus(item);
+                        setPage(1);
+                      }}
+                    >
+                      <div className="flex w-full h-full items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              STATUS_DOT[item] || "bg-gray-400"
+                            }`}
+                          />
+
+                          <span>
+                            {item
+                              .replaceAll("_", " ")
+                              .toLowerCase()
+                              .replace(/\b\w/g, (c) => c.toUpperCase())}
+                          </span>
+                        </div>
+
+                        {status === item && (
+                          <span className="text-blue-600">✓</span>
+                        )}
+                      </div>
+                    </SplitButtonItem>
+                  ))}
+                </>
+              }
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    status ? STATUS_DOT[status] || "bg-gray-400" : "bg-gray-400"
+                  }`}
+                />
+
+                <span>
+                  {status
+                    ? status
+                        .replaceAll("_", " ")
+                        .toLowerCase()
+                        .replace(/\b\w/g, (c) => c.toUpperCase())
+                    : "All Statuses"}
+                </span>
+              </div>
+            </SplitButton>
+          </div>
+        </div>
+      </div>
 
       {/* TABLE CARD */}
-      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-vissible">
+      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-visible">
         {/* MOBILE VIEW */}
         <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
           {paginated.length === 0 ? (
@@ -496,17 +785,17 @@ useEffect(() => {
                       <span className="text-xs text-gray-400 shrink-0">
                         #{start + idx + 1}
                       </span>
+
                       <h3 className="font-medium text-gray-900 truncate">
                         {o.orderId}
                       </h3>
                     </div>
+
                     <p className="text-xs text-gray-500 mt-1">
                       {formatDate(o.createdAt)}
                     </p>
+
                     <div className="mt-2 flex items-center gap-2 flex-wrap">
-                      {/* <span className="font-semibold text-sm text-gray-900">
-                        ₹{o.orderTotal}
-                      </span> */}
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
@@ -515,6 +804,7 @@ useEffect(() => {
                       />
                     </div>
                   </div>
+
                   <img
                     src={resolveFirebaseUrl({
                       folderName: "productImages",
@@ -530,7 +820,9 @@ useEffect(() => {
                   <p className="font-medium text-gray-700">
                     {o.user?.customer_name}
                   </p>
+
                   <p>{o.user?.phone_num}</p>
+
                   <p>
                     {[o.shippingAddress?.apartment, o.shippingAddress?.locality]
                       .filter(Boolean)
@@ -560,27 +852,35 @@ useEffect(() => {
                 <th className="w-10 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Sl No.
                 </th>
+
                 <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Order ID
                 </th>
+
                 <th className="w-14 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Image
                 </th>
+
                 <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Total
                 </th>
+
                 <th className="w-44 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Customer
                 </th>
+
                 <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Status
                 </th>
+
                 <th className="w-28 pl-5 pr-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Delivery Slot
                 </th>
+
                 <th className="w-24 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Created At
                 </th>
+
                 <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Action
                 </th>
@@ -600,9 +900,11 @@ useEffect(() => {
                     <td className="px-2.5 py-2.5 text-gray-400">
                       {start + idx + 1}
                     </td>
+
                     <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                       {o.orderId}
                     </td>
+
                     <td className="px-2.5 py-2.5">
                       <img
                         src={resolveFirebaseUrl({
@@ -614,9 +916,11 @@ useEffect(() => {
                         className="w-9 h-9 rounded-lg object-cover border border-gray-100"
                       />
                     </td>
+
                     <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap">
                       ₹{o.orderTotal}
                     </td>
+
                     <td
                       className="px-2.5 py-2.5 text-gray-600 cursor-default"
                       onMouseEnter={(e) => showAddressPopover(e, o)}
@@ -625,9 +929,11 @@ useEffect(() => {
                       <p className="font-medium text-gray-800 truncate">
                         {o.user?.customer_name}
                       </p>
+
                       <p className="text-xs text-gray-500 truncate">
                         {o.user?.phone_num}
                       </p>
+
                       <p className="text-xs text-gray-400 truncate">
                         {[
                           o.shippingAddress?.apartment,
@@ -637,14 +943,16 @@ useEffect(() => {
                           .join(", ")}
                       </p>
                     </td>
-                    <td className="px-4 py-3.5">
+
+                    <td className="px-2.5 py-2.5 align-middle">
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
                         disabled={updatingId === o.id}
-                        className="w-32"
+                        className="w-36"
                       />
                     </td>
+
                     <td className="pl-5 pr-2.5 py-2.5">
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
@@ -662,10 +970,12 @@ useEffect(() => {
                               <Clock3 size={11} className="text-blue-600" />
                             )}
                           </span>
+
                           <div className="min-w-0">
                             <p className="text-xs font-medium text-gray-800 truncate">
                               {o.deliverySlot.name}
                             </p>
+
                             {o.deliverySlot?.from && o.deliverySlot?.to && (
                               <p className="text-[10px] text-gray-400 truncate">
                                 {o.deliverySlot.from}-{o.deliverySlot.to}
@@ -677,14 +987,17 @@ useEffect(() => {
                         <span className="text-xs text-gray-400">—</span>
                       )}
                     </td>
+
                     <td className="px-2.5 py-2.5 whitespace-nowrap">
                       <p className="text-xs text-gray-700">
                         {formatDateOnly(o.createdAt)}
                       </p>
+
                       <p className="text-[10px] text-gray-400">
                         {formatTimeOnly(o.createdAt)}
                       </p>
                     </td>
+
                     <td className="px-2.5 py-2.5">
                       <button
                         onClick={() =>
@@ -722,6 +1035,7 @@ useEffect(() => {
                 value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
+
                   setPage(1);
                 }}
                 className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
@@ -804,19 +1118,30 @@ useEffect(() => {
           className="fixed z-50 w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
           style={
             popoverPos
-              ? { top: popoverPos.top, left: popoverPos.left, opacity: 1 }
-              : { top: 0, left: 0, opacity: 0 }
+              ? {
+                  top: popoverPos.top,
+                  left: popoverPos.left,
+                  opacity: 1,
+                }
+              : {
+                  top: 0,
+                  left: 0,
+                  opacity: 0,
+                }
           }
         >
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
             Delivery address
           </p>
+
           <p className="text-sm font-medium text-gray-900">
             {hoveredOrder.order.user?.customer_name}
           </p>
+
           <p className="text-sm text-gray-500 mt-0.5">
             {hoveredOrder.order.user?.phone_num}
           </p>
+
           <p className="text-sm text-gray-600 mt-2 leading-relaxed">
             {[
               hoveredOrder.order.shippingAddress?.apartment,
@@ -835,6 +1160,12 @@ useEffect(() => {
   );
 };
 
+/*
+ * ---------------------------------------------------------
+ * PAGE BUTTON
+ * ---------------------------------------------------------
+ */
+
 const PageButton = ({ children, onClick, disabled, label }) => (
   <button
     onClick={onClick}
@@ -847,14 +1178,18 @@ const PageButton = ({ children, onClick, disabled, label }) => (
   </button>
 );
 
+/*
+ * ---------------------------------------------------------
+ * STATUS SELECT
+ * ---------------------------------------------------------
+ */
+
 const StatusSelect = ({
   order,
   onChange,
   disabled,
   className = "w-36 z-[999]",
 }) => {
-  const availableStatuses = ORDER_STATUSES;
-
   return (
     <SplitButton
       variant="outline"
@@ -863,7 +1198,7 @@ const StatusSelect = ({
       onClick={() => {}}
       menuContent={
         <>
-          {availableStatuses.map((status) => (
+          {ORDER_STATUSES.map((status) => (
             <SplitButtonItem
               key={status}
               onClick={() => onChange(order, status)}
@@ -875,10 +1210,12 @@ const StatusSelect = ({
                       STATUS_DOT[status] || "bg-gray-400"
                     }`}
                   />
+
                   <span className="capitalize">
                     {status.replaceAll("_", " ").toLowerCase()}
                   </span>
                 </div>
+
                 {order.orderStatus === status && (
                   <span className="text-blue-600">✓</span>
                 )}
@@ -898,6 +1235,7 @@ const StatusSelect = ({
             }`}
           />
         )}
+
         <span>
           {order.orderStatus
             ?.replaceAll("_", " ")
@@ -909,10 +1247,18 @@ const StatusSelect = ({
   );
 };
 
+/*
+ * ---------------------------------------------------------
+ * EMPTY STATE
+ * ---------------------------------------------------------
+ */
+
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
     <PackageSearch size={32} className="text-gray-300" />
+
     <p className="text-sm font-medium text-gray-500">No orders found</p>
+
     <p className="text-xs text-gray-400">
       Try adjusting your search or filters
     </p>
