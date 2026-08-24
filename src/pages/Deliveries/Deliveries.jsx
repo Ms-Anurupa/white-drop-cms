@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Truck,
@@ -8,35 +9,11 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
-  ClipboardList,
-  UserRound,
 } from "lucide-react";
 import deliveryJobStore from "../../zustand/Store/deliveryJobStore";
 import Loader from "../../components/Loader";
 
 const PAGE_SIZE = 6;
-
-/* =========================================================
-   JOB STATUS
-========================================================= */
-
-// const JOB_STATUSES = [
-//   "CREATED",
-//   "ASSIGNED",
-//   "PICKED_UP",
-//   "DELIVERED",
-//   "FAILED",
-//   "CANCELLED",
-// ];
-
-const STATUS_PROGRESS = {
-  CREATED: 0,
-  ASSIGNED: 25,
-  PICKED_UP: 50,
-  DELIVERED: 100,
-  FAILED: 100,
-  CANCELLED: 0,
-};
 
 const STATUS_LABELS = {
   CREATED: "Created",
@@ -91,19 +68,9 @@ const statusMeta = {
   },
 };
 
-const getStatusMeta = (status) =>
-  statusMeta[status] || statusMeta.CREATED;
+const getStatusMeta = (status) => statusMeta[status] || statusMeta.CREATED;
 
-const getStatusLabel = (status) =>
-  STATUS_LABELS[status] || status || "Unknown";
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const getProgress = (status) => {
-  return STATUS_PROGRESS[status] ?? 0;
-};
+const getStatusLabel = (status) => STATUS_LABELS[status] || status || "Unknown";
 
 const formatDate = (date) => {
   if (!date) return "—";
@@ -128,160 +95,51 @@ const getPartnerName = (partner) => {
 const getPartnerInitials = (partner) => {
   if (!partner) return "—";
 
-  const first =
-    partner.firstName?.[0] ||
-    partner.first_name?.[0] ||
-    "";
+  const first = partner.firstName?.[0] || "";
 
-  const last =
-    partner.lastName?.[0] ||
-    partner.last_name?.[0] ||
-    "";
+  const last = partner.lastName?.[0] || "";
 
   return `${first}${last}`.toUpperCase() || "DP";
 };
 
-/* =========================================================
-   TRACKING STEPS
-========================================================= */
-
-const STEPS = [
-  {
-    label: "Created",
-    Icon: ClipboardList,
-    threshold: 0,
-  },
-  {
-    label: "Assigned",
-    Icon: UserRound,
-    threshold: 25,
-  },
-  {
-    label: "Picked Up",
-    Icon: Truck,
-    threshold: 50,
-  },
-  {
-    label: "Delivered",
-    Icon: CheckCircle2,
-    threshold: 100,
-  },
-];
-
-/* =========================================================
-   TRACKING TIMELINE
-========================================================= */
-
-const TrackingTimeline = ({ progress, status }) => {
-  const meta = getStatusMeta(status);
-
-  const activeIndex = STEPS.findLastIndex(
-    (step) => progress >= step.threshold,
-  );
-
-  return (
-    <div className="mt-4">
-      <div className="relative flex items-center justify-between mb-3">
-        {/* Background line */}
-
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-100" />
-
-        {/* Progress line */}
-
-        <div
-          className={`absolute left-0 top-1/2 -translate-y-1/2 h-0.5 transition-all duration-700 ${meta.bar}`}
-          style={{
-            width: `${progress}%`,
-          }}
-        />
-
-        {STEPS.map((step, index) => {
-          const done =
-            progress >= step.threshold;
-
-          const Icon = step.Icon;
-
-          return (
-            <div
-              key={step.label}
-              className="relative z-10 flex flex-col items-center"
-            >
-              <div
-                className={`
-                  w-7 h-7
-                  rounded-full
-                  flex items-center justify-center
-                  border-2
-                  transition-all
-                  ${
-                    done
-                      ? `${meta.bar} border-transparent text-white`
-                      : "bg-white border-slate-200 text-slate-300"
-                  }
-                  ${
-                    activeIndex === index
-                      ? "ring-2 ring-offset-1 ring-blue-300"
-                      : ""
-                  }
-                `}
-              >
-                <Icon size={12} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex justify-between">
-        {STEPS.map((step) => (
-          <span
-            key={step.label}
-            className={`
-              text-[10px]
-              font-medium
-              w-14
-              text-center
-              leading-tight
-              ${
-                progress >= step.threshold
-                  ? "text-gray-700"
-                  : "text-gray-300"
-              }
-            `}
-          >
-            {step.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* =========================================================
-   DELIVERY CARD
-========================================================= */
-
 const DeliveryCard = ({ job }) => {
+  const navigate = useNavigate();
+
   const meta = getStatusMeta(job.status);
 
-  const progress = getProgress(job.status);
+  const partnerName = getPartnerName(job.deliveryPartner);
 
-  const partnerName = getPartnerName(
-    job.deliveryPartner,
-  );
+  const partnerInitials = getPartnerInitials(job.deliveryPartner);
 
-  const partnerInitials =
-    getPartnerInitials(job.deliveryPartner);
+  const orders = job.orders || [];
 
-  const ordersCount = job.orders?.length || 0;
+  const ordersCount = orders.length;
+
+  // ==========================================
+  // ORDER LEVEL STATUS
+  // ==========================================
+
+  const pickedUpCount = orders.filter(
+    (order) => order.orderStatus === "PICKED_UP",
+  ).length;
+
+  const deliveredCount = orders.filter(
+    (order) => order.orderStatus === "DELIVERED",
+  ).length;
+
+  // Delivered orders / Total assigned orders
+  const deliveryPercentage =
+    ordersCount > 0 ? Math.round((deliveredCount / ordersCount) * 100) : 0;
+
+  const handleTrack = () => {
+    navigate(`/location-tracker/${job.id}`, {
+      state: { job },
+    });
+  };
 
   return (
     <div className="bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-5 flex flex-col gap-4">
-
-      {/* =================================================
-          TOP
-      ================================================= */}
-
+      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-0.5">
@@ -291,10 +149,6 @@ const DeliveryCard = ({ job }) => {
           <h3 className="font-semibold text-gray-900 text-sm truncate">
             {job.name || "Delivery Job"}
           </h3>
-
-          <p className="text-xs text-slate-400 mt-1">
-            {job.id}
-          </p>
         </div>
 
         <span
@@ -312,74 +166,43 @@ const DeliveryCard = ({ job }) => {
             ${meta.badge}
           `}
         >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${meta.dot}`}
-          />
+          <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
 
           {getStatusLabel(job.status)}
         </span>
       </div>
 
-      {/* =================================================
-          DETAILS
-      ================================================= */}
-
+      {/* Job Details */}
       <div className="space-y-2 text-sm text-gray-500">
-
-        {/* Area */}
-
         <div className="flex items-center gap-2">
-          <MapPin
-            size={13}
-            className="shrink-0 text-slate-400"
-          />
+          <MapPin size={13} className="shrink-0 text-slate-400" />
 
-          <span className="truncate">
-            {job.area || "—"}
-          </span>
+          <span className="truncate">{job.area || "—"}</span>
         </div>
 
-        {/* Delivery date */}
-
         <div className="flex items-center gap-2">
-          <Clock3
-            size={13}
-            className="shrink-0 text-slate-400"
-          />
+          <Clock3 size={13} className="shrink-0 text-slate-400" />
 
-          <span>
-            {formatDate(job.deliveryDate)}
-          </span>
+          <span>{formatDate(job.deliveryDate)}</span>
         </div>
 
-        {/* Slot */}
-
         <div className="flex items-center gap-2">
-          <Truck
-            size={13}
-            className="shrink-0 text-slate-400"
-          />
+          <Truck size={13} className="shrink-0 text-slate-400" />
 
           <span>
             {job.slot?.name || "—"}
 
-            {job.slot?.from &&
-              job.slot?.to && (
-                <span className="ml-1 text-xs text-slate-400">
-                  ({job.slot.from} -{" "}
-                  {job.slot.to})
-                </span>
-              )}
+            {job.slot?.from && job.slot?.to && (
+              <span className="ml-1 text-xs text-slate-400">
+                ({job.slot.from} - {job.slot.to})
+              </span>
+            )}
           </span>
         </div>
       </div>
 
-      {/* =================================================
-          DELIVERY PARTNER
-      ================================================= */}
-
+      {/* Delivery Partner */}
       <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-
         <div
           className={`
             w-9
@@ -412,17 +235,11 @@ const DeliveryCard = ({ job }) => {
         </div>
       </div>
 
-      {/* =================================================
-          ORDERS
-      ================================================= */}
-
+      {/* Orders */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <Package
-              size={15}
-              className="text-blue-600"
-            />
+            <Package size={15} className="text-blue-600" />
           </div>
 
           <div>
@@ -444,11 +261,9 @@ const DeliveryCard = ({ job }) => {
 
             <p className="text-sm font-semibold text-slate-800">
               ₹
-              {job.orders
+              {orders
                 .reduce(
-                  (total, order) =>
-                    total +
-                    Number(order.orderTotal || 0),
+                  (total, order) => total + Number(order.orderTotal || 0),
                   0,
                 )
                 .toFixed(2)}
@@ -457,37 +272,87 @@ const DeliveryCard = ({ job }) => {
         )}
       </div>
 
-      {/* =================================================
-          TRACKING TIMELINE
-      ================================================= */}
+      {/* ==========================================
+          ORDER DELIVERY PROGRESS
+      ========================================== */}
+      <div className="rounded-xl border border-slate-100 p-3 bg-white">
+        <div className="flex items-center justify-between gap-3 mb-3">
+          {/* Picked Up */}
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
 
-      <TrackingTimeline
-        progress={progress}
-        status={job.status}
-      />
+            <p className="text-xs text-slate-500">
+              Picked Up{" "}
+              <span className="font-semibold text-slate-800">
+                {pickedUpCount}
+              </span>
+            </p>
+          </div>
 
-      {/* =================================================
-          FOOTER
-      ================================================= */}
+          {/* Delivered */}
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
 
-      <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+            <p className="text-xs text-slate-500">
+              Delivered{" "}
+              <span className="font-semibold text-slate-800">
+                {deliveredCount}
+              </span>
+            </p>
+          </div>
+        </div>
 
-        <span className="text-xs text-slate-400 font-medium">
-          {progress}% complete
-        </span>
+        {/* Progress Bar */}
+        <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden mb-1">
+          <div
+            className="h-full bg-emerald-500 rounded-full transition-all duration-700"
+            style={{
+              width: `${deliveryPercentage}%`,
+            }}
+          />
+        </div>
 
-        <span
-          className={`text-xs font-semibold ${meta.text}`}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[10px] text-slate-400">
+            {deliveredCount} of {ordersCount} orders delivered
+          </span>
+
+          <span className="text-[10px] font-semibold text-emerald-600">
+            {deliveryPercentage}%
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleTrack}
+          className="
+            w-full
+            inline-flex
+            items-center
+            justify-center
+            gap-1.5
+            py-2
+            rounded-lg
+            bg-blue-600
+            text-white
+            text-xs
+            font-semibold
+            hover:bg-blue-700
+            active:scale-[0.98]
+            transition-all
+            duration-150
+            cursor-pointer
+          "
         >
-          {job.status === "DELIVERED"
-            ? "Completed"
-            : job.status === "FAILED"
-              ? "Failed"
-              : job.status === "CANCELLED"
-                ? "Cancelled"
-                : `Status: ${getStatusLabel(
-                    job.status,
-                  )}`}
+          <Truck size={13} />
+          Track
+        </button>
+      </div>
+
+      {/* Job Progress */}
+      <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+        <span className="text-xs font-semibold text-emerald-600">
+          {deliveryPercentage}% orders delivered
         </span>
       </div>
     </div>
@@ -498,15 +363,8 @@ const DeliveryCard = ({ job }) => {
    STAT CARD
 ========================================================= */
 
-const StatCard = ({
-  label,
-  value,
-  Icon,
-  iconClass,
-  bgClass,
-}) => (
+const StatCard = ({ label, value, Icon, iconClass, bgClass }) => (
   <div className="bg-white border border-slate-100 rounded-xl shadow-sm px-4 py-4 flex items-center gap-4">
-
     <div
       className={`
         w-10
@@ -519,16 +377,11 @@ const StatCard = ({
         ${bgClass}
       `}
     >
-      <Icon
-        size={18}
-        className={iconClass}
-      />
+      <Icon size={18} className={iconClass} />
     </div>
 
     <div>
-      <p className="text-xs text-gray-500 font-medium">
-        {label}
-      </p>
+      <p className="text-xs text-gray-500 font-medium">{label}</p>
 
       <p className="text-2xl font-semibold text-gray-900 leading-tight">
         {value}
@@ -542,21 +395,15 @@ const StatCard = ({
 ========================================================= */
 
 const Deliveries = () => {
-  const getDeliveryJobs = deliveryJobStore(
-    (state) => state.getDeliveryJobs,
-  );
+  const getDeliveryJobs = deliveryJobStore((state) => state.getDeliveryJobs);
 
-  const deliveryJobs = deliveryJobStore(
-    (state) => state.deliveryJobs,
-  );
+  const deliveryJobs = deliveryJobStore((state) => state.deliveryJobs);
 
   const [search, setSearch] = useState("");
 
   const [page, setPage] = useState(1);
 
-
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   /* =======================================================
      FETCH DELIVERY JOBS
@@ -569,10 +416,7 @@ const Deliveries = () => {
 
         await getDeliveryJobs();
       } catch (error) {
-        console.error(
-          "Failed to load delivery jobs:",
-          error,
-        );
+        console.error("Failed to load delivery jobs:", error);
       } finally {
         setLoading(false);
       }
@@ -585,44 +429,38 @@ const Deliveries = () => {
      FILTER
   ======================================================= */
 
- const filteredData = useMemo(() => {
-  const jobs = deliveryJobs || [];
+  const filteredData = useMemo(() => {
+    const jobs = deliveryJobs || [];
 
-  const q = search.trim().toLowerCase();
+    const q = search.trim().toLowerCase();
 
-  return jobs.filter((job) => {
-    // Only show PICKED_UP jobs
-    if (job.status !== "PICKED_UP") {
-      return false;
-    }
+    return jobs.filter((job) => {
+      // Only show PICKED_UP jobs
+      if (job.status !== "PICKED_UP") {
+        return false;
+      }
 
-    const matchesSearch =
-      !q ||
-      job.id?.toLowerCase().includes(q) ||
-      job.name?.toLowerCase().includes(q) ||
-      job.area?.toLowerCase().includes(q) ||
-      getPartnerName(job.deliveryPartner)
-        .toLowerCase()
-        .includes(q);
+      const matchesSearch =
+        !q ||
+        job.id?.toLowerCase().includes(q) ||
+        job.name?.toLowerCase().includes(q) ||
+        job.area?.toLowerCase().includes(q) ||
+        getPartnerName(job.deliveryPartner).toLowerCase().includes(q);
 
-    return matchesSearch;
-  });
-}, [deliveryJobs, search]);
+      return matchesSearch;
+    });
+  }, [deliveryJobs, search]);
 
   /* =======================================================
      PAGINATION
   ======================================================= */
 
-  const totalPages =
-    Math.ceil(
-      filteredData.length / PAGE_SIZE,
-    ) || 1;
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE) || 1;
 
-  const currentData =
-    filteredData.slice(
-      (page - 1) * PAGE_SIZE,
-      page * PAGE_SIZE,
-    );
+  const currentData = filteredData.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
 
   /* =======================================================
      STATS
@@ -634,58 +472,28 @@ const Deliveries = () => {
     return {
       total: jobs.length,
 
-      delivered: jobs.filter(
-        (job) =>
-          job.status === "DELIVERED",
-      ).length,
+      delivered: jobs.filter((job) => job.status === "DELIVERED").length,
 
-      outForDelivery: jobs.filter(
-        (job) =>
-          job.status === "PICKED_UP",
-      ).length,
+      outForDelivery: jobs.filter((job) => job.status === "PICKED_UP").length,
 
-      assigned: jobs.filter(
-        (job) =>
-          job.status === "ASSIGNED",
-      ).length,
+      assigned: jobs.filter((job) => job.status === "ASSIGNED").length,
 
-      pending: jobs.filter(
-        (job) =>
-          job.status === "CREATED",
-      ).length,
+      pending: jobs.filter((job) => job.status === "CREATED").length,
 
       totalOrders: jobs.reduce(
-        (total, job) =>
-          total +
-          (job.orders?.length || 0),
+        (total, job) => total + (job.orders?.length || 0),
         0,
       ),
     };
   }, [deliveryJobs]);
 
-  /* =======================================================
-     LOADING
-  ======================================================= */
-
   if (loading) {
-    return (
-      <Loader text="Loading Delivery Tracking..." />
-    );
+    return <Loader text="Loading Delivery Tracking..." />;
   }
-
-  /* =======================================================
-     UI
-  ======================================================= */
 
   return (
     <div className="p-6 md:p-6 space-y-2">
-
-      {/* ===================================================
-          HEADER
-      =================================================== */}
-
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-
         <div>
           <h1 className="text-xl font-semibold text-gray-900">
             Delivery Tracking
@@ -697,7 +505,6 @@ const Deliveries = () => {
         </div>
 
         <div className="relative w-full lg:w-72">
-
           <Search
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -730,26 +537,13 @@ const Deliveries = () => {
         </div>
       </div>
 
-      {/* ===================================================
-          STATS
-      =================================================== */}
-
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
         <StatCard
           label="Total Jobs"
           value={stats.total}
           Icon={Package}
           iconClass="text-slate-600"
           bgClass="bg-slate-100"
-        />
-
-        <StatCard
-          label="Assigned"
-          value={stats.assigned}
-          Icon={UserRound}
-          iconClass="text-violet-600"
-          bgClass="bg-violet-50"
         />
 
         <StatCard
@@ -770,20 +564,6 @@ const Deliveries = () => {
       </div>
 
       {/* ===================================================
-          SECONDARY INFO
-      =================================================== */}
-
-      <div className="flex items-center gap-2 text-xs text-slate-500 px-1">
-
-        <Package size={13} />
-
-        <span>
-          {stats.totalOrders} total orders assigned
-          across {stats.total} delivery jobs
-        </span>
-      </div>
-
-      {/* ===================================================
           CARDS
       =================================================== */}
 
@@ -794,10 +574,7 @@ const Deliveries = () => {
       ) : (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {currentData.map((job) => (
-            <DeliveryCard
-              key={job.id}
-              job={job}
-            />
+            <DeliveryCard key={job.id} job={job} />
           ))}
         </div>
       )}
@@ -807,7 +584,6 @@ const Deliveries = () => {
       =================================================== */}
 
       <div className="flex items-center justify-between pt-2">
-
         <p className="text-xs text-gray-400">
           {filteredData.length === 0
             ? "No results"
@@ -818,13 +594,10 @@ const Deliveries = () => {
         </p>
 
         <div className="flex items-center gap-2">
-
           <button
             type="button"
             disabled={page === 1}
-            onClick={() =>
-              setPage((p) => p - 1)
-            }
+            onClick={() => setPage((p) => p - 1)}
             className="
               w-8
               h-8
@@ -853,9 +626,7 @@ const Deliveries = () => {
           <button
             type="button"
             disabled={page === totalPages}
-            onClick={() =>
-              setPage((p) => p + 1)
-            }
+            onClick={() => setPage((p) => p + 1)}
             className="
               w-8
               h-8
@@ -876,7 +647,6 @@ const Deliveries = () => {
           >
             <ChevronRight size={15} />
           </button>
-
         </div>
       </div>
     </div>
