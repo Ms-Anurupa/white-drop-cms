@@ -18,11 +18,30 @@ const deliveryJobStore = create((set) => ({
     }
   },
 
+  changeDelijobStatus: async (payload) => {
+    try {
+      const res = await api.patch("/admin/changeDelijobStatus", payload,
+        {
+          withAuth: true,
+        },
+      );
+
+      return res.data;
+    } catch (error) {
+      console.error("updateDeliveryJobStatus error:", error);
+      throw error;
+    }
+  },
+
   associateOrderToDeliveryJob: async (payload) => {
     try {
-      const res = await api.post("/admin/associateOrderToDeliveryJob", payload, {
-        withAuth: true,
-      });
+      const res = await api.post(
+        "/admin/associateOrderToDeliveryJob",
+        payload,
+        {
+          withAuth: true,
+        },
+      );
       return res.data;
     } catch (error) {
       throw error;
