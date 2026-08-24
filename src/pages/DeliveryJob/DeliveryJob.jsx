@@ -5,6 +5,7 @@ import {
   Loader2,
   MapPin,
   Package,
+  Plus,
   Search,
   Truck,
   UserRound,
@@ -515,95 +516,90 @@ const DeliveryJob = () => {
 
                       <div className="flex-1 min-w-0">
                         {/* Job name + status */}
-
-                        <div className="flex flex-wrap items-center gap-3 mb-4">
-                          <h3 className="text-sm sm:text-base font-semibold text-slate-900">
+                        <div className="flex items-center justify-between gap-3 mb-4 w-full">
+                          <h3 className="text-sm sm:text-base font-semibold text-slate-900 shrink-0">
                             {job.name}
                           </h3>
 
-                          {/* ================= STATUS DROPDOWN ================= */}
-
-                          <div className="flex flex-col gap-1">
-                            <div className="relative flex items-center">
-                              {isUpdating && (
-                                <Loader2
-                                  size={13}
-                                  className="absolute left-2.5 text-slate-500 animate-spin pointer-events-none"
-                                />
-                              )}
-
-                              <select
-                                value={job.status}
-                                disabled={isUpdating || !statusChangeAllowed}
-                                title={
-                                  !statusChangeAllowed
-                                    ? statusDisabledMessage
-                                    : "Change delivery job status"
-                                }
-                                onChange={(e) =>
-                                  handleStatusChange(job.id, e.target.value)
-                                }
-                                className={`
-    rounded-lg
-    border
-    px-3
-    py-1.5
-    text-xs
-    font-semibold
-    outline-none
-    transition-all
-    ${statusChangeAllowed ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
-    disabled:cursor-not-allowed
-    ${
-      job.status === "PICKED_UP"
-        ? "border-amber-200 bg-amber-50 text-amber-700"
-        : job.status === "DELIVERED"
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-          : job.status === "FAILED"
-            ? "border-orange-200 bg-orange-50 text-orange-700"
-            : job.status === "CANCELLED"
-              ? "border-rose-200 bg-rose-50 text-rose-700"
-              : job.status === "ASSIGNED"
-                ? "border-violet-200 bg-violet-50 text-violet-700"
-                : "border-blue-200 bg-blue-50 text-blue-700"
-    }
-  `}
-                              >
-                                {getAvailableStatuses(job).map((status) => (
-                                  <option key={status} value={status}>
-                                    {getStatusLabel(status)}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            {/* Disabled reason */}
-
+                          {/* ================= CENTER INFO TEXT ================= */}
+                          <div className="flex-1 flex justify-center px-3 min-w-0">
                             {!statusChangeAllowed && (
-                              <div className="flex items-center gap-1 text-[10px] text-amber-600 max-w-xs">
+                              <div className="flex items-center gap-1 text-[10px] text-amber-600 text-center truncate">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-
-                                <span>{statusDisabledMessage}</span>
+                                <span className="truncate">
+                                  {statusDisabledMessage}
+                                </span>
                               </div>
                             )}
+                          </div>
+
+                          {/* ================= STATUS DROPDOWN (RIGHT) ================= */}
+                          <div className="relative flex items-center shrink-0">
+                            {isUpdating && (
+                              <Loader2
+                                size={13}
+                                className="absolute left-2.5 text-slate-500 animate-spin pointer-events-none"
+                              />
+                            )}
+
+                            <select
+                              value={job.status}
+                              disabled={isUpdating || !statusChangeAllowed}
+                              title={
+                                !statusChangeAllowed
+                                  ? statusDisabledMessage
+                                  : "Change delivery job status"
+                              }
+                              onChange={(e) =>
+                                handleStatusChange(job.id, e.target.value)
+                              }
+                              className={`
+        rounded-lg
+        border
+        px-3
+        py-1.5
+        text-xs
+        font-semibold
+        outline-none
+        transition-all
+        ${statusChangeAllowed ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
+        disabled:cursor-not-allowed
+        ${
+          job.status === "PICKED_UP"
+            ? "border-amber-200 bg-amber-50 text-amber-700"
+            : job.status === "DELIVERED"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : job.status === "FAILED"
+                ? "border-orange-200 bg-orange-50 text-orange-700"
+                : job.status === "CANCELLED"
+                  ? "border-rose-200 bg-rose-50 text-rose-700"
+                  : job.status === "ASSIGNED"
+                    ? "border-violet-200 bg-violet-50 text-violet-700"
+                    : "border-blue-200 bg-blue-50 text-blue-700"
+        }
+      `}
+                            >
+                              {getAvailableStatuses(job).map((status) => (
+                                <option key={status} value={status}>
+                                  {getStatusLabel(status)}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
 
                         {/* ================= INFORMATION ================= */}
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
                           {/* Area */}
-
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
                             <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
                               <MapPin size={17} className="text-slate-500" />
                             </div>
-
                             <div className="min-w-0">
                               <p className="text-[11px] text-slate-400 uppercase tracking-wide">
                                 Area
                               </p>
-
                               <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
                                 {job.area || "—"}
                               </p>
@@ -611,20 +607,17 @@ const DeliveryJob = () => {
                           </div>
 
                           {/* Date */}
-
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
                             <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
                               <CalendarDays
                                 size={17}
                                 className="text-slate-500"
                               />
                             </div>
-
-                            <div>
+                            <div className="min-w-0">
                               <p className="text-[11px] text-slate-400 uppercase tracking-wide">
                                 Delivery Date
                               </p>
-
                               <p className="text-sm font-medium text-slate-800 mt-0.5">
                                 {formatDate(job.deliveryDate)}
                               </p>
@@ -632,8 +625,7 @@ const DeliveryJob = () => {
                           </div>
 
                           {/* Slot */}
-
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
                             <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                               {job.slot?.icon ? (
                                 <img
@@ -648,16 +640,13 @@ const DeliveryJob = () => {
                                 <Clock3 size={17} className="text-blue-600" />
                               )}
                             </div>
-
-                            <div>
+                            <div className="min-w-0">
                               <p className="text-[11px] text-slate-400 uppercase tracking-wide">
                                 Delivery Slot
                               </p>
-
-                              <p className="text-sm font-medium text-slate-800 mt-0.5">
+                              <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
                                 {job.slot?.name || "—"}
                               </p>
-
                               {job.slot?.from && job.slot?.to && (
                                 <p className="text-xs text-slate-400 mt-0.5">
                                   {job.slot.from} - {job.slot.to}
@@ -667,71 +656,55 @@ const DeliveryJob = () => {
                           </div>
 
                           {/* Orders */}
-
-                          <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 transition-colors">
-                            <div className="w-9 h-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
-                              <Package size={16} className="text-slate-500" />
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                                Orders
-                              </p>
-
-                              <div className="flex items-center justify-between gap-2 mt-1">
-                                <p className="text-sm font-semibold text-slate-800">
-                                  {job.orders?.length || 0}
-                                </p>
-
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-
-                                    navigate(
-                                      `/dashboard/delivery-job/${job.id}/add-orders`,
-                                      {
-                                        state: {
-                                          job,
-                                        },
-                                      },
-                                    );
-                                  }}
-                                  className="
-                                    inline-flex
-                                    items-center
-                                    gap-1
-                                    px-2
-                                    py-1
-                                    rounded-lg
-                                    bg-blue-50
-                                    border
-                                    border-blue-100
-                                    text-blue-600
-                                    hover:bg-blue-100
-                                    hover:border-blue-200
-                                    text-[10px]
-                                    font-bold
-                                    transition-all
-                                    cursor-pointer
-                                  "
-                                >
-                                  <span className="text-sm leading-none">
-                                    +
+                          <div className="flex flex-col gap-2 p-2.5 -m-2.5 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/60 transition-colors duration-200">
+                            <div className="flex items-start gap-3">
+                              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                                <Package
+                                  size={17}
+                                  className="text-emerald-600"
+                                />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-slate-800 mt-0.5">
+                                  {job.orders?.length || 0}{" "}
+                                  <span className="text-slate-400 font-normal">
+                                    {(job.orders?.length || 0) === 1
+                                      ? "order"
+                                      : "orders"}
                                   </span>
-                                  Add
-                                </button>
+                                </p>
                               </div>
                             </div>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(
+                                  `/dashboard/delivery-job/${job.id}/add-orders`,
+                                  {
+                                    state: { job },
+                                  },
+                                );
+                              }}
+                              className="
+      w-full
+      inline-flex items-center justify-center gap-1.5
+      py-1.5 rounded-lg
+      bg-emerald-600 text-white text-[11px] font-semibold
+      hover:bg-emerald-700
+      active:scale-[0.98]
+      transition-all duration-150
+      cursor-pointer
+    "
+                            >
+                              <Plus size={13} strokeWidth={2.5} />
+                              <span>Add order</span>
+                            </button>
                           </div>
-                        </div>
-                      </div>
 
-                      {/* ================= RIGHT ACTION ================= */}
-
-                      <div className="xl:w-60 shrink-0">
-                        <div className="border border-slate-100 rounded-xl p-3.5 bg-slate-50/70">
-                          <div className="flex items-center gap-3 mb-3">
+                          {/* Delivery Partner */}
+                          <div className="flex items-start gap-3 p-2.5 -m-2.5 rounded-xl border border-slate-100 hover:border-violet-200 hover:bg-violet-50/60 transition-colors duration-200">
                             <div
                               className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold ${
                                 job.deliveryPartner
@@ -741,52 +714,47 @@ const DeliveryJob = () => {
                             >
                               {getInitials(job.deliveryPartner)}
                             </div>
-
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <p className="text-[11px] text-slate-400 uppercase tracking-wide">
                                 Delivery Partner
                               </p>
-
-                              <p className="text-sm font-medium text-slate-800 truncate mt-0.5">
-                                {job.deliveryPartner
-                                  ? `${job.deliveryPartner.firstName || job.deliveryPartner.first_name || ""} ${
-                                      job.deliveryPartner.lastName ||
-                                      job.deliveryPartner.last_name ||
-                                      ""
-                                    }`.trim() || "Assigned"
-                                  : "Not Assigned"}
-                              </p>
+                              <div className="flex items-center justify-between gap-2 mt-0.5">
+                                <p className="text-sm font-medium text-slate-800 truncate">
+                                  {job.deliveryPartner
+                                    ? `${job.deliveryPartner.firstName || job.deliveryPartner.first_name || ""} ${
+                                        job.deliveryPartner.lastName ||
+                                        job.deliveryPartner.last_name ||
+                                        ""
+                                      }`.trim() || "Assigned"
+                                    : "Not Assigned"}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(
+                                      `/dashboard/delivery-job/${job.id}/assign-partner`,
+                                    );
+                                  }}
+                                  className="
+            shrink-0 inline-flex items-center justify-center
+            w-6 h-6 rounded-full
+            bg-white border border-violet-200 text-violet-600
+            hover:bg-violet-600 hover:text-white hover:border-violet-600
+            active:scale-95
+            transition-all duration-150 cursor-pointer
+          "
+                                  title={
+                                    job.deliveryPartner
+                                      ? "View job"
+                                      : "Assign partner"
+                                  }
+                                >
+                                  <ChevronRight size={13} />
+                                </button>
+                              </div>
                             </div>
                           </div>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(
-                                `/dashboard/delivery-job/${job.id}/assign-partner`,
-                              )
-                            }
-                            className="
-                              w-full
-                              cursor-pointer
-                              flex items-center justify-center gap-2
-                              px-3 py-2.5
-                              rounded-lg
-                              bg-white
-                              border border-slate-200
-                              hover:border-blue-300
-                              hover:text-blue-600
-                              text-slate-700
-                              text-xs font-semibold
-                              transition-all
-                            "
-                          >
-                            {job.deliveryPartner
-                              ? "View Job"
-                              : "Assign Partner"}
-
-                            <ChevronRight size={15} />
-                          </button>
                         </div>
                       </div>
                     </div>
