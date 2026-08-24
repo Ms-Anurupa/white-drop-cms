@@ -554,21 +554,9 @@ const Deliveries = () => {
 
   const [page, setPage] = useState(1);
 
-  // const [activeFilter, setActiveFilter] =
-  //   useState("All");
 
   const [loading, setLoading] =
     useState(true);
-
-  // const FILTERS = [
-  //   "All",
-  //   "CREATED",
-  //   "ASSIGNED",
-  //   "PICKED_UP",
-  //   "DELIVERED",
-  //   "FAILED",
-  //   "CANCELLED",
-  // ];
 
   /* =======================================================
      FETCH DELIVERY JOBS
@@ -794,41 +782,6 @@ const Deliveries = () => {
           across {stats.total} delivery jobs
         </span>
       </div>
-
-      {/* ===================================================
-          FILTER TABS
-      =================================================== */}
-
-      {/* <div className="flex gap-2 flex-wrap">
-
-        {FILTERS.map((filter) => (
-          <button
-            key={filter}
-            type="button"
-            onClick={() => {
-              setActiveFilter(filter);
-              setPage(1);
-            }}
-            className={[
-              "px-3.5 py-1.5",
-              "cursor-pointer",
-              "rounded-lg",
-              "text-sm",
-              "font-medium",
-              "border",
-              "transition-colors",
-
-              activeFilter === filter
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-800",
-            ].join(" ")}
-          >
-            {filter === "All"
-              ? "All"
-              : getStatusLabel(filter)}
-          </button>
-        ))}
-      </div> */}
 
       {/* ===================================================
           CARDS
