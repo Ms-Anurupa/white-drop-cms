@@ -856,7 +856,7 @@ const Order = () => {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="hidden sm:block max-h-[calc(100vh-250px)] futuristic-scroll">
+        <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
             <thead className="order-table-head sticky top-0 z-10 relative">
               <tr className="border-b border-transparent">

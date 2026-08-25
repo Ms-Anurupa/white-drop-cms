@@ -229,6 +229,32 @@ const DeliveryJob = () => {
     return hasDeliveryPartner && hasOrders;
   };
 
+  const isOrderAdditionLocked = (job) => {
+    return ["PICKED_UP", "DELIVERED", "FAILED", "CANCELLED"].includes(
+      job?.status,
+    );
+  };
+
+  const getAddOrderDisabledMessage = (job) => {
+    if (job?.status === "PICKED_UP") {
+      return "Orders cannot be added after the job is picked up.";
+    }
+
+    if (job?.status === "DELIVERED") {
+      return "Orders cannot be added to a delivered job.";
+    }
+
+    if (job?.status === "FAILED") {
+      return "Orders cannot be added to a failed job.";
+    }
+
+    if (job?.status === "CANCELLED") {
+      return "Orders cannot be added to a cancelled job.";
+    }
+
+    return "";
+  };
+
   const getStatusDisabledMessage = (job) => {
     const hasDeliveryPartner = Boolean(job?.deliveryPartner);
     const hasOrders = (job?.orders?.length || 0) > 0;
@@ -653,14 +679,31 @@ const DeliveryJob = () => {
                           </div>
 
                           {/* Orders */}
-                          <div className="flex flex-col gap-2 p-2.5 -m-2.5 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/60 transition-colors duration-200">
+                          <div
+                            className={`flex flex-col gap-2 px-2.5 py-2 -m-2.5 rounded-xl border transition-colors duration-200 ${
+                              isOrderAdditionLocked(job)
+                                ? "border-slate-100 bg-slate-50/50"
+                                : "border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/60"
+                            }`}
+                          >
                             <div className="flex items-start gap-3">
-                              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                              <div
+                                className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                                  isOrderAdditionLocked(job)
+                                    ? "bg-slate-100"
+                                    : "bg-emerald-50"
+                                }`}
+                              >
                                 <Package
                                   size={17}
-                                  className="text-emerald-600"
+                                  className={
+                                    isOrderAdditionLocked(job)
+                                      ? "text-slate-400"
+                                      : "text-emerald-600"
+                                  }
                                 />
                               </div>
+
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-medium text-slate-800 mt-0.5">
                                   {job.orders?.length || 0}{" "}
@@ -675,8 +718,22 @@ const DeliveryJob = () => {
 
                             <button
                               type="button"
+                              disabled={isOrderAdditionLocked(job)}
+                              title={
+                                isOrderAdditionLocked(job)
+                                  ? getAddOrderDisabledMessage(job)
+                                  : "Add order"
+                              }
                               onClick={(e) => {
                                 e.stopPropagation();
+
+                                if (isOrderAdditionLocked(job)) {
+                                  toast.warning(
+                                    getAddOrderDisabledMessage(job),
+                                  );
+                                  return;
+                                }
+
                                 navigate(
                                   `/dashboard/delivery-job/${job.id}/add-orders`,
                                   {
@@ -684,20 +741,34 @@ const DeliveryJob = () => {
                                   },
                                 );
                               }}
-                              className="
+                              className={`
       w-full
       inline-flex items-center justify-center gap-1.5
       py-1.5 rounded-lg
-      bg-emerald-600 text-white text-[11px] font-semibold
-      hover:bg-emerald-700
-      active:scale-[0.98]
+      text-[11px] font-semibold
       transition-all duration-150
-      cursor-pointer
-    "
+
+      ${
+        isOrderAdditionLocked(job)
+          ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+          : "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] cursor-pointer"
+      }
+    `}
                             >
                               <Plus size={13} strokeWidth={2.5} />
-                              <span>Add order</span>
+
+                              <span>
+                                {isOrderAdditionLocked(job)
+                                  ? "Orders Locked"
+                                  : "Add order"}
+                              </span>
                             </button>
+
+                            {isOrderAdditionLocked(job) && (
+                              <p className="text-[10px] leading-tight text-slate-400 text-center px-1">
+                                {getAddOrderDisabledMessage(job)}
+                              </p>
+                            )}
                           </div>
 
                           {/* Delivery Partner */}
