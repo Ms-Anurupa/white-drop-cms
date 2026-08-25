@@ -270,6 +270,7 @@ const Order = () => {
   const loading = orderDataStore((state) => state.loading);
 
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
 
   const [page, setPage] = useState(1);
@@ -351,9 +352,19 @@ const Order = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 600);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
       getOrderListing({
         status: status || "",
-        search: search || "",
+        search: debouncedSearch || "",
         page,
         limit: pageSize,
         fromDate: appliedFromDate || "",
@@ -366,7 +377,7 @@ const Order = () => {
     };
   }, [
     getOrderListing,
-    search,
+    debouncedSearch,
     status,
     page,
     pageSize,
@@ -558,7 +569,7 @@ const Order = () => {
 
       await getOrderListing({
         status: status || "",
-        search: search || "",
+        search: debouncedSearch  || "",
         page: currentPage,
         limit: pageSize,
         fromDate: appliedFromDate || "",
@@ -771,7 +782,7 @@ const Order = () => {
       </div>
 
       {/* TABLE CARD */}
-      <div className="order-table-card bg-white rounded-xl border border-gray-100 overflow-visible">
+      <div className="order-table-card relative bg-white rounded-xl border border-gray-100 overflow-visible">
         {/* MOBILE VIEW */}
         <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
           {paginated.length === 0 ? (
@@ -845,7 +856,7 @@ const Order = () => {
         </div>
 
         {/* DESKTOP TABLE */}
-        <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-auto futuristic-scroll">
+        <div className="hidden sm:block max-h-[calc(100vh-250px)] futuristic-scroll">
           <table className="w-full table-fixed text-sm">
             <thead className="order-table-head sticky top-0 z-10 relative">
               <tr className="border-b border-transparent">
@@ -956,7 +967,7 @@ const Order = () => {
                     <td className="pl-5 pr-2.5 py-2.5">
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
+                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-vissible">
                             {o.deliverySlot?.icon ? (
                               <img
                                 src={resolveFirebaseUrl({
