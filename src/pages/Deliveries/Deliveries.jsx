@@ -115,10 +115,6 @@ const DeliveryCard = ({ job }) => {
 
   const ordersCount = orders.length;
 
-  // ==========================================
-  // ORDER LEVEL STATUS
-  // ==========================================
-
   const pickedUpCount = orders.filter(
     (order) => order.orderStatus === "PICKED_UP",
   ).length;
@@ -132,7 +128,7 @@ const DeliveryCard = ({ job }) => {
     ordersCount > 0 ? Math.round((deliveredCount / ordersCount) * 100) : 0;
 
   const handleTrack = () => {
-    navigate(`/location-tracker/${job.id}`, {
+    navigate(`/location-tracker/${job.deliveryPartnerId}`, {
       state: { job },
     });
   };
@@ -272,9 +268,6 @@ const DeliveryCard = ({ job }) => {
         )}
       </div>
 
-      {/* ==========================================
-          ORDER DELIVERY PROGRESS
-      ========================================== */}
       <div className="rounded-xl border border-slate-100 p-3 bg-white">
         <div className="flex items-center justify-between gap-3 mb-3">
           {/* Picked Up */}

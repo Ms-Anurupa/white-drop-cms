@@ -260,9 +260,6 @@ const DeliveryJob = () => {
       return;
     }
 
-    /*
-     * Final frontend validation before API call.
-     */
     if (!canChangeStatus(currentJob)) {
       const message = getStatusDisabledMessage(currentJob);
 
