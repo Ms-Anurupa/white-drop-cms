@@ -115,9 +115,9 @@ const DeliveryCard = ({ job }) => {
 
   const ordersCount = orders.length;
 
-  const pickedUpCount = orders.filter(
-    (order) => order.orderStatus === "PICKED_UP",
-  ).length;
+  // const pickedUpCount = orders.filter(
+  //   (order) => order.orderStatus === "PICKED_UP",
+  // ).length;
 
   const deliveredCount = orders.filter(
     (order) => order.orderStatus === "DELIVERED",
@@ -274,12 +274,12 @@ const DeliveryCard = ({ job }) => {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500" />
 
-            <p className="text-xs text-slate-500">
+            {/* <p className="text-xs text-slate-500">
               Picked Up{" "}
               <span className="font-semibold text-slate-800">
                 {pickedUpCount}
               </span>
-            </p>
+            </p> */}
           </div>
 
           {/* Delivered */}
