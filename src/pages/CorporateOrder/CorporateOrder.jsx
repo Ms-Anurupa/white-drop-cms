@@ -381,28 +381,26 @@ const CorporateOrder = () => {
   const handleViewInvoice = async (orderId) => {
     if (invoiceLoading.view === orderId) return;
 
-    // Open tab immediately while still inside the click event
-    const newTab = window.open("", "_blank");
-
-    if (!newTab) {
-      toast.error("Please allow popups to view the invoice");
-      return;
-    }
-
     try {
       setInvoiceLoading((prev) => ({
         ...prev,
         view: orderId,
       }));
 
+      // Wait for the invoice API to finish first
       const data = await getCorporateInvoice(orderId);
 
-      // Navigate the already-open tab to the invoice
-      newTab.location.href = data.signedUrl;
+      // Validate the response
+      if (!data?.signedUrl) {
+        throw new Error("Invoice URL was not generated");
+      }
+
+      // Open the invoice only after successful loading
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
       console.error("Failed to view invoice:", err);
-      newTab.close();
-      toast.error("Failed to view invoice");
+
+      toast.error(err?.message || "Failed to load invoice. Please try again.");
     } finally {
       setInvoiceLoading((prev) => ({
         ...prev,
