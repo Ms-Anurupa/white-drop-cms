@@ -1,4 +1,3 @@
-
 /* eslint-disable */
 import { create } from "zustand";
 import api from "../axios";
@@ -17,7 +16,6 @@ const subscriptionStore = create((set) => ({
     paymentMode = "",
     fromDate = "",
     toDate = "",
-    dateFilter = "",
   } = {}) => {
     try {
       set({ subscriptionLoading: true });
@@ -27,28 +25,65 @@ const subscriptionStore = create((set) => ({
         limit,
       };
 
-      if (search) params.search = search;
-      if (status) params.status = status;
-      if (paymentStatus) params.paymentStatus = paymentStatus;
-      if (paymentMode) params.paymentMode = paymentMode;
-      if (fromDate) params.fromDate = fromDate;
-      if (toDate) params.toDate = toDate;
-      if (dateFilter) params.dateFilter = dateFilter;
+      if (search?.trim()) {
+        params.search = search.trim();
+      }
+
+      if (status) {
+        params.status = status;
+      }
+
+      if (paymentStatus) {
+        params.paymentStatus = paymentStatus;
+      }
+
+      if (paymentMode) {
+        params.paymentMode = paymentMode;
+      }
+
+      if (fromDate) {
+        params.fromDate = fromDate;
+      }
+
+      if (toDate) {
+        params.toDate = toDate;
+      }
 
       const res = await api.get("/admin/getSubscriptionListing", {
         params,
         withAuth: true,
       });
 
+      const responseData = res?.data || {};
+
       set({
-        subscriptionLists: res.data?.data || [],
-        subscriptionPagination: res.data?.meta ||  null,
+        subscriptionLists: Array.isArray(responseData?.data)
+          ? responseData.data
+          : [],
+
+        subscriptionPagination: responseData?.meta || null,
+
         subscriptionLoading: false,
+      });
+
+      return responseData;
+    } catch (error) {
+      set({
+        subscriptionLoading: false,
+      });
+
+      throw error;
+    }
+  },
+
+  updateSubStatus: async (payload) => {
+    try {
+      const res = await api.post("/admin/updateSubStatus", payload, {
+        withAuth: true,
       });
 
       return res.data;
     } catch (error) {
-      set({ subscriptionLoading: false });
       throw error;
     }
   },

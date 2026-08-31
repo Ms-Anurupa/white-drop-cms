@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Search,
-  ChevronDown,
   ChevronLeft,
+  ChevronDown,
   ChevronRight,
   RefreshCw,
   CalendarDays,
@@ -18,23 +18,28 @@ import {
 } from "lucide-react";
 import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
+import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 const DATE_FILTERS = [
-  { key: "all", label: "All subscriptions" },
-  { key: "today", label: "Today" },
-  { key: "week", label: "This week" },
-  { key: "month", label: "This month" },
+  {
+    key: "all",
+    label: "All subscriptions",
+  },
+  {
+    key: "today",
+    label: "Today",
+  },
+  {
+    key: "thisWeek",
+    label: "This week",
+  },
+  {
+    key: "thisMonth",
+    label: "This month",
+  },
 ];
-
-const STATUS_STYLES = {
-  ACTIVE: "bg-emerald-50 text-emerald-700",
-  PENDING: "bg-amber-50 text-amber-700",
-  PAUSED: "bg-blue-50 text-blue-700",
-  EXPIRED: "bg-gray-100 text-gray-600",
-  CANCELLED: "bg-red-50 text-red-700",
-};
 
 const STATUS_DOTS = {
   ACTIVE: "bg-emerald-500",
@@ -60,11 +65,53 @@ const PAYMENT_STATUS_DOTS = {
   FAILED_AUTH: "bg-red-500",
 };
 
-const toYMD = (date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+const STATUS_OPTIONS = [
+  {
+    value: "ACTIVE",
+    label: "Active",
+    dot: "bg-emerald-500",
+  },
+  {
+    value: "PENDING",
+    label: "Pending",
+    dot: "bg-amber-500",
+  },
+  {
+    value: "PAUSED",
+    label: "Paused",
+    dot: "bg-blue-500",
+  },
+  {
+    value: "EXPIRED",
+    label: "Expired",
+    dot: "bg-gray-400",
+  },
+  {
+    value: "CANCELLED",
+    label: "Cancelled",
+    dot: "bg-red-500",
+  },
+];
+
+const formatStatusLabel = (value) => {
+  if (!value) return "Unknown";
+
+  return String(value)
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const toYMD = (date) => {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
     "0",
   )}-${String(date.getDate()).padStart(2, "0")}`;
+};
 
 const getQuickRangeDates = (filter) => {
   const now = new Date();
@@ -78,19 +125,19 @@ const getQuickRangeDates = (filter) => {
     };
   }
 
-  if (filter === "week") {
-    const weekAgo = new Date(now);
+  if (filter === "thisWeek") {
+    const weekStart = new Date(now);
 
-    // Inclusive 7-day range
-    weekAgo.setDate(now.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(now.getDate() - 6);
 
     return {
-      from: toYMD(weekAgo),
+      from: toYMD(weekStart),
       to: toYMD(now),
     };
   }
 
-  if (filter === "month") {
+  if (filter === "thisMonth") {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     return {
@@ -121,8 +168,15 @@ const formatShortDate = (value) => {
   });
 };
 
-const formatCurrency = (value) =>
-  `₹${Number(value || 0).toLocaleString("en-IN")}`;
+const formatCurrency = (value) => {
+  const amount = Number(value);
+
+  if (Number.isNaN(amount)) {
+    return "₹0";
+  }
+
+  return `₹${amount.toLocaleString("en-IN")}`;
+};
 
 const ScrollbarStyle = () => (
   <style>{`
@@ -156,7 +210,7 @@ const ScrollbarStyle = () => (
   `}</style>
 );
 
-const StatusPill = ({ status, styles, dots }) => {
+const StatusPill = ({ status, styles = {}, dots = {} }) => {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${
@@ -164,12 +218,12 @@ const StatusPill = ({ status, styles, dots }) => {
       }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
           dots?.[status] || "bg-gray-400"
         }`}
       />
 
-      {status || "UNKNOWN"}
+      {formatStatusLabel(status)}
     </span>
   );
 };
@@ -197,6 +251,7 @@ const SubscriptionOrder = () => {
   const subscriptionLoading = subscriptionStore(
     (state) => state.subscriptionLoading,
   );
+  const updateSubStatus = subscriptionStore((state) => state.updateSubStatus);
   const pagination = subscriptionStore((state) => state.subscriptionPagination);
 
   const [search, setSearch] = useState("");
@@ -209,29 +264,20 @@ const SubscriptionOrder = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
-  const subscriptions = subscriptionLists || [];
-  const meta = pagination?.meta || {};
-  const totalItems = meta?.totalItems ?? 0;
-  const totalPages = meta?.totalPages ?? pagination?.totalPages ?? 1;
-  const currentPage = meta?.currentPage ?? pagination?.currentPage;
-  const itemsPerPage = meta?.itemsPerPage ?? pagination?.itemsPerPage;
-  const dateCounts = meta?.dateCounts || {};
+  const subscriptions = subscriptionLists;
+  const paginationData = pagination || {};
+  const totalItems = Number(paginationData?.totalItems ?? 0);
+  const totalPages = Math.max(1, Number(paginationData?.totalPages ?? 1));
+  const currentPage = Math.max(1, Number(paginationData?.currentPage));
+  const itemsPerPage = Math.max(1, Number(paginationData?.itemsPerPage));
+  const dateCounts = paginationData?.dateCounts || {};
 
   const getDateCount = (key) => {
     if (key === "all") {
-      return dateCounts?.all ?? totalItems;
-    }
-    if (key === "today") {
-      return dateCounts?.today ?? 0;
-    }
-    if (key === "week") {
-      return dateCounts?.thisWeek ?? dateCounts?.week ?? 0;
-    }
-    if (key === "month") {
-      return dateCounts?.thisMonth ?? dateCounts?.month ?? 0;
+      return Number(dateCounts?.all ?? totalItems);
     }
 
-    return 0;
+    return Number(dateCounts?.[key] ?? 0);
   };
 
   const getActiveDateRange = () => {
@@ -245,10 +291,17 @@ const SubscriptionOrder = () => {
     };
   };
 
+  const hasInvalidDateRange =
+    Boolean(fromDate && toDate) && new Date(fromDate) > new Date(toDate);
+
   useEffect(() => {
     const { from, to } = getActiveDateRange();
 
     if ((from && !to) || (!from && to)) {
+      return;
+    }
+
+    if (hasInvalidDateRange) {
       return;
     }
 
@@ -289,6 +342,10 @@ const SubscriptionOrder = () => {
     const { from, to } = getActiveDateRange();
 
     if ((from && !to) || (!from && to)) {
+      return;
+    }
+
+    if (hasInvalidDateRange) {
       return;
     }
 
@@ -349,21 +406,26 @@ const SubscriptionOrder = () => {
     setPage(1);
   };
 
-  const hasFilters =
+  const hasFilters = Boolean(
     search ||
     status ||
     paymentStatus ||
     paymentMode ||
     fromDate ||
     toDate ||
-    dateFilter !== "all";
+    dateFilter !== "all",
+  );
 
   const handleRefresh = async () => {
     const { from, to } = getActiveDateRange();
 
+    if (hasInvalidDateRange) {
+      return;
+    }
+
     try {
       await getSubscriptionListing({
-        page,
+        page: currentPage,
         limit: pageSize,
         search,
         status,
@@ -374,6 +436,46 @@ const SubscriptionOrder = () => {
       });
     } catch (error) {
       console.error("Failed to refresh subscriptions:", error);
+    }
+  };
+
+  const handleStatusChange = async (item, newStatus) => {
+    const subscriptionId = item?.id || item?.subId;
+
+    if (!subscriptionId) {
+      console.error("Subscription ID not found", item);
+      return;
+    }
+
+    if (item?.status === newStatus) {
+      return;
+    }
+
+    try {
+      const payload = {
+        id: subscriptionId,
+        status: newStatus,
+      };
+
+      await updateSubStatus(payload);
+
+      const { from, to } = getActiveDateRange();
+
+      await getSubscriptionListing({
+        page: currentPage,
+        limit: pageSize,
+        search,
+        status,
+        paymentStatus,
+        paymentMode,
+        fromDate: from,
+        toDate: to,
+      });
+    } catch (error) {
+      console.error(
+        `Failed to change subscription status to ${newStatus}:`,
+        error,
+      );
     }
   };
 
@@ -392,13 +494,16 @@ const SubscriptionOrder = () => {
   }, [subscriptions]);
 
   const hasPreviousPage = currentPage > 1;
+
   const hasNextPage = currentPage < totalPages;
+
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   return (
     <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3">
       <ScrollbarStyle />
-      {/* header */}
+
+      {/* HEADER */}
       <div className="flex shrink-0 flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-baseline gap-3">
           <div className="flex items-center gap-2">
@@ -428,7 +533,6 @@ const SubscriptionOrder = () => {
         </div>
 
         <div className="flex w-full items-center gap-2 lg:w-auto">
-          {/* Search */}
           <div className="relative w-full sm:w-72 lg:w-80">
             <Search
               size={15}
@@ -447,9 +551,10 @@ const SubscriptionOrder = () => {
           </div>
         </div>
       </div>
-      {/* filter bar */}
+
+      {/* FILTER BAR */}
       <div className="subscription-scroll flex shrink-0 items-center gap-2 overflow-x-auto rounded-xl border border-gray-100 bg-white px-3 py-2 shadow-sm">
-        {/* Date Pills */}
+        {/* DATE FILTERS */}
         <div className="flex shrink-0 items-center gap-1.5">
           {DATE_FILTERS.map((filter) => {
             const active = dateFilter === filter.key;
@@ -485,13 +590,17 @@ const SubscriptionOrder = () => {
 
         <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block" />
 
-        {/* Custom Date Range */}
+        {/* CUSTOM DATES */}
         <div className="flex shrink-0 items-center gap-1.5">
           <input
             type="date"
             value={fromDate}
             onChange={(e) => handleFromDateChange(e.target.value)}
-            className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+              hasInvalidDateRange
+                ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
+                : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+            }`}
           />
 
           <span className="text-xs text-gray-300">→</span>
@@ -499,8 +608,13 @@ const SubscriptionOrder = () => {
           <input
             type="date"
             value={toDate}
+            min={fromDate || undefined}
             onChange={(e) => handleToDateChange(e.target.value)}
-            className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+              hasInvalidDateRange
+                ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
+                : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+            }`}
           />
 
           {(fromDate || toDate) && (
@@ -517,9 +631,9 @@ const SubscriptionOrder = () => {
 
         <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block" />
 
-        {/* Status Filters */}
+        {/* STATUS FILTERS */}
         <div className="flex shrink-0 items-center gap-1.5">
-          {/* Subscription Status */}
+          {/* SUBSCRIPTION STATUS */}
           <div className="relative">
             <select
               value={status}
@@ -530,11 +644,12 @@ const SubscriptionOrder = () => {
               className="h-8 min-w-[125px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
             >
               <option value="">All status</option>
-              <option value="PENDING">Pending</option>
-              <option value="ACTIVE">Active</option>
-              <option value="PAUSED">Paused</option>
-              <option value="EXPIRED">Expired</option>
-              <option value="CANCELLED">Cancelled</option>
+
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
 
             <ChevronDown
@@ -543,8 +658,7 @@ const SubscriptionOrder = () => {
             />
           </div>
 
-          {/* Payment Status */}
-
+          {/* PAYMENT STATUS */}
           <div className="relative">
             <select
               value={paymentStatus}
@@ -568,7 +682,7 @@ const SubscriptionOrder = () => {
             />
           </div>
 
-          {/* Payment Mode */}
+          {/* PAYMENT MODE */}
           <div className="relative">
             <select
               value={paymentMode}
@@ -590,7 +704,7 @@ const SubscriptionOrder = () => {
           </div>
         </div>
 
-        {/* Reset */}
+        {/* RESET */}
         {hasFilters && (
           <button
             type="button"
@@ -603,10 +717,14 @@ const SubscriptionOrder = () => {
         )}
       </div>
 
-      {/* ==========================================
-          SMALL SUMMARY STRIP
-      ========================================== */}
+      {/* INVALID DATE MESSAGE */}
+      {hasInvalidDateRange && (
+        <div className="shrink-0 rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-[11px] font-medium text-red-600">
+          The start date cannot be after the end date.
+        </div>
+      )}
 
+      {/* SUMMARY */}
       <div className="flex shrink-0 items-center gap-4 px-1 py-0.5">
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -620,7 +738,9 @@ const SubscriptionOrder = () => {
 
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+
           <span className="text-[11px] text-gray-500">Pending</span>
+
           <span className="text-[11px] font-semibold text-gray-700">
             {stats.pending}
           </span>
@@ -628,9 +748,7 @@ const SubscriptionOrder = () => {
 
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-
           <span className="text-[11px] text-gray-500">Paused</span>
-
           <span className="text-[11px] font-semibold text-gray-700">
             {stats.paused}
           </span>
@@ -649,14 +767,12 @@ const SubscriptionOrder = () => {
         </span>
       </div>
 
-      {/* ==========================================
-          TABLE
-      ========================================== */}
+      {/* TABLE */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb]">
         <div className="subscription-scroll min-h-0 flex-1 overflow-auto">
-          <table className="w-full min-w-[1350px] table-fixed text-xs">
-            <thead className="sticky top-0 z-10 bg-[#274de4] ">
-              <tr className="border-b border-gray-300 ">
+          <table className="w-full min-w-[1370px] table-fixed text-xs">
+            <thead className="sticky top-0 z-10 bg-[#274de4]">
+              <tr className="border-b border-gray-300">
                 <th className="w-12 px-2 py-2 text-left text-[11px] font-semibold whitespace-nowrap text-white">
                   Sl No.
                 </th>
@@ -681,7 +797,7 @@ const SubscriptionOrder = () => {
                 <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white">
                   Payment
                 </th>
-                <th className="w-28 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white">
                   Status
                 </th>
               </tr>
@@ -813,7 +929,7 @@ const SubscriptionOrder = () => {
                             <p className="truncate text-[10px] text-gray-500">
                               {item?.variant?.quantity
                                 ? `${item.variant.quantity} ${
-                                    item.variant.unit || ""
+                                    item?.variant?.unit || ""
                                   }`
                                 : "-"}
 
@@ -833,8 +949,7 @@ const SubscriptionOrder = () => {
 
                         <p className="mt-0.5 truncate text-[10px] text-gray-500">
                           {item?.durationMonths || 0} month
-                          {Number(item?.durationMonths) > 1 ? "s" : ""}
-                          {" · "}
+                          {Number(item?.durationMonths) > 1 ? "s" : ""} ·{" "}
                           {item?.totalDeliveries || 0} deliveries
                         </p>
 
@@ -940,13 +1055,51 @@ const SubscriptionOrder = () => {
 
                       {/* STATUS */}
                       <td className="px-2 py-2">
-                        <StatusPill
-                          status={rowStatus}
-                          styles={STATUS_STYLES}
-                          dots={STATUS_DOTS}
-                        />
+                        <SplitButton
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {}}
+                          menuContent={
+                            <div className="relative z-[100]">
+                              {STATUS_OPTIONS.map((option) => (
+                                <SplitButtonItem
+                                  key={option.value}
+                                  onClick={() =>
+                                    handleStatusChange(item, option.value)
+                                  }
+                                >
+                                  <div className="flex w-full items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`h-1.5 w-1.5 rounded-full ${option.dot}`}
+                                      />
 
-                        <p className="mt-1 text-[10px] text-gray-400">
+                                      <span>{option.label}</span>
+                                    </div>
+
+                                    {rowStatus === option.value && (
+                                      <span className="text-blue-600">✓</span>
+                                    )}
+                                  </div>
+                                </SplitButtonItem>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                STATUS_DOTS[rowStatus] || "bg-gray-400"
+                              }`}
+                            />
+
+                            <span className="truncate">
+                              {formatStatusLabel(rowStatus)}
+                            </span>
+                          </div>
+                        </SplitButton>
+
+                        <p className="mt-1 truncate text-[10px] text-gray-400">
                           Created {formatShortDate(item?.createdAt)}
                         </p>
                       </td>
@@ -958,12 +1111,9 @@ const SubscriptionOrder = () => {
           </table>
         </div>
 
-        {/* ========================================
-            PAGINATION
-        ======================================== */}
-
+        {/* PAGINATION */}
         <div className="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50/70 px-3 py-2">
-          {/* Left */}
+          {/* LEFT */}
           <div className="flex items-center gap-3">
             <span className="text-[11px] text-gray-500">
               Page{" "}
@@ -976,7 +1126,7 @@ const SubscriptionOrder = () => {
               {totalItems} subscriptions
             </span>
 
-            {/* Page size */}
+            {/* PAGE SIZE */}
             <div className="hidden items-center gap-1.5 sm:flex">
               <span className="text-[11px] text-gray-400">Rows</span>
 
@@ -997,7 +1147,7 @@ const SubscriptionOrder = () => {
             </div>
           </div>
 
-          {/* Right */}
+          {/* RIGHT */}
           <div className="flex items-center gap-2">
             <PageButton
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
@@ -1007,7 +1157,9 @@ const SubscriptionOrder = () => {
               <ChevronLeft size={14} />
             </PageButton>
 
-            <span className="text-[11px] text-gray-500">{currentPage}</span>
+            <span className="min-w-[25px] text-center text-[11px] font-medium text-gray-500">
+              {currentPage}
+            </span>
 
             <PageButton
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
