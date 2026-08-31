@@ -25,6 +25,7 @@ const menu = [
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
   { name: "Orders", path: "orders", icon: ShoppingCart },
+  { name: "Subscription Orders", path: "subscription-orders", icon: ShoppingCart },
   { name: "Corporate Orders", path: "corporate-orders", icon: ClipboardList },
   { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
   { name: "Production", path: "production", icon: Factory },
@@ -126,7 +127,7 @@ const Sidebar = ({ onLogOut }) => {
             Main menu
           </p>
         )}
-        {menu.slice(0, 6).map((item) => (
+        {menu.slice(0, 7).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
         
@@ -135,7 +136,7 @@ const Sidebar = ({ onLogOut }) => {
             Delivery Executive Details
           </p>
         )}
-        {menu.slice(8, 11).map((item) => (
+        {menu.slice(9, 12).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 
@@ -144,7 +145,7 @@ const Sidebar = ({ onLogOut }) => {
             Offers
           </p>
         )}
-        {menu.slice(11, 12).map((item) => (
+        {menu.slice(12, 14).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
 
@@ -154,7 +155,7 @@ const Sidebar = ({ onLogOut }) => {
             Operations
           </p>
         )}
-        {menu.slice(6, 8).map((item) => (
+        {menu.slice(7, 9).map((item) => (
           <NavItem
             key={item.path}
             item={item}
@@ -167,7 +168,7 @@ const Sidebar = ({ onLogOut }) => {
             Help
           </p>
         )}
-        {menu.slice(12, 13).map((item) => (
+        {menu.slice(14, 16).map((item) => (
           <NavItem key={item.path} item={item} onClick={onNavClick} />
         ))}
       </nav>
