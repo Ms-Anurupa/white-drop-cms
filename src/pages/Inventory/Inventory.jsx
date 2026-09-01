@@ -1,5 +1,13 @@
 import { useState } from "react";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Search,
   Plus,
   Download,
@@ -207,51 +215,109 @@ export default function Inventory() {
       </div>
 
       {/* ── TABLE ── */}
-      <div className="hidden xl:block bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="max-h-[430px] overflow-y-auto">
-          <table className="w-full">
-            <thead className="sticky top-0 bg-slate-50">
-              <tr className="text-left text-sm text-gray-500">
-                <th className="p-4">Product</th>
-                <th className="p-4">Category</th>
-                <th className="p-4">Stock</th>
-                <th className="p-4">Min Stock</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Updated</th>
-              </tr>
-            </thead>
+     {/* ── SHADCN TABLE ── */}
+<div className="hidden xl:block bg-white rounded-2xl border border-slate-100 overflow-hidden">
+  <div className="max-h-[430px] overflow-y-auto">
+    <Table>
+      <TableHeader className="sticky top-0 bg-slate-50 z-10">
+        <TableRow className="hover:bg-slate-50">
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Product
+          </TableHead>
 
-            <tbody>
-              {currentData.map((item) => (
-                <tr key={item.id} className="border-t hover:bg-blue-50/40">
-                  <td className="p-4">
-                    <p className="font-medium">{item.product}</p>
-                    <p className="text-xs text-gray-400">{item.id}</p>
-                  </td>
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Category
+          </TableHead>
 
-                  <td className="p-4 text-gray-600">{item.category}</td>
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Stock
+          </TableHead>
 
-                  <td className="p-4">
-                    {item.stock} {item.unit}
-                  </td>
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Min Stock
+          </TableHead>
 
-                  <td className="p-4">{item.minStock}</td>
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Status
+          </TableHead>
 
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 text-xs rounded-full ${statusColor[item.status]}`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
+          <TableHead className="h-12 px-4 text-sm font-medium text-gray-500">
+            Updated
+          </TableHead>
+        </TableRow>
+      </TableHeader>
 
-                  <td className="p-4 text-gray-500">{item.updated}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <TableBody>
+        {currentData.length > 0 ? (
+          currentData.map((item) => (
+            <TableRow
+              key={item.id}
+              className="border-t hover:bg-blue-50/40 transition-colors"
+            >
+              {/* PRODUCT */}
+              <TableCell className="p-4">
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {item.product}
+                  </p>
+
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {item.id}
+                  </p>
+                </div>
+              </TableCell>
+
+              {/* CATEGORY */}
+              <TableCell className="p-4 text-gray-600">
+                {item.category}
+              </TableCell>
+
+              {/* STOCK */}
+              <TableCell className="p-4">
+                <span className="font-medium text-gray-800">
+                  {item.stock}
+                </span>{" "}
+                <span className="text-gray-400 text-sm">
+                  {item.unit}
+                </span>
+              </TableCell>
+
+              {/* MIN STOCK */}
+              <TableCell className="p-4 text-gray-700">
+                {item.minStock}
+              </TableCell>
+
+              {/* STATUS */}
+              <TableCell className="p-4">
+                <span
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                    statusColor[item.status]
+                  }`}
+                >
+                  {item.status}
+                </span>
+              </TableCell>
+
+              {/* UPDATED */}
+              <TableCell className="p-4 text-gray-500">
+                {item.updated}
+              </TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell
+              colSpan={6}
+              className="h-32 text-center text-sm text-gray-400"
+            >
+              No inventory items found.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </div>
+</div>
 
       {/* ── MOBILE ── */}
       <div className="grid xl:hidden gap-4 sm:grid-cols-2">
