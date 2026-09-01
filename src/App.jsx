@@ -43,6 +43,7 @@ import AssignDeliveryPartner from "./components/AssignDeliveryPartner";
 import AssignOrderToDeliveryJob from "./components/AssignOrderToDeliveryJob";
 import CustomerDetails from "./components/CustomerDetails";
 import SubscriptionOrder from "./pages/subscriptionOrder/SubscriptionOrder";
+import AddInventory from "./components/AddInventory";
 
 const App = () => {
   return (
@@ -93,6 +94,7 @@ const App = () => {
                 />
                 <Route path="production" element={<Production />} />
                 <Route path="inventory" element={<Inventory />} />
+                <Route path="inventory/add-inventory" element={<AddInventory />} />
                 <Route path="delivery-tracking" element={<Deliveries />} />
                 <Route path="delivery-job" element={<DeliveryJob />} />
                 <Route path="delivery-job/add-delivery-job" element={<AddDeliveryJob />} />
