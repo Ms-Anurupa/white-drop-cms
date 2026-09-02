@@ -45,9 +45,6 @@ const AddInventory = () => {
     },
   ]);
 
-  /* ─────────────────────────────────────────────
-     BASIC FORM
-  ───────────────────────────────────────────── */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,10 +54,6 @@ const AddInventory = () => {
       [name]: value,
     }));
   };
-
-  /* ─────────────────────────────────────────────
-     STOCK IN
-  ───────────────────────────────────────────── */
 
   const addStockIn = () => {
     setStockIn((prev) => [
@@ -96,9 +89,6 @@ const AddInventory = () => {
     );
   };
 
-  /* ─────────────────────────────────────────────
-     STOCK OUT
-  ───────────────────────────────────────────── */
 
   const addStockOut = () => {
     setStockOut((prev) => [
@@ -134,9 +124,6 @@ const AddInventory = () => {
     );
   };
 
-  /* ─────────────────────────────────────────────
-     SUBMIT
-  ───────────────────────────────────────────── */
 
   const handleAddInventory = async (e) => {
     e.preventDefault();
