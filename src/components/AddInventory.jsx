@@ -1,58 +1,122 @@
-
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Plus, Trash2, ArrowLeft, PackagePlus, Save } from "lucide-react";
 import inventoryStore from "@/zustand/Store/inventoryStore";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, ArrowLeft } from "lucide-react";
 
 const AddInventory = () => {
-  const getInventoryListing = inventoryStore(
-    (state) => state.getInventoryListing,
-  );
-
-  const createInventory = inventoryStore(
-    (state) => state.createInventory,
-  );
-
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const inventoryId = searchParams.get("id");
+  const createInventory = inventoryStore((state) => state.createInventory);
+  const getMilkInventoryById = inventoryStore(
+    (state) => state.getMilkInventoryById,
+  );
+  const clearInventoryData = inventoryStore(
+    (state) => state.clearInventoryData,
+  );
+  const inventoryData = inventoryStore((state) => state.inventoryData);
+  const isEditMode = Boolean(inventoryId);
 
-  const [formData, setFormData] = useState({
-    entryDate: "2026-08-31",
+  const [inventoryDataList, setInventoryDataList] = useState({
+    entryDate: new Date().toISOString().split("T")[0],
     bulkUnit: "L",
     bulkProducedQty: "",
     wastageQty: 0,
   });
-
   const [stockIn, setStockIn] = useState([
     {
       isLoose: false,
       unit: "L",
-      sizeValue: 1,
-      packets: 10,
-    },
-    {
-      isLoose: true,
-      unit: "L",
-      quantity: 15,
+      unitSize: 1,
+      packets: 1,
     },
   ]);
+  const [stockOut, setStockOut] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const [stockOut, setStockOut] = useState([
-    {
-      isLoose: false,
-      unit: "L",
-      sizeValue: 1,
-      packets: 10,
-    },
-  ]);
+  useEffect(() => {
+    const loadInventory = async () => {
+      if (!inventoryId) {
+        clearInventoryData();
+        return;
+      }
 
+      try {
+        setLoading(true);
+        setHasChanges(false);
+
+        await getMilkInventoryById(inventoryId);
+      } catch (error) {
+        console.error("Failed to load inventory:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInventory();
+
+    return () => {
+      clearInventoryData();
+    };
+  }, [inventoryId, getMilkInventoryById, clearInventoryData]);
+
+  useEffect(() => {
+    if (!isEditMode || !inventoryData) {
+      return;
+    }
+
+    // console.log("INVENTORY DATA FROM API:", inventoryData);
+
+    setInventoryDataList({
+      entryDate: inventoryData.entryDate
+        ? new Date(inventoryData.entryDate).toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0],
+
+      bulkUnit: inventoryData.bulkUnit || "L",
+      bulkProducedQty: inventoryData.bulkProducedQty ?? "",
+      wastageQty: inventoryData.wastageQty ?? 0,
+    });
+
+    setStockIn(
+      Array.isArray(inventoryData.stockIn)
+        ? inventoryData.stockIn.map((item) => ({
+            id: item.id,
+            isLoose: Boolean(item.isLoose),
+            unit: item.unit || "L",
+            unitSize: item.isLoose ? undefined : (item.unitSize ?? 1),
+            packets: item.isLoose ? undefined : (item.packets ?? 1),
+            quantity: item.isLoose ? (item.quantity ?? 0) : undefined,
+          }))
+        : [],
+    );
+
+    setStockOut(
+      inventoryData.stockOut
+        ? inventoryData.stockOut.map((item) => ({
+            id: item.id,
+            isLoose: Boolean(item.isLoose),
+            unit: item.unit || "L",
+            unitSize: item.isLoose ? undefined : (item.unitSize ?? 1),
+            packets: item.isLoose ? undefined : (item.packets ?? 1),
+            quantity: item.isLoose ? (item.quantity ?? 0) : undefined,
+          }))
+        : [],
+    );
+
+    setHasChanges(false);
+  }, [inventoryData, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
+    setInventoryDataList((prev) => ({
       ...prev,
       [name]: value,
     }));
+    setHasChanges(true);
   };
 
   const addStockIn = () => {
@@ -60,15 +124,17 @@ const AddInventory = () => {
       ...prev,
       {
         isLoose: false,
-        unit: formData.bulkUnit,
-        sizeValue: 1,
+        unit: inventoryDataList.bulkUnit,
+        unitSize: 1,
         packets: 1,
       },
     ]);
+    setHasChanges(true);
   };
 
   const removeStockIn = (index) => {
     setStockIn((prev) => prev.filter((_, i) => i !== index));
+    setHasChanges(true);
   };
 
   const updateStockIn = (index, field, value) => {
@@ -76,34 +142,52 @@ const AddInventory = () => {
       prev.map((item, i) => {
         if (i !== index) return item;
 
+        if (field === "isLoose") {
+          return {
+            ...item,
+            isLoose: value,
+
+            ...(value
+              ? {
+                  quantity: item.quantity ?? 0,
+                  unitSize: undefined,
+                  packets: undefined,
+                }
+              : {
+                  unitSize: item.unitSize ?? 1,
+                  packets: item.packets ?? 1,
+                  quantity: undefined,
+                }),
+          };
+        }
+
         return {
           ...item,
-          [field]:
-            field === "isLoose"
-              ? value
-              : value === ""
-                ? ""
-                : Number(value),
+          [field]: value,
         };
       }),
     );
-  };
 
+    setHasChanges(true);
+  };
 
   const addStockOut = () => {
     setStockOut((prev) => [
       ...prev,
       {
         isLoose: false,
-        unit: formData.bulkUnit,
-        sizeValue: 1,
+        unit: inventoryDataList.bulkUnit,
+        unitSize: 1,
         packets: 1,
       },
     ]);
+
+    setHasChanges(true);
   };
 
   const removeStockOut = (index) => {
     setStockOut((prev) => prev.filter((_, i) => i !== index));
+    setHasChanges(true);
   };
 
   const updateStockOut = (index, field, value) => {
@@ -111,87 +195,134 @@ const AddInventory = () => {
       prev.map((item, i) => {
         if (i !== index) return item;
 
+        if (field === "isLoose") {
+          return {
+            ...item,
+            isLoose: value,
+
+            ...(value
+              ? {
+                  quantity: item.quantity ?? 0,
+                  unitSize: undefined,
+                  packets: undefined,
+                }
+              : {
+                  unitSize: item.unitSize ?? 1,
+                  packets: item.packets ?? 1,
+                  quantity: undefined,
+                }),
+          };
+        }
+
         return {
           ...item,
-          [field]:
-            field === "isLoose"
-              ? value
-              : value === ""
-                ? ""
-                : Number(value),
+          [field]: value,
         };
       }),
     );
+
+    setHasChanges(true);
   };
 
+  const buildPayload = () => {
+    const payload = {
+      entryDate: new Date(inventoryDataList.entryDate).toISOString(),
+      bulkUnit: inventoryDataList.bulkUnit,
+      bulkProducedQty: Number(inventoryDataList.bulkProducedQty),
+      wastageQty: Number(inventoryDataList.wastageQty),
+      stockIn: stockIn.map((item) => {
+        // LOOSE
+        if (item.isLoose) {
+          return {
+            ...(item.id && { id: item.id }),
+            isLoose: true,
+            unit: item.unit,
+            quantity: Number(item.quantity ?? 0),
+          };
+        }
 
-  const handleAddInventory = async (e) => {
+        // PACKET
+        return {
+          ...(item.id && { id: item.id }),
+          isLoose: false,
+          unit: item.unit,
+          unitSize: Number(item.unitSize ?? 0),
+          packets: Number(item.packets ?? 0),
+        };
+      }),
+
+      stockOut: stockOut.map((item) => {
+        // LOOSE
+        if (item.isLoose) {
+          return {
+            ...(item.id && { id: item.id }),
+            isLoose: true,
+            unit: item.unit,
+            quantity: Number(item.quantity ?? 0),
+          };
+        }
+
+        // PACKET
+        return {
+          ...(item.id && { id: item.id }),
+          isLoose: false,
+          unit: item.unit,
+          unitSize: Number(item.unitSize ?? 0),
+          packets: Number(item.packets ?? 0),
+        };
+      }),
+    };
+
+    if (isEditMode) {
+      payload.id = inventoryId;
+    }
+
+    return payload;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isEditMode && !hasChanges) {
+      return;
+    }
+
     try {
-      const payload = {
-        entryDate: new Date(formData.entryDate).toISOString(),
+      setSubmitting(true);
 
-        bulkUnit: formData.bulkUnit,
+      const payload = buildPayload();
 
-        bulkProducedQty: Number(formData.bulkProducedQty),
-
-        wastageQty: Number(formData.wastageQty),
-
-        stockIn: stockIn.map((item) => {
-          if (item.isLoose) {
-            return {
-              isLoose: true,
-              unit: item.unit,
-              quantity: Number(item.quantity),
-            };
-          }
-
-          return {
-            isLoose: false,
-            unit: item.unit,
-            sizeValue: Number(item.sizeValue),
-            packets: Number(item.packets),
-          };
-        }),
-
-        stockOut: stockOut.map((item) => {
-          if (item.isLoose) {
-            return {
-              isLoose: true,
-              unit: item.unit,
-              quantity: Number(item.quantity),
-            };
-          }
-
-          return {
-            isLoose: false,
-            unit: item.unit,
-            sizeValue: Number(item.sizeValue),
-            packets: Number(item.packets),
-          };
-        }),
-      };
-
-      console.log("CREATE INVENTORY PAYLOAD:", payload);
+      console.log(
+        isEditMode ? "UPDATE INVENTORY PAYLOAD:" : "CREATE INVENTORY PAYLOAD:",
+        payload,
+      );
 
       await createInventory(payload);
 
-      await getInventoryListing();
-
       navigate("/dashboard/inventory");
     } catch (error) {
-      console.error("Failed to create inventory:", error);
+      console.error(
+        isEditMode
+          ? "Failed to update inventory:"
+          : "Failed to create inventory:",
+        error,
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="text-sm text-gray-500">Loading inventory...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <form
-        onSubmit={handleAddInventory}
-        className="mx-auto max-w-6xl space-y-5"
-      >
-        {/* HEADER */}
+      <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <button
@@ -203,20 +334,34 @@ const AddInventory = () => {
               Back to Inventory
             </button>
 
+            <div className="flex items-center gap-2">
+              <PackagePlus size={22} className="text-blue-600" />
+
+              <h1 className="text-xl font-semibold text-gray-900">
+                {isEditMode ? "Edit Inventory" : "Add Inventory"}
+              </h1>
+            </div>
+
             <p className="mt-1 text-sm text-gray-500">
-              Add production, stock in and stock out details.
+              {isEditMode
+                ? "Update production, stock in and stock out details."
+                : "Add production, stock in and stock out details."}
             </p>
           </div>
         </div>
 
-        {/* BASIC DETAILS */}
+        {/* --------------------------------------------------
+            PRODUCTION DETAILS
+        -------------------------------------------------- */}
+
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-base font-semibold text-gray-900">
             Production Details
           </h2>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* DATE */}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
                 Entry Date
@@ -225,7 +370,7 @@ const AddInventory = () => {
               <input
                 type="date"
                 name="entryDate"
-                value={formData.entryDate}
+                value={inventoryDataList.entryDate}
                 onChange={handleChange}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                 required
@@ -233,6 +378,7 @@ const AddInventory = () => {
             </div>
 
             {/* UNIT */}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
                 Bulk Unit
@@ -240,17 +386,20 @@ const AddInventory = () => {
 
               <select
                 name="bulkUnit"
-                value={formData.bulkUnit}
+                value={inventoryDataList.bulkUnit}
                 onChange={handleChange}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="L">Litre (L)</option>
+
                 <option value="KG">Kilogram (KG)</option>
+
                 <option value="ML">Millilitre (ML)</option>
               </select>
             </div>
 
-            {/* BULK PRODUCED */}
+            {/* PRODUCED */}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
                 Bulk Produced Quantity
@@ -259,17 +408,17 @@ const AddInventory = () => {
               <input
                 type="number"
                 name="bulkProducedQty"
-                value={formData.bulkProducedQty}
+                value={inventoryDataList.bulkProducedQty}
                 onChange={handleChange}
                 min="0"
                 step="0.01"
                 placeholder="Enter quantity"
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
-                required
               />
             </div>
 
             {/* WASTAGE */}
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
                 Wastage Quantity
@@ -278,7 +427,7 @@ const AddInventory = () => {
               <input
                 type="number"
                 name="wastageQty"
-                value={formData.wastageQty}
+                value={inventoryDataList.wastageQty}
                 onChange={handleChange}
                 min="0"
                 step="0.01"
@@ -289,7 +438,10 @@ const AddInventory = () => {
           </div>
         </div>
 
-        {/* STOCK IN */}
+        {/* --------------------------------------------------
+            STOCK IN
+        -------------------------------------------------- */}
+
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -315,11 +467,12 @@ const AddInventory = () => {
           <div className="space-y-3">
             {stockIn.map((item, index) => (
               <div
-                key={index}
+                key={item.id || index}
                 className="rounded-xl border border-gray-100 bg-slate-50 p-4"
               >
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-                  {/* LOOSE */}
+                  {/* TYPE */}
+
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-gray-500">
                       Type
@@ -337,27 +490,36 @@ const AddInventory = () => {
                       className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
                     >
                       <option value="packet">Packet</option>
+
                       <option value="loose">Loose</option>
                     </select>
                   </div>
 
                   {/* UNIT */}
+
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-gray-500">
                       Unit
                     </label>
 
-                    <input
+                    <select
                       value={item.unit}
                       onChange={(e) =>
                         updateStockIn(index, "unit", e.target.value)
                       }
                       className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
-                    />
+                    >
+                      <option value="L">L</option>
+
+                      <option value="KG">KG</option>
+
+                      <option value="ML">ML</option>
+                    </select>
                   </div>
 
+                  {/* LOOSE */}
+
                   {item.isLoose ? (
-                    /* LOOSE QUANTITY */
                     <div>
                       <label className="mb-1.5 block text-xs font-medium text-gray-500">
                         Quantity
@@ -372,29 +534,33 @@ const AddInventory = () => {
                           updateStockIn(index, "quantity", e.target.value)
                         }
                         className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                        required
                       />
                     </div>
                   ) : (
                     <>
-                      {/* SIZE */}
+                      {/* UNIT SIZE */}
+
                       <div>
                         <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                          Size Value
+                          Unit Size
                         </label>
 
                         <input
                           type="number"
                           min="0"
                           step="0.01"
-                          value={item.sizeValue ?? ""}
+                          value={item.unitSize ?? ""}
                           onChange={(e) =>
-                            updateStockIn(index, "sizeValue", e.target.value)
+                            updateStockIn(index, "unitSize", e.target.value)
                           }
                           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                          required
                         />
                       </div>
 
                       {/* PACKETS */}
+
                       <div>
                         <label className="mb-1.5 block text-xs font-medium text-gray-500">
                           Packets
@@ -408,17 +574,20 @@ const AddInventory = () => {
                             updateStockIn(index, "packets", e.target.value)
                           }
                           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                          required
                         />
                       </div>
                     </>
                   )}
 
                   {/* DELETE */}
+
                   <div className="flex items-end">
                     <button
                       type="button"
                       onClick={() => removeStockIn(index)}
-                      className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 text-sm text-red-500 hover:bg-red-100"
+                      disabled={stockIn.length === 1}
+                      className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 text-sm text-red-500 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <Trash2 size={15} />
                       Remove
@@ -430,7 +599,10 @@ const AddInventory = () => {
           </div>
         </div>
 
-        {/* STOCK OUT */}
+        {/* --------------------------------------------------
+            STOCK OUT
+        -------------------------------------------------- */}
+
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -453,136 +625,202 @@ const AddInventory = () => {
             </button>
           </div>
 
-          <div className="space-y-3">
-            {stockOut.map((item, index) => (
-              <div
-                key={index}
-                className="rounded-xl border border-gray-100 bg-slate-50 p-4"
+          {stockOut.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-200 bg-slate-50 py-8 text-center">
+              <p className="text-sm text-gray-400">
+                No stock out entries added.
+              </p>
+
+              <button
+                type="button"
+                onClick={addStockOut}
+                className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-700"
               >
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-                  {/* TYPE */}
-                  <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                      Type
-                    </label>
+                + Add stock out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {stockOut.map((item, index) => (
+                <div
+                  key={item.id || index}
+                  className="rounded-xl border border-gray-100 bg-slate-50 p-4"
+                >
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
+                    {/* TYPE */}
 
-                    <select
-                      value={item.isLoose ? "loose" : "packet"}
-                      onChange={(e) =>
-                        updateStockOut(
-                          index,
-                          "isLoose",
-                          e.target.value === "loose",
-                        )
-                      }
-                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
-                    >
-                      <option value="packet">Packet</option>
-                      <option value="loose">Loose</option>
-                    </select>
-                  </div>
-
-                  {/* UNIT */}
-                  <div>
-                    <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                      Unit
-                    </label>
-
-                    <input
-                      value={item.unit}
-                      onChange={(e) =>
-                        updateStockOut(index, "unit", e.target.value)
-                      }
-                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
-                    />
-                  </div>
-
-                  {item.isLoose ? (
                     <div>
                       <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                        Quantity
+                        Type
                       </label>
 
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={item.quantity ?? ""}
+                      <select
+                        value={item.isLoose ? "loose" : "packet"}
                         onChange={(e) =>
-                          updateStockOut(index, "quantity", e.target.value)
+                          updateStockOut(
+                            index,
+                            "isLoose",
+                            e.target.value === "loose",
+                          )
                         }
                         className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
-                      />
+                      >
+                        <option value="packet">Packet</option>
+
+                        <option value="loose">Loose</option>
+                      </select>
                     </div>
-                  ) : (
-                    <>
+
+                    {/* UNIT */}
+
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                        Unit
+                      </label>
+
+                      <select
+                        value={item.unit}
+                        onChange={(e) =>
+                          updateStockOut(index, "unit", e.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                      >
+                        <option value="L">L</option>
+
+                        <option value="KG">KG</option>
+
+                        <option value="ML">ML</option>
+                      </select>
+                    </div>
+
+                    {/* LOOSE */}
+
+                    {item.isLoose ? (
                       <div>
                         <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                          Size Value
+                          Quantity
                         </label>
 
                         <input
                           type="number"
                           min="0"
                           step="0.01"
-                          value={item.sizeValue ?? ""}
+                          value={item.quantity ?? ""}
                           onChange={(e) =>
-                            updateStockOut(index, "sizeValue", e.target.value)
+                            updateStockOut(index, "quantity", e.target.value)
                           }
                           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                          required
                         />
                       </div>
+                    ) : (
+                      <>
+                        {/* UNIT SIZE */}
 
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                          Packets
-                        </label>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                            Unit Size
+                          </label>
 
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.packets ?? ""}
-                          onChange={(e) =>
-                            updateStockOut(index, "packets", e.target.value)
-                          }
-                          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
-                        />
-                      </div>
-                    </>
-                  )}
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.unitSize ?? ""}
+                            onChange={(e) =>
+                              updateStockOut(index, "unitSize", e.target.value)
+                            }
+                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                            required
+                          />
+                        </div>
 
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => removeStockOut(index)}
-                      className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 text-sm text-red-500 hover:bg-red-100"
-                    >
-                      <Trash2 size={15} />
-                      Remove
-                    </button>
+                        {/* PACKETS */}
+
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                            Packets
+                          </label>
+
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.packets ?? ""}
+                            onChange={(e) =>
+                              updateStockOut(index, "packets", e.target.value)
+                            }
+                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                            required
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {/* DELETE */}
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => removeStockOut(index)}
+                        className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 text-sm text-red-500 hover:bg-red-100"
+                      >
+                        <Trash2 size={15} />
+                        Remove
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* BOTTOM SUBMIT */}
+        {/* --------------------------------------------------
+            SUBMIT
+        -------------------------------------------------- */}
+
         <div className="flex justify-end gap-3 pb-6">
           <button
             type="button"
             onClick={() => navigate("/dashboard/inventory")}
-            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            disabled={submitting}
+            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
           >
             Cancel
           </button>
 
-          <button
-            type="submit"
-            className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Save Inventory
-          </button>
+          {/* ----------------------------------------------
+              ADD MODE
+          ---------------------------------------------- */}
+
+          {!isEditMode && (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Save size={16} />
+
+              {submitting ? "Saving..." : "Save Inventory"}
+            </button>
+          )}
+
+          {/* ----------------------------------------------
+              EDIT MODE
+              Only show after user changes something
+          ---------------------------------------------- */}
+
+          {isEditMode && hasChanges && (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Save size={16} />
+
+              {submitting ? "Updating..." : "Update Inventory"}
+            </button>
+          )}
         </div>
       </form>
     </div>
