@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, PackagePlus, Save } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import inventoryStore from "@/zustand/Store/inventoryStore";
+import { toast } from "react-toastify";
 
 const formatDateForInput = (date) => {
   if (!date) return "";
@@ -156,14 +157,12 @@ const AddInventory = () => {
       );
 
       await createInventory(payload);
+      toast.success("Inventory entry created successfully");
 
       navigate("/dashboard/inventory");
     } catch (error) {
-      console.error(
-        isEditMode
-          ? "Failed to update inventory:"
-          : "Failed to create inventory:",
-        error,
+      toast.error(
+        error.response?.data?.message || "Failed to create inventory entry",
       );
     } finally {
       setSubmitting(false);
