@@ -19,12 +19,12 @@ import {
 import inventoryStore from "@/zustand/Store/inventoryStore";
 import { useNavigate } from "react-router-dom";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 const DATE_FILTERS = [
   { label: "All", value: "" },
   { label: "Today", value: "today" },
-  { label: "Tomorrow", value: "tomorrow" },
+  { label: "Yesterday", value: "yesterday" },
   { label: "This week", value: "week" },
   { label: "This month", value: "month" },
 ];
@@ -77,7 +77,7 @@ const getDateKey = (date) => {
 function LedgerPanel({ summary }) {
   const periods = [
     { key: "today", label: "Today", data: summary.today },
-    { key: "tomorrow", label: "Tomorrow", data: summary.tomorrow },
+    { key: "yesterday", label: "Yesterday", data: summary.yesterday },
     { key: "thisWeek", label: "This week", data: summary.thisWeek },
     { key: "thisMonth", label: "This month", data: summary.thisMonth },
   ];
