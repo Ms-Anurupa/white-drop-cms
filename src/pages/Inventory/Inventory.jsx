@@ -273,8 +273,16 @@ export default function Inventory() {
   const loading = inventoryStore((state) => state.loading);
 
   useEffect(() => {
-    const params = { page, limit: PAGE_SIZE };
-    if (activeDateFilter) params.dateFilter = activeDateFilter;
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+      return;
+    }
+    const params = {
+      page,
+      limit: PAGE_SIZE,
+    };
+    if (activeDateFilter) {
+      params.dateFilter = activeDateFilter;
+    }
     if (startDate && endDate) {
       params.startDate = startDate;
       params.endDate = endDate;
