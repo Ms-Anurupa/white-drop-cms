@@ -216,7 +216,7 @@ const AddInventory = () => {
                 htmlFor="entryDate"
                 className="mb-1.5 block text-sm font-medium text-gray-700"
               >
-                Entry Date
+                Entry Date <span className="text-red-500">*</span>
               </label>
 
               <input
@@ -235,7 +235,7 @@ const AddInventory = () => {
                 htmlFor="type"
                 className="mb-1.5 block text-sm font-medium text-gray-700"
               >
-                Entry Type
+                Entry Type <span className="text-red-500">*</span>
               </label>
 
               <select
@@ -256,7 +256,7 @@ const AddInventory = () => {
                 htmlFor="qty"
                 className="mb-1.5 block text-sm font-medium text-gray-700"
               >
-                Quantity
+                Quantity <span className="text-red-500">*</span>
               </label>
 
               <input
@@ -278,7 +278,7 @@ const AddInventory = () => {
                 htmlFor="unit"
                 className="mb-1.5 block text-sm font-medium text-gray-700"
               >
-                Unit
+                Unit <span className="text-red-500">*</span>
               </label>
 
               <select
@@ -294,27 +294,29 @@ const AddInventory = () => {
                 <option value="G">Gram (G)</option>
               </select>
             </div>
-           {formData.type === "OPENING" && <div>
-              <label
-                htmlFor="rate"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
-              >
-                Rate
-              </label>
+            {formData.type === "OPENING" && (
+              <div>
+                <label
+                  htmlFor="rate"
+                  className="mb-1.5 block text-sm font-medium text-gray-700"
+                >
+                  Rate
+                </label>
 
-              <input
-                id="rate"
-                type="number"
-                name="rate"
-                value={formData.rate}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                placeholder="Enter rate"
-                disabled={formData.type === "CLOSING"}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
-              />
-            </div>}
+                <input
+                  id="rate"
+                  type="number"
+                  name="rate"
+                  value={formData.rate}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  placeholder="Enter rate"
+                  disabled={formData.type === "CLOSING"}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+                />
+              </div>
+            )}
 
             {formData.type === "CLOSING" && (
               <>
@@ -323,7 +325,10 @@ const AddInventory = () => {
                     htmlFor="wastageQty"
                     className="mb-1.5 block text-sm font-medium text-gray-700"
                   >
-                    Wastage Quantity
+                    Wastage Quantity{" "}
+                    <span className="font-normal text-gray-400">
+                      (Optional)
+                    </span>
                   </label>
 
                   <input
@@ -344,7 +349,10 @@ const AddInventory = () => {
                     htmlFor="remarks"
                     className="mb-1.5 block text-sm font-medium text-gray-700"
                   >
-                    Remarks
+                    Remarks{" "}
+                    <span className="font-normal text-gray-400">
+                      (Optional)
+                    </span>
                   </label>
 
                   <textarea
