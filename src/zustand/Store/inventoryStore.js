@@ -1,33 +1,40 @@
-/* eslint-disable */
 import { create } from "zustand";
 import api from "../axios";
 
 const inventoryStore = create((set) => ({
   inventoryLists: [],
   inventoryData: null,
+  inventoryMeta: null,
+  loading: false,
 
-  getInventoryListing: async () => {
+  getInventoryListing: async (params = {}) => {
     try {
+      set({ loading: true });
+
       const res = await api.get("/admin/getMilkInventoryListing", {
+        params,
         withAuth: true,
       });
 
       set({
         inventoryLists: res.data?.data || [],
+        inventoryMeta: res.data?.meta || null,
+        loading: false,
       });
 
       return res.data;
     } catch (error) {
+      set({ loading: false });
       throw error;
     }
   },
 
   getMilkInventoryById: async (id) => {
     try {
+      set({ loading: true });
+
       const res = await api.get("/admin/getMilkInventoryById", {
-        params: {
-          id,
-        },
+        params: { id },
         withAuth: true,
       });
 
@@ -35,10 +42,12 @@ const inventoryStore = create((set) => ({
 
       set({
         inventoryData: data,
+        loading: false,
       });
 
       return data;
     } catch (error) {
+      set({ loading: false });
       throw error;
     }
   },
