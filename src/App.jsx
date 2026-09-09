@@ -45,6 +45,7 @@ import CustomerDetails from "./components/CustomerDetails";
 import SubscriptionOrder from "./pages/subscriptionOrder/SubscriptionOrder";
 import AddInventory from "./components/AddInventory";
 import UpdateInventory from "./components/UpdateInventory";
+import PackagingJob from "./components/PackagingJob";
 
 const App = () => {
   return (
@@ -94,6 +95,7 @@ const App = () => {
                   element={<OrderViewDetails />}
                 />
                 <Route path="production" element={<Production />} />
+                <Route path="packaging-job" element={<PackagingJob/>}/>
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="inventory/add-inventory" element={<AddInventory />} />
                 <Route path="inventory/update-inventory/:id" element={<UpdateInventory />} />
