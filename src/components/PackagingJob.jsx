@@ -102,79 +102,82 @@ function SummaryStrip({ summary, loading }) {
 // -----------------------------------------------------------------------
 function FilterBar({ filters, onChange, onReset, onRefresh, refreshing }) {
     return (
-        <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
-            <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-slate-500">From</label>
-                <div className="relative">
-                    <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                    <input
-                        type="date"
-                        value={filters.startDate}
-                        onChange={(e) => {
-                            const startDate = e.target.value;
-                            onChange({ startDate });
-                        }}
-                        className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                    />
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-slate-500">To</label>
-                <div className="relative">
-                    <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                    <input
-                        type="date"
-                        value={filters.endDate}
-                        onChange={(e) => {
-                            const endDate = e.target.value;
-                            onChange({
-                                endDate,
-                            });
-                        }}
-                        className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                    />
-                </div>
-            </div>
-
-            <button
-                type="button"
-                onClick={() =>
-                    onChange({ sortOrder: filters.sortOrder === "asc" ? "desc" : "asc" })
-                }
-                className="flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-            >
-                {filters.sortOrder === "asc" ? (
-                    <ArrowUp className="h-3.5 w-3.5" />
-                ) : (
-                    <ArrowDown className="h-3.5 w-3.5" />
-                )}
-                {filters.sortOrder === "asc" ? "Ascending" : "Descending"}
-            </button>
-
-            <div className="ml-auto flex items-center gap-2">
-                {(filters.startDate || filters.endDate) && (
-                    <button
-                        type="button"
-                        onClick={onReset}
-                        className="cursor-pointer text-sm text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-700"
-                    >
-                        Clear dates
-                    </button>
-                )}
-                <button
-                    type="button"
-                    onClick={onRefresh}
-                    disabled={refreshing}
-                    className="cursor-pointer flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-                >
-                    <RefreshCw
-                        className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
-                    />
-                    Refresh
-                </button>
-            </div>
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500">From</label>
+          <div className="relative">
+            <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={(e) => {
+                const startDate = e.target.value;
+                onChange({ startDate });
+              }}
+              className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            />
+          </div>
         </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-slate-500">To</label>
+          <div className="relative">
+            <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(e) => {
+                const endDate = e.target.value;
+                onChange({
+                  endDate,
+                });
+              }}
+              className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            onChange({
+              sortOrder: filters.sortOrder === "asc" ? "desc" : "asc",
+            })
+          }
+          className="flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+        >
+          {filters.sortOrder === "asc" ? (
+            <ArrowUp className="h-3.5 w-3.5" />
+          ) : (
+            <ArrowDown className="h-3.5 w-3.5" />
+          )}
+          {filters.sortOrder === "asc" ? "Ascending" : "Descending"}
+        </button>
+
+        {(filters.startDate || filters.endDate) && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-sm text-red-500 decoration-slate-300 underline-offset-2 hover:text-red-700"
+          >
+            Clear dates
+          </button>
+        )}
+
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={refreshing}
+            className="cursor-pointer flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+        </div>
+      </div>
     );
 }
 
