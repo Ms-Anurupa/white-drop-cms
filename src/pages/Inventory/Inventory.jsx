@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import inventoryStore from "@/zustand/Store/inventoryStore";
 import { useNavigate } from "react-router-dom";
+import Loader from "@/components/Loader";
 
 const PAGE_SIZE = 10;
 
@@ -356,6 +357,10 @@ export default function Inventory() {
     const targetId = item.opening?.id || item.closing?.id;
     if (targetId) navigate(`/dashboard/inventory/add-inventory?id=${targetId}`);
   };
+
+  if (loading) {
+    return <Loader text="Loading Inventory Listing..." />;
+  }
 
   return (
     <div
