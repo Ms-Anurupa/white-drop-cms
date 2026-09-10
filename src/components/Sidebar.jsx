@@ -11,25 +11,36 @@ import {
   Factory,
   Boxes,
   Truck,
-  Headset,
   HelpingHand,
+  Headset,
   Menu,
   X,
   PackageCheck,
+  PackageIcon,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
 
 const menu = [
+  // 0-6: Main Menu items
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, end: true },
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
   { name: "Orders", path: "orders", icon: ShoppingCart },
-  { name: "Subscription Orders", path: "subscription-orders", icon: ShoppingCart },
+  {
+    name: "Subscription Orders",
+    path: "subscription-orders",
+    icon: ShoppingCart,
+  },
   { name: "Corporate Orders", path: "corporate-orders", icon: ClipboardList },
   { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
+
+  // 7-9: Operations items (Packaging Job placed here, above Delivery Job section)
   { name: "Production", path: "production", icon: Factory },
   { name: "Inventory", path: "inventory", icon: Boxes },
+  { name: "Packaging Job", path: "packaging-job", icon: PackageIcon },
+
+  // 10-12: Delivery Executive Details
   { name: "Delivery Job", path: "delivery-job", icon: Truck },
   { name: "Delivery Tracking", path: "delivery-tracking", icon: Truck },
   {
@@ -37,8 +48,12 @@ const menu = [
     path: "deliveryPartners",
     icon: PackageCheck,
   },
+
+  // 13-14: Offers
   { name: "Offers", path: "offers", icon: HelpingHand },
   { name: "Offer Type", path: "offerType", icon: HelpingHand },
+
+  // 15-16: Help
   { name: "Customer Helpline", path: "customerHelpLine", icon: HelpingHand },
   { name: "Service Manager", path: "support", icon: Headset },
 ];
@@ -122,40 +137,13 @@ const Sidebar = ({ onLogOut }) => {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+        {/* MAIN MENU */}
         {!collapsed && (
           <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Main menu
           </p>
         )}
         {menu.slice(0, 7).map((item) => (
-          <NavItem key={item.path} item={item} onClick={onNavClick} />
-        ))}
-        
-        {!collapsed && (
-          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-            Delivery Executive Details
-          </p>
-        )}
-        {menu.slice(9, 12).map((item) => (
-          <NavItem key={item.path} item={item} onClick={onNavClick} />
-        ))}
-
-        {!collapsed && (
-          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-            Offers
-          </p>
-        )}
-        {menu.slice(12, 14).map((item) => (
-          <NavItem key={item.path} item={item} onClick={onNavClick} />
-        ))}
-
-
-        {!collapsed && (
-          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-            Operations
-          </p>
-        )}
-        {menu.slice(7, 9).map((item) => (
           <NavItem
             key={item.path}
             item={item}
@@ -163,13 +151,65 @@ const Sidebar = ({ onLogOut }) => {
             collapsed={collapsed}
           />
         ))}
+
+        {/* OPERATIONS */}
+        {!collapsed && (
+          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            Operations
+          </p>
+        )}
+        {menu.slice(7, 10).map((item) => (
+          <NavItem
+            key={item.path}
+            item={item}
+            onClick={onNavClick}
+            collapsed={collapsed}
+          />
+        ))}
+
+        {/* DELIVERY EXECUTIVE DETAILS */}
+        {!collapsed && (
+          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            Delivery Executive Details
+          </p>
+        )}
+        {menu.slice(10, 13).map((item) => (
+          <NavItem
+            key={item.path}
+            item={item}
+            onClick={onNavClick}
+            collapsed={collapsed}
+          />
+        ))}
+
+        {/* OFFERS */}
+        {!collapsed && (
+          <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            Offers
+          </p>
+        )}
+        {menu.slice(13, 15).map((item) => (
+          <NavItem
+            key={item.path}
+            item={item}
+            onClick={onNavClick}
+            collapsed={collapsed}
+          />
+        ))}
+
+        {/* HELP */}
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Help
           </p>
         )}
-        {menu.slice(14, 16).map((item) => (
-          <NavItem key={item.path} item={item} onClick={onNavClick} />
+        {menu.slice(15, 17).map((item) => (
+          <NavItem
+            key={item.path}
+            item={item}
+            onClick={onNavClick}
+            collapsed={collapsed}
+          />
         ))}
       </nav>
 
