@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,6 +15,7 @@ import {
   Pencil,
   CalendarDays,
   X,
+  Clock,
 } from "lucide-react";
 import inventoryStore from "@/zustand/Store/inventoryStore";
 import { useNavigate } from "react-router-dom";
@@ -37,43 +38,60 @@ const AMBER = "#B45309";
 const AMBER_SOFT = "#FBEEE0";
 const LINE = "#E3E8EA";
 
-const formatDate = (date) => {
-  if (!date) return "—";
-  return new Date(date).toLocaleDateString("en-IN", {
+// Handles DD-MM-YYYY, ISO strings, and standard dates safely
+const formatDate = (dateStr) => {
+  if (!dateStr) return "—";
+
+  if (
+    typeof dateStr === "string" &&
+    dateStr.includes("-") &&
+    dateStr.length === 10
+  ) {
+    const parts = dateStr.split("-");
+    if (parts[0].length === 2) {
+      // DD-MM-YYYY format
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2];
+      const dateObj = new Date(`${year}-${month}-${day}`);
+      if (!isNaN(dateObj)) {
+        return dateObj.toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+    }
+  }
+
+  const parsedDate = new Date(dateStr);
+  if (isNaN(parsedDate)) return dateStr;
+
+  return parsedDate.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 };
 
-const formatDateTime = (date) => {
+const formatTime = (date) => {
   if (!date) return "—";
-  return new Date(date).toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate)) return "—";
+  return parsedDate.toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
   });
 };
 
 const formatNumber = (value) => {
-  const number = Number(value ?? 0);
-  if (Number.isNaN(number)) return 0;
+  if (value == null) return "—";
+  const number = Number(value);
+  if (Number.isNaN(number)) return "—";
   return Number.isInteger(number) ? number : Number(number.toFixed(2));
 };
 
-const getUnitLabel = (unit) => (unit ? String(unit).toUpperCase() : "—");
-
-const getDateKey = (date) => {
-  if (!date) return "";
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(date));
-};
+const getUnitLabel = (unit) => (unit ? String(unit).toUpperCase() : "L");
 
 function LedgerPanel({ summary }) {
   const periods = [
@@ -104,7 +122,7 @@ function LedgerPanel({ summary }) {
               className="mt-2 text-2xl font-semibold tracking-tight tabular-nums"
               style={{ color: INK }}
             >
-              {formatNumber(period.data?.totalQty)}
+              {Math.abs(formatNumber(period.data?.totalQty ?? 0))}
               <span className="text-sm font-normal text-slate-400 ml-1">L</span>
             </p>
 
@@ -133,23 +151,30 @@ function LedgerPanel({ summary }) {
 
 function InventoryDetailsPanel({ item, onClose }) {
   if (!item) return null;
-  const { opening, closing } = item;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40">
-      <div className="h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto">
+    // Outer overlay container
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex justify-end bg-slate-900/40"
+    >
+      {/* Modal drawer panel (stopPropagation prevents backdrop click from firing) */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto"
+      >
         <div
           className="sticky top-0 z-10 bg-white border-b px-5 py-4 flex items-center justify-between"
           style={{ borderColor: LINE }}
         >
           <div>
-            <p className="text-xs text-slate-400">Inventory entry</p>
+            <p className="text-xs text-slate-400">Inventory Entry</p>
             <h2
               className="text-base font-semibold flex items-center gap-2 mt-1"
               style={{ color: INK }}
             >
               <CalendarDays size={16} className="text-slate-400" />
-              {formatDate(opening?.entryDate || closing?.entryDate)}
+              {formatDate(item.entryDate)}
             </h2>
           </div>
 
@@ -164,62 +189,107 @@ function InventoryDetailsPanel({ item, onClose }) {
         </div>
 
         <div className="p-5 space-y-5">
+          {/* Opening Details */}
           <section
             className="rounded-lg p-4"
             style={{ backgroundColor: TEAL_SOFT }}
           >
-            <h3 className="text-sm font-medium mb-3" style={{ color: TEAL }}>
-              Opening
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold" style={{ color: TEAL }}>
+                Opening Stock
+              </h3>
+              <span className="text-xs text-slate-500 flex items-center gap-1">
+                <Clock size={12} />
+                {formatTime(item.openingTime)}
+              </span>
+            </div>
 
-            {opening ? (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-500">Quantity</p>
-                  <p
-                    className="text-sm font-semibold tabular-nums mt-1"
-                    style={{ color: INK }}
-                  >
-                    {formatNumber(opening.qty)} {getUnitLabel(opening.unit)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Rate</p>
-                  <p
-                    className="text-sm font-semibold tabular-nums mt-1"
-                    style={{ color: INK }}
-                  >
-                    {opening.rate != null
-                      ? `₹${formatNumber(opening.rate)}`
-                      : "—"}
-                  </p>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-slate-500">Opening Qty</p>
+                <p
+                  className="text-sm font-semibold tabular-nums mt-1"
+                  style={{ color: INK }}
+                >
+                  {formatNumber(item.openingQty)} {getUnitLabel(item.unit)}
+                </p>
               </div>
-            ) : (
-              <p className="text-sm text-slate-400">Not recorded</p>
-            )}
+              <div>
+                <p className="text-xs text-slate-500">Rate</p>
+                <p
+                  className="text-sm font-semibold tabular-nums mt-1"
+                  style={{ color: INK }}
+                >
+                  {item.rate != null ? `₹${formatNumber(item.rate)}` : "—"}
+                </p>
+              </div>
+            </div>
           </section>
 
+          {/* Operations & Movement */}
+          <section className="bg-slate-50 rounded-lg p-4 border border-slate-100 space-y-3">
+            <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">
+              Stock Movement
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <p className="text-xs text-slate-500">Produced</p>
+                <p className="text-sm font-medium tabular-nums mt-0.5 text-slate-700">
+                  {item.produced != null
+                    ? `${formatNumber(item.produced)} ${getUnitLabel(item.unit)}`
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Bulk Out</p>
+                <p className="text-sm font-medium tabular-nums mt-0.5 text-slate-700">
+                  {item.bulkStockout != null
+                    ? `${formatNumber(item.bulkStockout)} ${getUnitLabel(item.unit)}`
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Packet Out</p>
+                <p className="text-sm font-medium tabular-nums mt-0.5 text-slate-700">
+                  {item.packetStockout != null
+                    ? `${formatNumber(item.packetStockout)} ${getUnitLabel(item.unit)}`
+                    : "—"}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Closing Details */}
           <section
             className="rounded-lg p-4"
-            style={{ backgroundColor: closing ? "#F1F5F4" : AMBER_SOFT }}
+            style={{
+              backgroundColor: item.closingQty != null ? "#F1F5F4" : AMBER_SOFT,
+            }}
           >
-            <h3
-              className="text-sm font-medium mb-3"
-              style={{ color: closing ? "#334155" : AMBER }}
-            >
-              Closing
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3
+                className="text-sm font-semibold"
+                style={{ color: item.closingQty != null ? "#334155" : AMBER }}
+              >
+                Closing Stock
+              </h3>
+              {item.closingTime && (
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <Clock size={12} />
+                  {formatTime(item.closingTime)}
+                </span>
+              )}
+            </div>
 
-            {closing ? (
+            {item.closingQty != null ? (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-slate-500">Quantity</p>
+                  <p className="text-xs text-slate-500">Closing Qty</p>
                   <p
                     className="text-sm font-semibold tabular-nums mt-1"
                     style={{ color: INK }}
                   >
-                    {formatNumber(closing.qty)} {getUnitLabel(closing.unit)}
+                    {formatNumber(item.closingQty)} {getUnitLabel(item.unit)}
                   </p>
                 </div>
                 <div>
@@ -228,8 +298,8 @@ function InventoryDetailsPanel({ item, onClose }) {
                     className="text-sm font-semibold tabular-nums mt-1"
                     style={{ color: AMBER }}
                   >
-                    {closing.wastageQty != null
-                      ? `${formatNumber(closing.wastageQty)} ${getUnitLabel(closing.unit)}`
+                    {item.wastageQty != null
+                      ? `${formatNumber(item.wastageQty)} ${getUnitLabel(item.unit)}`
                       : "—"}
                   </p>
                 </div>
@@ -241,13 +311,14 @@ function InventoryDetailsPanel({ item, onClose }) {
             )}
           </section>
 
-          {closing?.remarks && (
+          {/* Wastage Note */}
+          {item.wastageNote && (
             <section>
-              <h3 className="text-sm font-medium mb-2" style={{ color: INK }}>
-                Remarks
+              <h3 className="text-xs font-semibold uppercase text-slate-400 mb-2">
+                Wastage Note
               </h3>
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-600">{closing.remarks}</p>
+              <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                <p className="text-sm text-slate-600">{item.wastageNote}</p>
               </div>
             </section>
           )}
@@ -293,27 +364,6 @@ export default function Inventory() {
 
   const data = Array.isArray(inventoryLists) ? inventoryLists : [];
 
-  const groupedData = useMemo(() => {
-    const grouped = new Map();
-    data.forEach((item) => {
-      const dateKey = getDateKey(item.entryDate);
-      if (!dateKey) return;
-      if (!grouped.has(dateKey)) {
-        grouped.set(dateKey, {
-          date: item.entryDate,
-          opening: null,
-          closing: null,
-        });
-      }
-      const group = grouped.get(dateKey);
-      if (item.type === "OPENING") group.opening = item;
-      if (item.type === "CLOSING") group.closing = item;
-    });
-    return Array.from(grouped.values()).sort(
-      (a, b) => new Date(b.date) - new Date(a.date),
-    );
-  }, [data]);
-
   const meta = inventoryMeta || {};
   const summary = meta.summary || {};
   const total = Number(meta.total) || 0;
@@ -354,11 +404,10 @@ export default function Inventory() {
   const handleNext = () => currentPage < totalPages && setPage((p) => p + 1);
 
   const handleEdit = (item) => {
-    const targetId = item.opening?.id || item.closing?.id;
-    if (targetId) navigate(`/dashboard/inventory/add-inventory?id=${targetId}`);
+    if (item.id) navigate(`/dashboard/inventory/add-inventory?id=${item.id}`);
   };
 
-  if (loading) {
+  if (loading && data.length === 0) {
     return <Loader text="Loading Inventory Listing..." />;
   }
 
@@ -373,7 +422,8 @@ export default function Inventory() {
             Inventory
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Daily opening and closing milk stock, with wastage tracked per entry
+            Daily opening and closing milk stock, production, and wastage
+            tracking
           </p>
         </div>
 
@@ -388,8 +438,9 @@ export default function Inventory() {
         </button>
       </div>
 
-      <LedgerPanel summary={summary} />
+      {/* <LedgerPanel summary={summary} /> */}
 
+      {/* Date Filter Bar */}
       <div
         className="bg-white rounded-lg p-4 border"
         style={{ borderColor: LINE }}
@@ -481,6 +532,7 @@ export default function Inventory() {
         )}
       </div>
 
+      {/* Main Listing Table */}
       <div
         className="bg-white rounded-lg border overflow-hidden"
         style={{ borderColor: LINE }}
@@ -489,12 +541,13 @@ export default function Inventory() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Entry date</TableHead>
-                <TableHead>Opening qty</TableHead>
-                <TableHead>Opening rate</TableHead>
-                <TableHead>Closing qty</TableHead>
+                <TableHead>Entry Date</TableHead>
+                <TableHead>Opening Qty</TableHead>
+                <TableHead>Rate</TableHead>
+                <TableHead>Produced</TableHead>
+                <TableHead>Stockouts (Bulk / Pkt)</TableHead>
+                <TableHead>Closing Qty</TableHead>
                 <TableHead>Wastage</TableHead>
-                <TableHead>Remarks</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -503,39 +556,59 @@ export default function Inventory() {
               {loading ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="h-32 text-center text-sm text-slate-400"
                   >
                     Loading inventory…
                   </TableCell>
                 </TableRow>
-              ) : groupedData.length > 0 ? (
-                groupedData.map((item) => {
-                  const isComplete = Boolean(item.closing);
+              ) : data.length > 0 ? (
+                data.map((item) => {
+                  const isClosed = item.closingQty != null;
                   return (
                     <TableRow
-                      key={getDateKey(item.date)}
+                      key={item.id}
                       className="hover:bg-slate-50/70 transition-colors"
                       style={{
-                        borderLeft: `3px solid ${isComplete ? TEAL : AMBER}`,
+                        borderLeft: `3px solid ${isClosed ? TEAL : AMBER}`,
                       }}
                     >
+                      {/* Entry Date */}
                       <TableCell className="p-4 text-slate-600">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 font-medium">
                           <CalendarDays size={14} className="text-slate-400" />
-                          {formatDate(item.date)}
+                          {formatDate(item.entryDate)}
                         </div>
                       </TableCell>
 
+                      {/* Opening Qty */}
                       <TableCell className="p-4 tabular-nums">
-                        {item.opening ? (
-                          <span
-                            style={{ color: INK }}
-                            className="font-semibold"
-                          >
-                            {formatNumber(item.opening.qty)}{" "}
-                            <span className="text-slate-400 text-sm font-normal">
-                              {getUnitLabel(item.opening.unit)}
+                        <span style={{ color: INK }} className="font-semibold">
+                          {formatNumber(item.openingQty)}{" "}
+                          <span className="text-slate-400 text-sm font-normal">
+                            {getUnitLabel(item.unit)}
+                          </span>
+                        </span>
+                      </TableCell>
+
+                      {/* Rate */}
+                      <TableCell className="p-4 tabular-nums">
+                        {item.rate != null ? (
+                          <span style={{ color: INK }} className="font-medium">
+                            ₹{formatNumber(item.rate)}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                      </TableCell>
+
+                      {/* Produced */}
+                      <TableCell className="p-4 tabular-nums text-slate-600">
+                        {item.produced != null ? (
+                          <span>
+                            {formatNumber(item.produced)}{" "}
+                            <span className="text-xs text-slate-400">
+                              {getUnitLabel(item.unit)}
                             </span>
                           </span>
                         ) : (
@@ -543,25 +616,30 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
-                      <TableCell className="p-4 tabular-nums">
-                        {item.opening?.rate != null ? (
-                          <span style={{ color: INK }} className="font-medium">
-                            ₹{formatNumber(item.opening.rate)}
+                      {/* Stockouts */}
+                      <TableCell className="p-4 tabular-nums text-slate-600">
+                        {item.bulkStockout != null ||
+                        item.packetStockout != null ? (
+                          <span className="text-xs">
+                            {formatNumber(item.bulkStockout ?? 0)} /{" "}
+                            {formatNumber(item.packetStockout ?? 0)}{" "}
+                            {getUnitLabel(item.unit)}
                           </span>
                         ) : (
                           <span className="text-slate-400">—</span>
                         )}
                       </TableCell>
 
+                      {/* Closing Qty */}
                       <TableCell className="p-4 tabular-nums">
-                        {item.closing ? (
+                        {isClosed ? (
                           <span
                             style={{ color: INK }}
                             className="font-semibold"
                           >
-                            {formatNumber(item.closing.qty)}{" "}
+                            {formatNumber(item.closingQty)}{" "}
                             <span className="text-slate-400 text-sm font-normal">
-                              {getUnitLabel(item.closing.unit)}
+                              {getUnitLabel(item.unit)}
                             </span>
                           </span>
                         ) : (
@@ -577,29 +655,22 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
+                      {/* Wastage Qty */}
                       <TableCell className="p-4 tabular-nums">
-                        {item.closing?.wastageQty != null ? (
+                        {item.wastageQty != null ? (
                           <span
                             className="font-medium"
                             style={{ color: AMBER }}
                           >
-                            {formatNumber(item.closing.wastageQty)}{" "}
-                            {getUnitLabel(item.closing.unit)}
+                            {formatNumber(item.wastageQty)}{" "}
+                            {getUnitLabel(item.unit)}
                           </span>
                         ) : (
                           <span className="text-slate-400">—</span>
                         )}
                       </TableCell>
 
-                      <TableCell className="p-4 max-w-xs">
-                        <p
-                          className="text-sm text-slate-500 truncate"
-                          title={item.closing?.remarks || ""}
-                        >
-                          {item.closing?.remarks || "—"}
-                        </p>
-                      </TableCell>
-
+                      {/* Actions */}
                       <TableCell className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
@@ -611,15 +682,6 @@ export default function Inventory() {
                             <Eye size={14} />
                             View
                           </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(item)}
-                            className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-slate-100 text-slate-400"
-                            aria-label="Edit entry"
-                          >
-                            <Pencil size={14} />
-                          </button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -627,7 +689,7 @@ export default function Inventory() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-40 text-center">
+                  <TableCell colSpan={8} className="h-40 text-center">
                     <p className="text-sm text-slate-500">
                       No entries in this range yet.
                     </p>
@@ -649,6 +711,7 @@ export default function Inventory() {
         </div>
       </div>
 
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
         <p className="text-xs text-slate-400">
           Showing {showingFrom}–{showingTo} of {total}
