@@ -16,6 +16,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 import usePackagingJobStore from "@/zustand/Store/packagingJobStore";
+import Loader from "./Loader";
 
 const SORT_FIELDS = [
     { value: "deliveryDate", label: "Delivery date" },
@@ -548,6 +549,8 @@ export default function PackagingJob() {
     const resetFilters = usePackagingJobStore((s) => s.resetFilters);
     const clearSelectedJob = usePackagingJobStore((s) => s.clearSelectedJob);
 
+    
+
     useEffect(() => {
         if ((filters.startDate && !filters.endDate) || (!filters.startDate && filters.endDate)) {
             return;
@@ -566,6 +569,10 @@ export default function PackagingJob() {
 
       return "Select both dates to apply filter";
     }, [filters.startDate, filters.endDate]);
+
+    if (loading) {
+      return <Loader text="Loading Packaging Jobs..." />;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
