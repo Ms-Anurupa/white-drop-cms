@@ -688,9 +688,9 @@ const AdhocOrders = () => {
                   Adhoc Order Details
                 </h2>
 
-                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                {/* <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                   Order ID: {selectedOrder?.id || "-"}
-                </p>
+                </p> */}
               </div>
 
               <button
@@ -767,19 +767,11 @@ const AdhocOrders = () => {
                 </div>
 
                 <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-800">
-                  <table className="w-full min-w-[650px] text-left">
+                  <table className="w-full min-w-[450px] text-left">
                     <thead className="bg-gray-50 dark:bg-slate-950">
                       <tr>
                         <th className="px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-slate-400">
-                          #
-                        </th>
-
-                        <th className="px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-slate-400">
-                          Product ID
-                        </th>
-
-                        <th className="px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-slate-400">
-                          Variant ID
+                          Sl No.
                         </th>
 
                         <th className="px-3 py-2.5 text-right text-xs font-semibold text-gray-500 dark:text-slate-400">
@@ -803,18 +795,6 @@ const AdhocOrders = () => {
                         >
                           <td className="px-3 py-3 text-sm text-gray-500 dark:text-slate-400">
                             {index + 1}
-                          </td>
-
-                          <td className="px-3 py-3">
-                            <span className="block max-w-[180px] truncate text-xs text-gray-700 dark:text-slate-300">
-                              {item?.productId || "-"}
-                            </span>
-                          </td>
-
-                          <td className="px-3 py-3">
-                            <span className="block max-w-[180px] truncate text-xs text-gray-700 dark:text-slate-300">
-                              {item?.variantId || "-"}
-                            </span>
                           </td>
 
                           <td className="px-3 py-3 text-right text-sm font-medium text-gray-800 dark:text-slate-200">
