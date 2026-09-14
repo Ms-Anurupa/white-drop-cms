@@ -48,6 +48,7 @@ import UpdateInventory from "./components/UpdateInventory";
 import PackagingJob from "./components/PackagingJob";
 import AdhocOrders from "./pages/adhocOrders/AdhocOrders";
 import SpecialOrderListing from "./pages/specialOrderListing/SpecialOrderListing";
+import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails";
 
 const App = () => {
   return (
@@ -97,6 +98,10 @@ const App = () => {
                 <Route
                   path="orders/orderDetails/:id"
                   element={<OrderViewDetails />}
+                />
+                <Route
+                  path="special-orders/specialOrderDetails/:id"
+                  element={<SpecialOrderDetails />}
                 />
                 <Route path="production" element={<Production />} />
                 <Route path="packaging-job" element={<PackagingJob/>}/>
