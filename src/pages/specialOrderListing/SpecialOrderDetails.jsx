@@ -85,19 +85,19 @@ const SpecialOrderDetails = () => {
   const getStatusClass = (status) => {
     switch (status?.toUpperCase()) {
       case "APPROVED":
-        return "bg-green-50 text-green-600 border-green-100";
+        return "border-emerald-200 bg-emerald-50 text-emerald-700";
 
       case "PENDING":
-        return "bg-yellow-50 text-yellow-600 border-yellow-100";
+        return "border-amber-200 bg-amber-50 text-amber-700";
 
       case "REJECTED":
-        return "bg-red-50 text-red-600 border-red-100";
+        return "border-red-200 bg-red-50 text-red-700";
 
       case "CANCELLED":
-        return "bg-gray-50 text-gray-600 border-gray-200";
+        return "border-gray-200 bg-gray-50 text-gray-600";
 
       default:
-        return "bg-blue-50 text-blue-600 border-blue-100";
+        return "border-blue-200 bg-blue-50 text-blue-700";
     }
   };
 
@@ -135,8 +135,6 @@ const SpecialOrderDetails = () => {
     };
 
     console.log("Update & Approve Payload:", payload);
-
-    // Connect your update API here
   };
 
   const handleCancelEdit = () => {
@@ -156,24 +154,26 @@ const SpecialOrderDetails = () => {
 
   if (!specialOrderDetails) {
     return (
-      <div className="min-h-full bg-gray-50 p-4 sm:p-6">
+      <div className="min-h-full bg-slate-50 p-4 sm:p-6">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="mb-5 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+          className="mb-5 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
         >
           <ArrowLeft size={16} />
           Back
         </button>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center">
-          <Package size={40} className="mx-auto mb-3 text-gray-300" />
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+            <Package size={26} className="text-slate-400" />
+          </div>
 
-          <h2 className="text-base font-semibold text-gray-800">
+          <h2 className="text-base font-semibold text-slate-800">
             Order not found
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1.5 text-sm text-slate-500">
             Unable to load special order details.
           </p>
         </div>
@@ -182,127 +182,183 @@ const SpecialOrderDetails = () => {
   }
 
   const customerName = specialOrderDetails?.user?.customer_name || "-";
-
   const phone = specialOrderDetails?.user?.phone_num || "-";
 
+  const totalItems = cart.reduce(
+    (total, item) => total + Number(item?.qty || 0),
+    0,
+  );
+
+  const calculatedTotal = cart.reduce(
+    (total, cartItem) =>
+      total + Number(cartItem?.qty || 0) * Number(cartItem?.item?.price || 0),
+    0,
+  );
+
   return (
-    <div className="min-h-full bg-gray-50 p-4 sm:p-6">
+    <div className="min-h-full bg-slate-50 p-4 pb-6 sm:p-4 sm:pb-12">
       {/* Header */}
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="mt-0.5 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-50"
+            className="mt-0.5 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800"
           >
-            <ArrowLeft size={17} />
+            <ArrowLeft size={18} />
           </button>
 
           <div>
-            <h1 className="text-xl font-semibold text-gray-800">
-              Special Order Details
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                Special Order Details
+              </h1>
 
-            <p className="mt-1 text-sm text-gray-500">
-              View and manage special order
+              <span
+                className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${getStatusClass(
+                  specialOrderDetails?.status,
+                )}`}
+              >
+                {specialOrderDetails?.status || "PENDING"}
+              </span>
+            </div>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Review order information and update requested quantities.
             </p>
           </div>
         </div>
 
-        <span
-          className={`inline-flex w-fit rounded-full border px-3 py-1 text-xs font-medium ${getStatusClass(
-            specialOrderDetails?.status,
-          )}`}
-        >
-          {specialOrderDetails?.status || "PENDING"}
-        </span>
-      </div>
-
-      {/* Order Summary */}
-      <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
-            <CreditCard size={18} />
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <Package size={16} />
           </div>
 
-          <p className="text-xs text-gray-500">Payment Mode</p>
-
-          <p className="mt-1 text-sm font-semibold text-gray-800">
-            {specialOrderDetails?.paymentMode || "-"}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-            <Package size={18} />
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
+              Order Total
+            </p>
+            <p className="text-sm font-bold text-slate-900">
+              ₹{Number(specialOrderDetails?.orderTotal || 0).toFixed(2)}
+            </p>
           </div>
-
-          <p className="text-xs text-gray-500">Total Items</p>
-
-          <p className="mt-1 text-sm font-semibold text-gray-800">
-            {cart.reduce((total, item) => total + Number(item?.qty || 0), 0)}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-            <CalendarDays size={18} />
-          </div>
-
-          <p className="text-xs text-gray-500">Order Date</p>
-
-          <p className="mt-1 text-sm font-semibold text-gray-800">
-            {formatDate(specialOrderDetails?.createdAt)}
-          </p>
         </div>
       </div>
 
-      {/* Customer / Order / Delivery */}
-      <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
+      {/* Summary Cards */}
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <CreditCard size={18} />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Payment Mode
+              </p>
+              <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
+                {specialOrderDetails?.paymentMode || "-"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+              <Package size={18} />
+            </div>
+
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Total Items
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                {totalItems}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+              <CalendarDays size={18} />
+            </div>
+
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Order Date
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-800">
+                {formatDate(specialOrderDetails?.createdAt)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Information Cards */}
+      <div className="mb-4 grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Customer */}
-        <div className="rounded-xl border border-gray-200 bg-white">
-          <div className="border-b border-gray-100 px-5 py-4">
-            <h2 className="text-sm font-semibold text-gray-800">
-              Customer Details
-            </h2>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div>
+              <h2 className="text-sm font-bold text-slate-800">
+                Customer Details
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Customer information
+              </p>
+            </div>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <UserRound size={17} />
+            </div>
           </div>
 
-          <div className="space-y-4 p-5">
+          <div className="grid gap-4 p-5 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <UserRound size={17} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <UserRound size={16} />
               </div>
 
-              <div>
-                <p className="text-xs text-gray-500">Customer Name</p>
-
-                <p className="text-sm font-medium text-gray-800">
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-slate-400">
+                  Customer Name
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
                   {customerName}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
-                <Phone size={17} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                <Phone size={16} />
               </div>
 
-              <div>
-                <p className="text-xs text-gray-500">Phone Number</p>
-
-                <p className="text-sm font-medium text-gray-800">{phone}</p>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-slate-400">
+                  Phone Number
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
+                  {phone}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                <UserRound size={17} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                <UserRound size={16} />
               </div>
 
               <div className="min-w-0">
-                <p className="text-xs text-gray-500">Customer Type</p>
-
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-[11px] font-medium text-slate-400">
+                  Customer Type
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
                   {specialOrderDetails?.user?.customer_type || "Customer"}
                 </p>
               </div>
@@ -310,112 +366,126 @@ const SpecialOrderDetails = () => {
           </div>
         </div>
 
-        {/* Order */}
-        <div className="rounded-xl border border-gray-200 bg-white">
-          <div className="border-b border-gray-100 px-5 py-4">
-            <h2 className="text-sm font-semibold text-gray-800">
-              Order Information
-            </h2>
+        {/* Order Information */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div>
+              <h2 className="text-sm font-bold text-slate-800">
+                Order Information
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Payment and creation details
+              </p>
+            </div>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <CreditCard size={17} />
+            </div>
           </div>
 
-          <div className="space-y-4 p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                  <CreditCard size={17} />
-                </div>
-
-                <div>
-                  <p className="text-xs text-gray-500">Payment Mode</p>
-
-                  <select
-                    value={paymentMode}
-                    onChange={(e) => handlePaymentChange(e.target.value)}
-                    className="mt-1 h-9 cursor-pointer rounded-md border border-gray-200 bg-white px-2 text-sm font-medium text-gray-700 outline-none focus:border-blue-400"
-                  >
-                    <option value="COD">COD</option>
-                    <option value="ONLINE">ONLINE</option>
-                  </select>
-                </div>
-              </div>
-
-              <Pencil size={14} className="text-gray-400" />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-                <CalendarDays size={17} />
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-500">Created Date</p>
-
-                <p className="text-sm font-medium text-gray-800">
-                  {formatDate(specialOrderDetails?.createdAt)}
+          <div className="grid gap-4 p-5 sm:grid-cols-3 lg:grid-cols-3">
+            <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+              <div className="mb-2 flex items-center gap-2">
+                <CreditCard size={15} className="text-blue-600" />
+                <p className="text-[11px] font-medium text-slate-400">
+                  Payment Mode
                 </p>
               </div>
+
+              <select
+                value={paymentMode}
+                onChange={(e) => handlePaymentChange(e.target.value)}
+                className="h-9 w-full cursor-pointer rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-50"
+              >
+                <option value="COD">COD</option>
+                <option value="ONLINE">ONLINE</option>
+              </select>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                <Clock3 size={17} />
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-500">Created Time</p>
-
-                <p className="text-sm font-medium text-gray-800">
-                  {formatTime(specialOrderDetails?.createdAt)}
+            <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+              <div className="mb-2 flex items-center gap-2">
+                <CalendarDays size={15} className="text-orange-600" />
+                <p className="text-[11px] font-medium text-slate-400">
+                  Created Date
                 </p>
               </div>
+
+              <p className="text-sm font-semibold text-slate-800">
+                {formatDate(specialOrderDetails?.createdAt)}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+              <div className="mb-2 flex items-center gap-2">
+                <Clock3 size={15} className="text-violet-600" />
+                <p className="text-[11px] font-medium text-slate-400">
+                  Created Time
+                </p>
+              </div>
+
+              <p className="text-sm font-semibold text-slate-800">
+                {formatTime(specialOrderDetails?.createdAt)}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Products */}
-      <div className="mb-5 overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-gray-800">
-              Order Products
-            </h2>
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <Package size={16} />
+              </div>
 
-            <p className="mt-1 text-xs text-gray-500">
-              Update product quantity if required
+              <h2 className="text-sm font-bold text-slate-800">
+                Order Products
+              </h2>
+            </div>
+
+            <p className="mt-1 pl-10 text-xs text-slate-400">
+              Adjust quantities before approving the order.
             </p>
           </div>
 
-          <span className="text-lg font-bold text-gray-800">
-            ₹{Number(specialOrderDetails?.orderTotal || 0).toFixed(2)}
-          </span>
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 sm:justify-end">
+            <span className="text-xs font-medium text-slate-500">
+              Current Total
+            </span>
+
+            <span className="text-base font-bold text-slate-900">
+              ₹{calculatedTotal.toFixed(2)}
+            </span>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[850px] text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+              <tr className="border-b border-slate-100 bg-slate-50/80">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Product
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Package
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Product Size
                 </th>
 
-                <th className="px-5 py-3 text-center text-xs font-semibold text-gray-500">
+                <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Quantity
                 </th>
 
-                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">
+                <th className="px-5 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Price
                 </th>
 
-                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500">
+                <th className="px-5 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Subtotal
                 </th>
               </tr>
@@ -432,11 +502,11 @@ const SpecialOrderDetails = () => {
                   return (
                     <tr
                       key={item?.variant_id || item?.product_id || index}
-                      className="border-b border-gray-100 last:border-0"
+                      className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50/60"
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                             {item?.product_images?.[0] ? (
                               <img
                                 src={resolveFirebaseUrl({
@@ -447,49 +517,57 @@ const SpecialOrderDetails = () => {
                                 className="h-full w-full object-cover"
                               />
                             ) : (
-                              <Package size={18} className="text-gray-400" />
+                              <Package size={19} className="text-slate-400" />
                             )}
                           </div>
 
-                          <div>
-                            <p className="font-medium text-gray-700">
+                          <div className="min-w-0">
+                            <p className="max-w-[260px] truncate font-semibold text-slate-700">
                               {item?.product_name || "-"}
                             </p>
 
-                            <p className="mt-1 text-xs text-gray-400">
+                            <p className="mt-1 max-w-[280px] truncate text-xs text-slate-400">
                               {item?.product_description || "-"}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-gray-600">
+                      <td className="px-5 py-4 text-slate-600">
                         {item?.package || "-"}
                       </td>
 
-                      <td className="px-5 py-4 text-gray-600">
-                        {item?.quantity
-                          ? `${item.quantity} ${item.unit || ""}`
-                          : "-"}
+                      <td className="px-5 py-4">
+                        {item?.quantity ? (
+                          <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                            {item.quantity} {item.unit || ""}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">-</span>
+                        )}
                       </td>
 
                       <td className="px-5 py-4 text-center">
-                        <input
-                          type="number"
-                          min="1"
-                          value={qty}
-                          onChange={(e) =>
-                            handleQuantityChange(index, e.target.value)
-                          }
-                          className="h-9 w-20 rounded-md border border-gray-200 bg-white px-2 text-center text-sm font-medium text-gray-700 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
-                        />
+                        <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white shadow-sm">
+                          <input
+                            type="number"
+                            min="1"
+                            value={qty}
+                            onChange={(e) =>
+                              handleQuantityChange(index, e.target.value)
+                            }
+                            className="h-9 w-20 rounded-lg bg-transparent px-2 text-center text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+                          />
+
+                          <Pencil size={13} className="mr-2 text-slate-300" />
+                        </div>
                       </td>
 
-                      <td className="px-5 py-4 text-right text-gray-600">
+                      <td className="px-5 py-4 text-right font-medium text-slate-600">
                         ₹{price.toFixed(2)}
                       </td>
 
-                      <td className="px-5 py-4 text-right font-semibold text-gray-800">
+                      <td className="px-5 py-4 text-right font-bold text-slate-800">
                         ₹{subtotal.toFixed(2)}
                       </td>
                     </tr>
@@ -497,11 +575,20 @@ const SpecialOrderDetails = () => {
                 })
               ) : (
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="px-5 py-10 text-center text-sm text-gray-400"
-                  >
-                    No products found
+                  <td colSpan="6" className="px-5 py-14 text-center">
+                    <div className="mx-auto flex max-w-xs flex-col items-center">
+                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+                        <Package size={22} className="text-slate-400" />
+                      </div>
+
+                      <p className="text-sm font-semibold text-slate-700">
+                        No products found
+                      </p>
+
+                      <p className="mt-1 text-xs text-slate-400">
+                        This order does not contain any products.
+                      </p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -510,58 +597,61 @@ const SpecialOrderDetails = () => {
         </div>
 
         {/* Total */}
-        <div className="flex justify-end border-t border-gray-100 bg-gray-50 px-5 py-4">
-          <div className="flex items-center gap-8">
-            <span className="text-sm font-medium text-gray-600">
-              Order Total
-            </span>
+        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/70 px-5 py-4">
+          <div>
+            <p className="text-xs font-medium text-slate-400">
+              {totalItems} total items
+            </p>
 
-            <span className="text-lg font-bold text-gray-800">
-              ₹
-              {cart
-                .reduce(
-                  (total, cartItem) =>
-                    total +
-                    Number(cartItem?.qty || 0) *
-                      Number(cartItem?.item?.price || 0),
-                  0,
-                )
-                .toFixed(2)}
-            </span>
+            <p className="mt-0.5 text-sm font-semibold text-slate-700">
+              Order Total
+            </p>
           </div>
+
+          <p className="text-xl font-bold tracking-tight text-slate-900">
+            ₹{calculatedTotal.toFixed(2)}
+          </p>
         </div>
       </div>
 
-      {/* Update Actions */}
+      {/* Sticky Actions */}
       {isEditing && (
-        <div className="sticky bottom-4 z-10 flex flex-col items-center justify-between gap-3 rounded-xl border border-blue-100 bg-white p-4 shadow-lg sm:flex-row">
-          <div>
-            <p className="text-sm font-semibold text-gray-800">
-              Unsaved changes
-            </p>
+        <div className="fixed bottom-4 left-4 right-4 z-20 mx-auto max-w-7xl">
+          <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-white/95 p-4 shadow-[0_10px_40px_rgba(15,23,42,0.14)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <Pencil size={15} />
+              </div>
 
-            <p className="mt-0.5 text-xs text-gray-500">
-              Quantity or payment mode has been modified.
-            </p>
-          </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">
+                  Unsaved changes
+                </p>
 
-          <div className="flex w-full gap-2 sm:w-auto">
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 sm:flex-none"
-            >
-              Cancel
-            </button>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Quantity or payment mode has been modified.
+                </p>
+              </div>
+            </div>
 
-            <button
-              type="button"
-              onClick={handleUpdateAndApprove}
-              className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 sm:flex-none"
-            >
-              <Check size={16} />
-              Update & Approve
-            </button>
+            <div className="flex w-full gap-2 sm:w-auto">
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="flex-1 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-800 sm:flex-none"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleUpdateAndApprove}
+                className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:bg-blue-800 sm:flex-none"
+              >
+                <Check size={16} />
+                Update & Approve
+              </button>
+            </div>
           </div>
         </div>
       )}
