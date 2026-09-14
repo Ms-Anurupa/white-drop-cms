@@ -87,6 +87,21 @@ const specialOrderStore = create((set) => ({
       throw error;
     }
   },
+
+  approveAndUpdateSpecialRequest: async (payload) => {
+    try {
+      const res = await api.post(
+        "/admin/approveAndUpdateSpecialRequest",
+        payload,
+        {
+          withAuth: true,
+        },
+      );
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 }));
 
 export default specialOrderStore;

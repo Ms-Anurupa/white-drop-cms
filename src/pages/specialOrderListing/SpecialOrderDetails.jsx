@@ -12,6 +12,7 @@ import {
   Pencil,
   Check,
 } from "lucide-react";
+import { toast } from "react-toastify";
 import specialOrderStore from "@/zustand/Store/specialOrderStore";
 import { resolveFirebaseUrl } from "@/utils/resolveUrl";
 
@@ -24,9 +25,13 @@ const SpecialOrderDetails = () => {
   const getSpecialOrderDetails = specialOrderStore(
     (state) => state.getSpecialOrderDetails,
   );
+  const approveAndUpdateSpecialRequest = specialOrderStore(
+    (state) => state.approveAndUpdateSpecialRequest,
+  );
   const [paymentMode, setPaymentMode] = useState("");
   const [cart, setCart] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -44,6 +49,10 @@ const SpecialOrderDetails = () => {
         ? specialOrderDetails.cart.map((cartItem) => ({
             ...cartItem,
             qty: Number(cartItem?.qty || 0),
+            item: {
+              ...cartItem?.item,
+              price: Number(cartItem?.item?.price || 0),
+            },
           }))
         : [],
     );
@@ -118,23 +127,80 @@ const SpecialOrderDetails = () => {
     setIsEditing(true);
   };
 
+  const handlePriceChange = (index, value) => {
+    const price = Math.max(0, Number(value) || 0);
+
+    setCart((prev) =>
+      prev.map((cartItem, itemIndex) =>
+        itemIndex === index
+          ? {
+              ...cartItem,
+              item: {
+                ...cartItem.item,
+                price,
+              },
+            }
+          : cartItem,
+      ),
+    );
+
+    setIsEditing(true);
+  };
+
   const handlePaymentChange = (value) => {
     setPaymentMode(value);
     setIsEditing(true);
   };
 
-  const handleUpdateAndApprove = () => {
-    const payload = {
-      reqId: id,
-      paymentMode,
-      cart: cart.map((cartItem) => ({
-        qty: Number(cartItem?.qty || 0),
-        item: cartItem?.item,
-      })),
-      status: "APPROVED",
-    };
+  const handleUpdateAndApprove = async () => {
+    try {
+      setIsSubmitting(true);
 
-    console.log("Update & Approve Payload:", payload);
+      const updatedCart = cart.map((cartItem) => ({
+        qty: Number(cartItem?.qty || 0),
+        item: {
+          ...cartItem?.item,
+          price: Number(cartItem?.item?.price || 0),
+        },
+      }));
+
+      const updatedOrderTotal = updatedCart.reduce(
+        (total, cartItem) =>
+          total +
+          Number(cartItem?.qty || 0) * Number(cartItem?.item?.price || 0),
+        0,
+      );
+
+      const updatedPaymentMode = paymentMode;
+
+      const payload = {
+        requestId: id,
+        updatedCart,
+        updatedOrderTotal,
+        updatedPaymentMode,
+      };
+
+      console.log("Update & Approve Payload:", payload);
+
+      await approveAndUpdateSpecialRequest(payload);
+
+      toast.success("Special order updated successfully");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Update & Approve Error:", error);
+
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.data?.message ||
+        error?.response?.data?.data?.error ||
+        error?.message ||
+        "Failed to update the special order request";
+
+      toast.error(backendMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -145,6 +211,10 @@ const SpecialOrderDetails = () => {
         ? specialOrderDetails.cart.map((cartItem) => ({
             ...cartItem,
             qty: Number(cartItem?.qty || 0),
+            item: {
+              ...cartItem?.item,
+              price: Number(cartItem?.item?.price || 0),
+            },
           }))
         : [],
     );
@@ -182,6 +252,7 @@ const SpecialOrderDetails = () => {
   }
 
   const customerName = specialOrderDetails?.user?.customer_name || "-";
+
   const phone = specialOrderDetails?.user?.phone_num || "-";
 
   const totalItems = cart.reduce(
@@ -238,8 +309,9 @@ const SpecialOrderDetails = () => {
             <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
               Order Total
             </p>
+
             <p className="text-sm font-bold text-slate-900">
-              ₹{Number(specialOrderDetails?.orderTotal || 0).toFixed(2)}
+              ₹{calculatedTotal.toFixed(2)}
             </p>
           </div>
         </div>
@@ -257,8 +329,9 @@ const SpecialOrderDetails = () => {
               <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 Payment Mode
               </p>
+
               <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
-                {specialOrderDetails?.paymentMode || "-"}
+                {paymentMode || "-"}
               </p>
             </div>
           </div>
@@ -274,6 +347,7 @@ const SpecialOrderDetails = () => {
               <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 Total Items
               </p>
+
               <p className="mt-0.5 text-sm font-semibold text-slate-800">
                 {totalItems}
               </p>
@@ -291,6 +365,7 @@ const SpecialOrderDetails = () => {
               <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 Order Date
               </p>
+
               <p className="mt-0.5 text-sm font-semibold text-slate-800">
                 {formatDate(specialOrderDetails?.createdAt)}
               </p>
@@ -308,6 +383,7 @@ const SpecialOrderDetails = () => {
               <h2 className="text-sm font-bold text-slate-800">
                 Customer Details
               </h2>
+
               <p className="mt-0.5 text-xs text-slate-400">
                 Customer information
               </p>
@@ -328,6 +404,7 @@ const SpecialOrderDetails = () => {
                 <p className="text-[11px] font-medium text-slate-400">
                   Customer Name
                 </p>
+
                 <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
                   {customerName}
                 </p>
@@ -343,6 +420,7 @@ const SpecialOrderDetails = () => {
                 <p className="text-[11px] font-medium text-slate-400">
                   Phone Number
                 </p>
+
                 <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
                   {phone}
                 </p>
@@ -358,6 +436,7 @@ const SpecialOrderDetails = () => {
                 <p className="text-[11px] font-medium text-slate-400">
                   Customer Type
                 </p>
+
                 <p className="mt-0.5 truncate text-sm font-semibold text-slate-800">
                   {specialOrderDetails?.user?.customer_type || "Customer"}
                 </p>
@@ -373,6 +452,7 @@ const SpecialOrderDetails = () => {
               <h2 className="text-sm font-bold text-slate-800">
                 Order Information
               </h2>
+
               <p className="mt-0.5 text-xs text-slate-400">
                 Payment and creation details
               </p>
@@ -387,6 +467,7 @@ const SpecialOrderDetails = () => {
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
               <div className="mb-2 flex items-center gap-2">
                 <CreditCard size={15} className="text-blue-600" />
+
                 <p className="text-[11px] font-medium text-slate-400">
                   Payment Mode
                 </p>
@@ -405,6 +486,7 @@ const SpecialOrderDetails = () => {
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
               <div className="mb-2 flex items-center gap-2">
                 <CalendarDays size={15} className="text-orange-600" />
+
                 <p className="text-[11px] font-medium text-slate-400">
                   Created Date
                 </p>
@@ -418,6 +500,7 @@ const SpecialOrderDetails = () => {
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
               <div className="mb-2 flex items-center gap-2">
                 <Clock3 size={15} className="text-violet-600" />
+
                 <p className="text-[11px] font-medium text-slate-400">
                   Created Time
                 </p>
@@ -446,10 +529,11 @@ const SpecialOrderDetails = () => {
             </div>
 
             <p className="mt-1 pl-10 text-xs text-slate-400">
-              Adjust quantities before approving the order.
+              Adjust quantity and price before approving the order.
             </p>
           </div>
 
+          {/* Auto calculated total */}
           <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 sm:justify-end">
             <span className="text-xs font-medium text-slate-500">
               Current Total
@@ -462,7 +546,7 @@ const SpecialOrderDetails = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[850px] text-sm">
+          <table className="w-full min-w-[950px] text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/80">
                 <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
@@ -504,6 +588,7 @@ const SpecialOrderDetails = () => {
                       key={item?.variant_id || item?.product_id || index}
                       className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50/60"
                     >
+                      {/* Product */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
@@ -533,10 +618,12 @@ const SpecialOrderDetails = () => {
                         </div>
                       </td>
 
+                      {/* Package */}
                       <td className="px-5 py-4 text-slate-600">
                         {item?.package || "-"}
                       </td>
 
+                      {/* Product Size */}
                       <td className="px-5 py-4">
                         {item?.quantity ? (
                           <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
@@ -547,6 +634,7 @@ const SpecialOrderDetails = () => {
                         )}
                       </td>
 
+                      {/* Quantity */}
                       <td className="px-5 py-4 text-center">
                         <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white shadow-sm">
                           <input
@@ -563,10 +651,27 @@ const SpecialOrderDetails = () => {
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-right font-medium text-slate-600">
-                        ₹{price.toFixed(2)}
+                      {/* Editable Price */}
+                      <td className="px-5 py-4 text-right">
+                        <div className="inline-flex items-center gap-1">
+                          <span className="text-sm text-slate-400">₹</span>
+
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={price}
+                            onChange={(e) =>
+                              handlePriceChange(index, e.target.value)
+                            }
+                            className="h-9 w-24 rounded-lg border border-slate-200 bg-white px-2.5 text-right text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                          />
+
+                          <Pencil size={13} className="text-slate-300" />
+                        </div>
                       </td>
 
+                      {/* Auto calculated Subtotal */}
                       <td className="px-5 py-4 text-right font-bold text-slate-800">
                         ₹{subtotal.toFixed(2)}
                       </td>
@@ -629,7 +734,7 @@ const SpecialOrderDetails = () => {
                 </p>
 
                 <p className="mt-0.5 text-xs text-slate-500">
-                  Quantity or payment mode has been modified.
+                  Quantity, price, or payment mode has been modified.
                 </p>
               </div>
             </div>
@@ -638,7 +743,8 @@ const SpecialOrderDetails = () => {
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="flex-1 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-800 sm:flex-none"
+                disabled={isSubmitting}
+                className="flex-1 cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
               >
                 Cancel
               </button>
@@ -646,10 +752,12 @@ const SpecialOrderDetails = () => {
               <button
                 type="button"
                 onClick={handleUpdateAndApprove}
-                className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:bg-blue-800 sm:flex-none"
+                disabled={isSubmitting}
+                className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
               >
                 <Check size={16} />
-                Update & Approve
+
+                {isSubmitting ? "Updating..." : "Update & Approve"}
               </button>
             </div>
           </div>
