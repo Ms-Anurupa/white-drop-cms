@@ -18,6 +18,7 @@ import {
   Clock3,
 } from "lucide-react";
 import adhocOrderStore from "@/zustand/Store/adhocOrderStore";
+import Loader from "@/components/Loader";
 
 const AdhocOrders = () => {
   const getAdHocSaleListing = adhocOrderStore(
@@ -186,6 +187,10 @@ const AdhocOrders = () => {
   const handleRefresh = () => {
     fetchOrders();
   };
+
+  if (loading) {
+    return <Loader text="Loading Adhoc order history lists..." />;
+  }
 
   return (
     <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3 dark:bg-slate-950">

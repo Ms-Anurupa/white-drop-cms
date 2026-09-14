@@ -23,7 +23,6 @@ import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
 
 const menu = [
-  // 0-6: Main Menu items
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, end: true },
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
@@ -33,16 +32,21 @@ const menu = [
     path: "subscription-orders",
     icon: ShoppingCart,
   },
-  { name: "Corporate Orders", path: "corporate-orders", icon: ClipboardList },
+  {
+    name: "Corporate Orders",
+    path: "corporate-orders",
+    icon: ClipboardList,
+  },
   { name: "Adhoc Orders", path: "adhoc-orders", icon: SquarePlus },
-  { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
-
-  // 7-9: Operations items (Packaging Job placed here, above Delivery Job section)
+  { name: "Special Orders", path: "special-orders", icon: SquarePlus },
+  {
+    name: "Corporate Accounts",
+    path: "corporate-accounts",
+    icon: ReceiptText,
+  },
   { name: "Production", path: "production", icon: Factory },
   { name: "Inventory", path: "inventory", icon: Boxes },
   { name: "Packaging Job", path: "packaging-job", icon: PackageIcon },
-
-  // 10-12: Delivery Executive Details
   { name: "Delivery Job", path: "delivery-job", icon: Truck },
   { name: "Delivery Tracking", path: "delivery-tracking", icon: Truck },
   {
@@ -50,17 +54,16 @@ const menu = [
     path: "deliveryPartners",
     icon: PackageCheck,
   },
-
-  // 13-14: Offers
   { name: "Offers", path: "offers", icon: HelpingHand },
   { name: "Offer Type", path: "offerType", icon: HelpingHand },
-
-  // 15-16: Help
-  { name: "Customer Helpline", path: "customerHelpLine", icon: HelpingHand },
+  {
+    name: "Customer Helpline",
+    path: "customerHelpLine",
+    icon: HelpingHand,
+  },
   { name: "Service Manager", path: "support", icon: Headset },
 ];
 
-/* ─── shared link renderer ─────────────────────────────────────────────── */
 const NavItem = ({ item, onClick, collapsed }) => {
   const Icon = item.icon;
 
@@ -99,25 +102,30 @@ const NavItem = ({ item, onClick, collapsed }) => {
   );
 };
 
-/* ─── main component ────────────────────────────────────────────────────── */
 const Sidebar = ({ onLogOut }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const user = authStore((state) => state.user);
-  const close = () => setMobileOpen(false);
 
-  /* inner sidebar body — reused for both desktop and mobile drawer */
-  const SidebarBody = ({ onNavClick, onLogOut }) => (
-    <div className="flex flex-col h-full">
+  const close = () => {
+    setMobileOpen(false);
+  };
+
+  const SidebarBody = ({ onNavClick, onLogOut, isMobile = false }) => (
+    <div className="flex flex-col h-full min-h-0">
       {/* Logo */}
       <div
         className={`h-14 flex items-center ${
-          collapsed ? "justify-center" : "justify-between"
+          collapsed && !isMobile ? "justify-center" : "justify-between"
         } px-4 border-b border-slate-100 shrink-0`}
       >
-        {!collapsed && (
-          <div className="flex items-center gap-2.5">
-            <img src={logo} alt="Logo" className="h-16 object-contain" />
+        {(!collapsed || isMobile) && (
+          <div className="flex items-center gap-2.5 min-w-0">
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-12 sm:h-14 w-auto object-contain shrink-0"
+            />
 
             <span className="text-xl font-semibold text-gray-900 tracking-tight">
               CMS
@@ -125,122 +133,142 @@ const Sidebar = ({ onLogOut }) => {
           </div>
         )}
 
-        {collapsed && (
-          <img src={logo} alt="Logo" className="h-10 object-contain" />
+        {collapsed && !isMobile && (
+          <img src={logo} alt="Logo" className="h-10 w-auto object-contain" />
         )}
 
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="hidden cursor-pointer lg:flex p-2 rounded-lg hover:bg-slate-100 transition"
-        >
-          <Menu size={18} />
-        </button>
+        {!isMobile && (
+          <button
+            type="button"
+            onClick={() => setCollapsed((prev) => !prev)}
+            className="hidden lg:flex cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition"
+          >
+            <Menu size={18} />
+          </button>
+        )}
       </div>
 
-      {/* Nav */}
+      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {/* MAIN MENU */}
         {!collapsed && (
           <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Main menu
           </p>
         )}
-        {menu.slice(0, 7).map((item) => (
+        {menu.slice(0, 8).map((item) => (
           <NavItem
             key={item.path}
             item={item}
             onClick={onNavClick}
-            collapsed={collapsed}
+            collapsed={collapsed && !isMobile}
           />
         ))}
 
-        {/* OPERATIONS */}
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Operations
           </p>
         )}
-        {menu.slice(7, 10).map((item) => (
+
+        {menu.slice(8, 10).map((item) => (
           <NavItem
             key={item.path}
             item={item}
             onClick={onNavClick}
-            collapsed={collapsed}
+            collapsed={collapsed && !isMobile}
           />
         ))}
 
-        {/* DELIVERY EXECUTIVE DETAILS */}
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Delivery Executive Details
           </p>
         )}
+
         {menu.slice(10, 13).map((item) => (
           <NavItem
             key={item.path}
             item={item}
             onClick={onNavClick}
-            collapsed={collapsed}
+            collapsed={collapsed && !isMobile}
           />
         ))}
 
-        {/* OFFERS */}
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Offers
           </p>
         )}
+
         {menu.slice(13, 15).map((item) => (
           <NavItem
             key={item.path}
             item={item}
             onClick={onNavClick}
-            collapsed={collapsed}
+            collapsed={collapsed && !isMobile}
           />
         ))}
 
-        {/* HELP */}
         {!collapsed && (
           <p className="px-3 mt-5 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
             Help
           </p>
         )}
+
         {menu.slice(15, 17).map((item) => (
           <NavItem
             key={item.path}
             item={item}
             onClick={onNavClick}
-            collapsed={collapsed}
+            collapsed={collapsed && !isMobile}
           />
         ))}
       </nav>
 
       {/* Mobile Logout */}
-      <div className="lg:hidden px-4 pb-3">
-        <button
-          onClick={onLogOut}
-          className="w-full cursor-pointer rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
-        >
-          Logout
-        </button>
-      </div>
+      {isMobile && (
+        <div className="lg:hidden px-4 pb-3 shrink-0">
+          <button
+            type="button"
+            onClick={onLogOut}
+            className="
+              w-full
+              cursor-pointer
+              rounded-lg
+              border
+              border-red-200
+              bg-red-50
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-red-600
+              hover:bg-red-100
+              transition-colors
+            "
+          >
+            Logout
+          </button>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="shrink-0 px-4 py-3 border-t border-slate-100">
         <div
           className={`flex items-center ${
-            collapsed ? "justify-center" : "gap-3"
+            collapsed && !isMobile ? "justify-center" : "gap-3"
           }`}
         >
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
-            {user?.first_name?.charAt(0)?.toUpperCase()}
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
+            {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
           </div>
 
-          {!collapsed && (
+          {(!collapsed || isMobile) && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-800 truncate">
                 {user?.first_name} {user?.last_name}
               </p>
+
               <p className="text-[11px] text-gray-400 truncate">
                 {user?.email}
               </p>
@@ -253,56 +281,141 @@ const Sidebar = ({ onLogOut }) => {
 
   return (
     <>
-      {/* ── MOBILE TOP BAR ──────────────────────────────────────────────── */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-white border-b border-slate-100 flex items-center px-4 gap-3">
+      {/* Mobile Top Bar */}
+      <div
+        className="
+          lg:hidden
+          fixed
+          top-0
+          left-0
+          right-0
+          z-[60]
+          h-14
+          bg-white
+          border-b
+          border-slate-100
+          flex
+          items-center
+          px-3
+          sm:px-4
+          gap-3
+        "
+      >
         <button
+          type="button"
           onClick={() => setMobileOpen(true)}
-          className="p-1.5 cursor-pointer rounded-lg text-gray-500 hover:bg-slate-100 transition-colors"
+          className="
+            flex
+            items-center
+            justify-center
+            w-9
+            h-9
+            p-1.5
+            cursor-pointer
+            rounded-lg
+            text-gray-500
+            hover:bg-slate-100
+            active:bg-slate-100
+            transition-colors
+            shrink-0
+          "
           aria-label="Open menu"
         >
-          <Menu size={20} />
+          <Menu size={21} />
         </button>
-        <span className="text-base font-semibold text-gray-900 tracking-tight">
-          CMS{" "}
-          <span className="text-blue-600">
-            {user?.first_name} {user?.last_name}
+
+        <div className="flex items-center min-w-0">
+          <span className="text-base font-semibold text-gray-900 tracking-tight truncate">
+            CMS
           </span>
-        </span>
+
+          <span className="text-base font-semibold text-blue-600 ml-1 truncate">
+            {user?.first_name || ""}
+          </span>
+        </div>
       </div>
 
-      {/* ── MOBILE DRAWER BACKDROP ──────────────────────────────────────── */}
+      {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          className="
+            lg:hidden
+            fixed
+            inset-0
+            z-[70]
+            bg-black/30
+            backdrop-blur-sm
+          "
           onClick={close}
           aria-hidden="true"
         />
       )}
 
-      {/* ── MOBILE DRAWER ───────────────────────────────────────────────── */}
+      {/* Mobile Drawer */}
       <div
         className={[
-          "lg:hidden fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-slate-100 shadow-xl",
-          "transition-transform duration-200 ease-in-out",
+          "lg:hidden",
+          "fixed",
+          "top-0",
+          "left-0",
+          "z-[80]",
+          "h-[100dvh]",
+          "w-[280px]",
+          "max-w-[85vw]",
+          "bg-white",
+          "border-r",
+          "border-slate-100",
+          "shadow-2xl",
+          "transition-transform",
+          "duration-300",
+          "ease-in-out",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
       >
-        {/* Close button */}
+        {/* Close Button */}
         <button
+          type="button"
           onClick={close}
-          className="absolute cursor-pointer top-3.5 right-3 p-1.5 rounded-lg text-gray-400 hover:bg-slate-100 transition-colors"
+          className="
+            absolute
+            cursor-pointer
+            top-3
+            right-3
+            z-10
+            w-8
+            h-8
+            flex
+            items-center
+            justify-center
+            rounded-lg
+            text-gray-400
+            hover:bg-slate-100
+            hover:text-gray-700
+            transition-colors
+          "
           aria-label="Close menu"
         >
-          <X size={18} />
+          <X size={19} />
         </button>
-        <SidebarBody onNavClick={close} onLogOut={onLogOut} />
+
+        <SidebarBody onNavClick={close} onLogOut={onLogOut} isMobile={true} />
       </div>
 
-      {/* ── DESKTOP SIDEBAR ─────────────────────────────────────────────── */}
+      {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col h-screen bg-white border-r border-slate-100 shrink-0 transition-all duration-300 ${
-          collapsed ? "w-20" : "w-60"
-        }`}
+        className={`
+          hidden
+          lg:flex
+          flex-col
+          h-screen
+          bg-white
+          border-r
+          border-slate-100
+          shrink-0
+          transition-all
+          duration-300
+          ${collapsed ? "w-20" : "w-60"}
+        `}
       >
         <SidebarBody onLogOut={onLogOut} />
       </aside>

@@ -676,12 +676,10 @@ const Order = () => {
     return pages;
   };
 
-  if (loading) {
-    return <Loader text="Loading order history lists..." />;
-  }
 
   return (
-    <div className="p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
+    <div className="relative p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
+      
       <PageStyles />
 
       {/* HEADER */}
