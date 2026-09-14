@@ -14,6 +14,7 @@ import {
   CalendarDays,
   X,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import inventoryStore from "@/zustand/Store/inventoryStore";
 import { useNavigate } from "react-router-dom";
@@ -387,6 +388,10 @@ export default function Inventory() {
     );
   }
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <div
       className="min-h-screen lg:p-6 md:p-6 space-y-5"
@@ -398,7 +403,8 @@ export default function Inventory() {
             Inventory
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Daily opening and closing milk stock, production, and wastage tracking
+            Daily opening and closing milk stock, production, and wastage
+            tracking
           </p>
         </div>
 
@@ -495,6 +501,16 @@ export default function Inventory() {
               Clear
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap border rounded-md bg-white"
+            style={{ borderColor: LINE }}
+          >
+            <RefreshCw size={14} />
+            Refresh
+          </button>
         </div>
 
         {(startDate || endDate) && !(startDate && endDate) && (
@@ -627,11 +643,17 @@ export default function Inventory() {
                       {/* Actions Column */}
                       <TableCell className="p-4 text-right">
                         {isClosed ? (
-                          <ActionButton variant="outline" onClick={() => handleRowAction(item, "view")}>
+                          <ActionButton
+                            variant="outline"
+                            onClick={() => handleRowAction(item, "view")}
+                          >
                             View
                           </ActionButton>
                         ) : (
-                          <ActionButton variant="solid" onClick={() => handleRowAction(item, "closing")}>
+                          <ActionButton
+                            variant="solid"
+                            onClick={() => handleRowAction(item, "closing")}
+                          >
                             Closing Entry
                           </ActionButton>
                         )}

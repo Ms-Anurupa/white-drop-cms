@@ -334,17 +334,17 @@ const AddInventory = () => {
                 }`}
               />
               {isDateLocked ? (
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-red-400 font-bold">
                   Closing entry date matches the recorded opening date.
                 </p>
               ) : (
                 <>
                   {usedDates.size > 0 && (
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-red-400 font-bold">
                       Dates that already have an entry can't be selected.
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-red-400 font-bold">
                     Entries are limited to the past 72 hours.
                   </p>
                 </>
@@ -376,7 +376,7 @@ const AddInventory = () => {
                 <option value="G">Gram (G)</option>
               </select>
               {entryType === "CLOSING" && (
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-red-400 font-bold">
                   Unit matches the recorded opening entry.
                 </p>
               )}
@@ -508,7 +508,7 @@ const AddInventory = () => {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    placeholder="End of day count"
+                    placeholder="Enter closing quantity"
                     required={entryType === "CLOSING"}
                     className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
@@ -534,7 +534,6 @@ const AddInventory = () => {
                   />
                 </div>
 
-                
                 <div className="md:col-span-2">
                   <label
                     htmlFor="wastageNote"
