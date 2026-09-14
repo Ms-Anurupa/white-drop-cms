@@ -46,6 +46,7 @@ import SubscriptionOrder from "./pages/subscriptionOrder/SubscriptionOrder";
 import AddInventory from "./components/AddInventory";
 import UpdateInventory from "./components/UpdateInventory";
 import PackagingJob from "./components/PackagingJob";
+import AdhocOrders from "./pages/adhocOrders/AdhocOrders";
 
 const App = () => {
   return (
@@ -83,6 +84,7 @@ const App = () => {
                 <Route path="customer" element={<Customer />} />
                 <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
+                <Route path="adhoc-orders" element={<AdhocOrders />} />
                 <Route path="subscription-orders" element={<SubscriptionOrder />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
                 <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />

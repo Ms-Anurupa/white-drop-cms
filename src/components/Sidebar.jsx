@@ -17,6 +17,7 @@ import {
   X,
   PackageCheck,
   PackageIcon,
+  SquarePlus,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
@@ -26,13 +27,14 @@ const menu = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, end: true },
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
-  { name: "Orders", path: "orders", icon: ShoppingCart },
+  { name: "Mini Orders", path: "orders", icon: ShoppingCart },
   {
     name: "Subscription Orders",
     path: "subscription-orders",
     icon: ShoppingCart,
   },
   { name: "Corporate Orders", path: "corporate-orders", icon: ClipboardList },
+  { name: "Adhoc Orders", path: "adhoc-orders", icon: SquarePlus },
   { name: "Corporate Accounts", path: "corporate-accounts", icon: ReceiptText },
 
   // 7-9: Operations items (Packaging Job placed here, above Delivery Job section)
