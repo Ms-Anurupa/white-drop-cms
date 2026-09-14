@@ -24,6 +24,7 @@ import authStore from "../zustand/Store/authStore";
 
 const menu = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, end: true },
+  { name: "Sales", path: "sales", icon: LayoutDashboard},
   { name: "Product", path: "product", icon: Package },
   { name: "Customers", path: "customer", icon: Users },
   { name: "Mini Orders", path: "orders", icon: ShoppingCart },
@@ -155,7 +156,7 @@ const Sidebar = ({ onLogOut }) => {
             Main menu
           </p>
         )}
-        {menu.slice(0, 8).map((item) => (
+        {menu.slice(0, 9).map((item) => (
           <NavItem
             key={item.path}
             item={item}
@@ -170,7 +171,7 @@ const Sidebar = ({ onLogOut }) => {
           </p>
         )}
 
-        {menu.slice(8, 10).map((item) => (
+        {menu.slice(9, 10).map((item) => (
           <NavItem
             key={item.path}
             item={item}
@@ -200,7 +201,7 @@ const Sidebar = ({ onLogOut }) => {
           </p>
         )}
 
-        {menu.slice(13, 15).map((item) => (
+        {menu.slice(13, 16).map((item) => (
           <NavItem
             key={item.path}
             item={item}
@@ -215,7 +216,7 @@ const Sidebar = ({ onLogOut }) => {
           </p>
         )}
 
-        {menu.slice(15, 17).map((item) => (
+        {menu.slice(16, 24).map((item) => (
           <NavItem
             key={item.path}
             item={item}

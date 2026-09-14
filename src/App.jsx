@@ -49,6 +49,7 @@ import PackagingJob from "./components/PackagingJob";
 import AdhocOrders from "./pages/adhocOrders/AdhocOrders";
 import SpecialOrderListing from "./pages/specialOrderListing/SpecialOrderListing";
 import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails";
+import Sales from "./pages/sales/Sales";
 
 const App = () => {
   return (
@@ -84,6 +85,7 @@ const App = () => {
                   element={<EditProduct />}
                 />
                 <Route path="customer" element={<Customer />} />
+                <Route path="sales" element={<Sales />} />
                 <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
