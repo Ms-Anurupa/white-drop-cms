@@ -11,6 +11,7 @@ import {
   PackageSearch,
   Loader2,
   Clock3,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -39,6 +40,29 @@ const STATUS_DOT = {
   PROCESSING: "bg-amber-500",
   CANCELLED: "bg-red-500",
   FAILED: "bg-red-500",
+};
+
+const PAYMENT_STATUS_STYLES = {
+  COMPLETE: {
+    dot: "bg-emerald-500",
+    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  },
+  PENDING: {
+    dot: "bg-amber-500",
+    badge: "bg-amber-50 text-amber-700 border-amber-200",
+  },
+  FAILED: {
+    dot: "bg-red-500",
+    badge: "bg-red-50 text-red-700 border-red-200",
+  },
+  POSTPAID: {
+    dot: "bg-blue-500",
+    badge: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  FAILED_AUTH: {
+    dot: "bg-orange-500",
+    badge: "bg-orange-50 text-orange-700 border-orange-200",
+  },
 };
 
 const formatDate = (value) => {
@@ -257,38 +281,28 @@ const PageStyles = () => (
 
 const Order = () => {
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
-
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
   );
-
   const updateOrderStatus = orderDataStore((state) => state.updateOrderStatus);
-
   const orders = orderDataStore((state) => state.orders);
   const meta = orderDataStore((state) => state.meta);
   const orderSummary = orderDataStore((state) => state.orderSummary);
   const loading = orderDataStore((state) => state.loading);
-
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
-
   const [dateFilter, setDateFilter] = useState("all");
-
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-
   const [appliedFromDate, setAppliedFromDate] = useState("");
   const [appliedToDate, setAppliedToDate] = useState("");
-
   const [updatingId, setUpdatingId] = useState(null);
-
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null);
-
+  const [refreshing, setRefreshing] = useState(false);
   const popoverRef = useRef(null);
 
   const navigate = useNavigate();
@@ -300,11 +314,29 @@ const Order = () => {
 
     setHoveredOrder({
       order,
+      type: "customer",
       anchor,
     });
   };
 
   const hideAddressPopover = () => {
+    setHoveredOrder(null);
+    setPopoverPos(null);
+  };
+
+  const showPopover = (e, order, type) => {
+    const anchor = e.currentTarget.getBoundingClientRect();
+
+    setPopoverPos(null);
+
+    setHoveredOrder({
+      order,
+      type,
+      anchor,
+    });
+  };
+
+  const hidePopover = () => {
     setHoveredOrder(null);
     setPopoverPos(null);
   };
@@ -315,11 +347,10 @@ const Order = () => {
     }
 
     const { anchor } = hoveredOrder;
-
     const { width, height } = popoverRef.current.getBoundingClientRect();
 
     const margin = 12;
-    const gap = 8;
+    const gap = 2;
 
     let left = anchor.left;
 
@@ -336,7 +367,6 @@ const Order = () => {
 
     if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
       top = anchor.bottom + gap;
-
       top = Math.min(top, window.innerHeight - margin - height);
     } else {
       top = anchor.top - height - gap;
@@ -525,6 +555,28 @@ const Order = () => {
 
   const paginated = Array.isArray(orders) ? orders : [];
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      await getOrderListing({
+        status: status || "",
+        search: debouncedSearch || "",
+        page: currentPage,
+        limit: pageSize,
+        fromDate: appliedFromDate || "",
+        toDate: appliedToDate || "",
+      });
+
+      toast.success("Orders refreshed successfully");
+    } catch (error) {
+      // console.error("Failed to refresh orders:", error);
+      toast.error("Failed to refresh orders");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const handleExport = async () => {
     try {
       const file = await exportOrderDetails();
@@ -569,7 +621,7 @@ const Order = () => {
 
       await getOrderListing({
         status: status || "",
-        search: debouncedSearch  || "",
+        search: debouncedSearch || "",
         page: currentPage,
         limit: pageSize,
         fromDate: appliedFromDate || "",
@@ -670,13 +722,27 @@ const Order = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleExport}
-            className="h-10 px-4 flex items-center gap-2 rounded-lg shrink-0 bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
-          >
-            <Download size={16} />
-            Export
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-blue-600 text-white text-sm hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <RefreshCw
+                size={16}
+                className={refreshing ? "animate-spin" : ""}
+              />
+              Refresh
+            </button>
+
+            <button
+              onClick={handleExport}
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
+            >
+              <Download size={16} />
+              Export
+            </button>
+          </div>
         </div>
       </div>
 
@@ -881,7 +947,15 @@ const Order = () => {
                 </th>
 
                 <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Status
+                  Order Status
+                </th>
+
+                <th className="w-32 px-2.5 py-2.5 pl-6 text-right text-xs font-semibold text-gray-500">
+                  Payment Status
+                </th>
+
+                <th className="w-32 px-2.5 py-2.5 text-right text-xs font-semibold text-gray-500">
+                  Payment Mode
                 </th>
 
                 <th className="w-28 pl-5 pr-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
@@ -892,13 +966,13 @@ const Order = () => {
                   Created At
                 </th>
 
-                <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2.5 py-2.5 mr-6 text-left text-xs font-semibold text-gray-500">
                   Action
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 px-4">
               {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={9}>
@@ -907,13 +981,20 @@ const Order = () => {
                 </tr>
               ) : (
                 paginated.map((o, idx) => (
-                  <tr key={o.orderId} className="order-row hover:bg-slate-50">
+                  <tr
+                    key={o.orderId}
+                    className="order-row hover:bg-slate-50 px-4"
+                  >
                     <td className="px-2.5 py-2.5 text-gray-400">
                       {start + idx + 1}
                     </td>
 
-                    <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
-                      {o.orderId}
+                    <td
+                      className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis cursor-default"
+                      onMouseEnter={(e) => showPopover(e, o, "orderId")}
+                      onMouseLeave={hidePopover}
+                    >
+                      <span className="block truncate">{o.orderId}</span>
                     </td>
 
                     <td className="px-2.5 py-2.5">
@@ -934,8 +1015,8 @@ const Order = () => {
 
                     <td
                       className="px-2.5 py-2.5 text-gray-600 cursor-default"
-                      onMouseEnter={(e) => showAddressPopover(e, o)}
-                      onMouseLeave={hideAddressPopover}
+                      onMouseEnter={(e) => showAddressPopover(e, o, "customer")}
+                      onMouseLeave={hidePopover}
                     >
                       <p className="font-medium text-gray-800 truncate">
                         {o.user?.customer_name}
@@ -964,10 +1045,36 @@ const Order = () => {
                       />
                     </td>
 
-                    <td className="pl-5 pr-2.5 py-2.5">
+                    <td className="px-2.5 py-2.5 pl-12 pr-12 whitespace-nowrap">
+                      <PaymentStatusBadge status={o.paymentStatus} />
+                    </td>
+
+                    <td className="px-2.5 py-2.5 pl-12 pr-12 whitespace-nowrap">
+                      <span
+                        className={`font-bold ${
+                          o.paymentMode === "PG"
+                            ? "text-emerald-600"
+                            : o.paymentMode === "COD"
+                              ? "text-blue-900"
+                              : "text-gray-700"
+                        }`}
+                      >
+                        {o.paymentMode === "PG"
+                          ? "Paid"
+                          : o.paymentMode === "COD"
+                            ? "COD"
+                            : o.paymentMode || "-"}
+                      </span>
+                    </td>
+
+                    <td
+                      className="pl-5 pr-2.5 py-2.5 cursor-default"
+                      onMouseEnter={(e) => showPopover(e, o, "deliverySlot")}
+                      onMouseLeave={hidePopover}
+                    >
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-vissible">
+                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
                             {o.deliverySlot?.icon ? (
                               <img
                                 src={resolveFirebaseUrl({
@@ -1009,7 +1116,7 @@ const Order = () => {
                       </p>
                     </td>
 
-                    <td className="px-2.5 py-2.5">
+                    <td className="px-2.5 py-2.5 pr-6 m-6">
                       <button
                         onClick={() =>
                           navigate(`/dashboard/orders/orderDetails/${o.id}`)
@@ -1141,30 +1248,89 @@ const Order = () => {
                 }
           }
         >
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-            Delivery address
-          </p>
+          {hoveredOrder.type === "orderId" && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Order ID
+              </p>
 
-          <p className="text-sm font-medium text-gray-900">
-            {hoveredOrder.order.user?.customer_name}
-          </p>
+              <p className="text-sm font-semibold text-gray-900 break-all">
+                {hoveredOrder.order.orderId}
+              </p>
 
-          <p className="text-sm text-gray-500 mt-0.5">
-            {hoveredOrder.order.user?.phone_num}
-          </p>
+              <p className="text-xs text-gray-400">
+                Created: {formatDate(hoveredOrder.order.createdAt)}
+              </p>
+            </>
+          )}
 
-          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-            {[
-              hoveredOrder.order.shippingAddress?.apartment,
-              hoveredOrder.order.shippingAddress?.locality,
-              hoveredOrder.order.shippingAddress?.landmark,
-              hoveredOrder.order.shippingAddress?.city,
-              hoveredOrder.order.shippingAddress?.state,
-              hoveredOrder.order.shippingAddress?.pincode,
-            ]
-              .filter(Boolean)
-              .join(", ") || "No address details available"}
-          </p>
+          {hoveredOrder.type === "deliverySlot" && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Delivery Slot
+              </p>
+
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                  {hoveredOrder.order.deliverySlot?.icon ? (
+                    <img
+                      src={resolveFirebaseUrl({
+                        folderName: "public",
+                        fileName: hoveredOrder.order.deliverySlot.icon,
+                      })}
+                      alt={hoveredOrder.order.deliverySlot.name}
+                      className="w-4 h-4 object-contain"
+                    />
+                  ) : (
+                    <Clock3 size={14} className="text-blue-600" />
+                  )}
+                </span>
+
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {hoveredOrder.order.deliverySlot?.name || "—"}
+                  </p>
+
+                  {hoveredOrder.order.deliverySlot?.from &&
+                    hoveredOrder.order.deliverySlot?.to && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {hoveredOrder.order.deliverySlot.from} -{" "}
+                        {hoveredOrder.order.deliverySlot.to}
+                      </p>
+                    )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {hoveredOrder.type === "customer" && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                Delivery address
+              </p>
+
+              <p className="text-sm font-medium text-gray-900">
+                {hoveredOrder.order.user?.customer_name}
+              </p>
+
+              <p className="text-sm text-gray-500 mt-0.5">
+                {hoveredOrder.order.user?.phone_num}
+              </p>
+
+              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                {[
+                  hoveredOrder.order.shippingAddress?.apartment,
+                  hoveredOrder.order.shippingAddress?.locality,
+                  hoveredOrder.order.shippingAddress?.landmark,
+                  hoveredOrder.order.shippingAddress?.city,
+                  hoveredOrder.order.shippingAddress?.state,
+                  hoveredOrder.order.shippingAddress?.pincode,
+                ]
+                  .filter(Boolean)
+                  .join(", ") || "No address details available"}
+              </p>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -1255,6 +1421,29 @@ const StatusSelect = ({
         </span>
       </div>
     </SplitButton>
+  );
+};
+
+const PaymentStatusBadge = ({ status }) => {
+  const config = PAYMENT_STATUS_STYLES[status] || {
+    dot: "bg-gray-400",
+    badge: "bg-gray-50 text-gray-600 border-gray-200",
+  };
+
+  const label = status
+    ? status
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Unknown";
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold whitespace-nowrap ${config.badge}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+      {label}
+    </span>
   );
 };
 
