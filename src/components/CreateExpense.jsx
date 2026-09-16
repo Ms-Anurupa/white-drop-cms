@@ -369,7 +369,7 @@ export default function CreateExpense() {
           <button
             type="button"
             onClick={() => navigate("/dashboard/expense")}
-            className="mb-5 inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-slate-800"
+            className="cursor-pointer mb-5 inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-slate-800"
           >
             <ArrowLeft size={17} />
             Back to expenses
