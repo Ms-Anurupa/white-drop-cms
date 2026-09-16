@@ -98,7 +98,7 @@ const ExpenseListing = () => {
     )
       return;
 
-    const t = setTimeout(getExpenseListing, filters.vendor ? 400 : 0);
+    const t = setTimeout(getExpenseListing, filters.search ? 400 : 0);
     return () => clearTimeout(t);
   }, [
     filters.page,
@@ -107,7 +107,7 @@ const ExpenseListing = () => {
     filters.dateFilter,
     filters.dateFrom,
     filters.dateTo,
-    filters.vendor,
+    filters.search,
     getExpenseListing,
   ]);
 
@@ -180,7 +180,7 @@ const ExpenseListing = () => {
           <button
             type="button"
             onClick={resetFilters}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
+            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
           >
             <RotateCcw size={13} />
             Reset Filters
@@ -194,8 +194,8 @@ const ExpenseListing = () => {
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
-              value={filters.vendor}
-              onChange={(e) => setFilter("vendor", e.target.value)}
+              value={filters.search}
+              onChange={(e) => setFilter("search", e.target.value)}
               placeholder="Search vendor / supplier..."
               className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
@@ -332,7 +332,7 @@ const ExpenseListing = () => {
 
                     {/* Invoice & Supplier Details */}
                     <td className="px-4 py-3 font-medium text-slate-800">
-                      {expense.supplierName || expense.vendor || "—"}
+                      {expense.supplierName || expense.supplierName || "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-slate-600">
                       {expense.gstin || "—"}

@@ -18,7 +18,7 @@ const expenseStore = create((set, get) => ({
         dateFilter: "",
         dateFrom: "",
         dateTo: "",
-        vendor: "",
+        search: "",
     },
 
     getExpenseListing: async () => {
@@ -91,7 +91,7 @@ const expenseStore = create((set, get) => ({
                 dateFilter: "",
                 dateFrom: "",
                 dateTo: "",
-                vendor: "",
+                search: "",
             },
         }),
 
