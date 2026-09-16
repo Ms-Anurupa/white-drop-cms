@@ -284,7 +284,7 @@ const Product = () => {
                     className="flex-1 py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
                   >
                     <Pencil size={13} />
-                    Edit
+                    Edit 
                   </button>
                   <button
                     onClick={() => handleHardDelete(item.product_id)}

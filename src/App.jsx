@@ -46,6 +46,12 @@ import SubscriptionOrder from "./pages/subscriptionOrder/SubscriptionOrder";
 import AddInventory from "./components/AddInventory";
 import UpdateInventory from "./components/UpdateInventory";
 import PackagingJob from "./components/PackagingJob";
+import AdhocOrders from "./pages/adhocOrders/AdhocOrders";
+import SpecialOrderListing from "./pages/specialOrderListing/SpecialOrderListing";
+import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails";
+import Sales from "./pages/sales/Sales";
+import ExpenseListing from "./components/ExpenseListing";
+import CreateExpense from "./components/CreateExpense";
 
 const App = () => {
   return (
@@ -81,9 +87,14 @@ const App = () => {
                   element={<EditProduct />}
                 />
                 <Route path="customer" element={<Customer />} />
+                <Route path="sales" element={<Sales />} />
+                <Route path="expense" element={<ExpenseListing />} />
+                <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
+                <Route path="adhoc-orders" element={<AdhocOrders />} />
                 <Route path="subscription-orders" element={<SubscriptionOrder />} />
+                <Route path="special-orders" element={<SpecialOrderListing />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
                 <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
                 <Route path="corporate-orders/edit/:id" element={<CorporateOrderEdit />} />
@@ -93,6 +104,10 @@ const App = () => {
                 <Route
                   path="orders/orderDetails/:id"
                   element={<OrderViewDetails />}
+                />
+                <Route
+                  path="special-orders/specialOrderDetails/:id"
+                  element={<SpecialOrderDetails />}
                 />
                 <Route path="production" element={<Production />} />
                 <Route path="packaging-job" element={<PackagingJob/>}/>

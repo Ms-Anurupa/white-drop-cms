@@ -19,6 +19,7 @@ import {
 import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
+import Loader from "@/components/Loader";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -253,7 +254,6 @@ const SubscriptionOrder = () => {
   );
   const updateSubStatus = subscriptionStore((state) => state.updateSubStatus);
   const pagination = subscriptionStore((state) => state.subscriptionPagination);
-
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
@@ -263,7 +263,6 @@ const SubscriptionOrder = () => {
   const [dateFilter, setDateFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-
   const subscriptions = subscriptionLists;
   const paginationData = pagination || {};
   const totalItems = Number(paginationData?.totalItems ?? 0);
@@ -271,6 +270,8 @@ const SubscriptionOrder = () => {
   const currentPage = Math.max(1, Number(paginationData?.currentPage));
   const itemsPerPage = Math.max(1, Number(paginationData?.itemsPerPage));
   const dateCounts = paginationData?.dateCounts || {};
+  const [loading, setLoading] = useState(true);
+const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   const getDateCount = (key) => {
     if (key === "all") {
@@ -307,6 +308,8 @@ const SubscriptionOrder = () => {
 
     const timer = setTimeout(async () => {
       try {
+        setLoading(true);
+
         await getSubscriptionListing({
           page: 1,
           limit: pageSize,
@@ -321,7 +324,10 @@ const SubscriptionOrder = () => {
         setPage(1);
       } catch (error) {
         console.error("Failed to load subscriptions:", error);
-      }
+      }finally {
+      setLoading(false);
+      setInitialLoadDone(true);
+    }
     }, 400);
 
     return () => clearTimeout(timer);
@@ -498,6 +504,10 @@ const SubscriptionOrder = () => {
   const hasNextPage = currentPage < totalPages;
 
   const startIndex = (currentPage - 1) * itemsPerPage;
+
+  if (!initialLoadDone || loading) {
+  return <Loader text="Loading subscription order history lists..." />;
+}
 
   return (
     <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3">

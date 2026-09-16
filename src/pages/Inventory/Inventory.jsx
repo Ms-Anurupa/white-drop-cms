@@ -11,11 +11,10 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
-  Eye,
-  Pencil,
   CalendarDays,
   X,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import inventoryStore from "@/zustand/Store/inventoryStore";
 import { useNavigate } from "react-router-dom";
@@ -38,7 +37,6 @@ const AMBER = "#B45309";
 const AMBER_SOFT = "#FBEEE0";
 const LINE = "#E3E8EA";
 
-// Handles DD-MM-YYYY, ISO strings, and standard dates safely
 const formatDate = (dateStr) => {
   if (!dateStr) return "—";
 
@@ -49,11 +47,10 @@ const formatDate = (dateStr) => {
   ) {
     const parts = dateStr.split("-");
     if (parts[0].length === 2) {
-      // DD-MM-YYYY format
-      const day = parts[0];
-      const month = parts[1];
-      const year = parts[2];
-      const dateObj = new Date(`${year}-${month}-${day}`);
+      const day = Number(parts[0]);
+      const month = Number(parts[1]) - 1;
+      const year = Number(parts[2]);
+      const dateObj = new Date(year, month, day);
       if (!isNaN(dateObj)) {
         return dateObj.toLocaleDateString("en-IN", {
           day: "2-digit",
@@ -93,72 +90,22 @@ const formatNumber = (value) => {
 
 const getUnitLabel = (unit) => (unit ? String(unit).toUpperCase() : "L");
 
-function LedgerPanel({ summary }) {
-  const periods = [
-    { key: "today", label: "Today", data: summary.today },
-    { key: "yesterday", label: "Yesterday", data: summary.yesterday },
-    { key: "thisWeek", label: "This week", data: summary.thisWeek },
-    { key: "thisMonth", label: "This month", data: summary.thisMonth },
-  ];
-
-  return (
-    <div
-      className="bg-white rounded-lg overflow-hidden border"
-      style={{ borderColor: LINE }}
-    >
-      <div
-        className="grid grid-cols-2 xl:grid-cols-4 divide-x divide-y xl:divide-y-0"
-        style={{ borderColor: LINE }}
-      >
-        {periods.map((period) => (
-          <div
-            key={period.key}
-            className="p-4 sm:p-5"
-            style={{ borderColor: LINE }}
-          >
-            <p className="text-sm text-slate-500">{period.label}</p>
-
-            <p
-              className="mt-2 text-2xl font-semibold tracking-tight tabular-nums"
-              style={{ color: INK }}
-            >
-              {Math.abs(formatNumber(period.data?.totalQty ?? 0))}
-              <span className="text-sm font-normal text-slate-400 ml-1">L</span>
-            </p>
-
-            <div className="mt-2 flex items-center gap-3 text-xs">
-              {period.data?.totalWastageQty > 0 && (
-                <span
-                  className="tabular-nums font-medium"
-                  style={{ color: AMBER }}
-                >
-                  {formatNumber(period.data.totalWastageQty)} L wastage
-                </span>
-              )}
-              {period.key === "thisMonth" &&
-                period.data?.totalEntries != null && (
-                  <span className="text-slate-400">
-                    {formatNumber(period.data.totalEntries)} entries
-                  </span>
-                )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function InventoryDetailsPanel({ item, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   if (!item) return null;
 
   return (
-    // Outer overlay container
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex justify-end bg-slate-900/40"
+      className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 transition-opacity"
     >
-      {/* Modal drawer panel (stopPropagation prevents backdrop click from firing) */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto"
@@ -189,7 +136,6 @@ function InventoryDetailsPanel({ item, onClose }) {
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Opening Details */}
           <section
             className="rounded-lg p-4"
             style={{ backgroundColor: TEAL_SOFT }}
@@ -204,29 +150,17 @@ function InventoryDetailsPanel({ item, onClose }) {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-slate-500">Opening Qty</p>
-                <p
-                  className="text-sm font-semibold tabular-nums mt-1"
-                  style={{ color: INK }}
-                >
-                  {formatNumber(item.openingQty)} {getUnitLabel(item.unit)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Rate</p>
-                <p
-                  className="text-sm font-semibold tabular-nums mt-1"
-                  style={{ color: INK }}
-                >
-                  {item.rate != null ? `₹${formatNumber(item.rate)}` : "—"}
-                </p>
-              </div>
+            <div>
+              <p className="text-xs text-slate-500">Opening Qty</p>
+              <p
+                className="text-sm font-semibold tabular-nums mt-1"
+                style={{ color: INK }}
+              >
+                {formatNumber(item.openingQty)} {getUnitLabel(item.unit)}
+              </p>
             </div>
           </section>
 
-          {/* Operations & Movement */}
           <section className="bg-slate-50 rounded-lg p-4 border border-slate-100 space-y-3">
             <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">
               Stock Movement
@@ -259,7 +193,6 @@ function InventoryDetailsPanel({ item, onClose }) {
             </div>
           </section>
 
-          {/* Closing Details */}
           <section
             className="rounded-lg p-4"
             style={{
@@ -311,7 +244,6 @@ function InventoryDetailsPanel({ item, onClose }) {
             )}
           </section>
 
-          {/* Wastage Note */}
           {item.wastageNote && (
             <section>
               <h3 className="text-xs font-semibold uppercase text-slate-400 mb-2">
@@ -338,7 +270,7 @@ export default function Inventory() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const getInventoryListing = inventoryStore(
-    (state) => state.getInventoryListing,
+    (state) => state.getInventoryListing
   );
   const inventoryLists = inventoryStore((state) => state.inventoryLists);
   const inventoryMeta = inventoryStore((state) => state.inventoryMeta);
@@ -364,8 +296,10 @@ export default function Inventory() {
 
   const data = Array.isArray(inventoryLists) ? inventoryLists : [];
 
+  // Extract recorded entry dates to pass to Add Inventory page
+  const existingDates = data.map((item) => item.entryDate).filter(Boolean);
+
   const meta = inventoryMeta || {};
-  const summary = meta.summary || {};
   const total = Number(meta.total) || 0;
   const totalPages = Math.max(Number(meta.totalPages) || 1, 1);
   const currentPage = Math.min(Number(meta.page) || page, totalPages);
@@ -403,13 +337,60 @@ export default function Inventory() {
   const handlePrevious = () => currentPage > 1 && setPage((p) => p - 1);
   const handleNext = () => currentPage < totalPages && setPage((p) => p + 1);
 
-  const handleEdit = (item) => {
-    if (item.id) navigate(`/dashboard/inventory/add-inventory?id=${item.id}`);
+  const handleAddEntryClick = () => {
+    navigate("/dashboard/inventory/add-inventory", {
+      state: {
+        entryType: "OPENING",
+        existingDates,
+      },
+    });
+  };
+
+  const handleAddClosingClick = (item) => {
+    // id goes in the query string so Add Inventory can load/update that record;
+    // entryType + selectedDate lock the form to Closing on that exact date.
+    navigate(`/dashboard/inventory/add-inventory?id=${item.id}`, {
+      state: {
+        entryType: "CLOSING",
+        selectedDate: item.entryDate,
+        existingDates,
+      },
+    });
+  };
+
+  const handleRowAction = (item, action) => {
+    if (action === "view") setSelectedItem(item);
+    else if (action === "closing") handleAddClosingClick(item);
   };
 
   if (loading && data.length === 0) {
     return <Loader text="Loading Inventory Listing..." />;
   }
+
+  const BASE_BTN =
+  "inline-flex h-8 min-w-[84px] items-center justify-center rounded-md px-3 text-xs font-medium leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer";
+
+  const BTN_VARIANTS = {
+    outline: "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 focus:ring-slate-200",
+    solid: "border border-transparent text-white hover:opacity-90 focus:ring-teal-200",
+  };
+
+  function ActionButton({ variant = "outline", style, className = "", children, ...props }) {
+    return (
+      <button
+        type="button"
+        className={`${BASE_BTN} ${BTN_VARIANTS[variant]} ${className}`}
+        style={variant === "solid" ? { backgroundColor: TEAL, ...style } : style}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
 
   return (
     <div
@@ -429,7 +410,7 @@ export default function Inventory() {
 
         <button
           type="button"
-          onClick={() => navigate("/dashboard/inventory/add-inventory")}
+          onClick={handleAddEntryClick}
           className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-md hover:opacity-90 w-full sm:w-auto"
           style={{ backgroundColor: TEAL }}
         >
@@ -438,9 +419,6 @@ export default function Inventory() {
         </button>
       </div>
 
-      {/* <LedgerPanel summary={summary} /> */}
-
-      {/* Date Filter Bar */}
       <div
         className="bg-white rounded-lg p-4 border"
         style={{ borderColor: LINE }}
@@ -523,6 +501,16 @@ export default function Inventory() {
               Clear
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap border rounded-md bg-white"
+            style={{ borderColor: LINE }}
+          >
+            <RefreshCw size={14} />
+            Refresh
+          </button>
         </div>
 
         {(startDate || endDate) && !(startDate && endDate) && (
@@ -532,7 +520,6 @@ export default function Inventory() {
         )}
       </div>
 
-      {/* Main Listing Table */}
       <div
         className="bg-white rounded-lg border overflow-hidden"
         style={{ borderColor: LINE }}
@@ -543,7 +530,6 @@ export default function Inventory() {
               <TableRow>
                 <TableHead>Entry Date</TableHead>
                 <TableHead>Opening Qty</TableHead>
-                <TableHead>Rate</TableHead>
                 <TableHead>Produced</TableHead>
                 <TableHead>Stockouts (Bulk / Pkt)</TableHead>
                 <TableHead>Closing Qty</TableHead>
@@ -556,7 +542,7 @@ export default function Inventory() {
               {loading ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="h-32 text-center text-sm text-slate-400"
                   >
                     Loading inventory…
@@ -573,7 +559,6 @@ export default function Inventory() {
                         borderLeft: `3px solid ${isClosed ? TEAL : AMBER}`,
                       }}
                     >
-                      {/* Entry Date */}
                       <TableCell className="p-4 text-slate-600">
                         <div className="flex items-center gap-2 font-medium">
                           <CalendarDays size={14} className="text-slate-400" />
@@ -581,7 +566,6 @@ export default function Inventory() {
                         </div>
                       </TableCell>
 
-                      {/* Opening Qty */}
                       <TableCell className="p-4 tabular-nums">
                         <span style={{ color: INK }} className="font-semibold">
                           {formatNumber(item.openingQty)}{" "}
@@ -591,18 +575,6 @@ export default function Inventory() {
                         </span>
                       </TableCell>
 
-                      {/* Rate */}
-                      <TableCell className="p-4 tabular-nums">
-                        {item.rate != null ? (
-                          <span style={{ color: INK }} className="font-medium">
-                            ₹{formatNumber(item.rate)}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </TableCell>
-
-                      {/* Produced */}
                       <TableCell className="p-4 tabular-nums text-slate-600">
                         {item.produced != null ? (
                           <span>
@@ -616,7 +588,6 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
-                      {/* Stockouts */}
                       <TableCell className="p-4 tabular-nums text-slate-600">
                         {item.bulkStockout != null ||
                         item.packetStockout != null ? (
@@ -630,7 +601,6 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
-                      {/* Closing Qty */}
                       <TableCell className="p-4 tabular-nums">
                         {isClosed ? (
                           <span
@@ -655,7 +625,6 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
-                      {/* Wastage Qty */}
                       <TableCell className="p-4 tabular-nums">
                         {item.wastageQty != null ? (
                           <span
@@ -670,35 +639,38 @@ export default function Inventory() {
                         )}
                       </TableCell>
 
-                      {/* Actions */}
+                      {/* Actions dropdown: View, and Closing Entry (only while pending) */}
+                      {/* Actions Column */}
                       <TableCell className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedItem(item)}
-                            className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                            style={{ borderColor: LINE }}
+                        {isClosed ? (
+                          <ActionButton
+                            variant="outline"
+                            onClick={() => handleRowAction(item, "view")}
                           >
-                            <Eye size={14} />
                             View
-                          </button>
-                        </div>
+                          </ActionButton>
+                        ) : (
+                          <ActionButton
+                            variant="solid"
+                            onClick={() => handleRowAction(item, "closing")}
+                          >
+                            Closing Entry
+                          </ActionButton>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-40 text-center">
+                  <TableCell colSpan={7} className="h-40 text-center">
                     <p className="text-sm text-slate-500">
                       No entries in this range yet.
                     </p>
                     <button
                       type="button"
-                      onClick={() =>
-                        navigate("/dashboard/inventory/add-inventory")
-                      }
-                      className="mt-3 text-sm font-medium"
+                      onClick={handleAddEntryClick}
+                      className="mt-3 text-sm font-medium cursor-pointer"
                       style={{ color: TEAL }}
                     >
                       Add today's opening stock →
@@ -711,7 +683,6 @@ export default function Inventory() {
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
         <p className="text-xs text-slate-400">
           Showing {showingFrom}–{showingTo} of {total}
@@ -722,7 +693,7 @@ export default function Inventory() {
             type="button"
             disabled={currentPage === 1}
             onClick={handlePrevious}
-            className="w-9 h-9 flex items-center justify-center border rounded-md disabled:opacity-40 bg-white hover:bg-slate-50"
+            className="w-9 h-9 flex items-center justify-center border rounded-md disabled:opacity-40 bg-white hover:bg-slate-50 cursor-pointer disabled:cursor-not-allowed"
             style={{ borderColor: LINE }}
           >
             <ChevronLeft size={16} />
@@ -736,7 +707,7 @@ export default function Inventory() {
             type="button"
             disabled={currentPage === totalPages}
             onClick={handleNext}
-            className="w-9 h-9 flex items-center justify-center border rounded-md disabled:opacity-40 bg-white hover:bg-slate-50"
+            className="w-9 h-9 flex items-center justify-center border rounded-md disabled:opacity-40 bg-white hover:bg-slate-50 cursor-pointer disabled:cursor-not-allowed"
             style={{ borderColor: LINE }}
           >
             <ChevronRight size={16} />

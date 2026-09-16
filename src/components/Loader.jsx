@@ -7,6 +7,7 @@ const Loader = ({ text = "Loading" }) => {
     const id = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "" : d + "."));
     }, 450);
+
     return () => clearInterval(id);
   }, []);
 
@@ -14,41 +15,79 @@ const Loader = ({ text = "Loading" }) => {
     <div
       role="status"
       aria-live="polite"
-      style={{ minHeight: "65vh" }}
-      className="relative flex w-full items-center justify-center overflow-hidden bg-gray-50"
+      className="relative flex min-h-[calc(100vh-64px)] w-full items-center justify-center overflow-hidden bg-gray-50"
     >
       <style>{`
         @keyframes loader-rotate {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
+
         @keyframes loader-dash {
-          0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
-          50% { stroke-dasharray: 100, 200; stroke-dashoffset: -25; }
-          100% { stroke-dasharray: 100, 200; stroke-dashoffset: -124; }
+          0% {
+            stroke-dasharray: 1, 200;
+            stroke-dashoffset: 0;
+          }
+
+          50% {
+            stroke-dasharray: 100, 200;
+            stroke-dashoffset: -25;
+          }
+
+          100% {
+            stroke-dasharray: 100, 200;
+            stroke-dashoffset: -124;
+          }
         }
+
         @keyframes loader-glow {
-          0%, 100% { opacity: 0.35; transform: scale(0.9); }
-          50% { opacity: 0.6; transform: scale(1.1); }
+          0%,
+          100% {
+            opacity: 0.35;
+            transform: scale(0.9);
+          }
+
+          50% {
+            opacity: 0.6;
+            transform: scale(1.1);
+          }
         }
+
         @keyframes loader-fade-in {
-          from { opacity: 0; transform: translateY(8px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+          from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.98);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
         }
+
         @keyframes loader-shimmer {
-          to { background-position: -200% center; }
+          to {
+            background-position: -200% center;
+          }
         }
+
         .loader-svg {
           animation: loader-rotate 1.6s linear infinite;
         }
+
         .loader-arc {
           animation: loader-dash 1.5s ease-in-out infinite;
         }
+
         .loader-glow {
           animation: loader-glow 2.4s ease-in-out infinite;
         }
+
         .loader-card {
           animation: loader-fade-in 0.4s ease-out;
         }
+
         .loader-text {
           background: linear-gradient(
             90deg,
@@ -65,11 +104,26 @@ const Loader = ({ text = "Loading" }) => {
           color: transparent;
           animation: loader-shimmer 2.2s linear infinite;
         }
+
         @media (prefers-reduced-motion: reduce) {
-          .loader-svg { animation-duration: 3s; }
-          .loader-arc { animation: none; stroke-dasharray: 80, 200; }
-          .loader-glow { animation: none; opacity: 0.4; }
-          .loader-card { animation: none; }
+          .loader-svg {
+            animation-duration: 3s;
+          }
+
+          .loader-arc {
+            animation: none;
+            stroke-dasharray: 80, 200;
+          }
+
+          .loader-glow {
+            animation: none;
+            opacity: 0.4;
+          }
+
+          .loader-card {
+            animation: none;
+          }
+
           .loader-text {
             animation: none;
             background: none;
@@ -86,17 +140,25 @@ const Loader = ({ text = "Loading" }) => {
             className="loader-glow absolute h-14 w-14 rounded-full bg-indigo-400 blur-xl"
             aria-hidden="true"
           />
+
           <svg
             className="loader-svg relative h-12 w-12"
             viewBox="0 0 50 50"
             aria-hidden="true"
           >
             <defs>
-              <linearGradient id="loader-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient
+                id="loader-gradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor="#818cf8" />
                 <stop offset="100%" stopColor="#4338ca" />
               </linearGradient>
             </defs>
+
             <circle
               className="loader-arc"
               cx="25"
