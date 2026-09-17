@@ -434,11 +434,12 @@ const ExpenseListing = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Numbered Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3.5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3.5">
+            {/* Page Info */}
             <p className="text-xs font-medium text-slate-500">
-              Showing page{" "}
+              Page{" "}
               <span className="font-semibold text-slate-800">
                 {pagination.page}
               </span>{" "}
@@ -448,25 +449,129 @@ const ExpenseListing = () => {
               </span>
             </p>
 
-            <div className="flex items-center gap-2">
+            {/* Page Controls */}
+            <div className="flex items-center gap-1.5">
+              {/* First Page (<<) */}
+              <button
+                type="button"
+                disabled={pagination.page === 1}
+                onClick={() => setPage(1)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                title="First Page"
+              >
+                «
+              </button>
+
+              {/* Previous Page (<) */}
               <button
                 type="button"
                 disabled={!pagination.hasPrevPage}
                 onClick={() => setPage(pagination.page - 1)}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                title="Previous Page"
               >
-                <ChevronLeft size={14} />
-                Previous
+                ‹
               </button>
 
+              {/* Page Numbers */}
+              {(() => {
+                const pages = [];
+                const total = pagination.totalPages;
+                const current = pagination.page;
+
+                let start = Math.max(1, current - 1);
+                let end = Math.min(total, current + 1);
+
+                if (current === 1) end = Math.min(total, 3);
+                if (current === total) start = Math.max(1, total - 2);
+
+                if (start > 1) {
+                  pages.push(
+                    <button
+                      key={1}
+                      type="button"
+                      onClick={() => setPage(1)}
+                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                    >
+                      1
+                    </button>,
+                  );
+                  if (start > 2) {
+                    pages.push(
+                      <span
+                        key="dots-start"
+                        className="px-1 text-xs text-slate-400 select-none"
+                      >
+                        ...
+                      </span>,
+                    );
+                  }
+                }
+
+                for (let i = start; i <= end; i++) {
+                  const isActive = i === current;
+                  pages.push(
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setPage(i)}
+                      className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                        isActive
+                          ? "bg-slate-900 text-white shadow-sm"
+                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {i}
+                    </button>,
+                  );
+                }
+
+                if (end < total) {
+                  if (end < total - 1) {
+                    pages.push(
+                      <span
+                        key="dots-end"
+                        className="px-1 text-xs text-slate-400 select-none"
+                      >
+                        ...
+                      </span>,
+                    );
+                  }
+                  pages.push(
+                    <button
+                      key={total}
+                      type="button"
+                      onClick={() => setPage(total)}
+                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                    >
+                      {total}
+                    </button>,
+                  );
+                }
+
+                return pages;
+              })()}
+
+              {/* Next Page (>) */}
               <button
                 type="button"
                 disabled={!pagination.hasNextPage}
                 onClick={() => setPage(pagination.page + 1)}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                title="Next Page"
               >
-                Next
-                <ChevronRight size={14} />
+                ›
+              </button>
+
+              {/* Last Page (>>) */}
+              <button
+                type="button"
+                disabled={pagination.page === pagination.totalPages}
+                onClick={() => setPage(pagination.totalPages)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                title="Last Page"
+              >
+                »
               </button>
             </div>
           </div>
