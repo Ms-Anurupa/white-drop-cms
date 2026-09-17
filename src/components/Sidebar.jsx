@@ -17,6 +17,7 @@ import {
   PackageIcon,
   ChevronDown,
   HandCoins,
+  ChartNoAxesGantt,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
@@ -36,7 +37,19 @@ const sections = [
         end: true,
       },
       { name: "Sales", path: "sales", icon: LayoutDashboard },
-      { name: "Expenses", path: "expense", icon: HandCoins },
+      {
+        name: "Expenses",
+        key: "expenses",
+        icon: HandCoins,
+        children: [
+          { name: "Expenses List", path: "expense" },
+          {
+            name: "Categories",
+            path: "expense-category",
+            icon: ChartNoAxesGantt,
+          },
+        ],
+      },
       { name: "Product", path: "product", icon: Package },
       { name: "Customers", path: "customer", icon: Users },
       {
@@ -102,15 +115,24 @@ const sections = [
 const SIDEBAR_WIDTH = "w-60";
 const SIDEBAR_WIDTH_COLLAPSED = "w-20";
 
-/* Check if the active path starts with or contains the item path segment */
+/* Check if any active URL segment exactly matches or starts with the path prefix */
 const matchesPath = (pathname, path) => {
-  const cleanPath = path.replace(/^\//, "");
-  const segments = pathname.split("/").filter(Boolean);
+  const cleanPath = path.replace(/^\//, "").toLowerCase();
+  const segments = pathname.split("/").filter(Boolean).map(s => s.toLowerCase());
 
-  // Handles /dashboard/expense, /dashboard/createExpense, /dashboard/expense/create, etc.
-  return segments.some((segment) =>
-    segment.toLowerCase().includes(cleanPath.toLowerCase()),
-  );
+  // 1. Exact segment match (e.g., segment "expense" === path "expense")
+  if (segments.includes(cleanPath)) {
+    return true;
+  }
+
+  // 2. Sub-route match for multi-word paths (e.g. /dashboard/expense/create or /dashboard/createExpense)
+  return segments.some((segment) => {
+    // Prevent "expense-category" from matching "expense"
+    if (segment.includes("-") && !cleanPath.includes("-")) {
+      return false;
+    }
+    return segment === cleanPath || segment.startsWith(cleanPath);
+  });
 };
 
 /* ------------------------------------------------------------------ */
