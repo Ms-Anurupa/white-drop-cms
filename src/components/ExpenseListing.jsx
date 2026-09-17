@@ -9,6 +9,7 @@ import {
   AlertCircle,
   Inbox,
   FileText,
+  FileSpreadsheet,
 } from "lucide-react";
 import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
@@ -131,14 +132,26 @@ const ExpenseListing = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => navigate("/dashboard/create-expense")}
-          className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
-        >
-          <Plus size={18} />
-          Create Expense
-        </button>
+        {/* Button Group Container */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            // onClick={() => handleExportToExcel()} // Update with your actual export function
+            className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98]"
+          >
+            <FileSpreadsheet size={18} />
+            Export To Excel
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/create-expense")}
+            className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
+          >
+            <Plus size={18} />
+            Create Expense
+          </button>
+        </div>
       </div>
 
       {/* Metric Overview */}

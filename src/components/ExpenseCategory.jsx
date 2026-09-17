@@ -176,13 +176,8 @@ const ExpenseCategory = () => {
                                         <h4 className="text-sm font-semibold text-gray-800 capitalize">
                                             {cat.name}
                                         </h4>
-                                        <span className="text-[11px] text-gray-400">
-                                            ID: {cat.id}
-                                        </span>
                                     </div>
                                 </div>
-
-                                <ChevronDownRightIcon />
                             </div>
                         ))}
                     </div>
