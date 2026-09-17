@@ -35,6 +35,7 @@ const AdhocOrders = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const fetchOrders = useCallback(async () => {
     try {
@@ -52,6 +53,7 @@ const AdhocOrders = () => {
       console.error("Failed to fetch adhoc orders:", error);
     } finally {
       setLoading(false);
+      setInitialLoadDone(true);
     }
   }, [
     getAdHocSaleListing,
@@ -188,7 +190,7 @@ const AdhocOrders = () => {
     fetchOrders();
   };
 
-  if (loading) {
+  if (!initialLoadDone) {
     return <Loader text="Loading Adhoc order history lists..." />;
   }
 

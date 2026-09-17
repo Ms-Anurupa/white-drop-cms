@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -92,6 +92,17 @@ const ExpenseListing = () => {
   const setPage = expenseStore((s) => s.setPage);
   const resetFilters = expenseStore((s) => s.resetFilters);
 
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const hasStartedLoading = useRef(false);
+
+  useEffect(() => {
+    if (loading) {
+      hasStartedLoading.current = true;
+    } else if (hasStartedLoading.current) {
+      setInitialLoadDone(true);
+    }
+  }, [loading]);
+
   useEffect(() => {
     if (
       filters.dateFilter === "custom" &&
@@ -113,6 +124,10 @@ const ExpenseListing = () => {
   ]);
 
   const serial = (idx) => (pagination.page - 1) * PAGE_LIMIT + idx + 1;
+
+  // True while the store is fetching, and also for the brief window before
+  // the very first fetch has kicked in (so we never flash an empty state).
+  const showSkeleton = loading || !initialLoadDone;
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
@@ -299,7 +314,7 @@ const ExpenseListing = () => {
             </thead>
 
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {loading &&
+              {showSkeleton &&
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
                     <td colSpan={23} className="px-4 py-4">
@@ -308,7 +323,7 @@ const ExpenseListing = () => {
                   </tr>
                 ))}
 
-              {!loading &&
+              {!showSkeleton &&
                 expenses.map((expense, idx) => (
                   <tr
                     key={expense.id}
@@ -411,7 +426,7 @@ const ExpenseListing = () => {
                   </tr>
                 ))}
 
-              {!loading && expenses.length === 0 && !error && (
+              {!showSkeleton && expenses.length === 0 && !error && (
                 <tr>
                   <td colSpan={23} className="px-4 py-16 text-center">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
@@ -424,7 +439,7 @@ const ExpenseListing = () => {
                 </tr>
               )}
 
-              {!loading && error && (
+              {!showSkeleton && error && (
                 <tr>
                   <td colSpan={23} className="px-4 py-12 text-center">
                     <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
@@ -467,7 +482,7 @@ const ExpenseListing = () => {
               {/* First Page (<<) */}
               <button
                 type="button"
-                disabled={pagination.page === 1}
+                disabled={pagination.page === 1 || showSkeleton}
                 onClick={() => setPage(1)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
                 title="First Page"
@@ -478,7 +493,7 @@ const ExpenseListing = () => {
               {/* Previous Page (<) */}
               <button
                 type="button"
-                disabled={!pagination.hasPrevPage}
+                disabled={!pagination.hasPrevPage || showSkeleton}
                 onClick={() => setPage(pagination.page - 1)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
                 title="Previous Page"
@@ -568,7 +583,7 @@ const ExpenseListing = () => {
               {/* Next Page (>) */}
               <button
                 type="button"
-                disabled={!pagination.hasNextPage}
+                disabled={!pagination.hasNextPage || showSkeleton}
                 onClick={() => setPage(pagination.page + 1)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
                 title="Next Page"
@@ -579,7 +594,9 @@ const ExpenseListing = () => {
               {/* Last Page (>>) */}
               <button
                 type="button"
-                disabled={pagination.page === pagination.totalPages}
+                disabled={
+                  pagination.page === pagination.totalPages || showSkeleton
+                }
                 onClick={() => setPage(pagination.totalPages)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
                 title="Last Page"

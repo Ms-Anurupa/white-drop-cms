@@ -12,6 +12,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Loader from "@/components/Loader";
 
 const SpecialOrderListing = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const SpecialOrderListing = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const orders = Array.isArray(specialOrder?.list) ? specialOrder.list : [];
   const pagination = specialOrder?.pagination || {};
   const total = Number(pagination?.totalItems || 0);
@@ -36,6 +39,8 @@ const SpecialOrderListing = () => {
   useEffect(() => {
     const fetchSpecialOrders = async () => {
       try {
+        setLoading(true);
+
         await getSpecialOrderRequests({
           search,
           page,
@@ -46,6 +51,9 @@ const SpecialOrderListing = () => {
         });
       } catch (error) {
         console.error("Failed to fetch special orders:", error);
+      } finally {
+        setLoading(false);
+        setInitialLoadDone(true);
       }
     };
 
@@ -133,6 +141,10 @@ const SpecialOrderListing = () => {
   const fromRecord = total > 0 ? (page - 1) * limit + 1 : 0;
 
   const toRecord = total > 0 ? Math.min(page * limit, total) : 0;
+
+  if (!initialLoadDone) {
+    return <Loader text="Loading special orders..." />;
+  }
 
   return (
     <div className="min-h-full bg-gray-50 p-4 sm:p-6">
@@ -311,7 +323,27 @@ const SpecialOrderListing = () => {
             </thead>
 
             <tbody>
-              {orders.length > 0 ? (
+              {loading ? (
+                Array.from({ length: limit > 8 ? 8 : limit }).map(
+                  (_, index) => (
+                    <tr key={index} className="border-b border-gray-100">
+                      {Array.from({ length: 10 }).map((__, cellIndex) => (
+                        <td key={cellIndex} className="px-4 py-3">
+                          <div
+                            className={`h-3 animate-pulse rounded bg-gray-100 ${
+                              cellIndex === 0
+                                ? "w-6"
+                                : cellIndex === 1
+                                  ? "w-32"
+                                  : "w-16"
+                            }`}
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ),
+                )
+              ) : orders.length > 0 ? (
                 orders.map((order, index) => {
                   const customerName = order?.user?.customer_name || "-";
 
@@ -518,7 +550,7 @@ const SpecialOrderListing = () => {
             {/* First */}
             <button
               type="button"
-              disabled={page === 1}
+              disabled={page === 1 || loading}
               onClick={() => setPage(1)}
               className="
                 flex
@@ -542,7 +574,7 @@ const SpecialOrderListing = () => {
             {/* Previous */}
             <button
               type="button"
-              disabled={page === 1}
+              disabled={page === 1 || loading}
               onClick={() => setPage((prev) => prev - 1)}
               className="
                 flex
@@ -570,7 +602,7 @@ const SpecialOrderListing = () => {
             {/* Next */}
             <button
               type="button"
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || loading}
               onClick={() => setPage((prev) => prev + 1)}
               className="
                 flex
@@ -594,7 +626,7 @@ const SpecialOrderListing = () => {
             {/* Last */}
             <button
               type="button"
-              disabled={page >= totalPages}
+              disabled={page >= totalPages || loading}
               onClick={() => setPage(totalPages)}
               className="
                 flex
