@@ -52,6 +52,7 @@ import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails
 import Sales from "./pages/sales/Sales";
 import ExpenseListing from "./components/ExpenseListing";
 import CreateExpense from "./components/CreateExpense";
+import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
 
 const App = () => {
   return (
@@ -94,6 +95,7 @@ const App = () => {
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
                 <Route path="subscription-orders" element={<SubscriptionOrder />} />
+                <Route path="subscription-details/:subId" element={<ViewSubscriptionDetails />} />
                 <Route path="special-orders" element={<SpecialOrderListing />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
                 <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
