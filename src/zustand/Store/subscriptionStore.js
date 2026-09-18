@@ -87,6 +87,21 @@ const subscriptionStore = create((set) => ({
       throw error;
     }
   },
+
+  getSubdetailsById: async (subId) => {
+    try {
+      const res = await api.get("/admin/getSubscriptionListing",{
+        withAuth: true,
+        params:{
+          subId
+        }
+      });
+
+      return res.data.subscription;
+    } catch (error) {
+      throw error;
+    }
+  },
 }));
 
 export default subscriptionStore;

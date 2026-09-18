@@ -1,5 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Search,
   ChevronLeft,
@@ -243,6 +245,8 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 );
 
 const SubscriptionOrder = () => {
+  const navigate = useNavigate();
+
   const getSubscriptionListing = subscriptionStore(
     (state) => state.getSubscriptionListing,
   );
@@ -506,8 +510,12 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   if (!initialLoadDone || loading) {
-  return <Loader text="Loading subscription order history lists..." />;
-}
+    return <Loader text="Loading subscription order history lists..." />;
+  }
+
+  const  handleDetailsNavigate = ((subId)=>{
+    navigate(`/dashboard/subscription-details/${subId}`)
+  })
 
   return (
     <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3">
@@ -874,7 +882,9 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
                   return (
                     <tr
                       key={item?.id || item?.subId || index}
-                      className="transition hover:bg-slate-50"
+                      className="transition hover:bg-slate-50 cursor-pointer"
+                      title="Click to view more details"
+                      onClick={() => handleDetailsNavigate(item.id)}
                     >
                       {/* SL NO */}
                       <td className="px-2 py-2 text-gray-400">

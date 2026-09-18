@@ -53,6 +53,7 @@ import Sales from "./pages/sales/Sales";
 import ExpenseListing from "./components/ExpenseListing";
 import CreateExpense from "./components/CreateExpense";
 import ExpenseCategory from "./components/ExpenseCategory";
+import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
 
 const App = () => {
   return (
@@ -96,9 +97,10 @@ const App = () => {
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
                 <Route path="subscription-orders" element={<SubscriptionOrder />} />
+                <Route path="subscription-details/:subId" element={<ViewSubscriptionDetails />} />
                 <Route path="special-orders" element={<SpecialOrderListing />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
-                <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
+                <Route path="corporate-orders/details/:id" element={<CorporateOrderView />} />
                 <Route path="corporate-orders/edit/:id" element={<CorporateOrderEdit />} />
                 <Route path="corporate-accounts" element={<CorporateAccounts />} />
                 <Route path="corporate-orders/create-corporate-order" element={<CreateCorporateOrder />} />
@@ -111,7 +113,6 @@ const App = () => {
                   path="special-orders/specialOrderDetails/:id"
                   element={<SpecialOrderDetails />}
                 />
-                <Route path="production" element={<Production />} />
                 <Route path="packaging-job" element={<PackagingJob/>}/>
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="inventory/add-inventory" element={<AddInventory />} />
@@ -130,7 +131,6 @@ const App = () => {
                   element={<DeliveryPartnerDetails />}
                 />
                 <Route path="customerHelpLine" element={<CustomerHelpLine />} />
-                <Route path="support" element={<Support />} />
                 <Route
                   path="support/locality-manager"
                   element={<LocalityManager />}

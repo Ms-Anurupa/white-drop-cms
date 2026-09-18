@@ -36,7 +36,7 @@ const sections = [
         icon: LayoutDashboard,
         end: true,
       },
-      { name: "Sales", path: "sales", icon: LayoutDashboard },
+      { name: "Product", path: "product", icon: Package },
       {
         name: "Expenses",
         key: "expenses",
@@ -50,8 +50,6 @@ const sections = [
           },
         ],
       },
-      { name: "Product", path: "product", icon: Package },
-      { name: "Customers", path: "customer", icon: Users },
       {
         name: "Orders",
         key: "orders",
@@ -65,9 +63,13 @@ const sections = [
         ],
       },
       {
-        name: "Corporate Accounts",
-        path: "corporate-accounts",
-        icon: ReceiptText,
+        name: "Customers",
+        key: "customers",
+        icon: Users,
+        children: [
+          { name: "Customer List", path: "customer" },
+          { name: "Corporate Accounts", path: "corporate-accounts" },
+        ],
       },
     ],
   },
@@ -75,7 +77,7 @@ const sections = [
   {
     label: "Operations",
     items: [
-      { name: "Production", path: "production", icon: Factory },
+      { name: "Sales", path: "sales", icon: LayoutDashboard },
       { name: "Inventory", path: "inventory", icon: Boxes },
       { name: "Packaging Job", path: "packaging-job", icon: PackageIcon },
     ],
@@ -83,20 +85,30 @@ const sections = [
   {
     label: "Delivery",
     items: [
-      { name: "Delivery Job", path: "delivery-job", icon: Truck },
-      { name: "Delivery Tracking", path: "delivery-tracking", icon: Truck },
       {
-        name: "Delivery Partner List",
-        path: "deliveryPartners",
-        icon: PackageCheck,
+        name: "Delivery",
+        key: "delivery",
+        icon: Truck,
+        children: [
+          { name: "Delivery Job", path: "delivery-job" },
+          { name: "Delivery Tracking", path: "delivery-tracking" },
+          { name: "Delivery Partner List", path: "deliveryPartners" },
+        ],
       },
     ],
   },
   {
     label: "Offers",
     items: [
-      { name: "Offers", path: "offers", icon: HelpingHand },
-      { name: "Offer Type", path: "offerType", icon: HelpingHand },
+      {
+        name: "Offers",
+        key: "offers",
+        icon: HelpingHand,
+        children: [
+          { name: "Offers", path: "offers" },
+          { name: "Offer Type", path: "offerType" },
+        ],
+      },
     ],
   },
   {
@@ -107,7 +119,6 @@ const sections = [
         path: "customerHelpLine",
         icon: HelpingHand,
       },
-      { name: "Service Manager", path: "support", icon: Headset },
     ],
   },
 ];
@@ -118,7 +129,10 @@ const SIDEBAR_WIDTH_COLLAPSED = "w-20";
 /* Check if any active URL segment exactly matches or starts with the path prefix */
 const matchesPath = (pathname, path) => {
   const cleanPath = path.replace(/^\//, "").toLowerCase();
-  const segments = pathname.split("/").filter(Boolean).map(s => s.toLowerCase());
+  const segments = pathname
+    .split("/")
+    .filter(Boolean)
+    .map((s) => s.toLowerCase());
 
   // 1. Exact segment match (e.g., segment "expense" === path "expense")
   if (segments.includes(cleanPath)) {
@@ -298,7 +312,7 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
           ].join(" ")}
         >
           <div className="overflow-hidden">
-            <div className="ml-[22px] mt-1 space-y-0.5 border-l border-slate-200 pl-3">
+            <div className="ml-[20px] mt-1 space-y-0.5 border-l border-slate-200 ">
               {item.children.map((child) => (
                 <SubNavItem
                   key={child.path}
@@ -334,9 +348,8 @@ const SidebarBody = ({
     <div className="flex flex-col h-full min-h-0">
       {/* Logo */}
       <div
-        className={`h-14 flex items-center ${
-          isCollapsed ? "justify-center" : "justify-between"
-        } px-4 border-b border-slate-100 shrink-0`}
+        className={`h-14 flex items-center ${isCollapsed ? "justify-center" : "justify-between"
+          } px-4 border-b border-slate-100 shrink-0`}
       >
         {!isCollapsed && (
           <div className="flex items-center gap-2.5 min-w-0">
@@ -418,9 +431,8 @@ const SidebarBody = ({
       {/* Footer */}
       <div className="shrink-0 px-4 py-3 border-t border-slate-100">
         <div
-          className={`flex items-center ${
-            isCollapsed ? "justify-center" : "gap-3"
-          }`}
+          className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"
+            }`}
         >
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
             {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
@@ -547,9 +559,8 @@ const Sidebar = ({ onLogOut }) => {
 
       {/* Desktop Sidebar — fixed */}
       <aside
-        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white border-r border-slate-100 transition-all duration-300 ${
-          collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
-        }`}
+        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white border-r border-slate-100 transition-all duration-300 ${collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
+          }`}
       >
         <SidebarBody {...bodyProps} />
       </aside>
@@ -557,9 +568,8 @@ const Sidebar = ({ onLogOut }) => {
       {/* Spacer keeps page content beside the fixed sidebar */}
       <div
         aria-hidden="true"
-        className={`hidden lg:block shrink-0 transition-all duration-300 ${
-          collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
-        }`}
+        className={`hidden lg:block shrink-0 transition-all duration-300 ${collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
+          }`}
       />
     </>
   );
