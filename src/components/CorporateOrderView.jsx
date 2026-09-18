@@ -294,7 +294,7 @@ const CorporateOrderView = () => {
               />
             </div>
             <p className="mt-0.5 text-xs text-gray-500">
-              Internal ID: {order.id} • Created on{" "}
+              Order ID: {order.orderId} • Created on{" "}
               {formatShortDate(order.createdAt, true)}
             </p>
           </div>
@@ -624,7 +624,7 @@ const CorporateOrderView = () => {
                       </p>
                     </div>
                     <StatusPill
-                      status={order.paymentStatus}
+                      status={!(currentDue > 0)?"COMPLETE":order.paymentStatus}
                       styles={PAYMENT_STATUS_STYLES}
                       dots={PAYMENT_STATUS_DOTS}
                     />
