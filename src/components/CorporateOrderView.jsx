@@ -624,7 +624,7 @@ const CorporateOrderView = () => {
                       </p>
                     </div>
                     <StatusPill
-                      status={order.paymentStatus}
+                      status={!(currentDue > 0)?"COMPLETE":order.paymentStatus}
                       styles={PAYMENT_STATUS_STYLES}
                       dots={PAYMENT_STATUS_DOTS}
                     />

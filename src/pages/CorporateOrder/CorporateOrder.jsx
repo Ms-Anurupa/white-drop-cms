@@ -774,7 +774,10 @@ const CorporateOrder = () => {
                       >
                         <div className="inline-flex rounded-md overflow-hidden shadow-sm">
                           <button
-                            onClick={() => handleViewInvoice(o.id)}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevents row click
+                              handleViewInvoice(o.id);
+                            }}
                             disabled={invoiceLoading.view === o.id}
                             className="h-7 pl-2 pr-2 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium hover:bg-blue-700 transition cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                             title="View invoice"
@@ -790,9 +793,10 @@ const CorporateOrder = () => {
                               : "View"}
                           </button>
                           <button
-                            onClick={() =>
-                              setOpenMenu(openMenu === o.id ? null : o.id)
-                            }
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevents row click
+                              setOpenMenu(openMenu === o.id ? null : o.id);
+                            }}
                             className="h-7 w-6 flex items-center justify-center bg-blue-700 text-white hover:bg-blue-800 transition cursor-pointer border-l border-blue-500/40"
                             title="More invoice actions"
                           >
@@ -801,10 +805,14 @@ const CorporateOrder = () => {
                         </div>
 
                         {openMenu === o.id && (
-                          <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left">
+                          <div
+                            className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left"
+                            onClick={(e) => e.stopPropagation()} // Prevents clicks inside the menu from triggering the row
+                          >
                             <button
                               disabled={invoiceLoading.regenerate === o.id}
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevents row click
                                 handleRegenerateInvoice(o.id);
                                 setOpenMenu(null);
                               }}
@@ -822,7 +830,8 @@ const CorporateOrder = () => {
                             </button>
                             <button
                               disabled={invoiceLoading.download === o.id}
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevents row click
                                 handleDownloadInvoice(o.id, o.orderId);
                                 setOpenMenu(null);
                               }}
