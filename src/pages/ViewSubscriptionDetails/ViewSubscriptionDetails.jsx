@@ -16,6 +16,7 @@ import {
   History,
   Phone,
   Plus,
+  Receipt,
 } from "lucide-react";
 import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
@@ -427,9 +428,29 @@ const ViewSubscriptionDetails = () => {
                       <History size={16} className="text-blue-500" />
                       Payment/Due Logs
                     </h2>
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
-                      {offlinePaymentLogs.length} Records
-                    </span>
+                    <div className="flex flex-row">
+                      {!isOnlinePaymentComplete && (
+                        <button
+                          onClick={() => {
+                            setPaymentContext({
+                              type: "SUBSCRIPTION",
+                              data: data,
+                            });
+                            setIsPaymentModalOpen(true);
+                          }}
+                          className="group flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 active:scale-95 cursor-pointer"
+                        >
+                          <Receipt
+                            size={14}
+                            className="text-gray-400 transition-colors group-hover:text-blue-500"
+                          />
+                          Add Payment
+                        </button>
+                      )}
+                      <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                        {offlinePaymentLogs.length} Records
+                      </span>
+                    </div>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -652,7 +673,7 @@ const ViewSubscriptionDetails = () => {
         contextType={paymentContext.type}
         contextData={paymentContext.data}
         onSuccess={() => {
-          fetchDetails()
+          fetchDetails();
         }}
       />
     </div>

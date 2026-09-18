@@ -62,7 +62,7 @@ const AddOfflinePaymentModal = ({
 
   const displayId = isSubscription
     ? contextData.subId || contextData.id
-    : contextData.bulkOrderId || contextData.id;
+    : contextData.orderId || contextData.id;
 
   
 
