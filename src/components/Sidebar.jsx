@@ -75,7 +75,6 @@ const sections = [
   {
     label: "Operations",
     items: [
-      { name: "Production", path: "production", icon: Factory },
       { name: "Inventory", path: "inventory", icon: Boxes },
       { name: "Packaging Job", path: "packaging-job", icon: PackageIcon },
     ],
@@ -106,8 +105,7 @@ const sections = [
         name: "Customer Helpline",
         path: "customerHelpLine",
         icon: HelpingHand,
-      },
-      { name: "Service Manager", path: "support", icon: Headset },
+      }
     ],
   },
 ];

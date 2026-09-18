@@ -111,7 +111,6 @@ const App = () => {
                   path="special-orders/specialOrderDetails/:id"
                   element={<SpecialOrderDetails />}
                 />
-                <Route path="production" element={<Production />} />
                 <Route path="packaging-job" element={<PackagingJob/>}/>
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="inventory/add-inventory" element={<AddInventory />} />
@@ -130,7 +129,6 @@ const App = () => {
                   element={<DeliveryPartnerDetails />}
                 />
                 <Route path="customerHelpLine" element={<CustomerHelpLine />} />
-                <Route path="support" element={<Support />} />
                 <Route
                   path="support/locality-manager"
                   element={<LocalityManager />}
