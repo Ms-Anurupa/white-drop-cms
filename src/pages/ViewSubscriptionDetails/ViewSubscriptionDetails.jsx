@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -154,21 +155,20 @@ const ViewSubscriptionDetails = () => {
     return Number(data.totalAmount || 0);
   }, [data]);
 
+  const fetchDetails = async () => {
+    try {
+      setLoading(true);
+      const details = await getSubdetailsById(subId);
+      setData(details);
+    } catch (error) {
+      console.error("Failed to fetch subscription details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!subId) return;
-
-    const fetchDetails = async () => {
-      try {
-        setLoading(true);
-        const details = await getSubdetailsById(subId);
-        setData(details);
-      } catch (error) {
-        console.error("Failed to fetch subscription details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDetails();
   }, [subId]);
 
@@ -652,8 +652,7 @@ const ViewSubscriptionDetails = () => {
         contextType={paymentContext.type}
         contextData={paymentContext.data}
         onSuccess={() => {
-          // Re-fetch your data here to show the newly added log
-          console.log("Success! Refresh data.");
+          fetchDetails()
         }}
       />
     </div>
