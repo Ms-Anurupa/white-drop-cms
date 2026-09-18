@@ -294,7 +294,7 @@ const CorporateOrderView = () => {
               />
             </div>
             <p className="mt-0.5 text-xs text-gray-500">
-              Internal ID: {order.id} • Created on{" "}
+              Order ID: {order.orderId} • Created on{" "}
               {formatShortDate(order.createdAt, true)}
             </p>
           </div>
