@@ -16,7 +16,8 @@ import {
   History,
   Receipt,
   CheckCircle2,
-  Truck
+  Truck,
+  Plus
 } from "lucide-react";
 import { toast } from "react-toastify";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
@@ -271,6 +272,7 @@ const CorporateOrderView = () => {
 
       {/* HEADER */}
       <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
+        {/* LEFT SIDE: Back Button & Title */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -297,6 +299,22 @@ const CorporateOrderView = () => {
             </p>
           </div>
         </div>
+
+        {/* RIGHT SIDE: Add Offline Payment Button */}
+        {!isPaidOnline && currentDue > 0 && (
+          <button
+            onClick={() => {
+              setIsPaymentModalOpen(true);
+            }}
+            className="group flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow active:scale-95 cursor-pointer"
+          >
+            <Plus
+              size={14}
+              className="transition-transform group-hover:rotate-90"
+            />
+            Add Offline Payment
+          </button>
+        )}
       </div>
 
       {/* CONTENT AREA */}
@@ -305,7 +323,6 @@ const CorporateOrderView = () => {
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
             {/* LEFT COLUMN (Wider) */}
             <div className="flex flex-col gap-4 xl:col-span-2">
-              
               {/* ORDER ITEMS & DETAILS CARD */}
               <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-800">
@@ -461,7 +478,7 @@ const CorporateOrderView = () => {
                   {!isPaidOnline && currentDue > 0 && (
                     <button
                       onClick={() => setIsPaymentModalOpen(true)}
-                      className="group flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 active:scale-95"
+                      className="group flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 active:scale-95 cursor-pointer"
                     >
                       <Receipt
                         size={14}
@@ -477,7 +494,9 @@ const CorporateOrderView = () => {
                     <table className="w-full text-left text-xs whitespace-nowrap">
                       <thead className="bg-gray-50/80 text-gray-500">
                         <tr>
-                          <th className="px-4 py-2.5 font-medium">Date & Time</th>
+                          <th className="px-4 py-2.5 font-medium">
+                            Date & Time
+                          </th>
                           <th className="px-4 py-2.5 font-medium">Mode</th>
                           <th className="px-4 py-2.5 text-right font-medium">
                             Due Before
@@ -528,7 +547,6 @@ const CorporateOrderView = () => {
 
             {/* RIGHT COLUMN (Sidebar Info) */}
             <div className="flex flex-col gap-4">
-              
               {/* COMPANY INFO */}
               <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-800">
@@ -704,8 +722,8 @@ const CorporateOrderView = () => {
         onClose={() => setIsPaymentModalOpen(false)}
         contextType="BULK_ORDER"
         contextData={{
-           ...order,
-           totalAmount: baseTotal // Inject calculated base total so modal correctly calculates due
+          ...order,
+          totalAmount: baseTotal, // Inject calculated base total so modal correctly calculates due
         }}
         onSuccess={() => {
           loadOrder(); // Re-fetch the order data on success
