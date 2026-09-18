@@ -267,7 +267,7 @@ const CorporateOrderView = () => {
   const { corpoAcc, orderDetails } = order;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+    <div className="bg-gray-50">
       <ScrollbarStyle />
 
       {/* HEADER */}
@@ -468,7 +468,7 @@ const CorporateOrderView = () => {
                   <div className="flex items-center gap-2">
                     <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                       <History size={16} className="text-blue-500" />
-                      Offline Payment Logs
+                      Payment/Due Logs
                     </h2>
                     <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
                       {offlinePaymentLogs.length}
