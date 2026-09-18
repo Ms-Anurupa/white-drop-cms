@@ -52,6 +52,7 @@ import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails
 import Sales from "./pages/sales/Sales";
 import ExpenseListing from "./components/ExpenseListing";
 import CreateExpense from "./components/CreateExpense";
+import ExpenseCategory from "./components/ExpenseCategory";
 
 const App = () => {
   return (
@@ -90,6 +91,7 @@ const App = () => {
                 <Route path="sales" element={<Sales />} />
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="create-expense" element={<CreateExpense />} />
+                <Route path="expense-category" element={<ExpenseCategory />} />
                 <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />

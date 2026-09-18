@@ -17,6 +17,7 @@ import {
   PackageIcon,
   ChevronDown,
   HandCoins,
+  ChartNoAxesGantt,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
@@ -36,7 +37,19 @@ const sections = [
         end: true,
       },
       { name: "Sales", path: "sales", icon: LayoutDashboard },
-      { name: "Expenses", path: "expense", icon: HandCoins },
+      {
+        name: "Expenses",
+        key: "expenses",
+        icon: HandCoins,
+        children: [
+          { name: "Expenses List", path: "expense" },
+          {
+            name: "Categories",
+            path: "expense-category",
+            icon: ChartNoAxesGantt,
+          },
+        ],
+      },
       { name: "Product", path: "product", icon: Package },
       { name: "Customers", path: "customer", icon: Users },
       {
@@ -102,9 +115,25 @@ const sections = [
 const SIDEBAR_WIDTH = "w-60";
 const SIDEBAR_WIDTH_COLLAPSED = "w-20";
 
-/* Does the current URL land on this relative path? */
-const matchesPath = (pathname, path) =>
-  pathname.split("/").filter(Boolean).includes(path.replace(/^\//, ""));
+/* Check if any active URL segment exactly matches or starts with the path prefix */
+const matchesPath = (pathname, path) => {
+  const cleanPath = path.replace(/^\//, "").toLowerCase();
+  const segments = pathname.split("/").filter(Boolean).map(s => s.toLowerCase());
+
+  // 1. Exact segment match (e.g., segment "expense" === path "expense")
+  if (segments.includes(cleanPath)) {
+    return true;
+  }
+
+  // 2. Sub-route match for multi-word paths (e.g. /dashboard/expense/create or /dashboard/createExpense)
+  return segments.some((segment) => {
+    // Prevent "expense-category" from matching "expense"
+    if (segment.includes("-") && !cleanPath.includes("-")) {
+      return false;
+    }
+    return segment === cleanPath || segment.startsWith(cleanPath);
+  });
+};
 
 /* ------------------------------------------------------------------ */
 /* Leaf link                                                           */
@@ -112,6 +141,14 @@ const matchesPath = (pathname, path) =>
 
 const NavItem = ({ item, onClick, collapsed }) => {
   const Icon = item.icon;
+  const { pathname } = useLocation();
+
+  // Custom active state logic to cover sub-routes (e.g. createExpense)
+  const isItemActive = (navLinkIsActive) => {
+    if (navLinkIsActive) return true;
+    if (item.end) return false;
+    return matchesPath(pathname, item.path);
+  };
 
   return (
     <NavLink
@@ -119,69 +156,86 @@ const NavItem = ({ item, onClick, collapsed }) => {
       end={item.end}
       onClick={onClick}
       title={collapsed ? item.name : undefined}
-      className={({ isActive }) =>
-        [
-          "group flex items-center rounded-lg text-sm font-medium transition-all duration-200",
+      className={({ isActive }) => {
+        const active = isItemActive(isActive);
+        return [
+          "group flex items-center rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
           collapsed ? "justify-center h-11" : "gap-3 px-3 py-2.5",
-          isActive
+          active
             ? "bg-blue-600 text-white shadow-sm"
             : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
-        ].join(" ")
-      }
+        ].join(" ");
+      }}
     >
-      {({ isActive }) => (
-        <>
-          <span
-            className={[
-              "flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md transition-colors",
-              isActive
-                ? "bg-white/20"
-                : "bg-slate-100 group-hover:bg-slate-200",
-            ].join(" ")}
-          >
-            <Icon size={16} />
-          </span>
+      {({ isActive }) => {
+        const active = isItemActive(isActive);
+        return (
+          <>
+            <span
+              className={[
+                "flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md transition-colors",
+                active
+                  ? "bg-white/20"
+                  : "bg-slate-100 group-hover:bg-slate-200",
+              ].join(" ")}
+            >
+              <Icon size={16} />
+            </span>
 
-          {!collapsed && <span className="truncate">{item.name}</span>}
-        </>
-      )}
+            {!collapsed && <span className="truncate">{item.name}</span>}
+          </>
+        );
+      }}
     </NavLink>
   );
 };
 
 /* ------------------------------------------------------------------ */
-/* Child link inside a dropdown                                        */
+/* Child link inside a dropdown                                       */
 /* ------------------------------------------------------------------ */
 
-const SubNavItem = ({ item, onClick }) => (
-  <NavLink
-    to={item.path}
-    onClick={onClick}
-    className={({ isActive }) =>
-      [
-        "flex items-center gap-3 rounded-lg py-2 pl-3 pr-3 text-sm transition-colors",
-        isActive
-          ? "bg-blue-50 font-medium text-blue-700"
-          : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
-      ].join(" ")
-    }
-  >
-    {({ isActive }) => (
-      <>
-        <span
-          className={[
-            "h-1.5 w-1.5 shrink-0 rounded-full transition-colors",
-            isActive ? "bg-blue-600" : "bg-slate-300",
-          ].join(" ")}
-        />
-        <span className="truncate">{item.name}</span>
-      </>
-    )}
-  </NavLink>
-);
+const SubNavItem = ({ item, onClick }) => {
+  const { pathname } = useLocation();
+
+  const isSubActive = (navLinkIsActive) => {
+    if (navLinkIsActive) return true;
+    return matchesPath(pathname, item.path);
+  };
+
+  return (
+    <NavLink
+      to={item.path}
+      onClick={onClick}
+      className={({ isActive }) => {
+        const active = isSubActive(isActive);
+        return [
+          "flex items-center gap-3 rounded-lg py-2 pl-3 pr-3 text-sm transition-colors cursor-pointer",
+          active
+            ? "bg-blue-50 font-medium text-blue-700"
+            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
+        ].join(" ");
+      }}
+    >
+      {({ isActive }) => {
+        const active = isSubActive(isActive);
+        return (
+          <>
+            <span
+              className={[
+                "h-1.5 w-1.5 shrink-0 rounded-full transition-colors",
+                active ? "bg-blue-600" : "bg-slate-300",
+              ].join(" ")}
+            />
+            <span className="truncate">{item.name}</span>
+          </>
+        );
+      }}
+    </NavLink>
+  );
+};
 
 /* ------------------------------------------------------------------ */
-/* Group with dropdown                                                 */
+/* Group with dropdown                                                */
 /* ------------------------------------------------------------------ */
 
 const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
@@ -261,7 +315,7 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Sidebar body (shared by drawer + desktop)                           */
+/* Sidebar body (shared by drawer + desktop)                          */
 /* ------------------------------------------------------------------ */
 
 const SidebarBody = ({
@@ -389,7 +443,7 @@ const SidebarBody = ({
 };
 
 /* ------------------------------------------------------------------ */
-/* Sidebar                                                             */
+/* Sidebar                                                            */
 /* ------------------------------------------------------------------ */
 
 const Sidebar = ({ onLogOut }) => {

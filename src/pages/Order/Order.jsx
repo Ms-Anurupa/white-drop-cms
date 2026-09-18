@@ -303,6 +303,8 @@ const Order = () => {
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+
   const popoverRef = useRef(null);
 
   const navigate = useNavigate();
@@ -399,6 +401,8 @@ const Order = () => {
         limit: pageSize,
         fromDate: appliedFromDate || "",
         toDate: appliedToDate || "",
+      }).finally(() => {
+        setInitialLoadDone(true);
       });
     }, 600);
 
@@ -676,10 +680,12 @@ const Order = () => {
     return pages;
   };
 
+  if (loading || !initialLoadDone) {
+    return <Loader text="Loading order history lists..." />;
+  }
 
   return (
     <div className="relative p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
-      
       <PageStyles />
 
       {/* HEADER */}

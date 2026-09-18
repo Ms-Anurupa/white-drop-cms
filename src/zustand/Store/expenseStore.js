@@ -182,6 +182,28 @@ const expenseStore = create((set, get) => ({
             };
         }
     },
+
+    createExpenseCategory: async (payload) => {
+        set({ creating: true });
+        try {
+            const { data } = await api.post("/admin/createExpenseCategory", payload, {
+                withAuth: true,
+            });
+
+            // Refresh category list after successful creation
+            get().setCategorySearch("");
+            await get().getExpenseCategories({ append: false });
+
+            set({ creating: false });
+            return { ok: true, data };
+        } catch (err) {
+            set({ creating: false });
+            return {
+                ok: false,
+                message: err?.response?.data?.message || "Could not create category. Try again.",
+            };
+        }
+    },
 }));
 
 export default expenseStore;
