@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,10 +14,12 @@ import {
   IndianRupee,
   History,
   Phone,
+  Plus,
 } from "lucide-react";
 import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 import Loader from "@/components/Loader";
+import AddOfflinePaymentModal from "@/components/AddOfflinePaymentModal";
 
 // Shared Status Mappings
 const STATUS_DOTS = {
@@ -122,10 +124,35 @@ const StatusPill = ({ status, styles = {}, dots = {} }) => {
 const ViewSubscriptionDetails = () => {
   const { subId } = useParams();
   const navigate = useNavigate();
-  const getSubdetailsById = subscriptionStore((state) => state.getSubdetailsById);
+  const getSubdetailsById = subscriptionStore(
+    (state) => state.getSubdetailsById,
+  );
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentContext, setPaymentContext] = useState({
+    type: "",
+    data: null,
+  });
+
+  const isOnlinePaymentComplete = data?.paymentInfo?.status === "COMPLETE";
+
+  const currentDue = useMemo(() => {
+    if (!data) return 0;
+
+    // If there are offline logs, sort by date and get the most recent 'dueAfter'
+    if (data.offlinePaymentLogs && data.offlinePaymentLogs.length > 0) {
+      const sortedLogs = [...data.offlinePaymentLogs].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      return Number(sortedLogs[0].dueAfter);
+    }
+
+    // Fallback: If no logs exist, the due amount is the total amount
+    return Number(data.totalAmount || 0);
+  }, [data]);
 
   useEffect(() => {
     if (!subId) return;
@@ -153,7 +180,9 @@ const ViewSubscriptionDetails = () => {
     return (
       <div className="flex h-screen flex-col items-center justify-center bg-gray-50">
         <FileText size={40} className="text-gray-300 mb-4" />
-        <p className="text-sm font-medium text-gray-500">Subscription not found</p>
+        <p className="text-sm font-medium text-gray-500">
+          Subscription not found
+        </p>
         <button
           onClick={() => navigate(-1)}
           className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
@@ -176,7 +205,7 @@ const ViewSubscriptionDetails = () => {
   } = data;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
+    <div className="bg-gray-50">
       <ScrollbarStyle />
 
       {/* HEADER */}
@@ -189,7 +218,7 @@ const ViewSubscriptionDetails = () => {
           >
             <ArrowLeft size={16} />
           </button>
-          
+
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold tracking-tight text-gray-900">
@@ -208,27 +237,44 @@ const ViewSubscriptionDetails = () => {
               />
             </div>
             <p className="mt-0.5 text-xs text-gray-500">
-              Internal ID: {data.id} • Created on {formatShortDate(data.createdAt, true)}
+              Internal ID: {data.id} • Created on{" "}
+              {formatShortDate(data.createdAt, true)}
             </p>
           </div>
         </div>
+        {!isOnlinePaymentComplete && (
+          <button
+            onClick={() => {
+              setPaymentContext({
+                type: "SUBSCRIPTION",
+                data: data,
+              });
+              setIsPaymentModalOpen(true);
+            }}
+            className="group flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow active:scale-95 cursor-pointer"
+          >
+            <Plus
+              size={14}
+              className="transition-transform group-hover:rotate-90"
+            />
+            Add Offline Payment
+          </button>
+        )}
       </div>
 
       {/* CONTENT AREA */}
       <div className="subscription-scroll flex-1 overflow-y-auto p-4 md:p-6">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-            
             {/* LEFT COLUMN (Wider) */}
             <div className="flex flex-col gap-4 xl:col-span-2">
-              
               {/* PRODUCT & PLAN CARD */}
               <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-800">
                   <Package size={16} className="text-blue-500" />
                   Product & Subscription Plan
                 </h2>
-                
+
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Product Image & Core Details */}
                   <div className="flex gap-4 md:w-1/2">
@@ -251,7 +297,8 @@ const ViewSubscriptionDetails = () => {
                         {product?.product_name || "-"}
                       </h3>
                       <p className="mt-1 text-xs font-medium text-gray-500">
-                        Variant: {variant?.quantity} {variant?.unit} ({variant?.package})
+                        Variant: {variant?.quantity} {variant?.unit} (
+                        {variant?.package})
                       </p>
                       <p className="mt-1 text-xs text-gray-400">
                         SKU: {variant?.sku || "-"}
@@ -270,24 +317,42 @@ const ViewSubscriptionDetails = () => {
                       <CalendarDays size={12} />
                       {plan?.name || "Custom Plan"}
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">{plan?.description}</p>
-                    
+                    <p className="text-xs text-gray-500 mb-3">
+                      {plan?.description}
+                    </p>
+
                     <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-xs">
                       <div>
-                        <span className="text-gray-400 block mb-0.5">Start Date</span>
-                        <span className="font-medium text-gray-800">{formatShortDate(data.startDate)}</span>
+                        <span className="text-gray-400 block mb-0.5">
+                          Start Date
+                        </span>
+                        <span className="font-medium text-gray-800">
+                          {formatShortDate(data.startDate)}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-gray-400 block mb-0.5">Duration</span>
-                        <span className="font-medium text-gray-800">{data.durationMonths} Month(s)</span>
+                        <span className="text-gray-400 block mb-0.5">
+                          Duration
+                        </span>
+                        <span className="font-medium text-gray-800">
+                          {data.durationMonths} Month(s)
+                        </span>
                       </div>
                       <div>
-                        <span className="text-gray-400 block mb-0.5">Quantity/Delivery</span>
-                        <span className="font-medium text-gray-800">{data.qtyPerDelivery} unit(s)</span>
+                        <span className="text-gray-400 block mb-0.5">
+                          Quantity/Delivery
+                        </span>
+                        <span className="font-medium text-gray-800">
+                          {data.qtyPerDelivery} unit(s)
+                        </span>
                       </div>
                       <div>
-                        <span className="text-gray-400 block mb-0.5">Delivery Interval</span>
-                        <span className="font-medium text-gray-800">Every {data.intervalWeeks} week(s)</span>
+                        <span className="text-gray-400 block mb-0.5">
+                          Delivery Interval
+                        </span>
+                        <span className="font-medium text-gray-800">
+                          Every {data.intervalWeeks} week(s)
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -306,7 +371,9 @@ const ViewSubscriptionDetails = () => {
                     <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-1">
                       <Clock3 size={14} /> Delivery Slot
                     </div>
-                    <p className="text-sm font-semibold text-gray-800">{deliverySlot?.name || "-"}</p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {deliverySlot?.name || "-"}
+                    </p>
                     <p className="text-[11px] text-gray-500 mt-0.5">
                       {deliverySlot?.from} - {deliverySlot?.to}
                     </p>
@@ -318,7 +385,10 @@ const ViewSubscriptionDetails = () => {
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {data.selectedDays?.map((day) => (
-                        <span key={day} className="rounded bg-white border border-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 shadow-sm">
+                        <span
+                          key={day}
+                          className="rounded bg-white border border-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 shadow-sm"
+                        >
                           {day.substring(0, 3)}
                         </span>
                       ))}
@@ -330,13 +400,19 @@ const ViewSubscriptionDetails = () => {
                       <Package size={14} /> Fulfillment
                     </div>
                     <div className="flex items-end gap-2">
-                      <span className="text-lg font-bold text-gray-900">{data.totalDeliveries - data.deliveriesRemaining}</span>
-                      <span className="text-xs text-gray-500 pb-0.5">/ {data.totalDeliveries} done</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {data.totalDeliveries - data.deliveriesRemaining}
+                      </span>
+                      <span className="text-xs text-gray-500 pb-0.5">
+                        / {data.totalDeliveries} done
+                      </span>
                     </div>
                     <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                      <div 
-                        className="h-full bg-blue-500 rounded-full" 
-                        style={{ width: `${((data.totalDeliveries - data.deliveriesRemaining) / data.totalDeliveries) * 100}%` }}
+                      <div
+                        className="h-full bg-blue-500 rounded-full"
+                        style={{
+                          width: `${((data.totalDeliveries - data.deliveriesRemaining) / data.totalDeliveries) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -355,30 +431,49 @@ const ViewSubscriptionDetails = () => {
                       {offlinePaymentLogs.length} Records
                     </span>
                   </div>
-                  
+
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs whitespace-nowrap">
                       <thead className="bg-gray-50/80 text-gray-500">
                         <tr>
-                          <th className="px-4 py-2.5 font-medium">Date & Time</th>
+                          <th className="px-4 py-2.5 font-medium">
+                            Date & Time
+                          </th>
                           <th className="px-4 py-2.5 font-medium">Mode</th>
-                          <th className="px-4 py-2.5 font-medium text-right">Due Before</th>
-                          <th className="px-4 py-2.5 font-medium text-right text-emerald-600">Amount Received</th>
-                          <th className="px-4 py-2.5 font-medium text-right">Due After</th>
+                          <th className="px-4 py-2.5 font-medium text-right">
+                            Due Before
+                          </th>
+                          <th className="px-4 py-2.5 font-medium text-right text-emerald-600">
+                            Amount Received
+                          </th>
+                          <th className="px-4 py-2.5 font-medium text-right">
+                            Due After
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {offlinePaymentLogs.map((log) => (
-                          <tr key={log.id} className="transition hover:bg-gray-50/50">
-                            <td className="px-4 py-3 text-gray-600">{formatShortDate(log.createdAt, true)}</td>
+                          <tr
+                            key={log.id}
+                            className="transition hover:bg-gray-50/50"
+                          >
+                            <td className="px-4 py-3 text-gray-600">
+                              {formatShortDate(log.createdAt, true)}
+                            </td>
                             <td className="px-4 py-3">
                               <span className="inline-flex rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
                                 {log.paymentMode}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-gray-500">{formatCurrency(log.dueBefore)}</td>
-                            <td className="px-4 py-3 text-right font-semibold text-emerald-600">+{formatCurrency(log.paymentRec)}</td>
-                            <td className="px-4 py-3 text-right font-medium text-gray-800">{formatCurrency(log.dueAfter)}</td>
+                            <td className="px-4 py-3 text-right text-gray-500">
+                              {formatCurrency(log.dueBefore)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-emerald-600">
+                              +{formatCurrency(log.paymentRec)}
+                            </td>
+                            <td className="px-4 py-3 text-right font-medium text-gray-800">
+                              {formatCurrency(log.dueAfter)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -386,27 +481,31 @@ const ViewSubscriptionDetails = () => {
                   </div>
                 </div>
               )}
-
             </div>
 
             {/* RIGHT COLUMN (Sidebar Info) */}
             <div className="flex flex-col gap-4">
-              
               {/* CUSTOMER INFO */}
               <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-800">
                   <User size={16} className="text-blue-500" />
                   Customer Details
                 </h2>
-                
+
                 <div className="space-y-4">
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Name</p>
-                    <p className="mt-0.5 text-sm font-medium text-gray-900">{user?.customer_name || "-"}</p>
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                      Name
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium text-gray-900">
+                      {user?.customer_name || "-"}
+                    </p>
                   </div>
-                  
+
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Contact</p>
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                      Contact
+                    </p>
                     <div className="mt-1 flex items-center gap-2 text-sm text-gray-700">
                       <Phone size={13} className="text-gray-400" />
                       {user?.phone_num || "-"}
@@ -414,11 +513,20 @@ const ViewSubscriptionDetails = () => {
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Shipping Address</p>
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                      Shipping Address
+                    </p>
                     <div className="mt-1 flex items-start gap-2 text-xs text-gray-600">
-                      <MapPin size={14} className="mt-0.5 shrink-0 text-gray-400" />
+                      <MapPin
+                        size={14}
+                        className="mt-0.5 shrink-0 text-gray-400"
+                      />
                       <p className="leading-relaxed">
-                        {shippingAddress?.apartment && <span className="block font-medium text-gray-800">{shippingAddress.apartment}</span>}
+                        {shippingAddress?.apartment && (
+                          <span className="block font-medium text-gray-800">
+                            {shippingAddress.apartment}
+                          </span>
+                        )}
                         {shippingAddress?.locality || "Address not provided"}
                       </p>
                     </div>
@@ -439,10 +547,15 @@ const ViewSubscriptionDetails = () => {
                 </h2>
 
                 <div className="space-y-4">
+                  {/* TOTAL AMOUNT ROW */}
                   <div className="flex items-center justify-between rounded-lg bg-blue-50/50 p-3">
                     <div>
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">Total Amount</p>
-                      <p className="mt-0.5 text-xl font-bold text-blue-900">{formatCurrency(data.totalAmount)}</p>
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-gray-500">
+                        Total Amount
+                      </p>
+                      <p className="mt-0.5 text-xl font-bold text-blue-900">
+                        {formatCurrency(data.totalAmount)}
+                      </p>
                     </div>
                     <StatusPill
                       status={data.paymentStatus}
@@ -451,34 +564,74 @@ const ViewSubscriptionDetails = () => {
                     />
                   </div>
 
+                  {/* DYNAMIC DUE AMOUNT ROW (Hidden if completely paid online) */}
+                  {!isOnlinePaymentComplete && (
+                    <div
+                      className={`flex items-center justify-between rounded-lg border p-3 ${
+                        currentDue > 0
+                          ? "border-amber-100 bg-amber-50"
+                          : "border-emerald-100 bg-emerald-50"
+                      }`}
+                    >
+                      <div>
+                        <p
+                          className={`text-[10px] font-medium uppercase tracking-wider ${
+                            currentDue > 0
+                              ? "text-amber-600/80"
+                              : "text-emerald-600/80"
+                          }`}
+                        >
+                          Current Due
+                        </p>
+                        <p
+                          className={`mt-0.5 text-lg font-bold ${
+                            currentDue > 0
+                              ? "text-amber-700"
+                              : "text-emerald-700"
+                          }`}
+                        >
+                          {formatCurrency(currentDue)}
+                        </p>
+                      </div>
+                      {currentDue <= 0 && (
+                        <span className="rounded bg-emerald-100/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                          Fully Paid
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* PAYMENT DETAILS LIST */}
                   <div className="space-y-3 pt-2 text-xs">
                     <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                       <span className="text-gray-500">Payment Mode</span>
-                      <span className="font-medium text-gray-800 flex items-center gap-1.5">
-                        <CreditCard size={12} className="text-gray-400"/>
-                        {data.paymentMode === "PG" ? "Payment Gateway" : data.paymentMode || "-"}
+                      <span className="flex items-center gap-1.5 font-medium text-gray-800">
+                        <CreditCard size={12} className="text-gray-400" />
+                        {data.paymentMode === "PG"
+                          ? "Payment Gateway"
+                          : data.paymentMode || "-"}
                       </span>
                     </div>
 
-                    {paymentInfo?.paymentMethod && (
+                    {data?.paymentInfo?.paymentMethod && (
                       <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                         <span className="text-gray-500">Method</span>
-                        <span className="font-medium text-gray-800 capitalize">
+                        <span className="font-medium capitalize text-gray-800">
                           {paymentInfo.paymentMethod}
                         </span>
                       </div>
                     )}
 
-                    {paymentInfo?.txnID && (
+                    {data?.paymentInfo?.txnID && (
                       <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                         <span className="text-gray-500">Transaction ID</span>
-                        <span className="font-mono text-gray-800 bg-gray-50 px-1 rounded">
+                        <span className="rounded bg-gray-50 px-1 font-mono text-gray-800">
                           {paymentInfo.txnID}
                         </span>
                       </div>
                     )}
 
-                    {paymentInfo?.raw?.bank && (
+                    {data?.paymentInfo?.raw?.bank && (
                       <div className="flex items-center justify-between border-b border-gray-50 pb-2">
                         <span className="text-gray-500">Bank / Provider</span>
                         <span className="font-medium text-gray-800">
@@ -489,11 +642,20 @@ const ViewSubscriptionDetails = () => {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       </div>
+      <AddOfflinePaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        contextType={paymentContext.type}
+        contextData={paymentContext.data}
+        onSuccess={() => {
+          // Re-fetch your data here to show the newly added log
+          console.log("Success! Refresh data.");
+        }}
+      />
     </div>
   );
 };

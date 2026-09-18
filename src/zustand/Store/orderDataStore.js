@@ -137,6 +137,19 @@ const orderDataStore = create((set) => ({
       set({ loading: false });
     }
   },
+
+  addOfflinePayment: async (data) => {
+    try {
+      const res = await api.post("/admin/addOfflinePaymentLog", data, {
+        withAuth: true,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Failed to add offline payment:", error);
+      throw error;
+    }
+  },
 }));
 
 export default orderDataStore;
