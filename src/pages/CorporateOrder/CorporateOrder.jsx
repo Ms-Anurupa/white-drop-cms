@@ -473,6 +473,10 @@ const CorporateOrder = () => {
 
   if (loading) return <Loader text="Loading corporate orders..." />;
 
+  const handleDetailsNavigate = ((orderId)=>{
+    navigate(`/dashboard/corporate-orders/details/${orderId}`)
+  })
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50 px-4 py-3 gap-2">
       <ScrollbarStyle />
@@ -665,9 +669,9 @@ const CorporateOrder = () => {
                 <th className="w-24 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
                   Invoice
                 </th>
-                <th className="w-16 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
+                {/* <th className="w-16 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
                   Action
-                </th>
+                </th> */}
               </tr>
             </thead>
 
@@ -686,7 +690,12 @@ const CorporateOrder = () => {
                 </tr>
               ) : (
                 orders.map((o, idx) => (
-                  <tr key={o.id} className="hover:bg-slate-50 transition">
+                  <tr
+                    key={o.id}
+                    className="transition hover:bg-slate-50 cursor-pointer"
+                    title="Click to view more details"
+                    onClick={() => handleDetailsNavigate(o.id)}
+                  >
                     <td className="px-2 py-1.5 text-gray-400">
                       {start + idx + 1}
                     </td>
@@ -834,7 +843,7 @@ const CorporateOrder = () => {
                       </div>
                     </td>
 
-                    <td className="px-2 py-1.5">
+                    {/* <td className="px-2 py-1.5">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() =>
@@ -846,7 +855,7 @@ const CorporateOrder = () => {
                           <Eye size={14} />
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               )}
