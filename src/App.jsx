@@ -52,6 +52,7 @@ import SpecialOrderDetails from "./pages/specialOrderListing/SpecialOrderDetails
 import Sales from "./pages/sales/Sales";
 import ExpenseListing from "./components/ExpenseListing";
 import CreateExpense from "./components/CreateExpense";
+import ExpenseCategory from "./components/ExpenseCategory";
 import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
 
 const App = () => {
@@ -91,6 +92,7 @@ const App = () => {
                 <Route path="sales" element={<Sales />} />
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="create-expense" element={<CreateExpense />} />
+                <Route path="expense-category" element={<ExpenseCategory />} />
                 <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
@@ -111,7 +113,6 @@ const App = () => {
                   path="special-orders/specialOrderDetails/:id"
                   element={<SpecialOrderDetails />}
                 />
-                <Route path="production" element={<Production />} />
                 <Route path="packaging-job" element={<PackagingJob/>}/>
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="inventory/add-inventory" element={<AddInventory />} />
@@ -130,7 +131,6 @@ const App = () => {
                   element={<DeliveryPartnerDetails />}
                 />
                 <Route path="customerHelpLine" element={<CustomerHelpLine />} />
-                <Route path="support" element={<Support />} />
                 <Route
                   path="support/locality-manager"
                   element={<LocalityManager />}
