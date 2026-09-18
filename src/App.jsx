@@ -98,7 +98,7 @@ const App = () => {
                 <Route path="subscription-details/:subId" element={<ViewSubscriptionDetails />} />
                 <Route path="special-orders" element={<SpecialOrderListing />} />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
-                <Route path="corporate-orders/view/:id" element={<CorporateOrderView />} />
+                <Route path="corporate-orders/details/:id" element={<CorporateOrderView />} />
                 <Route path="corporate-orders/edit/:id" element={<CorporateOrderEdit />} />
                 <Route path="corporate-accounts" element={<CorporateAccounts />} />
                 <Route path="corporate-orders/create-corporate-order" element={<CreateCorporateOrder />} />

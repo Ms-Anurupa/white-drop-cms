@@ -514,7 +514,6 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
   }
 
   const  handleDetailsNavigate = ((subId)=>{
-    console.log(subId)
     navigate(`/dashboard/subscription-details/${subId}`)
   })
 
