@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Filter,
@@ -17,6 +17,7 @@ import {
   X,
   IndianRupee,
 } from "lucide-react";
+import salesJobStore from "@/zustand/Store/salesJobStore";
 
 const Sales = () => {
   const [search, setSearch] = useState("");
@@ -24,154 +25,35 @@ const Sales = () => {
   const [dateFilter, setDateFilter] = useState("ALL");
   const [page, setPage] = useState(1);
 
-  const salesData = [
-    {
-      id: "clx001sales",
-      saleDate: "2026-09-14T10:30:00",
-      saleValue: 12500,
-      saleType: "CORPORATE",
-      details: {
-        customer: "ABC Technologies Pvt Ltd",
-        items: 24,
-        paymentMode: "ONLINE",
-      },
-      refId: "ORD-20260914-001",
-    },
-    {
-      id: "clx002sales",
-      saleDate: "2026-09-14T11:15:00",
-      saleValue: 2450,
-      saleType: "RETAIL",
-      details: {
-        customer: "Rahul Sharma",
-        items: 6,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260914-002",
-    },
-    {
-      id: "clx003sales",
-      saleDate: "2026-09-14T12:05:00",
-      saleValue: 5800,
-      saleType: "ADHOC",
-      details: {
-        customer: "Walk-in Customer",
-        items: 12,
-        paymentMode: "ONLINE",
-      },
-      refId: "ADH-20260914-001",
-    },
-    {
-      id: "clx004sales",
-      saleDate: "2026-09-13T09:45:00",
-      saleValue: 8999,
-      saleType: "SUBSCRIPTION",
-      details: {
-        customer: "Green Valley Apartments",
-        items: 30,
-        paymentMode: "ONLINE",
-      },
-      refId: "SUB-20260913-001",
-    },
-    {
-      id: "clx005sales",
-      saleDate: "2026-09-13T13:20:00",
-      saleValue: 4200,
-      saleType: "RETAIL",
-      details: {
-        customer: "Priya Das",
-        items: 10,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260913-004",
-    },
-    {
-      id: "clx006sales",
-      saleDate: "2026-09-12T10:10:00",
-      saleValue: 18500,
-      saleType: "CORPORATE",
-      details: {
-        customer: "MIPL Industries",
-        items: 42,
-        paymentMode: "ONLINE",
-      },
-      refId: "COR-20260912-003",
-    },
-    {
-      id: "clx007sales",
-      saleDate: "2026-09-12T16:40:00",
-      saleValue: 1650,
-      saleType: "ADHOC",
-      details: {
-        customer: "Special Order Customer",
-        items: 4,
-        paymentMode: "COD",
-      },
-      refId: "ADH-20260912-002",
-    },
-    {
-      id: "clx008sales",
-      saleDate: "2026-09-11T11:25:00",
-      saleValue: 7200,
-      saleType: "SUBSCRIPTION",
-      details: {
-        customer: "Lake View Residency",
-        items: 25,
-        paymentMode: "ONLINE",
-      },
-      refId: "SUB-20260911-002",
-    },
-    {
-      id: "clx009sales",
-      saleDate: "2026-09-11T14:30:00",
-      saleValue: 3150,
-      saleType: "RETAIL",
-      details: {
-        customer: "Sourav Roy",
-        items: 8,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260911-008",
-    },
-    {
-      id: "clx010sales",
-      saleDate: "2026-09-10T10:15:00",
-      saleValue: 15200,
-      saleType: "CORPORATE",
-      details: {
-        customer: "Orion Enterprises",
-        items: 36,
-        paymentMode: "ONLINE",
-      },
-      refId: "COR-20260910-001",
-    },
-    {
-      id: "clx011sales",
-      saleDate: "2026-09-10T15:10:00",
-      saleValue: 2750,
-      saleType: "RETAIL",
-      details: {
-        customer: "Ananya Sen",
-        items: 7,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260910-012",
-    },
-    {
-      id: "clx012sales",
-      saleDate: "2026-09-09T12:50:00",
-      saleValue: 6400,
-      saleType: "ADHOC",
-      details: {
-        customer: "Special Order Customer",
-        items: 15,
-        paymentMode: "ONLINE",
-      },
-      refId: "ADH-20260909-004",
-    },
-  ];
+  const LIMIT = 10;
+
+  const { salesJobList, salesJobData, salesJobLoading, getSalesJobListing } =
+    salesJobStore();
+
+  const fetchSales = async () => {
+    try {
+      await getSalesJobListing({
+        page,
+        limit: LIMIT,
+        ...(saleType !== "ALL" && {
+          saleType,
+        }),
+        ...(dateFilter !== "ALL" && {
+          dateFilter: dateFilter.toLowerCase(),
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to fetch sales:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSales();
+  }, [page, saleType, dateFilter]);
 
   const formatDate = (date) => {
+    if (!date) return "-";
+
     const parsedDate = new Date(date);
 
     return parsedDate.toLocaleDateString("en-IN", {
@@ -182,6 +64,8 @@ const Sales = () => {
   };
 
   const formatTime = (date) => {
+    if (!date) return "-";
+
     const parsedDate = new Date(date);
 
     return parsedDate.toLocaleTimeString("en-IN", {
@@ -195,7 +79,7 @@ const Sales = () => {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 2,
-    }).format(value);
+    }).format(value || 0);
   };
 
   const getSaleTypeClass = (type) => {
@@ -237,60 +121,64 @@ const Sales = () => {
   };
 
   const filteredSales = useMemo(() => {
-    let result = [...salesData];
-
-    if (search.trim()) {
-      const searchValue = search.toLowerCase();
-
-      result = result.filter((sale) => {
-        return (
-          sale.refId?.toLowerCase().includes(searchValue) ||
-          sale.saleType?.toLowerCase().includes(searchValue) ||
-          sale.details?.customer?.toLowerCase().includes(searchValue)
-        );
-      });
+    if (!search.trim()) {
+      return salesJobList;
     }
 
-    if (saleType !== "ALL") {
-      result = result.filter((sale) => sale.saleType === saleType);
-    }
+    const searchValue = search.toLowerCase();
 
-    if (dateFilter === "TODAY") {
-      result = result.filter((sale) => sale.saleDate.startsWith("2026-09-14"));
-    }
+    return salesJobList.filter((sale) => {
+      return (
+        sale.refId?.toLowerCase().includes(searchValue) ||
+        sale.saleType?.toLowerCase().includes(searchValue) ||
+        sale.details?.customer?.toLowerCase().includes(searchValue)
+      );
+    });
+  }, [salesJobList, search]);
 
-    if (dateFilter === "YESTERDAY") {
-      result = result.filter((sale) => sale.saleDate.startsWith("2026-09-13"));
-    }
+  const totalSales = salesJobData?.summary?.totalRevenue || 0;
 
-    return result;
-  }, [search, saleType, dateFilter]);
+  const totalTransactions = salesJobData?.pagination?.totalCount || 0;
 
-  const totalSales = salesData.reduce((sum, sale) => sum + sale.saleValue, 0);
+  const totalPages = salesJobData?.pagination?.totalPages || 1;
 
-  const totalTransactions = salesData.length;
-
-  const corporateSales = salesData
+  /*
+   * These are calculated only from the currently loaded page.
+   * The current API does not return global totals by sale type.
+   */
+  const corporateSales = salesJobList
     .filter((sale) => sale.saleType === "CORPORATE")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
+    .reduce((sum, sale) => sum + (sale.saleValue || 0), 0);
 
-  const retailSales = salesData
+  const retailSales = salesJobList
     .filter((sale) => sale.saleType === "RETAIL")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
+    .reduce((sum, sale) => sum + (sale.saleValue || 0), 0);
 
-  const adhocSales = salesData
+  const adhocSales = salesJobList
     .filter((sale) => sale.saleType === "ADHOC")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
+    .reduce((sum, sale) => sum + (sale.saleValue || 0), 0);
 
-  const subscriptionSales = salesData
+  const subscriptionSales = salesJobList
     .filter((sale) => sale.saleType === "SUBSCRIPTION")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
+    .reduce((sum, sale) => sum + (sale.saleValue || 0), 0);
 
   const clearFilters = () => {
     setSearch("");
     setSaleType("ALL");
     setDateFilter("ALL");
     setPage(1);
+  };
+
+  const handleRefresh = () => {
+    fetchSales();
+  };
+
+  const handlePreviousPage = () => {
+    setPage((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage((prev) => Math.min(totalPages, prev + 1));
   };
 
   return (
@@ -315,13 +203,28 @@ const Sales = () => {
           </div>
         </div>
 
-        <button
-          type="button"
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-        >
-          <CalendarDays size={16} />
-          Sales Report
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={salesJobLoading}
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw
+              size={16}
+              className={salesJobLoading ? "animate-spin" : ""}
+            />
+            Refresh
+          </button>
+
+          <button
+            type="button"
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            <CalendarDays size={16} />
+            Sales Report
+          </button>
+        </div>
       </div>
 
       {/* Main Sales Card */}
@@ -337,7 +240,9 @@ const Sales = () => {
                   </p>
 
                   <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                    {formatCurrency(totalSales)}
+                    {salesJobLoading
+                      ? "Loading..."
+                      : formatCurrency(totalSales)}
                   </p>
                 </div>
 
@@ -347,12 +252,12 @@ const Sales = () => {
               </div>
 
               <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 font-semibold text-emerald-600">
+                <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 font-semibold text-blue-600">
                   <TrendingUp size={12} />
-                  12.4%
+                  {totalTransactions}
                 </span>
 
-                <span>vs previous period</span>
+                <span>total recorded transactions</span>
               </div>
             </div>
 
@@ -369,7 +274,7 @@ const Sales = () => {
                 </p>
 
                 <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                  {totalTransactions}
+                  {salesJobLoading ? "..." : totalTransactions}
                 </p>
 
                 <p className="mt-1 text-xs text-slate-500">
@@ -394,11 +299,10 @@ const Sales = () => {
             setSaleType(saleType === "CORPORATE" ? "ALL" : "CORPORATE");
             setPage(1);
           }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "CORPORATE"
+          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${saleType === "CORPORATE"
               ? "border-blue-400 ring-2 ring-blue-100"
               : "border-slate-200"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -414,7 +318,7 @@ const Sales = () => {
             {formatCurrency(corporateSales)}
           </p>
 
-          <p className="mt-1 text-xs text-slate-500">Corporate sales</p>
+          <p className="mt-1 text-xs text-slate-500">Current page sales</p>
         </button>
 
         {/* Retail */}
@@ -424,11 +328,10 @@ const Sales = () => {
             setSaleType(saleType === "RETAIL" ? "ALL" : "RETAIL");
             setPage(1);
           }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "RETAIL"
+          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${saleType === "RETAIL"
               ? "border-emerald-400 ring-2 ring-emerald-100"
               : "border-slate-200"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
@@ -442,7 +345,7 @@ const Sales = () => {
             {formatCurrency(retailSales)}
           </p>
 
-          <p className="mt-1 text-xs text-slate-500">Retail sales</p>
+          <p className="mt-1 text-xs text-slate-500">Current page sales</p>
         </button>
 
         {/* Adhoc */}
@@ -452,11 +355,10 @@ const Sales = () => {
             setSaleType(saleType === "ADHOC" ? "ALL" : "ADHOC");
             setPage(1);
           }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "ADHOC"
+          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${saleType === "ADHOC"
               ? "border-orange-400 ring-2 ring-orange-100"
               : "border-slate-200"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
@@ -470,7 +372,7 @@ const Sales = () => {
             {formatCurrency(adhocSales)}
           </p>
 
-          <p className="mt-1 text-xs text-slate-500">Adhoc sales</p>
+          <p className="mt-1 text-xs text-slate-500">Current page sales</p>
         </button>
 
         {/* Subscription */}
@@ -480,11 +382,10 @@ const Sales = () => {
             setSaleType(saleType === "SUBSCRIPTION" ? "ALL" : "SUBSCRIPTION");
             setPage(1);
           }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "SUBSCRIPTION"
+          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${saleType === "SUBSCRIPTION"
               ? "border-violet-400 ring-2 ring-violet-100"
               : "border-slate-200"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
@@ -500,7 +401,7 @@ const Sales = () => {
             {formatCurrency(subscriptionSales)}
           </p>
 
-          <p className="mt-1 text-xs text-slate-500">Subscription sales</p>
+          <p className="mt-1 text-xs text-slate-500">Current page sales</p>
         </button>
       </div>
 
@@ -574,11 +475,13 @@ const Sales = () => {
                     setDateFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
                 >
                   <option value="ALL">All Dates</option>
                   <option value="TODAY">Today</option>
                   <option value="YESTERDAY">Yesterday</option>
+                  <option value="THIS_WEEK">This Week</option>
+                  <option value="THIS_MONTH">This Month</option>
                 </select>
               </div>
 
@@ -632,7 +535,16 @@ const Sales = () => {
             </thead>
 
             <tbody>
-              {filteredSales.length > 0 ? (
+              {salesJobLoading ? (
+                <tr>
+                  <td colSpan="7" className="px-5 py-16 text-center">
+                    <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+                      <RefreshCw size={17} className="animate-spin" />
+                      Loading sales...
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredSales.length > 0 ? (
                 filteredSales.map((sale) => {
                   const TypeIcon = getSaleTypeIcon(sale.saleType);
 
@@ -655,7 +567,7 @@ const Sales = () => {
                       {/* Reference */}
                       <td className="px-5 py-4">
                         <p className="font-mono text-xs font-semibold text-slate-700">
-                          {sale.refId}
+                          {sale.refId || "-"}
                         </p>
 
                         <p className="mt-1 text-[11px] text-slate-400">
@@ -671,7 +583,7 @@ const Sales = () => {
                           )}`}
                         >
                           <TypeIcon size={12} />
-                          {sale.saleType}
+                          {sale.saleType || "-"}
                         </span>
                       </td>
 
@@ -741,38 +653,43 @@ const Sales = () => {
           <p className="text-xs text-slate-500">
             Showing{" "}
             <span className="font-semibold text-slate-700">
-              {filteredSales.length > 0 ? 1 : 0}
+              {salesJobList.length > 0 ? (page - 1) * LIMIT + 1 : 0}
             </span>{" "}
             to{" "}
             <span className="font-semibold text-slate-700">
-              {filteredSales.length}
+              {salesJobList.length > 0
+                ? (page - 1) * LIMIT + salesJobList.length
+                : 0}
             </span>{" "}
             of{" "}
             <span className="font-semibold text-slate-700">
-              {filteredSales.length}
+              {totalTransactions}
             </span>{" "}
             sales
           </p>
 
           <div className="flex items-center gap-1.5">
+            {/* First */}
             <button
               type="button"
               onClick={() => setPage(1)}
-              disabled={page === 1}
+              disabled={page === 1 || salesJobLoading}
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronsLeft size={15} />
             </button>
 
+            {/* Previous */}
             <button
               type="button"
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page === 1}
+              onClick={handlePreviousPage}
+              disabled={page === 1 || salesJobLoading}
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronLeft size={15} />
             </button>
 
+            {/* Current Page */}
             <button
               type="button"
               className="flex h-8 min-w-8 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-xs font-semibold text-white"
@@ -780,18 +697,22 @@ const Sales = () => {
               {page}
             </button>
 
+            {/* Next */}
             <button
               type="button"
-              onClick={() => setPage((prev) => prev + 1)}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50"
+              onClick={handleNextPage}
+              disabled={page >= totalPages || salesJobLoading}
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronRight size={15} />
             </button>
 
+            {/* Last */}
             <button
               type="button"
-              onClick={() => setPage((prev) => prev + 1)}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50"
+              onClick={() => setPage(totalPages)}
+              disabled={page >= totalPages || salesJobLoading}
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronsRight size={15} />
             </button>
