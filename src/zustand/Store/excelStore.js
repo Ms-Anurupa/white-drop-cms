@@ -5,11 +5,11 @@ import api from "../axios";
 const excelStore = create((set) => ({
   isDownloading: false,
 
-  downloadExcel: async (type) => {
+  downloadExcel: async (type,dateFrom,dateTo) => {
     set({ isDownloading: true });
     try {
       const response = await api.get(`admin/exportToExcel`, {
-        params: {type},
+        params: {type,dateFrom,dateTo},
         withAuth: true,
         responseType: "blob",
       });

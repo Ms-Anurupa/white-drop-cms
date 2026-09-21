@@ -14,6 +14,7 @@ import {
 import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
 import excelStore from "@/zustand/Store/excelStore";
+import { toast } from "react-toastify";
 
 const DATE_PILLS = [
   { label: "All Time", value: "" },
@@ -133,7 +134,15 @@ const ExpenseListing = () => {
   const showSkeleton = loading || !initialLoadDone;
 
   const handleExport = () => {
-    downloadExcel("expense");
+    if(!filters.dateFilter=="" ||!filters.dateFilter=="custom"){
+      toast.error("Please either select ALL or Custom date range")
+      return;
+    }
+    if((!filters.dateFrom && !filters.dateTo) || (filters.dateFrom && filters.dateTo)){
+      downloadExcel("expense",filters.dateFrom,filters.dateTo);
+    }else{
+      toast.error("Select both To and From Date!!")
+    }
   };
 
   return (
