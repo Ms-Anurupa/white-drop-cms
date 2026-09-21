@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
+import excelStore from "@/zustand/Store/excelStore";
 
 const DATE_PILLS = [
   { label: "All Time", value: "" },
@@ -92,6 +93,8 @@ const ExpenseListing = () => {
   const setPage = expenseStore((s) => s.setPage);
   const resetFilters = expenseStore((s) => s.resetFilters);
 
+  const { downloadExcel, isDownloading } = excelStore();
+
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const hasStartedLoading = useRef(false);
 
@@ -129,6 +132,10 @@ const ExpenseListing = () => {
   // the very first fetch has kicked in (so we never flash an empty state).
   const showSkeleton = loading || !initialLoadDone;
 
+  const handleExport = () => {
+    downloadExcel("expense");
+  };
+
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -151,11 +158,11 @@ const ExpenseListing = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            // onClick={() => handleExportToExcel()} // Update with your actual export function
+            onClick={handleExport} disabled={isDownloading}
             className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98]"
           >
             <FileSpreadsheet size={18} />
-            Export To Excel
+            {isDownloading ? "Exporting..." : "Export To Excel"}
           </button>
 
           <button
