@@ -134,7 +134,7 @@ const ExpenseListing = () => {
   const showSkeleton = loading || !initialLoadDone;
 
   const handleExport = () => {
-    if(!filters.dateFilter=="" ||!filters.dateFilter=="custom"){
+    if(filters.dateFilter!="" && filters.dateFilter!="custom"){
       toast.error("Please either select ALL or Custom date range")
       return;
     }
