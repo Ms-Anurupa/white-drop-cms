@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Filter,
@@ -16,275 +16,264 @@ import {
   RefreshCw,
   X,
   IndianRupee,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Clock3,
+  Phone,
+  Hash,
 } from "lucide-react";
+import salesJobStore from "@/zustand/Store/salesJobStore";
+
+const TYPE_META = {
+  CORPORATE: {
+    icon: Building2,
+    badge: "border-blue-200 bg-blue-50 text-blue-700",
+    accent: "#2563EB",
+    avatar: "bg-blue-50 text-blue-700",
+  },
+  RETAIL: {
+    icon: Store,
+    badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    accent: "#059669",
+    avatar: "bg-emerald-50 text-emerald-700",
+  },
+  ADHOC: {
+    icon: ClipboardList,
+    badge: "border-orange-200 bg-orange-50 text-orange-700",
+    accent: "#EA580C",
+    avatar: "bg-orange-50 text-orange-700",
+  },
+  SUBSCRIPTION: {
+    icon: RefreshCw,
+    badge: "border-violet-200 bg-violet-50 text-violet-700",
+    accent: "#7C3AED",
+    avatar: "bg-violet-50 text-violet-700",
+  },
+};
+
+const DEFAULT_META = {
+  icon: ShoppingBag,
+  badge: "border-slate-200 bg-slate-50 text-slate-600",
+  accent: "#94A3B8",
+  avatar: "bg-slate-100 text-slate-500",
+};
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
+
+const DATE_FILTERS = [
+  { value: "ALL", label: "All Dates" },
+  { value: "TODAY", label: "Today" },
+  { value: "YESTERDAY", label: "Yesterday" },
+  { value: "THIS_WEEK", label: "This Week" },
+  { value: "THIS_MONTH", label: "This Month" },
+];
+
+const SALE_TYPES = [
+  { value: "ALL", label: "All Sale Types" },
+  { value: "RETAIL", label: "Retail" },
+  { value: "CORPORATE", label: "Corporate" },
+  { value: "ADHOC", label: "Adhoc" },
+  { value: "SUBSCRIPTION", label: "Subscription" },
+];
+
+const typeMeta = (type) => TYPE_META[type] ?? DEFAULT_META;
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0);
+
+const formatDate = (date) => {
+  if (!date) return "Not available";
+
+  const parsed = new Date(date);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "Not available";
+  }
+
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const formatTime = (date) => {
+  if (!date) return "";
+
+  const parsed = new Date(date);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+
+  return parsed.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getInitials = (name) => {
+  if (!name) return "?";
+
+  const parts = String(name).trim().split(/\s+/);
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+};
+
+const displayValue = (value) => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
+    return <span className="text-slate-300">Not available</span>;
+  }
+
+  return value;
+};
+
+const getSearchText = (sale) => {
+  const details = sale?.details ?? {};
+
+  return [
+    sale?.id,
+    sale?.refId,
+    sale?.saleType,
+    sale?.saleValue,
+    sale?.saleDate,
+    sale?.occurredAt,
+    details?.reference,
+    details?.customerName,
+    details?.customerPhone,
+    details?.itemCount,
+    details?.soldBy,
+  ]
+    .filter((value) => value !== null && value !== undefined)
+    .join(" ")
+    .toLowerCase();
+};
 
 const Sales = () => {
   const [search, setSearch] = useState("");
   const [saleType, setSaleType] = useState("ALL");
   const [dateFilter, setDateFilter] = useState("ALL");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [selectedSale, setSelectedSale] = useState(null);
+  const [sort, setSort] = useState({
+    key: null,
+    direction: "desc",
+  });
 
-  const salesData = [
-    {
-      id: "clx001sales",
-      saleDate: "2026-09-14T10:30:00",
-      saleValue: 12500,
-      saleType: "CORPORATE",
-      details: {
-        customer: "ABC Technologies Pvt Ltd",
-        items: 24,
-        paymentMode: "ONLINE",
-      },
-      refId: "ORD-20260914-001",
-    },
-    {
-      id: "clx002sales",
-      saleDate: "2026-09-14T11:15:00",
-      saleValue: 2450,
-      saleType: "RETAIL",
-      details: {
-        customer: "Rahul Sharma",
-        items: 6,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260914-002",
-    },
-    {
-      id: "clx003sales",
-      saleDate: "2026-09-14T12:05:00",
-      saleValue: 5800,
-      saleType: "ADHOC",
-      details: {
-        customer: "Walk-in Customer",
-        items: 12,
-        paymentMode: "ONLINE",
-      },
-      refId: "ADH-20260914-001",
-    },
-    {
-      id: "clx004sales",
-      saleDate: "2026-09-13T09:45:00",
-      saleValue: 8999,
-      saleType: "SUBSCRIPTION",
-      details: {
-        customer: "Green Valley Apartments",
-        items: 30,
-        paymentMode: "ONLINE",
-      },
-      refId: "SUB-20260913-001",
-    },
-    {
-      id: "clx005sales",
-      saleDate: "2026-09-13T13:20:00",
-      saleValue: 4200,
-      saleType: "RETAIL",
-      details: {
-        customer: "Priya Das",
-        items: 10,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260913-004",
-    },
-    {
-      id: "clx006sales",
-      saleDate: "2026-09-12T10:10:00",
-      saleValue: 18500,
-      saleType: "CORPORATE",
-      details: {
-        customer: "MIPL Industries",
-        items: 42,
-        paymentMode: "ONLINE",
-      },
-      refId: "COR-20260912-003",
-    },
-    {
-      id: "clx007sales",
-      saleDate: "2026-09-12T16:40:00",
-      saleValue: 1650,
-      saleType: "ADHOC",
-      details: {
-        customer: "Special Order Customer",
-        items: 4,
-        paymentMode: "COD",
-      },
-      refId: "ADH-20260912-002",
-    },
-    {
-      id: "clx008sales",
-      saleDate: "2026-09-11T11:25:00",
-      saleValue: 7200,
-      saleType: "SUBSCRIPTION",
-      details: {
-        customer: "Lake View Residency",
-        items: 25,
-        paymentMode: "ONLINE",
-      },
-      refId: "SUB-20260911-002",
-    },
-    {
-      id: "clx009sales",
-      saleDate: "2026-09-11T14:30:00",
-      saleValue: 3150,
-      saleType: "RETAIL",
-      details: {
-        customer: "Sourav Roy",
-        items: 8,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260911-008",
-    },
-    {
-      id: "clx010sales",
-      saleDate: "2026-09-10T10:15:00",
-      saleValue: 15200,
-      saleType: "CORPORATE",
-      details: {
-        customer: "Orion Enterprises",
-        items: 36,
-        paymentMode: "ONLINE",
-      },
-      refId: "COR-20260910-001",
-    },
-    {
-      id: "clx011sales",
-      saleDate: "2026-09-10T15:10:00",
-      saleValue: 2750,
-      saleType: "RETAIL",
-      details: {
-        customer: "Ananya Sen",
-        items: 7,
-        paymentMode: "COD",
-      },
-      refId: "ORD-20260910-012",
-    },
-    {
-      id: "clx012sales",
-      saleDate: "2026-09-09T12:50:00",
-      saleValue: 6400,
-      saleType: "ADHOC",
-      details: {
-        customer: "Special Order Customer",
-        items: 15,
-        paymentMode: "ONLINE",
-      },
-      refId: "ADH-20260909-004",
-    },
-  ];
+  const {
+    salesJobList = [],
+    salesJobData,
+    salesJobLoading,
+    getSalesJobListing,
+  } = salesJobStore();
 
-  const formatDate = (date) => {
-    const parsedDate = new Date(date);
-
-    return parsedDate.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const formatTime = (date) => {
-    const parsedDate = new Date(date);
-
-    return parsedDate.toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  const getSaleTypeClass = (type) => {
-    switch (type) {
-      case "CORPORATE":
-        return "border-blue-200 bg-blue-50 text-blue-700";
-
-      case "RETAIL":
-        return "border-emerald-200 bg-emerald-50 text-emerald-700";
-
-      case "ADHOC":
-        return "border-orange-200 bg-orange-50 text-orange-700";
-
-      case "SUBSCRIPTION":
-        return "border-violet-200 bg-violet-50 text-violet-700";
-
-      default:
-        return "border-slate-200 bg-slate-50 text-slate-600";
+  const fetchSales = async () => {
+    try {
+      await getSalesJobListing({
+        page,
+        limit,
+        ...(saleType !== "ALL" && {
+          saleType,
+        }),
+        ...(dateFilter !== "ALL" && {
+          dateFilter: dateFilter.toLowerCase(),
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to fetch sales:", error);
     }
   };
 
-  const getSaleTypeIcon = (type) => {
-    switch (type) {
-      case "CORPORATE":
-        return Building2;
-
-      case "RETAIL":
-        return Store;
-
-      case "ADHOC":
-        return ClipboardList;
-
-      case "SUBSCRIPTION":
-        return RefreshCw;
-
-      default:
-        return ShoppingBag;
-    }
-  };
+  useEffect(() => {
+    fetchSales();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, saleType, dateFilter]);
 
   const filteredSales = useMemo(() => {
-    let result = [...salesData];
+    let rows = [...salesJobList];
 
+    /*
+     * Search is intentionally client-side because the current API
+     * does not accept a search parameter.
+     *
+     * This searches the currently loaded API page.
+     */
     if (search.trim()) {
-      const searchValue = search.toLowerCase();
+      const query = search.trim().toLowerCase();
 
-      result = result.filter((sale) => {
-        return (
-          sale.refId?.toLowerCase().includes(searchValue) ||
-          sale.saleType?.toLowerCase().includes(searchValue) ||
-          sale.details?.customer?.toLowerCase().includes(searchValue)
-        );
+      rows = rows.filter((sale) =>
+        getSearchText(sale).includes(query)
+      );
+    }
+
+    if (sort.key) {
+      rows.sort((a, b) => {
+        let aValue;
+        let bValue;
+
+        if (sort.key === "date") {
+          aValue = new Date(
+            a.occurredAt ?? a.saleDate ?? 0
+          ).getTime();
+
+          bValue = new Date(
+            b.occurredAt ?? b.saleDate ?? 0
+          ).getTime();
+        }
+
+        if (sort.key === "value") {
+          aValue = Number(a.saleValue) || 0;
+          bValue = Number(b.saleValue) || 0;
+        }
+
+        if (sort.direction === "asc") {
+          return aValue - bValue;
+        }
+
+        return bValue - aValue;
       });
     }
 
-    if (saleType !== "ALL") {
-      result = result.filter((sale) => sale.saleType === saleType);
-    }
+    return rows;
+  }, [salesJobList, search, sort]);
 
-    if (dateFilter === "TODAY") {
-      result = result.filter((sale) => sale.saleDate.startsWith("2026-09-14"));
-    }
+  const toggleSort = (key) => {
+    setSort((previous) => {
+      if (previous.key !== key) {
+        return {
+          key,
+          direction: "desc",
+        };
+      }
 
-    if (dateFilter === "YESTERDAY") {
-      result = result.filter((sale) => sale.saleDate.startsWith("2026-09-13"));
-    }
+      if (previous.direction === "desc") {
+        return {
+          key,
+          direction: "asc",
+        };
+      }
 
-    return result;
-  }, [search, saleType, dateFilter]);
-
-  const totalSales = salesData.reduce((sum, sale) => sum + sale.saleValue, 0);
-
-  const totalTransactions = salesData.length;
-
-  const corporateSales = salesData
-    .filter((sale) => sale.saleType === "CORPORATE")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
-
-  const retailSales = salesData
-    .filter((sale) => sale.saleType === "RETAIL")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
-
-  const adhocSales = salesData
-    .filter((sale) => sale.saleType === "ADHOC")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
-
-  const subscriptionSales = salesData
-    .filter((sale) => sale.saleType === "SUBSCRIPTION")
-    .reduce((sum, sale) => sum + sale.saleValue, 0);
+      return {
+        key: null,
+        direction: "desc",
+      };
+    });
+  };
 
   const clearFilters = () => {
     setSearch("");
@@ -293,223 +282,203 @@ const Sales = () => {
     setPage(1);
   };
 
+  const hasActiveFilters =
+    Boolean(search) ||
+    saleType !== "ALL" ||
+    dateFilter !== "ALL";
+
+  const summary = salesJobData?.summary ?? {};
+  const meta = salesJobData?.meta ?? {};
+  const pagination = salesJobData?.pagination ?? {};
+
+  const totalRevenue = Number(summary.totalRevenue) || 0;
+  const totalTransactions = Number(pagination.totalCount) || 0;
+  const totalPages = Math.max(Number(pagination.totalPages) || 1, 1);
+
+  const currentPageCount = filteredSales.length;
+
+  const rangeStart =
+    currentPageCount > 0
+      ? (page - 1) * limit + 1
+      : 0;
+
+  const rangeEnd =
+    currentPageCount > 0
+      ? (page - 1) * limit + currentPageCount
+      : 0;
+
+  const periodCards = [
+    {
+      key: "today",
+      label: "Today",
+      data: meta.today,
+    },
+    {
+      key: "yesterday",
+      label: "Yesterday",
+      data: meta.yesterday,
+    },
+    {
+      key: "this_week",
+      label: "This Week",
+      data: meta.this_week,
+    },
+    {
+      key: "this_month",
+      label: "This Month",
+      data: meta.this_month,
+    },
+  ];
+
   return (
-    <div className="min-h-full bg-slate-50 p-4 sm:p-4 lg:p-4">
-      {/* Header */}
+    <div className="min-h-full bg-slate-50 p-4 lg:p-5">
+      {/* HEADER */}
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-              <TrendingUp size={19} />
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+            <TrendingUp size={19} />
+          </div>
 
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-                Sales
-              </h1>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+              Sales
+            </h1>
 
-              <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
-                Track and monitor sales across all channels.
-              </p>
-            </div>
+            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+              Track and monitor sales across all channels.
+            </p>
           </div>
         </div>
 
-        <button
-          type="button"
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-        >
-          <CalendarDays size={16} />
-          Sales Report
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={fetchSales}
+            disabled={salesJobLoading}
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw
+              size={16}
+              className={salesJobLoading ? "animate-spin" : ""}
+            />
+            Refresh
+          </button>
+
+          <button
+            type="button"
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            <CalendarDays size={16} />
+            Sales Report
+          </button>
+        </div>
       </div>
 
-      {/* Main Sales Card */}
-      <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.25fr_1fr]">
-          {/* Total Sales */}
-          <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
-            <div className="relative z-10">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-blue-600">
-                    Total Sales
-                  </p>
-
-                  <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                    {formatCurrency(totalSales)}
-                  </p>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                  <IndianRupee size={20} />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 font-semibold text-emerald-600">
-                  <TrendingUp size={12} />
-                  12.4%
-                </span>
-
-                <span>vs previous period</span>
-              </div>
-            </div>
-
-            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-blue-100/50" />
-            <div className="absolute -bottom-14 right-20 h-28 w-28 rounded-full bg-blue-100/40" />
-          </div>
-
-          {/* Transactions */}
-          <div className="rounded-2xl border border-slate-200 p-5">
+      {/* MAIN SUMMARY */}
+      <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.3fr_1fr]">
+        {/* TOTAL REVENUE */}
+        <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/60 p-5 shadow-sm">
+          <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Transactions
+                <p className="text-xs font-medium uppercase tracking-wider text-blue-600">
+                  Total Sales
                 </p>
 
-                <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                  {totalTransactions}
+                <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
+                  {salesJobLoading
+                    ? "Loading..."
+                    : formatCurrency(totalRevenue)}
                 </p>
 
-                <p className="mt-1 text-xs text-slate-500">
-                  Total recorded sales
+                <p className="mt-2 text-xs text-slate-500">
+                  Total revenue for the current filter
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
-                <ShoppingBag size={20} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+                <IndianRupee size={20} />
               </div>
+            </div>
+
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 font-semibold text-blue-600 tabular-nums">
+                <TrendingUp size={12} />
+                {totalTransactions}
+              </span>
+
+              <span>recorded transactions</span>
+            </div>
+          </div>
+
+          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-blue-100/50" />
+          <div className="absolute -bottom-14 right-20 h-28 w-28 rounded-full bg-blue-100/40" />
+        </div>
+
+        {/* TRANSACTIONS */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                Transactions
+              </p>
+
+              <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
+                {salesJobLoading ? "..." : totalTransactions}
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                Total recorded sales
+              </p>
+            </div>
+
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+              <ShoppingBag size={20} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sales Type Cards */}
+      {/* PERIOD SUMMARY */}
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {/* Corporate */}
-        <button
-          type="button"
-          onClick={() => {
-            setSaleType(saleType === "CORPORATE" ? "ALL" : "CORPORATE");
-            setPage(1);
-          }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "CORPORATE"
-              ? "border-blue-400 ring-2 ring-blue-100"
-              : "border-slate-200"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-              <Building2 size={17} />
+        {periodCards.map((card) => (
+          <div
+            key={card.key}
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                  {card.label}
+                </p>
+
+                <p className="mt-2 text-lg font-bold text-slate-900 tabular-nums">
+                  {salesJobLoading
+                    ? "..."
+                    : formatCurrency(card.data?.totalRevenue)}
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-slate-100 p-2 text-slate-500">
+                <IndianRupee size={15} />
+              </div>
             </div>
 
-            <span className="text-xs font-medium text-slate-400">
-              Corporate
-            </span>
+            <p className="mt-2 text-xs text-slate-500">
+              {salesJobLoading
+                ? "Loading..."
+                : `${card.data?.totalCount ?? 0} transactions`}
+            </p>
           </div>
-
-          <p className="mt-4 text-lg font-bold text-slate-900">
-            {formatCurrency(corporateSales)}
-          </p>
-
-          <p className="mt-1 text-xs text-slate-500">Corporate sales</p>
-        </button>
-
-        {/* Retail */}
-        <button
-          type="button"
-          onClick={() => {
-            setSaleType(saleType === "RETAIL" ? "ALL" : "RETAIL");
-            setPage(1);
-          }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "RETAIL"
-              ? "border-emerald-400 ring-2 ring-emerald-100"
-              : "border-slate-200"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-              <Store size={17} />
-            </div>
-
-            <span className="text-xs font-medium text-slate-400">Retail</span>
-          </div>
-
-          <p className="mt-4 text-lg font-bold text-slate-900">
-            {formatCurrency(retailSales)}
-          </p>
-
-          <p className="mt-1 text-xs text-slate-500">Retail sales</p>
-        </button>
-
-        {/* Adhoc */}
-        <button
-          type="button"
-          onClick={() => {
-            setSaleType(saleType === "ADHOC" ? "ALL" : "ADHOC");
-            setPage(1);
-          }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "ADHOC"
-              ? "border-orange-400 ring-2 ring-orange-100"
-              : "border-slate-200"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-              <ClipboardList size={17} />
-            </div>
-
-            <span className="text-xs font-medium text-slate-400">Adhoc</span>
-          </div>
-
-          <p className="mt-4 text-lg font-bold text-slate-900">
-            {formatCurrency(adhocSales)}
-          </p>
-
-          <p className="mt-1 text-xs text-slate-500">Adhoc sales</p>
-        </button>
-
-        {/* Subscription */}
-        <button
-          type="button"
-          onClick={() => {
-            setSaleType(saleType === "SUBSCRIPTION" ? "ALL" : "SUBSCRIPTION");
-            setPage(1);
-          }}
-          className={`cursor-pointer rounded-2xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-            saleType === "SUBSCRIPTION"
-              ? "border-violet-400 ring-2 ring-violet-100"
-              : "border-slate-200"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-              <RefreshCw size={17} />
-            </div>
-
-            <span className="text-xs font-medium text-slate-400">
-              Subscription
-            </span>
-          </div>
-
-          <p className="mt-4 text-lg font-bold text-slate-900">
-            {formatCurrency(subscriptionSales)}
-          </p>
-
-          <p className="mt-1 text-xs text-slate-500">Subscription sales</p>
-        </button>
+        ))}
       </div>
 
-      {/* Filters + Table */}
+      {/* FILTERS + TABLE */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        {/* Filter Header */}
+        {/* FILTER BAR */}
         <div className="border-b border-slate-100 p-4">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            {/* Search */}
+            {/* SEARCH */}
             <div className="relative w-full xl:max-w-md">
               <Search
                 size={17}
@@ -519,11 +488,8 @@ const Sales = () => {
               <input
                 type="text"
                 value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="Search by reference, customer or type..."
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search loaded results..."
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-50"
               />
 
@@ -538,7 +504,7 @@ const Sales = () => {
               )}
             </div>
 
-            {/* Filters */}
+            {/* FILTERS */}
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative">
                 <Filter
@@ -554,11 +520,14 @@ const Sales = () => {
                   }}
                   className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
                 >
-                  <option value="ALL">All Sale Types</option>
-                  <option value="CORPORATE">Corporate</option>
-                  <option value="RETAIL">Retail</option>
-                  <option value="ADHOC">Adhoc</option>
-                  <option value="SUBSCRIPTION">Subscription</option>
+                  {SALE_TYPES.map((type) => (
+                    <option
+                      key={type.value}
+                      value={type.value}
+                    >
+                      {type.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -574,15 +543,20 @@ const Sales = () => {
                     setDateFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
                 >
-                  <option value="ALL">All Dates</option>
-                  <option value="TODAY">Today</option>
-                  <option value="YESTERDAY">Yesterday</option>
+                  {DATE_FILTERS.map((filter) => (
+                    <option
+                      key={filter.value}
+                      value={filter.value}
+                    >
+                      {filter.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              {(search || saleType !== "ALL" || dateFilter !== "ALL") && (
+              {hasActiveFilters && (
                 <button
                   type="button"
                   onClick={clearFilters}
@@ -594,19 +568,31 @@ const Sales = () => {
               )}
             </div>
           </div>
+
+          {search && (
+            <p className="mt-2 text-xs text-slate-400">
+              Search applies to the currently loaded page.
+            </p>
+          )}
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80">
+        {/* TABLE */}
+        <div className="max-h-[640px] overflow-auto">
+          <table className="w-full min-w-[850px] text-sm">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-slate-100 bg-slate-50/95 backdrop-blur">
                 <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                  Sale Date
-                </th>
-
-                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                  Reference
+                  <button
+                    type="button"
+                    onClick={() => toggleSort("date")}
+                    className="flex cursor-pointer items-center gap-1 hover:text-slate-600"
+                  >
+                    Sale Date
+                    <SortIcon
+                      column="date"
+                      sort={sort}
+                    />
+                  </button>
                 </th>
 
                 <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
@@ -622,88 +608,167 @@ const Sales = () => {
                 </th>
 
                 <th className="px-5 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                  Sale Value
+                  <button
+                    type="button"
+                    onClick={() => toggleSort("value")}
+                    className="ml-auto flex cursor-pointer items-center gap-1 hover:text-slate-600"
+                  >
+                    Sale Value
+                    <SortIcon
+                      column="value"
+                      sort={sort}
+                    />
+                  </button>
                 </th>
 
                 <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                  Action
+                  View
                 </th>
               </tr>
             </thead>
 
             <tbody>
-              {filteredSales.length > 0 ? (
+              {salesJobLoading ? (
+                Array.from({ length: 6 }).map((_, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-slate-100"
+                  >
+                    <td className="px-5 py-4">
+                      <Skeleton width="w-20" />
+                      <Skeleton
+                        width="w-12"
+                        className="mt-2"
+                      />
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <Skeleton width="w-24" />
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 animate-pulse rounded-full bg-slate-100" />
+
+                        <div>
+                          <Skeleton width="w-28" />
+                          <Skeleton
+                            width="w-20"
+                            className="mt-1.5"
+                          />
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4 text-center">
+                      <Skeleton width="w-8" />
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <div className="ml-auto">
+                        <Skeleton width="w-20" />
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <div className="flex justify-center">
+                        <Skeleton width="w-8" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : filteredSales.length > 0 ? (
                 filteredSales.map((sale) => {
-                  const TypeIcon = getSaleTypeIcon(sale.saleType);
+                  const meta = typeMeta(sale.saleType);
+                  const Icon = meta.icon;
+
+                  const customerName =
+                    sale?.details?.customerName;
+
+                  const customerPhone =
+                    sale?.details?.customerPhone;
 
                   return (
                     <tr
                       key={sale.id}
-                      className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50/60"
+                      onClick={() => setSelectedSale(sale)}
+                      className="group cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50/70"
+                      style={{
+                        borderLeft: `3px solid ${meta.accent}`,
+                      }}
                     >
-                      {/* Date */}
+                      {/* DATE */}
                       <td className="px-5 py-4">
                         <p className="font-medium text-slate-700">
-                          {formatDate(sale.saleDate)}
+                          {formatDate(
+                            sale.occurredAt ?? sale.saleDate
+                          )}
                         </p>
 
-                        <p className="mt-0.5 text-xs text-slate-400">
-                          {formatTime(sale.saleDate)}
-                        </p>
+                        {sale.occurredAt && (
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                            <Clock3 size={11} />
+                            {formatTime(sale.occurredAt)}
+                          </p>
+                        )}
                       </td>
 
-                      {/* Reference */}
-                      <td className="px-5 py-4">
-                        <p className="font-mono text-xs font-semibold text-slate-700">
-                          {sale.refId}
-                        </p>
-
-                        <p className="mt-1 text-[11px] text-slate-400">
-                          {sale.id}
-                        </p>
-                      </td>
-
-                      {/* Type */}
+                      {/* TYPE */}
                       <td className="px-5 py-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getSaleTypeClass(
-                            sale.saleType,
-                          )}`}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${meta.badge}`}
                         >
-                          <TypeIcon size={12} />
-                          {sale.saleType}
+                          <Icon size={12} />
+                          {sale.saleType || "Unknown"}
                         </span>
                       </td>
 
-                      {/* Customer */}
+                      {/* CUSTOMER */}
                       <td className="px-5 py-4">
-                        <p className="font-medium text-slate-700">
-                          {sale.details?.customer || "-"}
-                        </p>
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${meta.avatar}`}
+                          >
+                            {getInitials(customerName)}
+                          </div>
 
-                        <p className="mt-1 text-xs text-slate-400">
-                          {sale.details?.paymentMode || "-"}
-                        </p>
+                          <div className="min-w-0">
+                            <p className="max-w-[180px] truncate font-medium text-slate-700">
+                              {displayValue(customerName)}
+                            </p>
+
+                            {customerPhone && (
+                              <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                                <Phone size={10} />
+                                {customerPhone}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
-                      {/* Items */}
+                      {/* ITEMS */}
                       <td className="px-5 py-4 text-center">
-                        <span className="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
-                          {sale.details?.items || 0}
+                        <span className="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 tabular-nums">
+                          {sale.details?.itemCount ?? 0}
                         </span>
                       </td>
 
-                      {/* Value */}
+                      {/* VALUE */}
                       <td className="px-5 py-4 text-right">
-                        <span className="font-bold text-slate-800">
+                        <span className="font-bold text-slate-800 tabular-nums">
                           {formatCurrency(sale.saleValue)}
                         </span>
                       </td>
 
-                      {/* Action */}
+                      {/* VIEW */}
                       <td className="px-5 py-4 text-center">
                         <button
                           type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedSale(sale);
+                          }}
                           className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                           title="View sale"
                         >
@@ -715,19 +780,39 @@ const Sales = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="px-5 py-16 text-center">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-16 text-center"
+                  >
                     <div className="mx-auto flex max-w-xs flex-col items-center">
                       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
-                        <ShoppingBag size={22} className="text-slate-400" />
+                        <ShoppingBag
+                          size={22}
+                          className="text-slate-400"
+                        />
                       </div>
 
                       <p className="text-sm font-semibold text-slate-700">
-                        No sales found
+                        {hasActiveFilters
+                          ? "No matching sales"
+                          : "No sales yet"}
                       </p>
 
                       <p className="mt-1 text-xs text-slate-400">
-                        Try changing your search or filters.
+                        {hasActiveFilters
+                          ? "Try a different search term or clear your filters."
+                          : "Sales will show up here once transactions come in."}
                       </p>
+
+                      {hasActiveFilters && (
+                        <button
+                          type="button"
+                          onClick={clearFilters}
+                          className="mt-4 inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        >
+                          Clear filters
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -736,65 +821,248 @@ const Sales = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* PAGINATION */}
         <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-slate-500">
-            Showing{" "}
-            <span className="font-semibold text-slate-700">
-              {filteredSales.length > 0 ? 1 : 0}
-            </span>{" "}
-            to{" "}
-            <span className="font-semibold text-slate-700">
-              {filteredSales.length}
-            </span>{" "}
-            of{" "}
-            <span className="font-semibold text-slate-700">
-              {filteredSales.length}
-            </span>{" "}
-            sales
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-slate-500">
+              Showing{" "}
+              <span className="font-semibold text-slate-700 tabular-nums">
+                {rangeStart}
+              </span>{" "}
+              to{" "}
+              <span className="font-semibold text-slate-700 tabular-nums">
+                {rangeEnd}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-slate-700 tabular-nums">
+                {totalTransactions}
+              </span>{" "}
+              sales
+            </p>
+
+            <div className="hidden items-center gap-1.5 sm:flex">
+              <label
+                htmlFor="page-size"
+                className="text-xs text-slate-400"
+              >
+                Rows
+              </label>
+
+              <select
+                id="page-size"
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="h-7 cursor-pointer rounded-md border border-slate-200 bg-white px-1.5 text-xs font-medium text-slate-600 outline-none focus:border-blue-400"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
+            <PaginationButton
               onClick={() => setPage(1)}
-              disabled={page === 1}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={page === 1 || salesJobLoading}
             >
               <ChevronsLeft size={15} />
-            </button>
+            </PaginationButton>
 
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page === 1}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+            <PaginationButton
+              onClick={() =>
+                setPage((current) =>
+                  Math.max(1, current - 1)
+                )
+              }
+              disabled={page === 1 || salesJobLoading}
             >
               <ChevronLeft size={15} />
-            </button>
+            </PaginationButton>
 
-            <button
-              type="button"
-              className="flex h-8 min-w-8 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-xs font-semibold text-white"
-            >
+            <div className="flex h-8 min-w-8 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-xs font-semibold text-white tabular-nums">
               {page}
-            </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => setPage((prev) => prev + 1)}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50"
+            <PaginationButton
+              onClick={() =>
+                setPage((current) =>
+                  Math.min(totalPages, current + 1)
+                )
+              }
+              disabled={
+                page >= totalPages || salesJobLoading
+              }
             >
               <ChevronRight size={15} />
-            </button>
+            </PaginationButton>
 
-            <button
-              type="button"
-              onClick={() => setPage((prev) => prev + 1)}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50"
+            <PaginationButton
+              onClick={() => setPage(totalPages)}
+              disabled={
+                page >= totalPages || salesJobLoading
+              }
             >
               <ChevronsRight size={15} />
-            </button>
+            </PaginationButton>
+          </div>
+        </div>
+      </div>
+
+      {/* DETAIL MODAL */}
+      {selectedSale && (
+        <SaleDetailModal
+          sale={selectedSale}
+          onClose={() => setSelectedSale(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+const SortIcon = ({ column, sort }) => {
+  if (sort.key !== column) {
+    return (
+      <ArrowUpDown
+        size={13}
+        className="text-slate-300"
+      />
+    );
+  }
+
+  return sort.direction === "asc" ? (
+    <ArrowUp
+      size={13}
+      className="text-blue-600"
+    />
+  ) : (
+    <ArrowDown
+      size={13}
+      className="text-blue-600"
+    />
+  );
+};
+
+const Skeleton = ({ width = "w-16", className = "" }) => (
+  <div
+    className={`h-3.5 animate-pulse rounded bg-slate-100 ${width} ${className}`}
+  />
+);
+
+const PaginationButton = ({
+  onClick,
+  disabled,
+  children,
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+  >
+    {children}
+  </button>
+);
+
+const SaleDetailModal = ({ sale, onClose }) => {
+  const meta = typeMeta(sale.saleType);
+  const Icon = meta.icon;
+  const details = sale?.details ?? {};
+
+  const excludedKeys = [
+    "reference",
+    "customerName",
+    "customerPhone",
+    "itemCount",
+  ];
+
+  const additionalDetails = Object.entries(details).filter(
+    ([key]) => !excludedKeys.includes(key)
+  );
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {/* MODAL HEADER */}
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${meta.badge}`}
+            >
+              <Icon size={12} />
+              {sale.saleType || "Unknown"}
+            </span>
+
+            <h2 className="text-sm font-semibold text-slate-800">
+              Sale Details
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* MODAL BODY */}
+        <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+          {/* PRIMARY DETAILS */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+            {/* <DetailItem
+              label="Reference"
+              value={
+                details.reference ?? sale.refId
+              }
+              icon={<Hash size={12} />}
+              mono
+            /> */}
+
+            <DetailItem
+              label="Sale Value"
+              value={formatCurrency(sale.saleValue)}
+              valueClass="font-bold text-slate-800"
+            />
+
+            <DetailItem
+              label="Sale Date"
+              value={formatDate(
+                sale.occurredAt ?? sale.saleDate
+              )}
+            />
+
+            <DetailItem
+              label="Sale Time"
+              value={formatTime(sale.occurredAt) || "Not available"}
+            />
+
+            <DetailItem
+              label="Customer"
+              value={details.customerName}
+            />
+
+            <DetailItem
+              label="Phone"
+              value={details.customerPhone}
+            />
+
+            <DetailItem
+              label="Items"
+              value={details.itemCount}
+            />
           </div>
         </div>
       </div>
@@ -802,4 +1070,45 @@ const Sales = () => {
   );
 };
 
+const DetailItem = ({
+  label,
+  value,
+  icon,
+  mono = false,
+  valueClass = "text-slate-700",
+}) => (
+  <div className="min-w-0">
+    <dt className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+      {icon}
+      {label}
+    </dt>
+
+    <dd
+      className={`mt-1 break-words text-sm ${valueClass} ${
+        mono ? "font-mono text-xs font-semibold" : ""
+      }`}
+    >
+      {displayValue(value)}
+    </dd>
+  </div>
+);
+
+const formatLabel = (key) =>
+  String(key)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase());
+
+const formatDetailValue = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+};
+
 export default Sales;
+
