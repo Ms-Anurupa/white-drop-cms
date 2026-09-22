@@ -1022,14 +1022,14 @@ const SaleDetailModal = ({ sale, onClose }) => {
         <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
           {/* PRIMARY DETAILS */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-            <DetailItem
+            {/* <DetailItem
               label="Reference"
               value={
                 details.reference ?? sale.refId
               }
               icon={<Hash size={12} />}
               mono
-            />
+            /> */}
 
             <DetailItem
               label="Sale Value"
