@@ -116,6 +116,43 @@ const usePackagingJobStore = create((set, get) => ({
 
     clearSelectedJob: () =>
         set({ selectedJobId: null, selectedJob: null, selectedJobError: null }),
+
+    addExtraPackaging: async (id, extraDelta) => {
+        set({ extraUpdatingId: id, extraUpdateError: null });
+
+        try {
+            await api.post("/admin/addExtraPackagingData", {
+              id,
+              extra: extraDelta,
+              
+            }, {withAuth: true});
+
+            set((state) => ({
+                jobs: state.jobs.map((job) =>
+                    job.id === id
+                        ? { ...job, extra: (job.extra ?? 0) + extraDelta }
+                        : job,
+                ),
+                selectedJob:
+                    state.selectedJob?.id === id
+                        ? {
+                            ...state.selectedJob,
+                            extra: (state.selectedJob.extra ?? 0) + extraDelta,
+                        }
+                        : state.selectedJob,
+            }));
+
+            return true;
+        } catch (err) {
+            set({
+                extraUpdateError:
+                    err?.response?.data?.error ?? "Failed to update extra packaging.",
+            });
+            return false;
+        } finally {
+            set({ extraUpdatingId: null });
+        }
+    },
 }));
 
 export default usePackagingJobStore;
