@@ -167,9 +167,15 @@ const Sales = () => {
   const [search, setSearch] = useState("");
   const [saleType, setSaleType] = useState("ALL");
   const [dateFilter, setDateFilter] = useState("ALL");
+
+  // Custom date range
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [selectedSale, setSelectedSale] = useState(null);
+
   const [sort, setSort] = useState({
     key: null,
     direction: "desc",
@@ -182,17 +188,36 @@ const Sales = () => {
     getSalesJobListing,
   } = salesJobStore();
 
+  const hasCustomRange = Boolean(customFrom) && Boolean(customTo);
+
+  const isCustomRangeInvalid =
+    Boolean(customFrom) &&
+    Boolean(customTo) &&
+    new Date(customFrom) > new Date(customTo);
+
   const fetchSales = async () => {
+    if (isCustomRangeInvalid) return;
+
     try {
       await getSalesJobListing({
         page,
         limit,
+
         ...(saleType !== "ALL" && {
           saleType,
         }),
-        ...(dateFilter !== "ALL" && {
-          dateFilter: dateFilter.toLowerCase(),
-        }),
+
+        ...(hasCustomRange
+          ? {
+            dateFilter: "custom",
+            fromDate: customFrom,
+            toDate: customTo,
+          }
+          : dateFilter !== "ALL"
+            ? {
+              dateFilter: dateFilter.toLowerCase(),
+            }
+            : {}),
       });
     } catch (error) {
       console.error("Failed to fetch sales:", error);
@@ -200,10 +225,13 @@ const Sales = () => {
   };
 
   useEffect(() => {
-    fetchSales();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, saleType, dateFilter]);
+    if ((customFrom && !customTo) || (!customFrom && customTo)) {
+      return;
+    }
 
+    fetchSales();
+  }, [page, limit, saleType, dateFilter, customFrom, customTo]);
+  
   const filteredSales = useMemo(() => {
     let rows = [...salesJobList];
 
@@ -216,9 +244,7 @@ const Sales = () => {
     if (search.trim()) {
       const query = search.trim().toLowerCase();
 
-      rows = rows.filter((sale) =>
-        getSearchText(sale).includes(query)
-      );
+      rows = rows.filter((sale) => getSearchText(sale).includes(query));
     }
 
     if (sort.key) {
@@ -227,13 +253,9 @@ const Sales = () => {
         let bValue;
 
         if (sort.key === "date") {
-          aValue = new Date(
-            a.occurredAt ?? a.saleDate ?? 0
-          ).getTime();
+          aValue = new Date(a.occurredAt ?? a.saleDate ?? 0).getTime();
 
-          bValue = new Date(
-            b.occurredAt ?? b.saleDate ?? 0
-          ).getTime();
+          bValue = new Date(b.occurredAt ?? b.saleDate ?? 0).getTime();
         }
 
         if (sort.key === "value") {
@@ -275,17 +297,27 @@ const Sales = () => {
     });
   };
 
+  const clearCustomDateRange = () => {
+    setCustomFrom("");
+    setCustomTo("");
+    setPage(1);
+  };
+
   const clearFilters = () => {
     setSearch("");
     setSaleType("ALL");
     setDateFilter("ALL");
+    setCustomFrom("");
+    setCustomTo("");
     setPage(1);
   };
 
   const hasActiveFilters =
     Boolean(search) ||
     saleType !== "ALL" ||
-    dateFilter !== "ALL";
+    dateFilter !== "ALL" ||
+    Boolean(customFrom) ||
+    Boolean(customTo);
 
   const summary = salesJobData?.summary ?? {};
   const meta = salesJobData?.meta ?? {};
@@ -297,15 +329,10 @@ const Sales = () => {
 
   const currentPageCount = filteredSales.length;
 
-  const rangeStart =
-    currentPageCount > 0
-      ? (page - 1) * limit + 1
-      : 0;
+  const rangeStart = currentPageCount > 0 ? (page - 1) * limit + 1 : 0;
 
   const rangeEnd =
-    currentPageCount > 0
-      ? (page - 1) * limit + currentPageCount
-      : 0;
+    currentPageCount > 0 ? (page - 1) * limit + currentPageCount : 0;
 
   const periodCards = [
     {
@@ -478,34 +505,116 @@ const Sales = () => {
         {/* FILTER BAR */}
         <div className="border-b border-slate-100 p-4">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            {/* SEARCH */}
-            <div className="relative w-full xl:max-w-md">
-              <Search
-                size={17}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
+            {/* SEARCH + CUSTOM DATE RANGE */}
+            <div className="flex w-full flex-col gap-2 sm:flex-row xl:max-w-3xl">
+              {/* SEARCH */}
+              <div className="relative w-full sm:max-w-md">
+                <Search
+                  size={17}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
 
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search loaded results..."
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-50"
-              />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search loaded results..."
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-50"
+                />
 
-              {search && (
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* CUSTOM FROM DATE */}
+              <div className="relative w-full sm:w-auto">
+                <CalendarDays
+                  size={15}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <input
+                  type="date"
+                  value={customFrom}
+                  max={customTo || undefined}
+                  onChange={(e) => {
+                    setCustomFrom(e.target.value);
+                    setDateFilter("ALL");
+                    setPage(1);
+                  }}
+                  className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                />
+              </div>
+
+              <span className="hidden items-center text-xs text-slate-400 sm:flex">
+                to
+              </span>
+
+              {/* CUSTOM TO DATE */}
+              <div className="relative w-full sm:w-auto">
+                <input
+                  type="date"
+                  value={customTo}
+                  min={customFrom || undefined}
+                  onChange={(e) => {
+                    setCustomTo(e.target.value);
+                    setDateFilter("ALL");
+                    setPage(1);
+                  }}
+                  className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                />
+              </div>
+
+              {/* CLEAR CUSTOM RANGE */}
+              {(customFrom || customTo) && (
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  onClick={clearCustomDateRange}
+                  title="Clear date range"
+                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600"
                 >
-                  <X size={14} />
+                  <X size={15} />
                 </button>
               )}
             </div>
 
             {/* FILTERS */}
             <div className="flex flex-col gap-2 sm:flex-row">
+              {/* DATE PRESET */}
+              <div className="relative">
+                <CalendarDays
+                  size={15}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <select
+                  value={dateFilter}
+                  onChange={(e) => {
+                    const nextFilter = e.target.value;
+
+                    setDateFilter(nextFilter);
+                    setCustomFrom("");
+                    setCustomTo("");
+                    setPage(1);
+                  }}
+                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
+                >
+                  {DATE_FILTERS.map((filter) => (
+                    <option key={filter.value} value={filter.value}>
+                      {filter.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* SALE TYPE */}
               <div className="relative">
                 <Filter
                   size={15}
@@ -521,41 +630,14 @@ const Sales = () => {
                   className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
                 >
                   {SALE_TYPES.map((type) => (
-                    <option
-                      key={type.value}
-                      value={type.value}
-                    >
+                    <option key={type.value} value={type.value}>
                       {type.label}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="relative">
-                <CalendarDays
-                  size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <select
-                  value={dateFilter}
-                  onChange={(e) => {
-                    setDateFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
-                >
-                  {DATE_FILTERS.map((filter) => (
-                    <option
-                      key={filter.value}
-                      value={filter.value}
-                    >
-                      {filter.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* CLEAR ALL */}
               {hasActiveFilters && (
                 <button
                   type="button"
@@ -569,6 +651,22 @@ const Sales = () => {
             </div>
           </div>
 
+          {/* CUSTOM RANGE VALIDATION */}
+          {isCustomRangeInvalid && (
+            <p className="mt-2 text-xs font-medium text-red-500">
+              "From" date cannot be after "To" date.
+            </p>
+          )}
+
+          {/* CUSTOM RANGE INCOMPLETE */}
+          {!isCustomRangeInvalid &&
+            ((customFrom && !customTo) || (!customFrom && customTo)) && (
+              <p className="mt-2 text-xs text-slate-400">
+                Pick both a "from" and "to" date to apply the custom range.
+              </p>
+            )}
+
+          {/* SEARCH INFO */}
           {search && (
             <p className="mt-2 text-xs text-slate-400">
               Search applies to the currently loaded page.
@@ -588,10 +686,7 @@ const Sales = () => {
                     className="flex cursor-pointer items-center gap-1 hover:text-slate-600"
                   >
                     Sale Date
-                    <SortIcon
-                      column="date"
-                      sort={sort}
-                    />
+                    <SortIcon column="date" sort={sort} />
                   </button>
                 </th>
 
@@ -614,10 +709,7 @@ const Sales = () => {
                     className="ml-auto flex cursor-pointer items-center gap-1 hover:text-slate-600"
                   >
                     Sale Value
-                    <SortIcon
-                      column="value"
-                      sort={sort}
-                    />
+                    <SortIcon column="value" sort={sort} />
                   </button>
                 </th>
 
@@ -630,16 +722,10 @@ const Sales = () => {
             <tbody>
               {salesJobLoading ? (
                 Array.from({ length: 6 }).map((_, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-slate-100"
-                  >
+                  <tr key={index} className="border-b border-slate-100">
                     <td className="px-5 py-4">
                       <Skeleton width="w-20" />
-                      <Skeleton
-                        width="w-12"
-                        className="mt-2"
-                      />
+                      <Skeleton width="w-12" className="mt-2" />
                     </td>
 
                     <td className="px-5 py-4">
@@ -652,10 +738,7 @@ const Sales = () => {
 
                         <div>
                           <Skeleton width="w-28" />
-                          <Skeleton
-                            width="w-20"
-                            className="mt-1.5"
-                          />
+                          <Skeleton width="w-20" className="mt-1.5" />
                         </div>
                       </div>
                     </td>
@@ -682,11 +765,9 @@ const Sales = () => {
                   const meta = typeMeta(sale.saleType);
                   const Icon = meta.icon;
 
-                  const customerName =
-                    sale?.details?.customerName;
+                  const customerName = sale?.details?.customerName;
 
-                  const customerPhone =
-                    sale?.details?.customerPhone;
+                  const customerPhone = sale?.details?.customerPhone;
 
                   return (
                     <tr
@@ -700,9 +781,7 @@ const Sales = () => {
                       {/* DATE */}
                       <td className="px-5 py-4">
                         <p className="font-medium text-slate-700">
-                          {formatDate(
-                            sale.occurredAt ?? sale.saleDate
-                          )}
+                          {formatDate(sale.occurredAt ?? sale.saleDate)}
                         </p>
 
                         {sale.occurredAt && (
@@ -780,16 +859,10 @@ const Sales = () => {
                 })
               ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-5 py-16 text-center"
-                  >
+                  <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="mx-auto flex max-w-xs flex-col items-center">
                       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
-                        <ShoppingBag
-                          size={22}
-                          className="text-slate-400"
-                        />
+                        <ShoppingBag size={22} className="text-slate-400" />
                       </div>
 
                       <p className="text-sm font-semibold text-slate-700">
@@ -841,10 +914,7 @@ const Sales = () => {
             </p>
 
             <div className="hidden items-center gap-1.5 sm:flex">
-              <label
-                htmlFor="page-size"
-                className="text-xs text-slate-400"
-              >
+              <label htmlFor="page-size" className="text-xs text-slate-400">
                 Rows
               </label>
 
@@ -875,11 +945,7 @@ const Sales = () => {
             </PaginationButton>
 
             <PaginationButton
-              onClick={() =>
-                setPage((current) =>
-                  Math.max(1, current - 1)
-                )
-              }
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={page === 1 || salesJobLoading}
             >
               <ChevronLeft size={15} />
@@ -891,22 +957,16 @@ const Sales = () => {
 
             <PaginationButton
               onClick={() =>
-                setPage((current) =>
-                  Math.min(totalPages, current + 1)
-                )
+                setPage((current) => Math.min(totalPages, current + 1))
               }
-              disabled={
-                page >= totalPages || salesJobLoading
-              }
+              disabled={page >= totalPages || salesJobLoading}
             >
               <ChevronRight size={15} />
             </PaginationButton>
 
             <PaginationButton
               onClick={() => setPage(totalPages)}
-              disabled={
-                page >= totalPages || salesJobLoading
-              }
+              disabled={page >= totalPages || salesJobLoading}
             >
               <ChevronsRight size={15} />
             </PaginationButton>
@@ -927,24 +987,13 @@ const Sales = () => {
 
 const SortIcon = ({ column, sort }) => {
   if (sort.key !== column) {
-    return (
-      <ArrowUpDown
-        size={13}
-        className="text-slate-300"
-      />
-    );
+    return <ArrowUpDown size={13} className="text-slate-300" />;
   }
 
   return sort.direction === "asc" ? (
-    <ArrowUp
-      size={13}
-      className="text-blue-600"
-    />
+    <ArrowUp size={13} className="text-blue-600" />
   ) : (
-    <ArrowDown
-      size={13}
-      className="text-blue-600"
-    />
+    <ArrowDown size={13} className="text-blue-600" />
   );
 };
 
@@ -954,11 +1003,7 @@ const Skeleton = ({ width = "w-16", className = "" }) => (
   />
 );
 
-const PaginationButton = ({
-  onClick,
-  disabled,
-  children,
-}) => (
+const PaginationButton = ({ onClick, disabled, children }) => (
   <button
     type="button"
     onClick={onClick}
@@ -982,7 +1027,7 @@ const SaleDetailModal = ({ sale, onClose }) => {
   ];
 
   const additionalDetails = Object.entries(details).filter(
-    ([key]) => !excludedKeys.includes(key)
+    ([key]) => !excludedKeys.includes(key),
   );
 
   return (
@@ -1039,9 +1084,7 @@ const SaleDetailModal = ({ sale, onClose }) => {
 
             <DetailItem
               label="Sale Date"
-              value={formatDate(
-                sale.occurredAt ?? sale.saleDate
-              )}
+              value={formatDate(sale.occurredAt ?? sale.saleDate)}
             />
 
             <DetailItem
@@ -1049,21 +1092,30 @@ const SaleDetailModal = ({ sale, onClose }) => {
               value={formatTime(sale.occurredAt) || "Not available"}
             />
 
-            <DetailItem
-              label="Customer"
-              value={details.customerName}
-            />
+            <DetailItem label="Customer" value={details.customerName} />
 
-            <DetailItem
-              label="Phone"
-              value={details.customerPhone}
-            />
+            <DetailItem label="Phone" value={details.customerPhone} />
 
-            <DetailItem
-              label="Items"
-              value={details.itemCount}
-            />
+            <DetailItem label="Items" value={details.itemCount} />
           </div>
+
+          {additionalDetails.length > 0 && (
+            <div className="mt-5 border-t border-slate-100 pt-4">
+              <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Additional Details
+              </p>
+
+              <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                {additionalDetails.map(([key, value]) => (
+                  <DetailItem
+                    key={key}
+                    label={formatLabel(key)}
+                    value={formatDetailValue(value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1084,9 +1136,8 @@ const DetailItem = ({
     </dt>
 
     <dd
-      className={`mt-1 break-words text-sm ${valueClass} ${
-        mono ? "font-mono text-xs font-semibold" : ""
-      }`}
+      className={`mt-1 break-words text-sm ${valueClass} ${mono ? "font-mono text-xs font-semibold" : ""
+        }`}
     >
       {displayValue(value)}
     </dd>
@@ -1111,4 +1162,3 @@ const formatDetailValue = (value) => {
 };
 
 export default Sales;
-
