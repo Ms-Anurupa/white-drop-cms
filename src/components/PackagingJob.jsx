@@ -274,10 +274,19 @@ function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
                                 align="left"
                             />
                         </th>
+                        <th className="px-4 py-2.5 text-lfet">
+                            <SortHeader
+                                field="extra"
+                                label="Extra"
+                                filters={filters}
+                                onChange={onChange}
+                                align="left"
+                            />
+                        </th>
                         <th className="px-4 py-2.5 text-left">
                             <SortHeader
                                 field="totalCount"
-                                label="Total packaged"
+                                label="Total"
                                 filters={filters}
                                 onChange={onChange}
                                 align="left"
@@ -320,7 +329,10 @@ function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
                                 {fmtNum(job.totalSubscriptions)}
                             </td>
                             <td className="px-4 py-3 text-left font-mono text-base font-semibold tabular-nums text-slate-900">
-                                {fmtNum(job.totalCount)}
+                                {fmtNum(job.extra)}
+                            </td>
+                            <td className="px-4 py-3 text-left font-mono text-base font-semibold tabular-nums text-slate-900">
+                                {fmtNum(job.totalCount+job.extra)}
                             </td>
                             <td className="px-4 py-3 text-slate-500">
                                 {fmtDateTime(job.createdAt)}

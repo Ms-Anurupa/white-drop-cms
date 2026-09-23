@@ -1098,6 +1098,10 @@ const Order = () => {
                               {o.deliverySlot.name}
                             </p>
 
+                            <p className="text-xs font-medium text-gray-800 truncate">
+                              {o.deliveryDate}
+                            </p>
+
                             {o.deliverySlot?.from && o.deliverySlot?.to && (
                               <p className="text-[10px] text-gray-400 truncate">
                                 {o.deliverySlot.from}-{o.deliverySlot.to}
@@ -1293,6 +1297,13 @@ const Order = () => {
                 <div>
                   <p className="text-sm font-semibold text-gray-900">
                     {hoveredOrder.order.deliverySlot?.name || "—"}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {hoveredOrder.order.deliveryDate
+                      ? new Intl.DateTimeFormat("en-US", {
+                          dateStyle: "medium",
+                        }).format(new Date(hoveredOrder.order.deliveryDate))
+                      : "—"}
                   </p>
 
                   {hoveredOrder.order.deliverySlot?.from &&
