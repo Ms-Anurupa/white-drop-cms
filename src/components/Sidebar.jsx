@@ -78,6 +78,7 @@ const sections = [
     label: "Operations",
     items: [
       { name: "Sales", path: "sales", icon: LayoutDashboard },
+      { name: "Due Register", path: "due-register", icon: LayoutDashboard },
       { name: "Inventory", path: "inventory", icon: Boxes },
       { name: "Packaging Job", path: "packaging-job", icon: PackageIcon },
     ],
