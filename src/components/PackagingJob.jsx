@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Plus,
   Check,
+  Sparkles,
 } from "lucide-react";
 import usePackagingJobStore from "@/zustand/Store/packagingJobStore";
 import Loader from "./Loader";
@@ -103,7 +104,7 @@ function SummaryStrip({ summary, loading }) {
 // -----------------------------------------------------------------------
 // Filter bar — date range + sort control
 // -----------------------------------------------------------------------
-function FilterBar({ filters, onChange, onReset, onRefresh, refreshing }) {
+function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenerate }) {
   return (
     <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
       <div className="flex flex-col gap-1">
@@ -168,6 +169,17 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing }) {
       )}
 
       <div className="ml-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onGenerate}
+          className="cursor-pointer flex items-center gap-1.5 rounded-md border border-blue-500 bg-blue-500 px-3 py-1.5 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Sparkles
+            className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+          />
+          Generate
+        </button>
+        
         <button
           type="button"
           onClick={onRefresh}
@@ -662,6 +674,7 @@ export default function PackagingJob() {
   const summary = usePackagingJobStore((s) => s.summary);
   const loading = usePackagingJobStore((s) => s.loading);
   const refreshing = usePackagingJobStore((s) => s.refreshing);
+  const generate = usePackagingJobStore((s) => s.generate);
   const error = usePackagingJobStore((s) => s.error);
   const selectedJobId = usePackagingJobStore((s) => s.selectedJobId);
 
@@ -673,6 +686,7 @@ export default function PackagingJob() {
   const setPage = usePackagingJobStore((s) => s.setPage);
   const resetFilters = usePackagingJobStore((s) => s.resetFilters);
   const clearSelectedJob = usePackagingJobStore((s) => s.clearSelectedJob);
+  const generatePackagingJob = usePackagingJobStore((s) => s.generatePackagingJob);
 
   useEffect(() => {
     if (
@@ -723,6 +737,7 @@ export default function PackagingJob() {
             onReset={resetFilters}
             onRefresh={() => fetchPackagingJobs(true)}
             refreshing={refreshing}
+            onGenerate={() => generatePackagingJob()}
           />
         </div>
 
