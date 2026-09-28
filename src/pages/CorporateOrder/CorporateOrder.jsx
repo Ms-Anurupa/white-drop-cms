@@ -19,6 +19,7 @@ import {
   Pencil,
   X,
   Loader2,
+  ReceiptText
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
@@ -742,7 +743,7 @@ const CorporateOrder = () => {
                     </td> */}
 
                     <td className="px-2 py-1.5 font-semibold text-green-900 whitespace-nowrap">
-                      {formatCurrency(o.orderDetails?.receivedTotalPrice)}
+                      {formatCurrency(o.orderDetails?.receivedTotalPrice==0? o.orderDetails?.grandTotal:o.orderDetails?.receivedTotalPrice)}
                     </td>
 
                     <td className="px-2 py-1.5">
@@ -776,7 +777,7 @@ const CorporateOrder = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation(); // Prevents row click
-                              handleViewInvoice(o.id);
+                              handleDetailsNavigate(o.id)
                             }}
                             disabled={invoiceLoading.view === o.id}
                             className="h-7 pl-2 pr-2 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium hover:bg-blue-700 transition cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
@@ -809,6 +810,23 @@ const CorporateOrder = () => {
                             className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left"
                             onClick={(e) => e.stopPropagation()} // Prevents clicks inside the menu from triggering the row
                           >
+                            <button
+                              disabled={invoiceLoading.regenerate === o.id}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevents row click
+                                handleViewInvoice(o.id);
+                                setOpenMenu(null);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                              {invoiceLoading.regenerate === o.id ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <ReceiptText size={12} />
+                              )}
+
+                              {"View Invoice"}
+                            </button>
                             <button
                               disabled={invoiceLoading.regenerate === o.id}
                               onClick={(e) => {
