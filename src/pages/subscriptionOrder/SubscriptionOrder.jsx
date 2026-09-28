@@ -1084,9 +1084,10 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
                               {STATUS_OPTIONS.map((option) => (
                                 <SplitButtonItem
                                   key={option.value}
-                                  onClick={() =>
-                                    handleStatusChange(item, option.value)
-                                  }
+                                  onClick={(e) =>{
+                                    e.stopPropagation();
+                                    handleStatusChange(item, option.value);
+                                  }}
                                 >
                                   <div className="flex w-full items-center justify-between gap-3">
                                     <div className="flex items-center gap-2">
