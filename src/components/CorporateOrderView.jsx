@@ -169,7 +169,7 @@ const CorporateOrderView = () => {
 
   // Calculations for Payment Due
   const baseTotal =
-    order?.orderDetails?.receivedTotalPrice ??
+    order?.orderDetails?.receivedTotalPrice!=0?order?.orderDetails?.receivedTotalPrice:
     order?.orderDetails?.grandTotal ??
     0;
     
@@ -276,7 +276,7 @@ const CorporateOrderView = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 cursor-pointer"
             title="Go back"
           >
             <ArrowLeft size={16} />
@@ -670,7 +670,7 @@ const CorporateOrderView = () => {
                   {isPaidOnline && (
                     <div className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-xs text-emerald-700">
                       <CheckCircle2 size={16} className="text-emerald-500" />
-                      Paid via Payment Gateway
+                      Fully paid up
                     </div>
                   )}
                 </div>
