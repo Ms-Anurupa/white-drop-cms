@@ -150,6 +150,19 @@ const orderDataStore = create((set) => ({
       throw error;
     }
   },
+
+  addCorporateOrderItem: async (data) => {
+    try {
+      const res = await api.post("/admin/addCorporateOrderItem", data, {
+        withAuth: true,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Failed to add corporate order item:", error);
+      throw error;
+    }
+  },
 }));
 
 export default orderDataStore;

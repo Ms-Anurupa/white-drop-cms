@@ -12,147 +12,202 @@ const DEFAULT_FILTERS = {
 };
 
 const usePackagingJobStore = create((set, get) => ({
-    // -----------------------------------------------------------------
-    // List state
-    // -----------------------------------------------------------------
-    filters: { ...DEFAULT_FILTERS },
-    jobs: [],
-    pagination: null,
-    summary: null,
-    loading: false,
-    refreshing: false,
-    error: null,
+  // -----------------------------------------------------------------
+  // List state
+  // -----------------------------------------------------------------
+  filters: { ...DEFAULT_FILTERS },
+  jobs: [],
+  pagination: null,
+  summary: null,
+  loading: false,
+  refreshing: false,
+  generate: false,
+  generateError: null,
+  error: null,
 
-    // -----------------------------------------------------------------
-    // Single-job detail state (slide-over)
-    // -----------------------------------------------------------------
-    selectedJobId: null,
-    selectedJob: null,
-    selectedJobLoading: false,
-    selectedJobError: null,
+  // -----------------------------------------------------------------
+  // Single-job detail state (slide-over)
+  // -----------------------------------------------------------------
+  selectedJobId: null,
+  selectedJob: null,
+  selectedJobLoading: false,
+  selectedJobError: null,
 
-    // -----------------------------------------------------------------
-    // Filter actions — changing any filter other than page resets to page 1
-    // -----------------------------------------------------------------
-    setFilters: (patch) =>
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                ...patch,
-                page: Object.prototype.hasOwnProperty.call(patch, "page")
-                    ? patch.page
-                    : 1,
-            },
-        })),
+  // -----------------------------------------------------------------
+  // Filter actions — changing any filter other than page resets to page 1
+  // -----------------------------------------------------------------
+  setFilters: (patch) =>
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        ...patch,
+        page: Object.prototype.hasOwnProperty.call(patch, "page")
+          ? patch.page
+          : 1,
+      },
+    })),
 
-    setPage: (page) => set((state) => ({ filters: { ...state.filters, page } })),
+  setPage: (page) => set((state) => ({ filters: { ...state.filters, page } })),
 
-    resetFilters: () => set({ filters: { ...DEFAULT_FILTERS } }),
+  resetFilters: () => set({ filters: { ...DEFAULT_FILTERS } }),
 
-    // -----------------------------------------------------------------
-    // Fetch list (+ meta.summary) for current filters
-    // -----------------------------------------------------------------
-    fetchPackagingJobs: async (isRefresh = false) => {
-        const { filters } = get();
-        set(
-            isRefresh
-                ? { refreshing: true, error: null }
-                : { loading: true, error: null },
-        );
+  // -----------------------------------------------------------------
+  // Fetch list (+ meta.summary) for current filters
+  // -----------------------------------------------------------------
+  fetchPackagingJobs: async (isRefresh = false) => {
+    const { filters } = get();
+    set(
+      isRefresh
+        ? { refreshing: true, error: null }
+        : { loading: true, error: null },
+    );
 
-        try {
-            const { data } = await api.get("/admin/getPackagingList", {
-                params: filters,
-                withAuth: true,
-            });
+    try {
+      const { data } = await api.get("/admin/getPackagingList", {
+        params: filters,
+        withAuth: true,
+      });
 
-            set({
-                jobs: data.data ?? [],
-                pagination: data.pagination ?? null,
-                summary: data.meta?.summary ?? null,
-            });
-        } catch (err) {
-            set({
-                error:
-                    err?.response?.data?.message ||
-                    err.message ||
-                    "Failed to load packaging jobs.",
-            });
-        } finally {
-            set({ loading: false, refreshing: false });
-        }
-    },
+      set({
+        jobs: data.data ?? [],
+        pagination: data.pagination ?? null,
+        summary: data.meta?.summary ?? null,
+      });
+    } catch (err) {
+      set({
+        error:
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to load packaging jobs.",
+      });
+    } finally {
+      set({ loading: false, refreshing: false });
+    }
+  },
 
-    // -----------------------------------------------------------------
-    // Fetch single job's detail for the slide-over.
-    // This hits a separate endpoint from the list — /getPackagingDetailsById
-    // — with the id passed as a `targetId` query param, not a route param.
-    // -----------------------------------------------------------------
-    getPackagingDetailsById: async (id) => {
-        set({
-            selectedJobId: id,
-            selectedJob: null,
-            selectedJobLoading: true,
-            selectedJobError: null,
-        });
+  // -----------------------------------------------------------------
+  // Fetch single job's detail for the slide-over.
+  // This hits a separate endpoint from the list — /getPackagingDetailsById
+  // — with the id passed as a `targetId` query param, not a route param.
+  // -----------------------------------------------------------------
+  getPackagingDetailsById: async (id) => {
+    set({
+      selectedJobId: id,
+      selectedJob: null,
+      selectedJobLoading: true,
+      selectedJobError: null,
+    });
 
-        try {
-            const { data } = await api.get("/admin/getPackagingDetailsById", {
-                params: { targetId: id },
-                withAuth: true,
-            });
-            set({ selectedJob: data.data });
-        } catch (err) {
-            set({
-                selectedJobError:
-                    err?.response?.data?.message ||
-                    err.message ||
-                    "Failed to load job detail.",
-            });
-        } finally {
-            set({ selectedJobLoading: false });
-        }
-    },
+    try {
+      const { data } = await api.get("/admin/getPackagingDetailsById", {
+        params: { targetId: id },
+        withAuth: true,
+      });
+      set({ selectedJob: data.data });
+    } catch (err) {
+      set({
+        selectedJobError:
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to load job detail.",
+      });
+    } finally {
+      set({ selectedJobLoading: false });
+    }
+  },
 
-    clearSelectedJob: () =>
-        set({ selectedJobId: null, selectedJob: null, selectedJobError: null }),
+  clearSelectedJob: () =>
+    set({ selectedJobId: null, selectedJob: null, selectedJobError: null }),
 
-    addExtraPackaging: async (id, extraDelta) => {
-        set({ extraUpdatingId: id, extraUpdateError: null });
+  addExtraPackaging: async (id, extraDelta) => {
+    set({ extraUpdatingId: id, extraUpdateError: null });
 
-        try {
-            await api.post("/admin/addExtraPackagingData", {
-              id,
-              extra: extraDelta,
-              
-            }, {withAuth: true});
+    try {
+      await api.post(
+        "/admin/addExtraPackagingData",
+        {
+          id,
+          extra: extraDelta,
+        },
+        { withAuth: true },
+      );
 
-            set((state) => ({
-                jobs: state.jobs.map((job) =>
-                    job.id === id
-                        ? { ...job, extra: (job.extra ?? 0) + extraDelta }
-                        : job,
-                ),
-                selectedJob:
-                    state.selectedJob?.id === id
-                        ? {
-                            ...state.selectedJob,
-                            extra: (state.selectedJob.extra ?? 0) + extraDelta,
-                        }
-                        : state.selectedJob,
-            }));
+      set((state) => ({
+        jobs: state.jobs.map((job) =>
+          job.id === id
+            ? { ...job, extra: (job.extra ?? 0) + extraDelta }
+            : job,
+        ),
+        selectedJob:
+          state.selectedJob?.id === id
+            ? {
+                ...state.selectedJob,
+                extra: (state.selectedJob.extra ?? 0) + extraDelta,
+              }
+            : state.selectedJob,
+      }));
 
-            return true;
-        } catch (err) {
-            set({
-                extraUpdateError:
-                    err?.response?.data?.error ?? "Failed to update extra packaging.",
-            });
-            return false;
-        } finally {
-            set({ extraUpdatingId: null });
-        }
-    },
+      return true;
+    } catch (err) {
+      set({
+        extraUpdateError:
+          err?.response?.data?.error ?? "Failed to update extra packaging.",
+      });
+      return false;
+    } finally {
+      set({ extraUpdatingId: null });
+    }
+  },
+
+  generatePackagingJob: async (deliveryDate) => {
+    set({
+      generate: true,
+      generateError: null,
+    });
+
+    try {
+      const { data } = await api.post(
+        "/admin/generatePackagingJob",
+        {
+          deliveryDate,
+        },
+        { withAuth: true },
+      );
+
+      const packagingJob = data?.packagingJob;
+
+      set((state) => ({
+        jobs: packagingJob
+          ? state.jobs.some((job) => job.id === packagingJob.id)
+            ? state.jobs.map((job) =>
+                job.id === packagingJob.id ? { ...job, ...packagingJob } : job,
+              )
+            : [packagingJob, ...state.jobs]
+          : state.jobs,
+
+        selectedJob:
+          packagingJob && state.selectedJob?.id === packagingJob.id
+            ? {
+                ...state.selectedJob,
+                ...packagingJob,
+              }
+            : state.selectedJob,
+      }));
+
+      return true;
+    } catch (err) {
+      set({
+        generateError:
+          err?.response?.data?.error ?? "Failed to generate packaging job.",
+      });
+
+      return false;
+    } finally {
+      set({
+        generate: false,
+      });
+    }
+  },
 }));
 
 export default usePackagingJobStore;

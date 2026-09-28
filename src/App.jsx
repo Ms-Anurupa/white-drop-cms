@@ -54,6 +54,7 @@ import ExpenseListing from "./components/ExpenseListing";
 import CreateExpense from "./components/CreateExpense";
 import ExpenseCategory from "./components/ExpenseCategory";
 import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
+import DueRegister from "./components/DueRegister";
 
 const App = () => {
   return (
@@ -90,6 +91,7 @@ const App = () => {
                 />
                 <Route path="customer" element={<Customer />} />
                 <Route path="sales" element={<Sales />} />
+                <Route path="due-register" element={<DueRegister theme="light" />} />
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="expense-category" element={<ExpenseCategory />} />

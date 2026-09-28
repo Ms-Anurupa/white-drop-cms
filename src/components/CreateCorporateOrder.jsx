@@ -87,10 +87,16 @@ const CreateCorporateOrder = () => {
   const handleCorporateChange = (e) => {
     const { name, value } = e.target;
 
-    setCorporateData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setCorporateData((prev) => {
+      const newData = { ...prev, [name]: value };
+      
+      // If delivery is changed back to PROCESSING, payment must be PENDING
+      if (name === "deliveryStatus" && value === "PROCESSING") {
+        newData.paymentStatus = "PENDING";
+      }
+      
+      return newData;
+    });
   };
 
   const handleItemChange = (index, e) => {
@@ -117,7 +123,6 @@ const CreateCorporateOrder = () => {
 
   const addItem = () => {
     const firstUnit = items[0]?.unit || "L";
-
     setItems((prev) => [...prev, createEmptyItem(firstUnit)]);
   };
 
@@ -126,16 +131,21 @@ const CreateCorporateOrder = () => {
       toast.info("At least one order item is required.");
       return;
     }
-
     setItems((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   };
 
-  const handleReceivedChange = (e) => {
-    if (corporateData.deliveryStatus === "PROCESSING") {
-      return;
-    }
+  // Conditions for enabling fields
+  const canEnterReceivedQty = corporateData.deliveryStatus === "DELIVERED";
+  const canEnterReceivedPrice = 
+    corporateData.deliveryStatus === "DELIVERED" && 
+    corporateData.paymentStatus === "COMPLETE";
 
+  const handleReceivedChange = (e) => {
     const { name, value } = e.target;
+    
+    // Safety guard
+    if ((name === "quantity" || name === "unit") && !canEnterReceivedQty) return;
+    if (name === "totalPrice" && !canEnterReceivedPrice) return;
 
     setReceivedData((prev) => ({
       ...prev,
@@ -155,28 +165,32 @@ const CreateCorporateOrder = () => {
     );
   }, [items]);
 
-  const isDeliveryPending = corporateData.deliveryStatus === "PROCESSING";
+  const calculatedReceivedQuantity = canEnterReceivedQty
+    ? Number(receivedData.quantity) || 0
+    : 0;
 
-  const calculatedReceivedQuantity = isDeliveryPending
-    ? totalSentQuantity
-    : Number(receivedData.quantity) || 0;
+  const calculatedReceivedUnit = canEnterReceivedQty
+    ? receivedData.unit
+    : items[0]?.unit || "L";
 
-  const calculatedReceivedUnit = isDeliveryPending
-    ? items[0]?.unit || "L"
-    : receivedData.unit;
-
-  const calculatedReceivedTotalPrice = isDeliveryPending
-    ? totalSentPrice
-    : Number(receivedData.totalPrice) || 0;
+  const calculatedReceivedTotalPrice = canEnterReceivedPrice
+    ? Number(receivedData.totalPrice) || 0
+    : 0;
 
   const calculatedReceivedPricePerUnit =
-    calculatedReceivedQuantity > 0
+    calculatedReceivedQuantity > 0 && calculatedReceivedTotalPrice > 0
       ? calculatedReceivedTotalPrice / calculatedReceivedQuantity
       : 0;
 
-  const discount = Math.max(totalSentPrice - calculatedReceivedTotalPrice, 0);
+  const discount = canEnterReceivedPrice 
+    ? Math.max(totalSentPrice - calculatedReceivedTotalPrice, 0)
+    : 0;
 
-  const grandTotal = calculatedReceivedTotalPrice;
+  // GRAND TOTAL LOGIC UPDATE
+  // If payment isn't complete, display the expected full sent price.
+  const grandTotal = canEnterReceivedPrice
+    ? calculatedReceivedTotalPrice
+    : totalSentPrice;
 
   const validateItems = () => {
     for (let index = 0; index < items.length; index++) {
@@ -186,25 +200,21 @@ const CreateCorporateOrder = () => {
         toast.error(`Unit is required for item ${index + 1}.`);
         return false;
       }
-
       if (!item.qty || Number(item.qty) <= 0) {
         toast.error(`Quantity must be greater than 0 for item ${index + 1}.`);
         return false;
       }
-
       if (!item.pricePerUnit || Number(item.pricePerUnit) <= 0) {
         toast.error(
           `Price per unit must be greater than 0 for item ${index + 1}.`,
         );
         return false;
       }
-
       if (!item.orderDate) {
         toast.error(`Order date is required for item ${index + 1}.`);
         return false;
       }
     }
-
     return true;
   };
 
@@ -225,17 +235,18 @@ const CreateCorporateOrder = () => {
       return;
     }
 
-    if (!isDeliveryPending) {
+    if (canEnterReceivedQty) {
       if (!receivedData.quantity || Number(receivedData.quantity) <= 0) {
         toast.error("Received quantity must be greater than 0.");
         return;
       }
-
       if (!receivedData.unit) {
         toast.error("Please select received unit.");
         return;
       }
+    }
 
+    if (canEnterReceivedPrice) {
       if (
         receivedData.totalPrice === "" ||
         Number(receivedData.totalPrice) < 0
@@ -245,7 +256,7 @@ const CreateCorporateOrder = () => {
       }
     }
 
-    if (discount > 0 && !discountReason.trim()) {
+    if (canEnterReceivedPrice && discount > 0 && !discountReason.trim()) {
       toast.error("Discount reason is required.");
       return;
     }
@@ -255,76 +266,44 @@ const CreateCorporateOrder = () => {
     try {
       const confirmMessage = await confirm({
         title: "Create Corporate Order",
-        message: "Are you want to create the order?",
+        message: "Are you sure you want to create the order?",
       });
 
-      if (!confirmMessage) return;
-
-      const finalReceivedQuantity = calculatedReceivedQuantity;
-
-      const finalReceivedUnit = calculatedReceivedUnit;
-
-      const finalReceivedTotal = calculatedReceivedTotalPrice;
-
-      const finalReceivedPricePerUnit =
-        calculatedReceivedQuantity > 0
-          ? calculatedReceivedTotalPrice / calculatedReceivedQuantity
-          : 0;
-
-      const finalDiscount = Math.max(totalSentPrice - finalReceivedTotal, 0);
-
-      const finalGrandTotal = finalReceivedTotal;
+      if (!confirmMessage) {
+        setLoading(false);
+        return;
+      }
 
       const payload = {
         corpoAccId: corporateData.corpoAccId,
-
         deliveryStatus: corporateData.deliveryStatus,
-
         paymentStatus: corporateData.paymentStatus,
-
         orderDetails: {
           productName: corporateData.productName.trim(),
-
           deliveryNote: corporateData.notes.trim(),
-
           sentTotalPrice: totalSentPrice,
-
-          receivedQuantity: finalReceivedQuantity,
-
-          receivedUnit: finalReceivedUnit,
-
-          receivedTotalPrice: finalReceivedTotal,
-
-          receivedPricePerUnit: finalReceivedPricePerUnit,
-
-          grandTotal: finalGrandTotal,
-
-          discountValue: finalDiscount,
-
-          discountReason: finalDiscount > 0 ? discountReason.trim() : "",
-
+          receivedQuantity: calculatedReceivedQuantity,
+          receivedUnit: calculatedReceivedUnit,
+          receivedTotalPrice: calculatedReceivedTotalPrice,
+          receivedPricePerUnit: calculatedReceivedPricePerUnit,
+          grandTotal: grandTotal,
+          discountValue: discount,
+          discountReason: discount > 0 ? discountReason.trim() : "",
           items: items.map((item) => ({
             qty: Number(item.qty),
-
             unit: item.unit,
-
             itemTotalPrice: Number(item.qty) * Number(item.pricePerUnit),
-
             orderDate: new Date(item.orderDate).toISOString(),
-
             pricePerUnit: Number(item.pricePerUnit),
           })),
         },
       };
 
       await createCorporateOrderAdmin(payload);
-
       toast.success("Corporate order created successfully.");
-
       navigate(-1);
     } catch (error) {
       console.error(error);
-
       toast.error("Failed to create corporate order.");
     } finally {
       setLoading(false);
@@ -338,7 +317,6 @@ const CreateCorporateOrder = () => {
   return (
     <div className="min-h-screen bg-gray-50/60 p-4 sm:p-6">
       <div className="mx-auto max-w-7xl">
-        {/* BACK */}
         <button
           onClick={() => navigate(-1)}
           className="group mb-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-900"
@@ -351,19 +329,16 @@ const CreateCorporateOrder = () => {
         </button>
 
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-          {/* HEADER */}
           <div className="border-b border-gray-100 px-5 py-5 sm:px-7">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50">
                   <ShoppingCart size={20} className="text-blue-600" />
                 </div>
-
                 <div>
                   <h1 className="text-lg font-semibold text-gray-900">
                     Create Corporate Order
                   </h1>
-
                   <p className="mt-0.5 text-sm text-gray-500">
                     Create and manage corporate purchase items
                   </p>
@@ -373,18 +348,15 @@ const CreateCorporateOrder = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
-            {/* WARNING */}
             <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
               <AlertTriangle
                 size={17}
                 className="mt-0.5 shrink-0 text-amber-500"
               />
-
               <div>
                 <p className="text-xs font-semibold text-amber-900">
                   Verify order information
                 </p>
-
                 <p className="mt-0.5 text-xs leading-relaxed text-amber-800">
                   Verify quantity, pricing, delivery status, payment status and
                   received information before creating the corporate order.
@@ -392,29 +364,24 @@ const CreateCorporateOrder = () => {
               </div>
             </div>
 
-            {/* ACCOUNT */}
             <section>
               <div className="mb-3 flex items-center gap-2">
                 <Building2 size={17} className="text-blue-600" />
-
                 <h2 className="text-sm font-semibold text-gray-900">
-                  Corporate Account 
+                  Corporate Account
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* CORPORATE ACCOUNT */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
                     Corporate Account <span className="text-red-500">*</span>
                   </label>
-
                   <div className="relative">
                     <Building2
                       size={16}
                       className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
-
                     <select
                       name="corpoAccId"
                       value={corporateData.corpoAccId}
@@ -422,7 +389,6 @@ const CreateCorporateOrder = () => {
                       className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
                     >
                       <option value="">Select Corporate Account</option>
-
                       {corporateOrderAcc?.map((account) => (
                         <option key={account.id} value={account.id}>
                           {account.businessName}
@@ -432,38 +398,32 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* ADDRESS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
                     Delivery Address <span className="text-red-500">*</span>
                   </label>
-
                   <textarea
                     rows={2}
                     readOnly
                     value={selectedAccount?.address || ""}
                     placeholder="Select a corporate account to see the address"
-                    className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none"
+                    className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none bg-gray-50"
                   />
                 </div>
               </div>
             </section>
 
-            {/* PRODUCT / NOTES / STATUS */}
             <section>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* PRODUCT */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
                     Product Name <span className="text-red-500">*</span>
                   </label>
-
                   <div className="relative">
                     <Package
                       size={16}
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
-
                     <input
                       required
                       name="productName"
@@ -475,18 +435,15 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* NOTES */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Delivery Notes 
+                    Delivery Notes
                   </label>
-
                   <div className="relative">
                     <StickyNote
                       size={16}
                       className="absolute left-3 top-3.5 text-gray-400"
                     />
-
                     <textarea
                       rows={3}
                       name="notes"
@@ -498,12 +455,10 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* DELIVERY STATUS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
                     Delivery Status <span className="text-red-500">*</span>
                   </label>
-
                   <div className="relative">
                     {corporateData.deliveryStatus === "DELIVERED" ? (
                       <CheckCircle2
@@ -516,7 +471,6 @@ const CreateCorporateOrder = () => {
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
                       />
                     )}
-
                     <select
                       name="deliveryStatus"
                       value={corporateData.deliveryStatus}
@@ -524,18 +478,15 @@ const CreateCorporateOrder = () => {
                       className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
                     >
                       <option value="PROCESSING">Processing</option>
-
                       <option value="DELIVERED">Delivered</option>
                     </select>
                   </div>
                 </div>
 
-                {/* PAYMENT STATUS */}
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-700">
                     Payment Status <span className="text-red-500">*</span>
                   </label>
-
                   <div className="relative">
                     {corporateData.paymentStatus === "COMPLETE" ? (
                       <PackageCheck
@@ -548,71 +499,73 @@ const CreateCorporateOrder = () => {
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
                       />
                     )}
-
                     <select
                       name="paymentStatus"
                       value={corporateData.paymentStatus}
                       onChange={handleCorporateChange}
-                      className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
+                      disabled={corporateData.deliveryStatus === "PROCESSING"}
+                      className={`w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20 ${
+                        corporateData.deliveryStatus === "PROCESSING"
+                          ? "cursor-not-allowed bg-gray-100 text-gray-500"
+                          : "cursor-pointer bg-white"
+                      }`}
                     >
                       <option value="PENDING">Pending</option>
-
-                      <option value="COMPLETE">Complete</option>
+                      <option
+                        value="COMPLETE"
+                        disabled={corporateData.deliveryStatus === "PROCESSING"}
+                      >
+                        Complete
+                      </option>
                     </select>
                   </div>
+                  {corporateData.deliveryStatus === "PROCESSING" && (
+                    <p className="mt-1 text-[10px] text-gray-400">
+                      Must be delivered to complete payment
+                    </p>
+                  )}
                 </div>
               </div>
             </section>
 
-            {/* ORDER ITEMS */}
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ClipboardList size={17} className="text-blue-600" />
-
                   <div>
                     <h2 className="text-sm font-semibold text-gray-900">
                       Order Items <span className="text-red-500">*</span>
                     </h2>
-
                     <p className="text-xs text-gray-500">
                       The first item's unit controls all order items
                     </p>
                   </div>
                 </div>
-
                 <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
                   {items.length} {items.length === 1 ? "Item" : "Items"}
                 </span>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-gray-200">
-                {/* TABLE HEADER */}
                 <div className="hidden min-w-[900px] grid-cols-[120px_140px_160px_160px_160px_50px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 md:grid">
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Order Date
                   </span>
-
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Unit
                   </span>
-
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Quantity
                   </span>
-
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Price / Unit
                   </span>
-
                   <span className="text-[11px] font-semibold uppercase text-gray-500">
                     Order Total
                   </span>
-
                   <span />
                 </div>
 
-                {/* ITEMS */}
                 <div className="divide-y divide-gray-100">
                   {items.map((item, index) => {
                     const itemTotal =
@@ -624,7 +577,6 @@ const CreateCorporateOrder = () => {
                         key={index}
                         className="grid min-w-[900px] gap-3 bg-white p-4 md:grid-cols-[120px_140px_160px_160px_160px_50px] md:items-center"
                       >
-                        {/* DATE */}
                         <input
                           type="date"
                           name="orderDate"
@@ -632,8 +584,6 @@ const CreateCorporateOrder = () => {
                           onChange={(e) => handleItemChange(index, e)}
                           className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-xs outline-none focus:border-blue-300"
                         />
-
-                        {/* UNIT */}
                         <div className="relative">
                           <select
                             name="unit"
@@ -652,7 +602,6 @@ const CreateCorporateOrder = () => {
                               </option>
                             ))}
                           </select>
-
                           {index !== 0 && (
                             <p className="mt-1 text-[10px] text-gray-400">
                               Same as first item
@@ -660,13 +609,11 @@ const CreateCorporateOrder = () => {
                           )}
                         </div>
 
-                        {/* QUANTITY */}
                         <div className="relative">
                           <Boxes
                             size={15}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                           />
-
                           <input
                             type="number"
                             min="0"
@@ -679,13 +626,11 @@ const CreateCorporateOrder = () => {
                           />
                         </div>
 
-                        {/* PRICE */}
                         <div className="relative">
                           <IndianRupee
                             size={15}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                           />
-
                           <input
                             type="number"
                             min="0"
@@ -698,10 +643,8 @@ const CreateCorporateOrder = () => {
                           />
                         </div>
 
-                        {/* TOTAL */}
                         <div className="flex items-center gap-1.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
                           <IndianRupee size={14} className="text-blue-600" />
-
                           <span className="text-sm font-semibold text-blue-700">
                             {itemTotal.toLocaleString("en-IN", {
                               maximumFractionDigits: 2,
@@ -709,7 +652,6 @@ const CreateCorporateOrder = () => {
                           </span>
                         </div>
 
-                        {/* DELETE */}
                         <button
                           type="button"
                           onClick={() => removeItem(index)}
@@ -723,7 +665,6 @@ const CreateCorporateOrder = () => {
                   })}
                 </div>
 
-                {/* ADD ITEM */}
                 <div className="border-t border-gray-200 bg-gray-50/70 p-3">
                   <button
                     type="button"
@@ -737,16 +678,13 @@ const CreateCorporateOrder = () => {
               </div>
             </section>
 
-            {/* SUMMARY */}
             <section>
               <div className="mb-4 flex items-center gap-2">
                 <Calculator size={17} className="text-blue-600" />
-
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900">
                     Order Summary
                   </h2>
-
                   <p className="text-xs text-gray-500">
                     Compare sent order with the quantity actually received
                   </p>
@@ -754,17 +692,14 @@ const CreateCorporateOrder = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {/* SENT */}
                 <div className="overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/40">
                   <div className="flex items-center justify-between border-b border-blue-100 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Truck size={16} className="text-blue-600" />
-
                       <p className="text-sm font-semibold text-gray-900">
                         Total Sent Order
                       </p>
                     </div>
-
                     <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
                       SENT
                     </span>
@@ -773,7 +708,6 @@ const CreateCorporateOrder = () => {
                   <div className="grid grid-cols-2 gap-3 p-4">
                     <div className="rounded-xl border border-blue-100 bg-white p-3">
                       <p className="text-[11px] text-gray-500">Quantity</p>
-
                       <p className="mt-1 text-lg font-bold text-gray-900">
                         {totalSentQuantity.toFixed(2)}
                       </p>
@@ -781,7 +715,6 @@ const CreateCorporateOrder = () => {
 
                     <div className="rounded-xl border border-blue-100 bg-white p-3">
                       <p className="text-[11px] text-gray-500">Unit</p>
-
                       <p className="mt-1 text-lg font-bold text-gray-900">
                         {items[0]?.unit || "L"}
                       </p>
@@ -792,10 +725,8 @@ const CreateCorporateOrder = () => {
                         <span className="text-xs text-gray-500">
                           Total Sent Price
                         </span>
-
                         <span className="flex items-center gap-1 text-base font-bold text-blue-700">
                           <IndianRupee size={15} />
-
                           {totalSentPrice.toLocaleString("en-IN", {
                             maximumFractionDigits: 2,
                           })}
@@ -805,25 +736,21 @@ const CreateCorporateOrder = () => {
                   </div>
                 </div>
 
-                {/* RECEIVED */}
                 <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50/40">
                   <div className="flex items-center justify-between border-b border-emerald-100 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <PackageCheck size={16} className="text-emerald-600" />
-
                       <div>
                         <p className="text-sm font-semibold text-gray-900">
                           Total Received Order
                         </p>
-
                         <p className="text-[11px] text-gray-500">
-                          {isDeliveryPending
-                            ? "Automatically calculated from order items"
+                          {!canEnterReceivedQty
+                            ? "Awaiting delivery status to enter quantity"
                             : "Admin enters actual received values"}
                         </p>
                       </div>
                     </div>
-
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                         corporateData.deliveryStatus === "DELIVERED"
@@ -836,56 +763,46 @@ const CreateCorporateOrder = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 p-4">
-                    {/* RECEIVED QUANTITY */}
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
                         Received Quantity
-                        {isDeliveryPending && (
-                          <span className="ml-1 text-emerald-600">(Auto)</span>
-                        )}
                       </label>
-
                       <input
                         type="number"
                         min="0"
                         step="0.01"
                         name="quantity"
                         value={
-                          isDeliveryPending
-                            ? calculatedReceivedQuantity
+                          !canEnterReceivedQty
+                            ? 0
                             : receivedData.quantity
                         }
                         onChange={handleReceivedChange}
-                        disabled={isDeliveryPending}
-                        placeholder="17.14"
+                        disabled={!canEnterReceivedQty}
+                        placeholder={!canEnterReceivedQty ? "0" : "17.14"}
                         className={`w-full rounded-xl border border-emerald-100 px-3 py-2.5 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 ${
-                          isDeliveryPending
+                          !canEnterReceivedQty
                             ? "cursor-not-allowed bg-gray-100 text-gray-600"
                             : "bg-white"
                         }`}
                       />
                     </div>
 
-                    {/* RECEIVED UNIT */}
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
                         Unit
-                        {isDeliveryPending && (
-                          <span className="ml-1 text-emerald-600">(Auto)</span>
-                        )}
                       </label>
-
                       <select
                         name="unit"
                         value={
-                          isDeliveryPending
+                          !canEnterReceivedQty
                             ? calculatedReceivedUnit
                             : receivedData.unit
                         }
                         onChange={handleReceivedChange}
-                        disabled={isDeliveryPending}
+                        disabled={!canEnterReceivedQty}
                         className={`w-full rounded-xl border border-emerald-100 px-3 py-2.5 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 ${
-                          isDeliveryPending
+                          !canEnterReceivedQty
                             ? "cursor-not-allowed bg-gray-100 text-gray-600"
                             : "cursor-pointer bg-white"
                         }`}
@@ -898,59 +815,46 @@ const CreateCorporateOrder = () => {
                       </select>
                     </div>
 
-                    {/* PRICE PER UNIT */}
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
                         Price / Unit
                         <span className="ml-1 text-emerald-600">(Auto)</span>
                       </label>
-
                       <div className="flex items-center rounded-xl border border-emerald-100 bg-gray-100 px-3 py-2.5">
                         <IndianRupee size={14} className="mr-1 text-gray-400" />
-
                         <span className="text-sm font-semibold text-gray-700">
                           {calculatedReceivedPricePerUnit.toLocaleString(
                             "en-IN",
-                            {
-                              maximumFractionDigits: 2,
-                            },
+                            { maximumFractionDigits: 2 }
                           )}
                         </span>
                       </div>
                     </div>
 
-                    {/* RECEIVED TOTAL */}
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-gray-600">
                         Received Total
-                        {isDeliveryPending ? (
-                          <span className="ml-1 text-emerald-600">(Auto)</span>
-                        ) : (
-                          <span className="ml-1 text-emerald-600">(Input)</span>
-                        )}
                       </label>
-
                       <div className="relative">
                         <IndianRupee
                           size={15}
                           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                         />
-
                         <input
                           type="number"
                           min="0"
                           step="0.01"
                           name="totalPrice"
                           value={
-                            isDeliveryPending
-                              ? calculatedReceivedTotalPrice
+                            !canEnterReceivedPrice
+                              ? 0
                               : receivedData.totalPrice
                           }
                           onChange={handleReceivedChange}
-                          disabled={isDeliveryPending}
-                          placeholder="1200"
+                          disabled={!canEnterReceivedPrice}
+                          placeholder={!canEnterReceivedPrice ? "0" : "1200"}
                           className={`w-full rounded-xl border border-emerald-100 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 ${
-                            isDeliveryPending
+                            !canEnterReceivedPrice
                               ? "cursor-not-allowed bg-gray-100 text-gray-600"
                               : "bg-white"
                           }`}
@@ -962,62 +866,54 @@ const CreateCorporateOrder = () => {
               </div>
             </section>
 
-            {/* ADJUSTMENT */}
-            <section className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
-              <div className="mb-3 flex items-center gap-2">
-                <Minus size={16} className="text-orange-500" />
-
-                <div>
-                  <h2 className="text-sm font-semibold text-gray-900">
-                    Discount / Adjustment
-                  </h2>
-
-                  <p className="text-[11px] text-gray-500">
-                    Automatically calculated from sent total and received total
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* DISCOUNT */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Discount / Adjustment
-                    <span className="ml-1 text-orange-500">(Auto)</span>
-                  </label>
-
-                  <div className="flex items-center rounded-xl border border-gray-200 bg-gray-100 px-3 py-2.5">
-                    <IndianRupee size={15} className="mr-1 text-gray-400" />
-
-                    <span className="text-sm font-semibold text-gray-700">
-                      {discount.toLocaleString("en-IN", {
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
+            {/* Conditionally render adjustments only if payment has been received */}
+            {canEnterReceivedPrice && (
+              <section className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <Minus size={16} className="text-orange-500" />
+                  <div>
+                    <h2 className="text-sm font-semibold text-gray-900">
+                      Discount / Adjustment
+                    </h2>
+                    <p className="text-[11px] text-gray-500">
+                      Automatically calculated from sent total and received total
+                    </p>
                   </div>
                 </div>
-
-                {/* REASON */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-700">
-                    Adjustment Reason
-                    {discount > 0 && (
-                      <span className="ml-1 text-red-500">*</span>
-                    )}
-                  </label>
-
-                  <input
-                    type="text"
-                    value={discountReason}
-                    onChange={(e) => setDiscountReason(e.target.value)}
-                    placeholder="Less quantity received"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-500/20"
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                      Discount / Adjustment
+                      <span className="ml-1 text-orange-500">(Auto)</span>
+                    </label>
+                    <div className="flex items-center rounded-xl border border-gray-200 bg-gray-100 px-3 py-2.5">
+                      <IndianRupee size={15} className="mr-1 text-gray-400" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        {discount.toLocaleString("en-IN", {
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                      Adjustment Reason
+                      {discount > 0 && (
+                        <span className="ml-1 text-red-500">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="text"
+                      value={discountReason}
+                      onChange={(e) => setDiscountReason(e.target.value)}
+                      placeholder="Less quantity received"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-500/20"
+                    />
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
 
-            {/* GRAND TOTAL */}
             <div className="overflow-hidden rounded-2xl border border-gray-200">
               <div className="bg-gray-900 px-5 py-4">
                 <div className="flex items-center justify-between">
@@ -1025,15 +921,12 @@ const CreateCorporateOrder = () => {
                     <p className="text-xs font-medium text-gray-400">
                       Final Amount
                     </p>
-
                     <p className="mt-0.5 text-sm font-semibold text-white">
                       Corporate Order Grand Total
                     </p>
                   </div>
-
                   <div className="flex items-center gap-1.5 text-2xl font-bold text-white">
                     <IndianRupee size={21} />
-
                     {grandTotal.toLocaleString("en-IN", {
                       maximumFractionDigits: 2,
                     })}
@@ -1044,7 +937,6 @@ const CreateCorporateOrder = () => {
               <div className="grid grid-cols-3 divide-x divide-gray-200 bg-white">
                 <div className="p-4">
                   <p className="text-[11px] text-gray-500">Sent Total</p>
-
                   <p className="mt-1 text-sm font-semibold">
                     ₹
                     {totalSentPrice.toLocaleString("en-IN", {
@@ -1052,10 +944,8 @@ const CreateCorporateOrder = () => {
                     })}
                   </p>
                 </div>
-
                 <div className="p-4">
                   <p className="text-[11px] text-gray-500">Received Total</p>
-
                   <p className="mt-1 text-sm font-semibold text-emerald-600">
                     ₹
                     {calculatedReceivedTotalPrice.toLocaleString("en-IN", {
@@ -1063,10 +953,8 @@ const CreateCorporateOrder = () => {
                     })}
                   </p>
                 </div>
-
                 <div className="p-4">
                   <p className="text-[11px] text-gray-500">Adjustment</p>
-
                   <p className="mt-1 text-sm font-semibold text-orange-600">
                     - ₹
                     {discount.toLocaleString("en-IN", {
@@ -1077,7 +965,6 @@ const CreateCorporateOrder = () => {
               </div>
             </div>
 
-            {/* FOOTER */}
             <div className="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end">
               <button
                 type="button"
@@ -1086,14 +973,12 @@ const CreateCorporateOrder = () => {
               >
                 Cancel
               </button>
-
               <button
                 type="submit"
                 disabled={loading}
                 className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
-
                 {loading ? "Creating..." : "Create Corporate Order"}
               </button>
             </div>

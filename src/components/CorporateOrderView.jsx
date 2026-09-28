@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import corporateDataStore from "../zustand/Store/corporateDataStore";
 import Loader from "./Loader";
 import AddOfflinePaymentModal from "./AddOfflinePaymentModal"; // Ensure the path is correct
+import AddOrderItemModal from "./AddOrderItemModal";
 
 // Shared Status Mappings
 const DELIVERY_STATUS_STYLES = {
@@ -149,6 +150,8 @@ const CorporateOrderView = () => {
 
   // Modal State
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+
 
   const loadOrder = async () => {
     try {
@@ -169,7 +172,7 @@ const CorporateOrderView = () => {
 
   // Calculations for Payment Due
   const baseTotal =
-    order?.orderDetails?.receivedTotalPrice ??
+    order?.orderDetails?.receivedTotalPrice!=0?order?.orderDetails?.receivedTotalPrice:
     order?.orderDetails?.grandTotal ??
     0;
     
@@ -276,7 +279,7 @@ const CorporateOrderView = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 cursor-pointer"
             title="Go back"
           >
             <ArrowLeft size={16} />
@@ -325,10 +328,19 @@ const CorporateOrderView = () => {
             <div className="flex flex-col gap-4 xl:col-span-2">
               {/* ORDER ITEMS & DETAILS CARD */}
               <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-800">
-                  <Package size={16} className="text-blue-500" />
-                  Product & Order Items
-                </h2>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                    <Package size={16} className="text-blue-500" />
+                    Product & Order Items
+                  </h2>
+                  <button
+                    onClick={() => setIsAddItemModalOpen(true)}
+                    className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 active:scale-95 cursor-pointer"
+                  >
+                    <Plus size={14} className="text-blue-500" />
+                    Add Item
+                  </button>
+                </div>
 
                 <div className="mb-5 flex items-center gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -624,7 +636,9 @@ const CorporateOrderView = () => {
                       </p>
                     </div>
                     <StatusPill
-                      status={!(currentDue > 0)?"COMPLETE":order.paymentStatus}
+                      status={
+                        !(currentDue > 0) ? "COMPLETE" : order.paymentStatus
+                      }
                       styles={PAYMENT_STATUS_STYLES}
                       dots={PAYMENT_STATUS_DOTS}
                     />
@@ -670,7 +684,7 @@ const CorporateOrderView = () => {
                   {isPaidOnline && (
                     <div className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-xs text-emerald-700">
                       <CheckCircle2 size={16} className="text-emerald-500" />
-                      Paid via Payment Gateway
+                      Fully paid up
                     </div>
                   )}
                 </div>
@@ -727,6 +741,16 @@ const CorporateOrderView = () => {
         }}
         onSuccess={() => {
           loadOrder(); // Re-fetch the order data on success
+        }}
+      />
+
+      <AddOrderItemModal
+        isOpen={isAddItemModalOpen}
+        onClose={() => setIsAddItemModalOpen(false)}
+        orderId={order.id} // Assuming the database CUID is order.id
+        unitValue={orderDetails.items[0].unit}
+        onSuccess={() => {
+          loadOrder();
         }}
       />
     </div>

@@ -120,7 +120,7 @@ export function SplitButton({
         ref={toggleBtnRef}
         type="button"
         disabled={disabled}
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={(e) => {e.stopPropagation();setIsOpen((v) => !v)}}
         className={`${baseStyles} ${variantStyle} ${dividerStyle} rounded-r-lg px-2.5`}
         aria-haspopup="menu"
         aria-expanded={isOpen}
