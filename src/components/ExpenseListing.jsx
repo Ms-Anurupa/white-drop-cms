@@ -15,7 +15,8 @@ import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
 import excelStore from "@/zustand/Store/excelStore";
 import { toast } from "react-toastify";
-import ExportModal from "./ExportExcelModal";
+import ExportModal from "./ExportExcelButton";
+import ExportExcelButton from "./ExportExcelButton";
 
 const DATE_PILLS = [
   { label: "All Time", value: "" },
@@ -134,13 +135,6 @@ const ExpenseListing = () => {
   // the very first fetch has kicked in (so we never flash an empty state).
   const showSkeleton = loading || !initialLoadDone;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleExport = async ({ fromDate, toDate }) => {
-    console.log(fromDate)
-    console.log(toDate)
-    downloadExcel("expense", fromDate, toDate);
-  };
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
@@ -162,21 +156,7 @@ const ExpenseListing = () => {
 
         {/* Button Group Container */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            disabled={isDownloading}
-            className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98]"
-          >
-            <FileSpreadsheet size={18} />
-            {isDownloading ? "Exporting..." : "Export To Excel"}
-          </button>
-
-          <ExportModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onGenerate={handleExport}
-          />
+          <ExportExcelButton type="expense" />
 
           <button
             type="button"

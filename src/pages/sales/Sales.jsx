@@ -24,7 +24,8 @@ import {
   Hash,
 } from "lucide-react";
 import salesJobStore from "@/zustand/Store/salesJobStore";
-import ExportModal from "@/components/ExportExcelModal";
+import ExportModal from "@/components/ExportExcelButton";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const TYPE_META = {
   CORPORATE: {
@@ -313,8 +314,6 @@ const Sales = () => {
     setPage(1);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const hasActiveFilters =
     Boolean(search) ||
     saleType !== "ALL" ||
@@ -394,19 +393,8 @@ const Sales = () => {
             Refresh
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            <CalendarDays size={16} />
-            Sales Report
-          </button>
-          <ExportModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onGenerate={()=>{}}
-          />
+          <ExportExcelButton type="sales" />
+          
         </div>
       </div>
 
