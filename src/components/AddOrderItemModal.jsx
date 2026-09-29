@@ -4,7 +4,7 @@ import { X, PackagePlus, Calculator } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "@/zustand/Store/orderDataStore";
 
-const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue }) => {
+const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, minOrderDate }) => {
   const [loading, setLoading] = useState(false);
   const addCorporateOrderItem = orderDataStore(
     (state) => state.addCorporateOrderItem
@@ -117,6 +117,7 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue }) =
               <input
                 type="date"
                 name="orderDate"
+                min={minOrderDate ? minOrderDate.split("T")[0] : undefined}
                 value={formData.orderDate}
                 onChange={handleInputChange}
                 required

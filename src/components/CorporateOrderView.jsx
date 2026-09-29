@@ -749,6 +749,7 @@ const CorporateOrderView = () => {
         onClose={() => setIsAddItemModalOpen(false)}
         orderId={order.id} // Assuming the database CUID is order.id
         unitValue={orderDetails.items[0].unit}
+        minOrderDate={orderDetails.items.at(-1).orderDate}
         onSuccess={() => {
           loadOrder();
         }}
