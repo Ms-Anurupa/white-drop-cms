@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   RefreshCw
 } from "lucide-react";
+import ExportExcelButton from "./ExportExcelButton";
 const inr = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -702,15 +703,7 @@ export default function DueTrackerPro({
             </span>
           </button>
 
-          <button
-            type="button"
-            className="dt-btn primary"
-            onClick={exportCsv}
-            disabled={loading || normalizedRows.length === 0}
-          >
-            <Icon name="download" />
-            {selected.size > 0 ? `Export ${selected.size}` : "Export"}
-          </button>
+          <ExportExcelButton type="due" />
         </div>
       </header>
 
@@ -882,7 +875,7 @@ export default function DueTrackerPro({
           <table className={`dt-table ${density}`}>
             <thead>
               <tr>
-                <th className="c-check">
+                {/* <th className="c-check">
                   <input
                     type="checkbox"
                     checked={allOnPage}
@@ -895,7 +888,7 @@ export default function DueTrackerPro({
                     disabled={loading || normalizedRows.length === 0}
                     aria-label="Select all"
                   />
-                </th>
+                </th> */}
 
                 <th>
                   <SortButton
@@ -967,7 +960,7 @@ export default function DueTrackerPro({
                         }
                       }}
                     >
-                      <td
+                      {/* <td
                         className="c-check"
                         onClick={(event) => event.stopPropagation()}
                       >
@@ -977,7 +970,7 @@ export default function DueTrackerPro({
                           onChange={() => toggleRow(row.id)}
                           aria-label={`Select ${row.displayName}`}
                         />
-                      </td>
+                      </td> */}
 
                       <td>
                         <div className="dt-account-cell">
