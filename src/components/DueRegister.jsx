@@ -1,9 +1,11 @@
 import useDueRegisterStore from "@/zustand/Store/dueRegisterStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  RefreshCw
+  RefreshCw,
+  RotateCcw
 } from "lucide-react";
 import ExportExcelButton from "./ExportExcelButton";
+import { SplitButton, SplitButtonItem } from "./SplitButton";
 const inr = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -677,33 +679,6 @@ export default function DueTrackerPro({
             <input type="month" value={month} onChange={handleMonthChange} />
           </label>
 
-          <button
-            type="button"
-            className="dt-btn flex-row"
-            onClick={handleResync}
-            disabled={syncing}
-            title="Refresh"
-            aria-label="Refresh"
-          >
-            <span className="flex items-center justify-center gap-2 whitespace-nowrap">
-              <RefreshCw size={18} className={syncing ? "dt-spin" : ""} />
-              {syncing ? "Resyncing..." : "Resync"}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="dt-btn icon"
-            onClick={handleRefresh}
-            disabled={loading}
-            title="Refresh"
-            aria-label="Refresh"
-          >
-            <span className={loading ? "dt-spin" : ""}>
-              <Icon name="refresh" />
-            </span>
-          </button>
-
           <ExportExcelButton type="due" />
         </div>
       </header>
@@ -821,6 +796,27 @@ export default function DueTrackerPro({
             ))}
           </select>
         </label>
+
+        <div className="ml-auto">
+          <SplitButton
+            variant="secondary"
+            disabled={syncing}
+            onClick={handleRefresh}
+            menuContent={
+              <SplitButtonItem onClick={handleResync} disabled={loading}>
+                <div className="flex w-full items-center gap-2">
+                  <RotateCcw size={16} className={syncing ? "dt-spin" : ""} />
+                  <span>{syncing ? "Resyncing..." : "Resync"}</span>
+                </div>
+              </SplitButtonItem>
+            }
+          >
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              <RefreshCw size={14} className={loading ? "dt-spin" : ""} />
+              <span>{loading ? "Refreshing..." : "Refresh"}</span>
+            </div>
+          </SplitButton>
+        </div>
 
         {search && !loading && (
           <span className="dt-search-meta">
