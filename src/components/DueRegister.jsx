@@ -227,6 +227,7 @@ export default function DueTrackerPro({
     pagination,
     filters,
     loading,
+    syncing,
     error,
 
     fetchDueRegister,
@@ -680,13 +681,13 @@ export default function DueTrackerPro({
             type="button"
             className="dt-btn flex-row"
             onClick={handleResync}
-            disabled={loading}
+            disabled={syncing}
             title="Refresh"
             aria-label="Refresh"
           >
             <span className="flex items-center justify-center gap-2 whitespace-nowrap">
-              <RefreshCw size={18} className={loading ? "dt-spin" : ""} />
-              {loading ? "Resyncing..." : "Resync"}
+              <RefreshCw size={18} className={syncing ? "dt-spin" : ""} />
+              {syncing ? "Resyncing..." : "Resync"}
             </span>
           </button>
 

@@ -27,6 +27,7 @@ const useDueRegisterStore = create((set, get) => ({
   filters: DEFAULT_FILTERS,
 
   loading: false,
+  syncing:false,
   error: null,
 
   fetchDueRegister: async (customFilters = {}) => {
@@ -95,13 +96,13 @@ const useDueRegisterStore = create((set, get) => ({
 
   manuallySyncDues: async () => {
     try {
-      set({ loading: true });
+      set({ syncing: true });
 
       await api.get("/admin/manualDueSync", {
         withAuth: true,
       });
 
-      set({loading: false});
+      set({syncing: false});
 
       return true;
     } catch (error) {
