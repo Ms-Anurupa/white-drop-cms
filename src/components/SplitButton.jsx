@@ -180,7 +180,7 @@ export function SplitButtonItem({
       className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors duration-100 outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
         destructive
           ? "text-red-600 hover:bg-red-50 focus:bg-red-50"
-          : "text-gray-700 hover:bg-gray-100 focus:bg-gray-100 hover:text-gray-900"
+          : "text-gray-700 hover:bg-blue-100 focus:bg-white-100 hover:text-gray-900"
       }`}
     >
       {children}

@@ -172,7 +172,7 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
 
       <div className="ml-auto">
         <SplitButton
-          variant="secondary"
+          variant="outline"
           disabled={refreshing}
           onClick={onRefresh}
           className="!bg-slate-100 !text-gray-700 hover:!bg-slate-200"

@@ -799,7 +799,7 @@ export default function DueTrackerPro({
 
         <div className="ml-auto">
           <SplitButton
-            variant="secondary"
+            variant="outline"
             disabled={syncing}
             onClick={handleRefresh}
             menuContent={
