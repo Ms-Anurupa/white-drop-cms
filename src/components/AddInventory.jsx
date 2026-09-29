@@ -519,7 +519,10 @@ const AddInventory = () => {
                     htmlFor="wastageQty"
                     className="mb-1.5 block text-sm font-medium text-gray-700"
                   >
-                    Wastage Quantity
+                    Wastage Quantity{" "}
+                    <span className="font-normal text-gray-400">
+                      (Optional)
+                    </span>
                   </label>
                   <input
                     id="wastageQty"
