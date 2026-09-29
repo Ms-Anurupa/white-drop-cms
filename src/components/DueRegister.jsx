@@ -788,8 +788,6 @@ export default function DueTrackerPro({
               <Icon name="close" size={13} />
             </button>
           )}
-
-          {!query && <kbd>/</kbd>}
         </div>
 
         <label className="dt-field">
