@@ -21,198 +21,215 @@ const DEFAULT_PAGINATION = {
 };
 
 const useDueRegisterStore = create((set, get) => ({
-    rows: [],
-    pagination: DEFAULT_PAGINATION,
+  rows: [],
+  pagination: DEFAULT_PAGINATION,
 
-    filters: DEFAULT_FILTERS,
+  filters: DEFAULT_FILTERS,
 
-    loading: false,
-    error: null,
+  loading: false,
+  error: null,
 
-    fetchDueRegister: async (customFilters = {}) => {
-        const currentFilters = {
-            ...get().filters,
-            ...customFilters,
-        };
+  fetchDueRegister: async (customFilters = {}) => {
+    const currentFilters = {
+      ...get().filters,
+      ...customFilters,
+    };
 
-        set({
-            loading: true,
-            error: null,
-            filters: currentFilters,
-        });
+    set({
+      loading: true,
+      error: null,
+      filters: currentFilters,
+    });
 
-        try {
-            const response = await api.get("/admin/getDueRegisterListing", {
-                params: {
-                    month: currentFilters.month,
-                    type: currentFilters.type,
-                    search: currentFilters.search?.trim() || undefined,
-                    page: currentFilters.page,
-                    limit: currentFilters.limit,
-                    sortBy: currentFilters.sortBy,
-                    sortOrder: currentFilters.sortOrder,
-                },
-                withAuth: true,
-            });
+    try {
+      const response = await api.get("/admin/getDueRegisterListing", {
+        params: {
+          month: currentFilters.month,
+          type: currentFilters.type,
+          search: currentFilters.search?.trim() || undefined,
+          page: currentFilters.page,
+          limit: currentFilters.limit,
+          sortBy: currentFilters.sortBy,
+          sortOrder: currentFilters.sortOrder,
+        },
+        withAuth: true,
+      });
 
-            const data = response?.data?.data || [];
-            const pagination = response?.data?.pagination || {};
+      const data = response?.data?.data || [];
+      const pagination = response?.data?.pagination || {};
 
-            set({
-                rows: data,
-                pagination: {
-                    totalRecords: Number(pagination.totalRecords) || 0,
-                    totalPages: Number(pagination.totalPages) || 0,
-                    currentPage: Number(pagination.currentPage) || currentFilters.page,
-                    pageSize: Number(pagination.pageSize) || currentFilters.limit,
-                    hasNextPage: Boolean(pagination.hasNextPage),
-                    hasPrevPage: Boolean(pagination.hasPrevPage),
-                },
-                loading: false,
-                error: null,
-            });
+      set({
+        rows: data,
+        pagination: {
+          totalRecords: Number(pagination.totalRecords) || 0,
+          totalPages: Number(pagination.totalPages) || 0,
+          currentPage: Number(pagination.currentPage) || currentFilters.page,
+          pageSize: Number(pagination.pageSize) || currentFilters.limit,
+          hasNextPage: Boolean(pagination.hasNextPage),
+          hasPrevPage: Boolean(pagination.hasPrevPage),
+        },
+        loading: false,
+        error: null,
+      });
 
-            return response?.data;
-        } catch (error) {
-            const message =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to fetch due register.";
+      return response?.data;
+    } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch due register.";
 
-            set({
-                rows: [],
-                pagination: {
-                    ...DEFAULT_PAGINATION,
-                    pageSize: currentFilters.limit,
-                },
-                loading: false,
-                error: message,
-            });
+      set({
+        rows: [],
+        pagination: {
+          ...DEFAULT_PAGINATION,
+          pageSize: currentFilters.limit,
+        },
+        loading: false,
+        error: message,
+      });
 
-            throw error;
-        }
-    },
+      throw error;
+    }
+  },
 
-    setFilter: (key, value) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                [key]: value,
-            },
-        }));
-    },
+  manuallySyncDues: async () => {
+    try {
+      set({ loading: true });
 
-    setFilters: (values) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                ...values,
-            },
-        }));
-    },
+      await api.get("/admin/manualDueSync", {
+        withAuth: true,
+      });
 
-    setPage: (page) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                page,
-            },
-        }));
-    },
+      set({loading: false});
 
-    setLimit: (limit) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                limit,
-                page: 1,
-            },
-        }));
-    },
+      return true;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
 
-    setMonth: (month) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                month,
-                page: 1,
-            },
-        }));
-    },
+  setFilter: (key, value) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        [key]: value,
+      },
+    }));
+  },
 
-    setType: (type) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                type,
-                page: 1,
-            },
-        }));
-    },
+  setFilters: (values) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        ...values,
+      },
+    }));
+  },
 
-    setSearch: (search) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                search,
-                page: 1,
-            },
-        }));
-    },
+  setPage: (page) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        page,
+      },
+    }));
+  },
 
-    setSort: (sortBy) => {
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                sortBy,
-                sortOrder:
-                    state.filters.sortBy === sortBy
-                        ? state.filters.sortOrder === "asc"
-                            ? "desc"
-                            : "asc"
-                        : "desc",
-                page: 1,
-            },
-        }));
-    },
+  setLimit: (limit) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        limit,
+        page: 1,
+      },
+    }));
+  },
 
-    nextPage: () => {
-        const { pagination } = get();
+  setMonth: (month) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        month,
+        page: 1,
+      },
+    }));
+  },
 
-        if (!pagination.hasNextPage) return;
+  setType: (type) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        type,
+        page: 1,
+      },
+    }));
+  },
 
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                page: state.filters.page + 1,
-            },
-        }));
-    },
+  setSearch: (search) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        search,
+        page: 1,
+      },
+    }));
+  },
 
-    previousPage: () => {
-        const { pagination } = get();
+  setSort: (sortBy) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        sortBy,
+        sortOrder:
+          state.filters.sortBy === sortBy
+            ? state.filters.sortOrder === "asc"
+              ? "desc"
+              : "asc"
+            : "desc",
+        page: 1,
+      },
+    }));
+  },
 
-        if (!pagination.hasPrevPage) return;
+  nextPage: () => {
+    const { pagination } = get();
 
-        set((state) => ({
-            filters: {
-                ...state.filters,
-                page: Math.max(1, state.filters.page - 1),
-            },
-        }));
-    },
+    if (!pagination.hasNextPage) return;
 
-    resetFilters: () => {
-        set({
-            filters: DEFAULT_FILTERS,
-        });
-    },
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        page: state.filters.page + 1,
+      },
+    }));
+  },
 
-    clearError: () => {
-        set({
-            error: null,
-        });
-    },
+  previousPage: () => {
+    const { pagination } = get();
+
+    if (!pagination.hasPrevPage) return;
+
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        page: Math.max(1, state.filters.page - 1),
+      },
+    }));
+  },
+
+  resetFilters: () => {
+    set({
+      filters: DEFAULT_FILTERS,
+    });
+  },
+
+  clearError: () => {
+    set({
+      error: null,
+    });
+  },
 }));
 
 export default useDueRegisterStore;

@@ -1,6 +1,8 @@
 import useDueRegisterStore from "@/zustand/Store/dueRegisterStore";
 import { useEffect, useMemo, useRef, useState } from "react";
-
+import {
+  RefreshCw
+} from "lucide-react";
 const inr = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -228,6 +230,8 @@ export default function DueTrackerPro({
 
     fetchDueRegister,
 
+    manuallySyncDues,
+
     setMonth,
     setType,
     setSearch,
@@ -412,6 +416,16 @@ export default function DueTrackerPro({
     try {
       await fetchDueRegister();
       notify("Due register refreshed");
+    } catch {
+      notify("Unable to refresh due register", "error");
+    }
+  };
+
+  const handleResync = async () => {
+    try {
+      await manuallySyncDues();
+      await fetchDueRegister();
+      notify("Due register resynced");
     } catch {
       notify("Unable to refresh due register", "error");
     }
@@ -644,7 +658,6 @@ export default function DueTrackerPro({
         <div>
           <div className="dt-title-row">
             <h2>Due Register</h2>
-
             <span className="dt-record-count">
               {pagination.totalRecords} records
             </span>
@@ -656,12 +669,25 @@ export default function DueTrackerPro({
           </p>
         </div>
 
-        <div className="dt-actions">
+        <div className="dt-actions flex flex-wrap items-center gap-3">
           <label className="dt-field">
             <span className="dt-sr">Month</span>
-
             <input type="month" value={month} onChange={handleMonthChange} />
           </label>
+
+          <button
+            type="button"
+            className="dt-btn flex-row"
+            onClick={handleResync}
+            disabled={loading}
+            title="Refresh"
+            aria-label="Refresh"
+          >
+            <span className="flex items-center justify-center gap-2 whitespace-nowrap">
+              <RefreshCw size={18} className={loading ? "dt-spin" : ""} />
+              {loading ? "Resyncing..." : "Resync"}
+            </span>
+          </button>
 
           <button
             type="button"
