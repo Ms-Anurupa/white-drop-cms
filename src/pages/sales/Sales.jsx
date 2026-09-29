@@ -24,6 +24,8 @@ import {
   Hash,
 } from "lucide-react";
 import salesJobStore from "@/zustand/Store/salesJobStore";
+import ExportModal from "@/components/ExportExcelButton";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const TYPE_META = {
   CORPORATE: {
@@ -391,13 +393,8 @@ const Sales = () => {
             Refresh
           </button>
 
-          <button
-            type="button"
-            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            <CalendarDays size={16} />
-            Sales Report
-          </button>
+          <ExportExcelButton type="sales" />
+          
         </div>
       </div>
 
