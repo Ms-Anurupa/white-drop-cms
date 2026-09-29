@@ -88,6 +88,8 @@ export function SplitButton({
   const variants = {
     primary:
       "bg-blue-600 text-white hover:bg-blue-700 border-transparent shadow-sm",
+    secondary:
+      "bg-slate-50 text-gray-700 hover:bg-slate-100 border-gray-200 shadow-none ",
     outline:
       "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 border shadow-sm",
   };
@@ -95,7 +97,7 @@ export function SplitButton({
   const variantStyle = variants[variant] || variants.primary;
 
   const dividerStyle =
-    variant === "outline"
+    variant === "outline" || variant === "secondary"
       ? "border-l-transparent"
       : "border-l-blue-500/60 border-l";
 

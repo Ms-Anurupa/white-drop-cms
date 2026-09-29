@@ -17,6 +17,7 @@ import {
   Plus,
   Check,
   Sparkles,
+  RotateCcw,
 } from "lucide-react";
 import usePackagingJobStore from "@/zustand/Store/packagingJobStore";
 import Loader from "./Loader";
@@ -171,16 +172,15 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
 
       <div className="ml-auto">
         <SplitButton
-          variant="primary"
+          variant="secondary"
           disabled={refreshing}
           onClick={onRefresh}
+          className="!bg-slate-100 !text-gray-700 hover:!bg-slate-200"
           menuContent={
             <SplitButtonItem onClick={onGenerate} disabled={refreshing}>
               <div className="flex w-full items-center gap-2">
-                <Sparkles
-                  className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
-                />
-                <span>Generate</span>
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span>Regenerate</span>
               </div>
             </SplitButtonItem>
           }
