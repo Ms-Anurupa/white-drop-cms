@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import usePackagingJobStore from "@/zustand/Store/packagingJobStore";
 import Loader from "./Loader";
+import { SplitButton, SplitButtonItem } from "./SplitButton";
 
 const SORT_FIELDS = [
   { value: "deliveryDate", label: "Delivery date" },
@@ -168,29 +169,29 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
         </button>
       )}
 
-      <div className="ml-auto flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onGenerate}
-          className="cursor-pointer flex items-center gap-1.5 rounded-md border border-blue-500 bg-blue-500 px-3 py-1.5 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Sparkles
-            className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
-          />
-          Generate
-        </button>
-        
-        <button
-          type="button"
-          onClick={onRefresh}
+      <div className="ml-auto">
+        <SplitButton
+          variant="primary"
           disabled={refreshing}
-          className="cursor-pointer flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          onClick={onRefresh}
+          menuContent={
+            <SplitButtonItem onClick={onGenerate} disabled={refreshing}>
+              <div className="flex w-full items-center gap-2">
+                <Sparkles
+                  className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+                />
+                <span>Generate</span>
+              </div>
+            </SplitButtonItem>
+          }
         >
-          <RefreshCw
-            className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </button>
+          <div className="flex items-center gap-2">
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+            />
+            <span>Refresh</span>
+          </div>
+        </SplitButton>
       </div>
     </div>
   );

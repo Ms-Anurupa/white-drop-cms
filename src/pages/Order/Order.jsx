@@ -738,14 +738,6 @@ const Order = () => {
               />
               Refresh
             </button>
-
-            <button
-              onClick={handleExport}
-              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition"
-            >
-              <Download size={16} />
-              Export
-            </button>
           </div>
         </div>
       </div>
