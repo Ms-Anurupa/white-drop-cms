@@ -1,248 +1,99 @@
+import useDueRegisterStore from "@/zustand/Store/dueRegisterStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * DueTrackerPro — receivables workspace over the `dueRegister` table.
- *
- * Props
- *  fetchDues({ type, month }) => Promise<Row[]>
- *      type "subscription" → rows that have userId · type "corporate" → rows that have corpoAccId
- *      Row: { id, name?, userId?, corpoAccId?, dueAmount, month, lastCalculated, details }
- *  fetchTrend({ type, months }) => Promise<{ month, total, owingCount }[]>     (optional)
- *      Enables month-over-month deltas and the 6-month chart. Hidden if omitted.
- *  onOpenAccount(row) · onSendReminder(rows[]) · onRecordPayment(row)           (optional)
- *      A button is rendered only when its handler is passed.
- *  theme: "auto" | "light" | "dark"
- *
- * With no fetchDues the component runs on demo data (and shows all actions).
- * The component reads `fetchDues` / `fetchTrend` through a ref, so inline arrow functions are safe.
- */
-
-/* ───────────── formatting & date helpers (month key = UTC "YYYY-MM", same as the cron) ───────────── */
-const inr = (n) =>
+const inr = (value) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(n || 0);
-const inrCompact = (n) =>
-  "₹" +
-  new Intl.NumberFormat("en-IN", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(n || 0);
-const monthKey = (d) => d.toISOString().slice(0, 7);
-const monthLabel = (k) =>
-  new Date(`${k}-01T00:00:00Z`).toLocaleDateString("en-IN", {
+  }).format(Number(value) || 0);
+
+const monthLabel = (month) => {
+  if (!month) return "—";
+
+  return new Date(`${month}-01T00:00:00Z`).toLocaleDateString("en-IN", {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
-const shortMonth = (k) =>
-  new Date(`${k}-01T00:00:00Z`).toLocaleDateString("en-IN", {
-    month: "short",
-    timeZone: "UTC",
-  });
-const lastMonths = (n = 6) => {
-  const now = new Date();
-  return Array.from({ length: n }, (_, i) =>
-    monthKey(
-      new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1)),
-    ),
-  );
 };
-const timeAgo = (iso) => {
-  if (!iso) return "—";
-  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins} min ago`;
-  const hrs = Math.round(mins / 60);
-  if (hrs < 24) return `${hrs} hr ago`;
-  return new Date(iso).toLocaleDateString("en-IN", {
-    day: "numeric",
+
+const formatDate = (value) => {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
     month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
-/* ───────────── register analysis ───────────── */
-const LOG_RE = /^(\w+) (\S+): ([\d.]+) - ([\d.]+) paid = ([\d.]+) due$/;
-const parseLog = (line) => {
-  const m = LOG_RE.exec(line);
-  return m
-    ? { kind: m[1], id: m[2], total: +m[3], paid: +m[4], due: +m[5] }
-    : { raw: line };
-};
-const analyse = (row, type) => {
-  const logs = (row.details?.calculationLogs || []).map(parseLog);
-  const parsed = logs.filter((l) => !l.raw);
-  const billed = parsed.reduce((s, l) => s + l.total, 0);
-  const paid = parsed.reduce((s, l) => s + l.paid, 0);
-  const items =
-    type === "subscription"
-      ? (row.details?.unpaidOrders?.length || 0) +
-        (row.details?.unpaidSubscriptions?.length || 0)
-      : row.details?.unpaidCorporateOrders?.length || 0;
-  const status = !(row.dueAmount > 0)
-    ? "clear"
-    : paid > 0
-      ? "partial"
-      : "unpaid";
-  return { logs, billed, paid, items, status };
-};
-const STATUS_LABEL = {
-  unpaid: "Unpaid",
-  partial: "Partly paid",
-  clear: "Cleared",
-};
-const STATUS_RANK = { unpaid: 0, partial: 1, clear: 2 };
-const strip = ({ _a, ...raw }) => raw;
-
-/* ───────────── demo data ───────────── */
-const FIRST = [
-  "Riya",
-  "Manoj",
-  "Priyanka",
-  "Subhas",
-  "Farhana",
-  "Debashis",
-  "Ananya",
-  "Imran",
-  "Sneha",
-  "Tapan",
-  "Mitali",
-  "Rohit",
-  "Kaveri",
-  "Arjun",
-  "Nusrat",
-  "Sourav",
-  "Pallavi",
-  "Dilip",
-  "Meera",
-  "Jayanta",
-  "Tanushree",
-  "Asif",
-  "Barnali",
-  "Kunal",
-  "Ishita",
-  "Ratan",
-];
-const LAST = [
-  "Sen",
-  "Das",
-  "Ghosh",
-  "Roy",
-  "Khatun",
-  "Pal",
-  "Mukherjee",
-  "Sheikh",
-  "Basu",
-  "Dey",
-];
-const CORPS = [
-  "Sunrise Hospitality Pvt Ltd",
-  "Eastern Canteen Services",
-  "Lakeview Apartments AOA",
-  "Greenleaf Foods",
-  "Metro Tiffin Co-op",
-  "Harbour Hotels Group",
-  "Bengal Institute of Tech",
-  "Orchid Catering",
-  "Riverside Medical Centre",
-  "Ankur Public School",
-  "Cityline Offices LLP",
-  "Silverline Hostels",
-];
-const FACTORS = [1, 0.87, 0.94, 0.76, 0.82, 0.68];
-const rnd = (i, k) => {
-  const x = Math.sin(i * 97.13 + k * 31.7) * 10000;
-  return x - Math.floor(x);
-};
-const demoRows = (type, month) => {
-  const f = FACTORS[Math.max(0, lastMonths().indexOf(month))] ?? 1;
-  const base = Date.now() - 3.5 * 3600e3;
-  const scale = (v, step = 100) =>
-    Math.max(step, Math.round((v * f) / step) * step);
-  if (type === "subscription") {
-    return Array.from({ length: 26 }, (_, i) => {
-      const cleared = rnd(i, 3) < 0.15;
-      const nSubs = cleared ? 0 : Math.floor(rnd(i, 1) * 3);
-      const nRetail = cleared
-        ? 0
-        : Math.floor(rnd(i, 2) * 4) + (nSubs === 0 ? 1 : 0);
-      const subs = Array.from({ length: nSubs }, (_, s) => {
-        const total = scale((Math.floor(rnd(i, 10 + s) * 10) + 2) * 500, 500);
-        const paid =
-          rnd(i, 20 + s) < 0.45
-            ? Math.round((total * rnd(i, 30 + s) * 0.8) / 100) * 100
-            : 0;
-        return { id: 100 + i * 3 + s, total, paid };
-      });
-      const retail = Array.from({ length: nRetail }, (_, r) => ({
-        id: 800 + i * 4 + r,
-        amt: scale((Math.floor(rnd(i, 40 + r) * 8) + 3) * 100),
-      }));
-      const due =
-        subs.reduce((s, x) => s + (x.total - x.paid), 0) +
-        retail.reduce((s, x) => s + x.amt, 0);
-      return {
-        id: `u${i}`,
-        name: `${FIRST[i % FIRST.length]} ${LAST[(i * 7) % LAST.length]}`,
-        userId: `USR-${1000 + i}`,
-        month,
-        dueAmount: due,
-        lastCalculated: new Date(base - i * 1000).toISOString(),
-        details: {
-          unpaidOrders: retail.map((r) => r.id),
-          unpaidSubscriptions: subs.map((s) => s.id),
-          calculationLogs: subs.map(
-            (s) =>
-              `Sub ${s.id}: ${s.total} - ${s.paid} paid = ${s.total - s.paid} due`,
-          ),
-        },
-      };
-    });
+const getAccountName = (row) => {
+  if (row?.userId) {
+    return row?.user?.customer_name || "Unknown customer";
   }
-  return CORPS.map((name, i) => {
-    const n = rnd(i, 5) < 0.12 ? 0 : Math.floor(rnd(i, 6) * 3) + 1;
-    const orders = Array.from({ length: n }, (_, o) => {
-      const total = scale((Math.floor(rnd(i, 50 + o) * 80) + 16) * 500, 500);
-      const paid =
-        rnd(i, 60 + o) < 0.5
-          ? Math.round((total * rnd(i, 70 + o) * 0.7) / 500) * 500
-          : 0;
-      return { id: 20 + i * 3 + o, total, paid };
-    });
-    return {
-      id: `c${i}`,
-      name,
-      corpoAccId: `CORP-${200 + i}`,
-      month,
-      dueAmount: orders.reduce((s, x) => s + (x.total - x.paid), 0),
-      lastCalculated: new Date(base - i * 1000).toISOString(),
-      details: {
-        unpaidCorporateOrders: orders.map((o) => o.id),
-        calculationLogs: orders.map(
-          (o) =>
-            `CorpOrder ${o.id}: ${o.total} - ${o.paid} paid = ${o.total - o.paid} due`,
-        ),
-      },
-    };
-  });
+
+  if (row?.corpoAccId) {
+    return row?.corpAcc?.businessName || "Unknown company";
+  }
+
+  return "Unknown account";
 };
-const demoFetch = ({ type, month }) =>
-  new Promise((r) => setTimeout(() => r(demoRows(type, month)), 400));
-const demoTrend = ({ type, months }) =>
-  Promise.resolve(
-    months.map((m) => {
-      const rows = demoRows(type, m).filter((r) => r.dueAmount > 0);
-      return {
-        month: m,
-        total: rows.reduce((s, r) => s + r.dueAmount, 0),
-        owingCount: rows.length,
-      };
-    }),
+
+const getAccountId = (row) => {
+  if (row?.userId) {
+    return row?.user?.phone_num || row.userId;
+  }
+
+  if (row?.corpoAccId) {
+    return row?.corpAcc?.contactNo || row.corpoAccId;
+  }
+
+  return "—";
+};
+
+const getAccountType = (row) => {
+  if (row?.userId) return "USER";
+  if (row?.corpoAccId) return "CORPORATE";
+  return "UNKNOWN";
+};
+
+const getInitials = (name = "") => {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+
+  if (!parts.length) return "?";
+
+  return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+};
+
+const normalizeRow = (row) => {
+  const currentDue = Number(row?.currentMonthDue ?? row?.dueAmount ?? 0);
+
+  const previousDue = Number(row?.previousMonthDue ?? 0);
+
+  const cumulativeDue = Number(
+    row?.cumulativeDueAmount ?? previousDue + currentDue,
   );
 
-/* ───────────── icons ───────────── */
+  return {
+    ...row,
+
+    displayName: getAccountName(row),
+    displayId: getAccountId(row),
+    accountType: getAccountType(row),
+
+    currentDue,
+    previousDue,
+    cumulativeDue,
+  };
+};
+
 const ICONS = {
   search: (
     <>
@@ -250,6 +101,14 @@ const ICONS = {
       <path d="m20 20-3.5-3.5" />
     </>
   ),
+
+  refresh: (
+    <>
+      <path d="M20 11a8 8 0 1 0-2.3 5.7" />
+      <path d="M20 4v7h-7" />
+    </>
+  ),
+
   download: (
     <>
       <path d="M12 4v11" />
@@ -257,28 +116,37 @@ const ICONS = {
       <path d="M5 20h14" />
     </>
   ),
-  refresh: (
-    <>
-      <path d="M20 11a8 8 0 1 0-2.3 5.7" />
-      <path d="M20 4v7h-7" />
-    </>
-  ),
+
   close: (
     <>
       <path d="M6 6l12 12" />
       <path d="M18 6 6 18" />
     </>
   ),
+
+  left: <path d="m15 18-6-6 6-6" />,
+
+  right: <path d="m9 18 6-6-6-6" />,
+
   up: <path d="m6 15 6-6 6 6" />,
+
   down: <path d="m6 9 6 6 6-6" />,
+
+  sort: (
+    <>
+      <path d="m8 10 4-4 4 4" />
+      <path d="m8 14 4 4 4-4" />
+    </>
+  ),
+
   send: (
     <>
       <path d="M21 3 10 14" />
       <path d="M21 3 14 21l-4-7-7-4z" />
     </>
   ),
-  sort: <path d="m8 10 4-4 4 4M8 14l4 4 4-4" />,
 };
+
 const Icon = ({ name, size = 16 }) => (
   <svg
     width={size}
@@ -295,588 +163,688 @@ const Icon = ({ name, size = 16 }) => (
   </svg>
 );
 
-/* ───────────── small pieces ───────────── */
-const StatusBadge = ({ status }) => (
-  <span className={`dt-badge ${status}`}>{STATUS_LABEL[status]}</span>
-);
+const SortButton = ({ field, label, sortBy, sortOrder, onSort }) => {
+  const active = sortBy === field;
 
-function Delta({ cur, prev, prevLabel }) {
-  if (prev == null || prev === 0)
-    return <span className="dt-delta flat">No prior month to compare</span>;
-  const p = ((cur - prev) / prev) * 100;
-  if (Math.abs(p) < 0.05)
-    return <span className="dt-delta flat">No change vs {prevLabel}</span>;
-  const up = p > 0; // more owed = worse
   return (
-    <span className={`dt-delta ${up ? "up" : "down"}`}>
-      {up ? "▲" : "▼"} {Math.abs(p).toFixed(1)}% vs {prevLabel}
-    </span>
-  );
-}
-
-function SortTh({ k, label, sort, onSort, className = "" }) {
-  const active = sort.key === k;
-  return (
-    <th
-      className={className}
-      aria-sort={
-        active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"
-      }
+    <button
+      type="button"
+      className={`dt-sortbtn ${active ? "active" : ""}`}
+      onClick={() => onSort(field)}
     >
-      <button
-        className={`dt-sortbtn ${active ? "on" : ""}`}
-        onClick={() => onSort(k)}
-      >
-        {label}
-        <Icon
-          name={active ? (sort.dir === "asc" ? "up" : "down") : "sort"}
-          size={13}
-        />
-      </button>
-    </th>
-  );
-}
+      <span>{label}</span>
 
-function Chips({ title, ids, prefix }) {
-  if (!ids?.length) return null;
+      <Icon
+        name={active ? (sortOrder === "asc" ? "up" : "down") : "sort"}
+        size={13}
+      />
+    </button>
+  );
+};
+
+const TypeBadge = ({ type }) => {
+  if (type === "USER") {
+    return <span className="dt-type user">Customer</span>;
+  }
+
+  if (type === "CORPORATE") {
+    return <span className="dt-type corporate">Corporate</span>;
+  }
+
+  return <span className="dt-type">—</span>;
+};
+
+const AmountCell = ({ value, max }) => {
+  const amount = Number(value) || 0;
+
+  const ratio = max > 0 ? Math.min(1, Math.max(0, amount / max)) : 0;
+
+  const level =
+    amount <= 0 ? "zero" : ratio > 0.66 ? "high" : ratio > 0.33 ? "mid" : "low";
+
   return (
-    <div className="dt-sec">
-      <h4>{title}</h4>
-      <div className="dt-chips">
-        {ids.map((id) => (
-          <span key={id} className="dt-chip">
-            {prefix} #{id}
-          </span>
-        ))}
-      </div>
+    <div className="dt-amount">
+      <strong className={amount <= 0 ? "zero" : ""}>{inr(amount)}</strong>
+
+      <span className="dt-amount-bar">
+        <i className={level} style={{ width: `${ratio * 100}%` }} />
+      </span>
     </div>
   );
-}
+};
 
-function TrendCard({ months, trend, selected, onSelect }) {
-  const asc = [...months].reverse();
-  const byMonth = Object.fromEntries(trend.map((t) => [t.month, t]));
-  const max = Math.max(1, ...asc.map((m) => byMonth[m]?.total || 0));
-  return (
-    <div className="dt-card dt-trend">
-      <h3>Outstanding by month</h3>
-      <div
-        className="dt-bars"
-        role="group"
-        aria-label="Outstanding amount by month"
-      >
-        {asc.map((m) => {
-          const v = byMonth[m]?.total || 0;
-          const on = m === selected;
-          return (
-            <button
-              key={m}
-              className={`dt-col ${on ? "on" : ""}`}
-              aria-pressed={on}
-              aria-label={`${monthLabel(m)}: ${inr(v)} outstanding`}
-              title={`${monthLabel(m)} · ${inr(v)}`}
-              onClick={() => onSelect(m)}
-            >
-              <span className="dt-colval">{on ? inrCompact(v) : ""}</span>
-              <span className="dt-colbar">
-                <i style={{ height: `${Math.max(3, (v / max) * 100)}%` }} />
-              </span>
-              <span className="dt-collbl">{shortMonth(m)}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ───────────── main component ───────────── */
 export default function DueTrackerPro({
-  fetchDues,
-  fetchTrend,
   onOpenAccount,
   onSendReminder,
   onRecordPayment,
   theme = "auto",
 }) {
-  const demo = !fetchDues;
-  const api = useRef({});
-  api.current = {
-    load: fetchDues ?? demoFetch,
-    trend: fetchTrend ?? (demo ? demoTrend : null),
-  };
+  const {
+    rows,
+    pagination,
+    filters,
+    loading,
+    error,
 
-  const months = useMemo(() => lastMonths(6), []);
-  const [type, setType] = useState("subscription");
-  const [month, setMonth] = useState(months[0]);
-  const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("dues");
-  const [minAmount, setMinAmount] = useState(0);
-  const [sort, setSort] = useState({ key: "dueAmount", dir: "desc" });
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [density, setDensity] = useState("comfortable");
+    fetchDueRegister,
+
+    setMonth,
+    setType,
+    setSearch,
+    setLimit,
+    setSort,
+
+    nextPage,
+    previousPage,
+  } = useDueRegisterStore();
+
+  const { month, type, search, page, limit, sortBy, sortOrder } = filters;
+
+  const [query, setQuery] = useState(search || "");
   const [selected, setSelected] = useState(() => new Set());
   const [activeId, setActiveId] = useState(null);
-  const [rows, setRows] = useState([]);
-  const [trend, setTrend] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [tick, setTick] = useState(0);
+  const [density, setDensity] = useState("comfortable");
   const [toast, setToast] = useState(null);
 
   const searchRef = useRef(null);
   const drawerRef = useRef(null);
   const closeRef = useRef(null);
-  const lastFocus = useRef(null);
+  const lastFocusRef = useRef(null);
 
-  const canRemind = demo || !!onSendReminder;
-  const canPay = demo || !!onRecordPayment;
-  const canOpen = demo || !!onOpenAccount;
-  const notify = (msg, tone = "ok") => setToast({ msg, tone });
+  const normalizedRows = useMemo(() => rows.map(normalizeRow), [rows]);
 
-  /* data */
-  useEffect(() => {
-    let off = false;
-    setLoading(true);
-    setError(null);
-    Promise.resolve(api.current.load({ type, month }))
-      .then((d) => !off && setRows(Array.isArray(d) ? d : []))
-      .catch(
-        (e) =>
-          !off && setError(e?.message || "Could not load the due register."),
-      )
-      .finally(() => !off && setLoading(false));
-    return () => {
-      off = true;
-    };
-  }, [type, month, tick]);
-
-  useEffect(() => {
-    const t = api.current.trend;
-    if (!t) return setTrend(null);
-    let off = false;
-    Promise.resolve(t({ type, months }))
-      .then((d) => !off && setTrend(Array.isArray(d) ? d : null))
-      .catch(() => !off && setTrend(null));
-    return () => {
-      off = true;
-    };
-  }, [type, months, tick]);
-
-  useEffect(() => {
-    setSelected(new Set());
-    setPage(1);
-    setActiveId(null);
-  }, [type, month]);
-  useEffect(() => setPage(1), [query, statusFilter, minAmount, sort, pageSize]);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 3400);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  /* derived */
-  const enriched = useMemo(
-    () => rows.map((r) => ({ ...r, _a: analyse(r, type) })),
-    [rows, type],
+  const activeRow = useMemo(
+    () => normalizedRows.find((row) => row.id === activeId) || null,
+    [normalizedRows, activeId],
   );
 
-  const counts = useMemo(() => {
-    const c = { all: enriched.length, unpaid: 0, partial: 0, clear: 0 };
-    enriched.forEach((r) => c[r._a.status]++);
-    c.dues = c.unpaid + c.partial;
-    return c;
-  }, [enriched]);
+  const maxCurrentDue = useMemo(
+    () => Math.max(1, ...normalizedRows.map((row) => row.currentDue)),
+    [normalizedRows],
+  );
 
-  const summary = useMemo(() => {
-    const owing = enriched
-      .filter((r) => r.dueAmount > 0)
-      .sort((a, b) => b.dueAmount - a.dueAmount);
-    const total = owing.reduce((s, r) => s + r.dueAmount, 0);
-    const top5 = owing.slice(0, 5).reduce((s, r) => s + r.dueAmount, 0);
-    const latest = enriched.reduce(
-      (a, r) => (r.lastCalculated > a ? r.lastCalculated : a),
-      "",
-    );
-    return {
-      total,
-      owing: owing.length,
-      top5Share: total ? (top5 / total) * 100 : 0,
-      max: owing[0]?.dueAmount || 1,
-      latest,
-    };
-  }, [enriched]);
+  const pageCurrentTotal = useMemo(
+    () => normalizedRows.reduce((sum, row) => sum + row.currentDue, 0),
+    [normalizedRows],
+  );
 
-  const prevKey = useMemo(() => {
-    const [y, m] = month.split("-").map(Number);
-    return monthKey(new Date(Date.UTC(y, m - 2, 1)));
-  }, [month]);
-  const prev = trend?.find((t) => t.month === prevKey);
+  const pagePreviousTotal = useMemo(
+    () => normalizedRows.reduce((sum, row) => sum + row.previousDue, 0),
+    [normalizedRows],
+  );
 
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = enriched.filter((r) => {
-      const s = r._a.status;
-      if (statusFilter === "dues" && s === "clear") return false;
-      if (
-        ["unpaid", "partial", "clear"].includes(statusFilter) &&
-        s !== statusFilter
-      )
-        return false;
-      if (minAmount && r.dueAmount < minAmount) return false;
-      if (!q) return true;
-      return [r.name, r.userId, r.corpoAccId]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q));
-    });
-    const d = sort.dir === "asc" ? 1 : -1;
-    const val = {
-      name: (a, b) =>
-        String(a.name || a.userId || a.corpoAccId).localeCompare(
-          String(b.name || b.userId || b.corpoAccId),
-        ),
-      status: (a, b) => STATUS_RANK[a._a.status] - STATUS_RANK[b._a.status],
-      items: (a, b) => a._a.items - b._a.items,
-      lastCalculated: (a, b) =>
-        String(a.lastCalculated).localeCompare(String(b.lastCalculated)),
-      dueAmount: (a, b) => a.dueAmount - b.dueAmount,
-    }[sort.key];
-    return [...list].sort((a, b) => d * val(a, b));
-  }, [enriched, query, statusFilter, minAmount, sort]);
+  const pageCumulativeTotal = useMemo(
+    () => normalizedRows.reduce((sum, row) => sum + row.cumulativeDue, 0),
+    [normalizedRows],
+  );
 
-  const pages = Math.max(1, Math.ceil(visible.length / pageSize));
-  const pageRows = visible.slice((page - 1) * pageSize, page * pageSize);
+  const selectedRows = useMemo(
+    () => normalizedRows.filter((row) => selected.has(row.id)),
+    [normalizedRows, selected],
+  );
+
+  const selectedTotal = useMemo(
+    () => selectedRows.reduce((sum, row) => sum + row.currentDue, 0),
+    [selectedRows],
+  );
+
   const allOnPage =
-    pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
-  const someOnPage = pageRows.some((r) => selected.has(r.id));
-  const selectedRows = enriched.filter((r) => selected.has(r.id));
-  const selectedTotal = selectedRows.reduce((s, r) => s + r.dueAmount, 0);
+    normalizedRows.length > 0 &&
+    normalizedRows.every((row) => selected.has(row.id));
 
-  const activeIdx = visible.findIndex((r) => r.id === activeId);
-  const active =
-    activeIdx >= 0
-      ? visible[activeIdx]
-      : enriched.find((r) => r.id === activeId) || null;
+  const someOnPage = normalizedRows.some((row) => selected.has(row.id));
 
-  /* interactions */
-  const toggleSort = (key) =>
-    setSort((s) =>
-      s.key === key
-        ? { key, dir: s.dir === "asc" ? "desc" : "asc" }
-        : { key, dir: key === "name" ? "asc" : "desc" },
-    );
-  const toggleRow = (id) =>
-    setSelected((s) => {
-      const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
+  // True while the user's typing hasn't been sent to the server yet (debounce) or is loading
+  const searching = query.trim() !== (search || "") || (loading && !!search);
+
+  const notify = (message, tone = "ok") => {
+    setToast({
+      message,
+      tone,
     });
-  const togglePage = () =>
-    setSelected((s) => {
-      const n = new Set(s);
-      pageRows.forEach((r) => (allOnPage ? n.delete(r.id) : n.add(r.id)));
-      return n;
-    });
-
-  const openDrawer = (id, el) => {
-    lastFocus.current = el;
-    setActiveId(id);
   };
-  const closeDrawer = () => {
+
+  /*
+   * Initial API call
+   */
+  useEffect(() => {
+    fetchDueRegister();
+  }, []);
+
+  /*
+   * Debounced search
+   */
+  useEffect(() => {
+    const currentSearch = search || "";
+
+    if (query === currentSearch) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSearch(query.trim());
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [query, search, setSearch]);
+
+  /*
+   * Fetch whenever server-side filters change.
+   *
+   * The initial request is handled separately above.
+   */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchDueRegister();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [month, type, search, page, limit, sortBy, sortOrder]);
+
+  /*
+   * Clear selected rows whenever server-side page/filter changes.
+   */
+  useEffect(() => {
+    setSelected(new Set());
     setActiveId(null);
-    requestAnimationFrame(() => lastFocus.current?.focus?.());
-  };
-  useEffect(() => {
-    if (activeId != null) closeRef.current?.focus();
-  }, [activeId]);
+  }, [month, type, search, page, limit, sortBy, sortOrder]);
 
+  /*
+   * Keep local search synchronized with store.
+   */
   useEffect(() => {
-    const h = (e) => {
-      if (e.key === "Escape" && activeId != null) return closeDrawer();
+    setQuery(search || "");
+  }, [search]);
+
+  /*
+   * Toast auto-hide
+   */
+  useEffect(() => {
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3200);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  /*
+   * Keyboard shortcuts
+   */
+  useEffect(() => {
+    const handleKeyDown = (event) => {
       if (
-        e.key === "/" &&
-        !/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName || "")
+        event.key === "/" &&
+        !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")
       ) {
-        e.preventDefault();
+        event.preventDefault();
         searchRef.current?.focus();
       }
+
+      if (event.key === "Escape" && activeId) {
+        closeDrawer();
+      }
     };
-    window.addEventListener("keydown", h);
-    return () => window.removeEventListener("keydown", h);
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeId]);
 
-  const trapTab = (e) => {
-    if (e.key !== "Tab" || !drawerRef.current) return;
-    const f = [
+  const handleTypeChange = (value) => {
+    setType(value);
+  };
+
+  const handleMonthChange = (event) => {
+    setMonth(event.target.value);
+  };
+
+  const handleSort = (field) => {
+    setSort(field);
+  };
+
+  const handleLimitChange = (event) => {
+    setLimit(Number(event.target.value));
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await fetchDueRegister();
+      notify("Due register refreshed");
+    } catch {
+      notify("Unable to refresh due register", "error");
+    }
+  };
+
+  const toggleRow = (id) => {
+    setSelected((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  const togglePage = () => {
+    setSelected((current) => {
+      const next = new Set(current);
+
+      if (allOnPage) {
+        normalizedRows.forEach((row) => {
+          next.delete(row.id);
+        });
+      } else {
+        normalizedRows.forEach((row) => {
+          next.add(row.id);
+        });
+      }
+
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelected(new Set());
+  };
+
+  const openDrawer = (row, element) => {
+    lastFocusRef.current = element;
+    setActiveId(row.id);
+  };
+
+  const closeDrawer = () => {
+    setActiveId(null);
+
+    requestAnimationFrame(() => {
+      lastFocusRef.current?.focus?.();
+    });
+  };
+
+  const handleReminder = async (rowsToRemind) => {
+    if (!onSendReminder) {
+      notify("Send reminder action is not configured", "error");
+      return;
+    }
+
+    try {
+      await onSendReminder(rowsToRemind);
+
+      notify(
+        `Reminder sent for ${rowsToRemind.length} ${
+          rowsToRemind.length === 1 ? "account" : "accounts"
+        }`,
+      );
+    } catch (err) {
+      notify(err?.message || "Unable to send reminder", "error");
+    }
+  };
+
+  const handleRecordPayment = (row) => {
+    if (!onRecordPayment) {
+      notify("Record payment action is not configured", "error");
+      return;
+    }
+
+    onRecordPayment(row);
+  };
+
+  const handleOpenAccount = (row) => {
+    if (!onOpenAccount) {
+      notify("Open account action is not configured", "error");
+      return;
+    }
+
+    onOpenAccount(row);
+  };
+
+  const exportCsv = () => {
+    const exportRows = selectedRows.length > 0 ? selectedRows : normalizedRows;
+
+    if (!exportRows.length) {
+      notify("There are no rows to export", "error");
+      return;
+    }
+
+    const header = [
+      "Account Type",
+      "Account",
+      "Account ID",
+      "Month",
+      "Current Due",
+      "Previous Due",
+      "Cumulative Due",
+      "Created At",
+      "Updated At",
+    ];
+
+    const body = exportRows.map((row) =>
+      [
+        row.accountType,
+        row.displayName,
+        row.displayId,
+        row.month,
+        row.currentDue,
+        row.previousDue,
+        row.cumulativeDue,
+        row.createdAt || "",
+        row.updatedAt || "",
+      ]
+        .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+        .join(","),
+    );
+
+    const csv = [header.join(","), ...body].join("\n");
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = `due-register-${month}-${type}.csv`;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    URL.revokeObjectURL(url);
+
+    notify(
+      `Exported ${exportRows.length} ${
+        exportRows.length === 1 ? "row" : "rows"
+      }`,
+    );
+  };
+
+  const resetSearch = () => {
+    setQuery("");
+    setSearch("");
+    searchRef.current?.focus();
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (event.key === "Escape") {
+      if (query) {
+        event.preventDefault();
+        event.stopPropagation();
+        resetSearch();
+      } else {
+        searchRef.current?.blur();
+      }
+    }
+
+    // Enter applies the search immediately without waiting for the debounce
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setSearch(query.trim());
+    }
+  };
+
+  const trapDrawerTab = (event) => {
+    if (event.key !== "Tab" || !drawerRef.current) {
+      return;
+    }
+
+    const elements = [
       ...drawerRef.current.querySelectorAll(
-        "button,[href],input,select,[tabindex]:not([tabindex='-1'])",
+        "button,input,select,textarea,a,[tabindex]:not([tabindex='-1'])",
       ),
-    ].filter((el) => !el.disabled);
-    if (!f.length) return;
-    const first = f[0],
-      last = f[f.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
+    ].filter((element) => !element.disabled);
+
+    if (!elements.length) return;
+
+    const first = elements[0];
+    const last = elements[elements.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
       last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
       first.focus();
     }
   };
 
-  const remind = async (list) => {
-    try {
-      if (onSendReminder) await onSendReminder(list.map(strip));
-      notify(
-        `Reminder queued for ${list.length} ${list.length === 1 ? "account" : "accounts"}${demo ? " (demo)" : ""}`,
-      );
-    } catch (e) {
-      notify(e?.message || "Couldn't send reminders. Try again.", "err");
+  useEffect(() => {
+    if (activeId) {
+      requestAnimationFrame(() => {
+        closeRef.current?.focus();
+      });
     }
-  };
-  const recordPayment = (row) => {
-    if (onRecordPayment) onRecordPayment(strip(row));
-    else notify("Demo: your payment form would open here");
-  };
-  const openAccount = (row) => {
-    if (onOpenAccount) onOpenAccount(strip(row));
-    else notify("Demo: this would open the account page");
-  };
+  }, [activeId]);
 
-  const exportCsv = () => {
-    const list = selectedRows.length ? selectedRows : visible;
-    const head = [
-      "Account",
-      "ID",
-      "Month",
-      "Status",
-      "Open items",
-      "Amount due",
-      "Last calculated",
-    ];
-    const body = list.map((r) =>
-      [
-        r.name || "",
-        r.userId || r.corpoAccId || "",
-        month,
-        STATUS_LABEL[r._a.status],
-        r._a.items,
-        r.dueAmount,
-        r.lastCalculated,
-      ]
-        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-        .join(","),
-    );
-    const blob = new Blob([[head.join(","), ...body].join("\n")], {
-      type: "text/csv",
-    });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `dues-${type}-${month}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    notify(`Exported ${list.length} ${list.length === 1 ? "row" : "rows"}`);
-  };
+  const currentStart =
+    pagination.totalRecords === 0
+      ? 0
+      : (pagination.currentPage - 1) * pagination.pageSize + 1;
 
-  const isSub = type === "subscription";
-  const noun = isSub ? "customers" : "accounts";
-  const STATUS_TABS = [
-    ["dues", "With dues", counts.dues],
-    ["unpaid", "Unpaid", counts.unpaid],
-    ["partial", "Partly paid", counts.partial],
-    ["clear", "Cleared", counts.clear],
-    ["all", "All", counts.all],
-  ];
+  const currentEnd =
+    pagination.totalRecords === 0
+      ? 0
+      : Math.min(
+          pagination.currentPage * pagination.pageSize,
+          pagination.totalRecords,
+        );
 
   return (
     <section className="dt" data-theme={theme}>
       <style>{CSS}</style>
 
-      {/* Header */}
+      {/* HEADER */}
       <header className="dt-head">
         <div>
-          <h2>Dues</h2>
+          <div className="dt-title-row">
+            <h2>Due Register</h2>
+
+            <span className="dt-record-count">
+              {pagination.totalRecords} records
+            </span>
+          </div>
+
           <p className="dt-lead">
-            Outstanding balances for {monthLabel(month)}, net of offline
-            payments.
-            {summary.latest && (
-              <> Register recalculated {timeAgo(summary.latest)}.</>
-            )}
+            Track current, previous and cumulative outstanding dues for{" "}
+            <strong>{monthLabel(month)}</strong>.
           </p>
         </div>
+
         <div className="dt-actions">
           <label className="dt-field">
             <span className="dt-sr">Month</span>
-            <select value={month} onChange={(e) => setMonth(e.target.value)}>
-              {months.map((m) => (
-                <option key={m} value={m}>
-                  {monthLabel(m)}
-                </option>
-              ))}
-            </select>
+
+            <input type="month" value={month} onChange={handleMonthChange} />
           </label>
+
           <button
+            type="button"
             className="dt-btn icon"
-            onClick={() => setTick((t) => t + 1)}
-            aria-label="Refresh"
+            onClick={handleRefresh}
+            disabled={loading}
             title="Refresh"
+            aria-label="Refresh"
           >
-            <Icon name="refresh" />
+            <span className={loading ? "dt-spin" : ""}>
+              <Icon name="refresh" />
+            </span>
           </button>
+
           <button
-            className="dt-btn"
+            type="button"
+            className="dt-btn primary"
             onClick={exportCsv}
-            disabled={!visible.length}
+            disabled={loading || normalizedRows.length === 0}
           >
-            <Icon name="download" /> Export
+            <Icon name="download" />
+            {selected.size > 0 ? `Export ${selected.size}` : "Export"}
           </button>
         </div>
       </header>
 
-      <div className="dt-tabs" role="tablist" aria-label="Due type">
+      {/* ACCOUNT TYPE */}
+      <div className="dt-tabs" role="tablist" aria-label="Account type">
         {[
-          ["subscription", "Subscription dues"],
-          ["corporate", "Corporate dues"],
-        ].map(([k, label]) => (
+          ["ALL", "All accounts"],
+          ["USER", "Customers"],
+          ["CORPORATE", "Corporate"],
+        ].map(([value, label]) => (
           <button
-            key={k}
+            key={value}
+            type="button"
             role="tab"
-            aria-selected={type === k}
-            className={type === k ? "on" : ""}
-            onClick={() => setType(k)}
+            aria-selected={type === value}
+            className={type === value ? "on" : ""}
+            onClick={() => handleTypeChange(value)}
           >
             {label}
           </button>
         ))}
       </div>
 
-      {/* KPIs + trend */}
-      <div className={`dt-overview ${trend ? "" : "solo"}`}>
-        <div className="dt-kpis">
-          <div className="dt-card dt-kpi hero">
-            <span className="dt-label">Total outstanding</span>
-            <strong>{loading ? "—" : inr(summary.total)}</strong>
-            {trend && !loading && (
-              <Delta
-                cur={summary.total}
-                prev={prev?.total}
-                prevLabel={shortMonth(prevKey)}
-              />
-            )}
-          </div>
-          <div className="dt-card dt-kpi">
-            <span className="dt-label">
-              {isSub ? "Customers" : "Accounts"} owing
-            </span>
-            <strong>{loading ? "—" : summary.owing}</strong>
-            {trend && !loading ? (
-              <Delta
-                cur={summary.owing}
-                prev={prev?.owingCount}
-                prevLabel={shortMonth(prevKey)}
-              />
-            ) : (
-              <span className="dt-delta flat">of {counts.all} in register</span>
-            )}
-          </div>
-          <div className="dt-card dt-kpi">
-            <span className="dt-label">Top 5 concentration</span>
-            <strong>
-              {loading ? "—" : `${summary.top5Share.toFixed(0)}%`}
-            </strong>
-            <span className="dt-delta flat">of all outstanding</span>
-          </div>
+      {/* SUMMARY */}
+      <div className="dt-summary-grid">
+        <div className="dt-card dt-summary-card highlight">
+          <span className="dt-label">Cumulative due</span>
+
+          <strong>{loading ? "—" : inr(pageCumulativeTotal)}</strong>
+
+          <small>Previous + current due on this page</small>
         </div>
-        {trend && (
-          <TrendCard
-            months={months}
-            trend={trend}
-            selected={month}
-            onSelect={setMonth}
+
+        <div className="dt-card dt-summary-card">
+          <span className="dt-label">
+            <i className="dt-dot current" />
+            Current month
+          </span>
+
+          <strong>{loading ? "—" : inr(pageCurrentTotal)}</strong>
+
+          <small>{pagination.pageSize} records per page</small>
+        </div>
+
+        <div className="dt-card dt-summary-card">
+          <span className="dt-label">
+            <i className="dt-dot previous" />
+            Previous dues
+          </span>
+
+          <strong>{loading ? "—" : inr(pagePreviousTotal)}</strong>
+
+          <small>Before {monthLabel(month)}</small>
+        </div>
+
+        <div className="dt-card dt-summary-card">
+          <span className="dt-label">
+            <i className="dt-dot total" />
+            Total records
+          </span>
+
+          <strong>{loading ? "—" : pagination.totalRecords}</strong>
+
+          <small>Matching current filters</small>
+        </div>
+      </div>
+
+      {/* TOOLBAR */}
+      <div className="dt-toolbar">
+        <div className={`dt-search ${query ? "has-value" : ""}`} role="search">
+          <label htmlFor="dt-search-input" className="dt-search-icon">
+            <Icon name="search" size={17} />
+          </label>
+
+          <input
+            id="dt-search-input"
+            ref={searchRef}
+            type="text"
+            inputMode="search"
+            autoComplete="off"
+            spellCheck={false}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Search by customer, company or phone"
+            aria-label="Search due register"
           />
+
+          {searching && (
+            <span className="dt-search-spinner" aria-hidden="true" />
+          )}
+
+          {query && (
+            <button
+              type="button"
+              className="dt-search-clear"
+              onClick={resetSearch}
+              aria-label="Clear search"
+              title="Clear (Esc)"
+            >
+              <Icon name="close" size={13} />
+            </button>
+          )}
+
+          {!query && <kbd>/</kbd>}
+        </div>
+
+        <label className="dt-field">
+          <span className="dt-sr">Rows per page</span>
+
+          <select value={limit} onChange={handleLimitChange}>
+            {[10, 25, 50, 100].map((value) => (
+              <option key={value} value={value}>
+                {value} / page
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {search && !loading && (
+          <span className="dt-search-meta">
+            {pagination.totalRecords}{" "}
+            {pagination.totalRecords === 1 ? "result" : "results"} for{" "}
+            <b>"{search}"</b>
+          </span>
         )}
       </div>
 
-      {/* Toolbar */}
-      <div className="dt-toolbar">
-        <label className="dt-search">
-          <Icon name="search" />
-          <input
-            ref={searchRef}
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={
-              isSub ? "Search customer name or ID" : "Search company name or ID"
-            }
-            aria-label="Search dues"
-          />
-          <kbd>/</kbd>
-        </label>
-        <div className="dt-seg" role="group" aria-label="Filter by status">
-          {STATUS_TABS.map(([k, label, n]) => (
-            <button
-              key={k}
-              aria-pressed={statusFilter === k}
-              className={statusFilter === k ? "on" : ""}
-              onClick={() => setStatusFilter(k)}
-            >
-              {label}
-              <span>{loading ? "" : n}</span>
-            </button>
-          ))}
-        </div>
-        <label className="dt-field">
-          <span className="dt-sr">Minimum amount</span>
-          <select
-            value={minAmount}
-            onChange={(e) => setMinAmount(+e.target.value)}
-          >
-            <option value={0}>Any amount</option>
-            <option value={5000}>₹5,000 and above</option>
-            <option value={10000}>₹10,000 and above</option>
-            <option value={50000}>₹50,000 and above</option>
-          </select>
-        </label>
-        <div className="dt-seg tight" role="group" aria-label="Row density">
-          {["comfortable", "compact"].map((d) => (
-            <button
-              key={d}
-              aria-pressed={density === d}
-              className={density === d ? "on" : ""}
-              onClick={() => setDensity(d)}
-            >
-              {d === "comfortable" ? "Roomy" : "Compact"}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bulk bar */}
+      {/* BULK ACTIONS */}
       {selected.size > 0 && (
         <div className="dt-bulk" role="region" aria-label="Bulk actions">
           <span>
             <b>{selected.size}</b> selected · {inr(selectedTotal)} due
           </span>
+
           <div>
-            {canRemind && (
+            {onSendReminder && (
               <button
+                type="button"
                 className="dt-btn sm"
                 onClick={() =>
-                  remind(selectedRows.filter((r) => r.dueAmount > 0))
+                  handleReminder(
+                    selectedRows.filter((row) => row.currentDue > 0),
+                  )
                 }
-                disabled={!selectedRows.some((r) => r.dueAmount > 0)}
               >
-                <Icon name="send" size={14} /> Send reminders
+                <Icon name="send" size={14} />
+                Send reminders
               </button>
             )}
-            <button className="dt-btn sm" onClick={exportCsv}>
-              <Icon name="download" size={14} /> Export selected
+
+            <button type="button" className="dt-btn sm" onClick={exportCsv}>
+              <Icon name="download" size={14} />
+              Export selected
             </button>
+
             <button
+              type="button"
               className="dt-btn sm ghost"
-              onClick={() => setSelected(new Set())}
+              onClick={clearSelection}
             >
               Clear
             </button>
@@ -884,7 +852,7 @@ export default function DueTrackerPro({
         </div>
       )}
 
-      {/* Table */}
+      {/* TABLE */}
       <div className="dt-card dt-tablecard">
         <div className="dt-tablewrap">
           <table className={`dt-table ${density}`}>
@@ -893,56 +861,63 @@ export default function DueTrackerPro({
                 <th className="c-check">
                   <input
                     type="checkbox"
-                    aria-label="Select all on this page"
                     checked={allOnPage}
-                    ref={(el) =>
-                      el && (el.indeterminate = someOnPage && !allOnPage)
-                    }
+                    ref={(element) => {
+                      if (element) {
+                        element.indeterminate = someOnPage && !allOnPage;
+                      }
+                    }}
                     onChange={togglePage}
-                    disabled={!pageRows.length}
+                    disabled={loading || normalizedRows.length === 0}
+                    aria-label="Select all"
                   />
                 </th>
-                <SortTh
-                  k="name"
-                  label={isSub ? "Customer" : "Company"}
-                  sort={sort}
-                  onSort={toggleSort}
-                />
-                <SortTh
-                  k="status"
-                  label="Status"
-                  sort={sort}
-                  onSort={toggleSort}
-                />
-                <SortTh
-                  k="items"
-                  label="Open items"
-                  sort={sort}
-                  onSort={toggleSort}
-                  className="num hide-sm"
-                />
-                <SortTh
-                  k="dueAmount"
-                  label="Amount due"
-                  sort={sort}
-                  onSort={toggleSort}
-                  className="num"
-                />
-                <th className="num hide-sm">Share</th>
-                <SortTh
-                  k="lastCalculated"
-                  label="Updated"
-                  sort={sort}
-                  onSort={toggleSort}
-                  className="num hide-md"
-                />
+
+                <th>
+                  <SortButton
+                    field="createdAt"
+                    label="Account"
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                </th>
+
+                <th>Type</th>
+
+                <th>
+                  <SortButton
+                    field="month"
+                    label="Month"
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                </th>
+
+                <th className="num">
+                  <SortButton
+                    field="dueAmount"
+                    label="Current due"
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={handleSort}
+                  />
+                </th>
+
+                <th className="num hide-sm">Previous due</th>
+
+                <th className="num">Cumulative due</th>
+
+                <th className="hide-md">Updated</th>
               </tr>
             </thead>
+
             <tbody>
               {loading &&
-                Array.from({ length: 6 }, (_, i) => (
-                  <tr key={i} className="skel">
-                    <td colSpan={7}>
+                Array.from({ length: 7 }, (_, index) => (
+                  <tr key={`loading-${index}`} className="dt-skeleton-row">
+                    <td colSpan={8}>
                       <span />
                     </td>
                   </tr>
@@ -950,61 +925,83 @@ export default function DueTrackerPro({
 
               {!loading &&
                 !error &&
-                pageRows.map((r) => {
-                  const on = selected.has(r.id);
+                normalizedRows.map((row) => {
+                  const isSelected = selected.has(row.id);
+
                   return (
                     <tr
-                      key={r.id}
+                      key={row.id}
+                      className={isSelected ? "selected" : ""}
                       tabIndex={0}
-                      className={`${on ? "sel" : ""} ${r.id === activeId ? "active" : ""}`}
-                      onClick={(e) => openDrawer(r.id, e.currentTarget)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && e.target === e.currentTarget)
-                          openDrawer(r.id, e.currentTarget);
+                      onClick={(event) => openDrawer(row, event.currentTarget)}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter" &&
+                          event.target === event.currentTarget
+                        ) {
+                          openDrawer(row, event.currentTarget);
+                        }
                       }}
                     >
                       <td
                         className="c-check"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
                       >
                         <input
                           type="checkbox"
-                          checked={on}
-                          onChange={() => toggleRow(r.id)}
-                          aria-label={`Select ${r.name || r.userId || r.corpoAccId}`}
+                          checked={isSelected}
+                          onChange={() => toggleRow(row.id)}
+                          aria-label={`Select ${row.displayName}`}
                         />
                       </td>
+
                       <td>
-                        <div className="dt-who">
-                          <b>{r.name || r.userId || r.corpoAccId}</b>
-                          <small>{r.userId || r.corpoAccId}</small>
+                        <div className="dt-account-cell">
+                          <span
+                            className={`dt-avatar ${row.accountType.toLowerCase()}`}
+                          >
+                            {getInitials(row.displayName)}
+                          </span>
+
+                          <div className="dt-account">
+                            <strong>{row.displayName}</strong>
+
+                            <small>{row.displayId}</small>
+                          </div>
                         </div>
                       </td>
+
                       <td>
-                        <StatusBadge status={r._a.status} />
+                        <TypeBadge type={row.accountType} />
                       </td>
-                      <td className="num hide-sm">{r._a.items || "—"}</td>
+
+                      <td>
+                        <span className="dt-month">
+                          {monthLabel(row.month)}
+                        </span>
+                      </td>
+
                       <td className="num">
-                        <div className="dt-amt">
-                          <b className={r.dueAmount > 0 ? "" : "zero"}>
-                            {inr(r.dueAmount)}
-                          </b>
-                          <i className="dt-bar">
-                            <em
-                              style={{
-                                width: `${(r.dueAmount / summary.max) * 100}%`,
-                              }}
-                            />
-                          </i>
-                        </div>
+                        <AmountCell
+                          value={row.currentDue}
+                          max={maxCurrentDue}
+                        />
                       </td>
-                      <td className="num hide-sm mut">
-                        {summary.total && r.dueAmount
-                          ? `${((r.dueAmount / summary.total) * 100).toFixed(1)}%`
-                          : "—"}
+
+                      <td className="num hide-sm">
+                        <span className="dt-money">{inr(row.previousDue)}</span>
                       </td>
-                      <td className="num hide-md mut">
-                        {timeAgo(r.lastCalculated)}
+
+                      <td className="num">
+                        <strong className="dt-cumulative">
+                          {inr(row.cumulativeDue)}
+                        </strong>
+                      </td>
+
+                      <td className="hide-md">
+                        <span className="dt-muted">
+                          {formatDate(row.updatedAt || row.createdAt)}
+                        </span>
                       </td>
                     </tr>
                   );
@@ -1014,119 +1011,112 @@ export default function DueTrackerPro({
 
           {!loading && error && (
             <div className="dt-state">
-              <strong>Couldn't load dues</strong>
+              <strong>Couldn't load due register</strong>
+
               <p>{error}</p>
-              <button className="dt-btn" onClick={() => setTick((t) => t + 1)}>
+
+              <button type="button" className="dt-btn" onClick={handleRefresh}>
                 Try again
               </button>
             </div>
           )}
-          {!loading && !error && visible.length === 0 && (
+
+          {!loading && !error && normalizedRows.length === 0 && (
             <div className="dt-state">
-              <strong>
-                {rows.length === 0
-                  ? `No register entries for ${monthLabel(month)}`
-                  : "No results"}
-              </strong>
+              <strong>No due-register records</strong>
+
               <p>
-                {rows.length === 0
-                  ? "The due cron creates these once it has run for the month."
-                  : "Nothing matches the current filters."}
+                No records were found for {monthLabel(month)}
+                {search ? ` matching "${search}"` : ""}.
               </p>
-              {rows.length > 0 && (
-                <button
-                  className="dt-btn"
-                  onClick={() => {
-                    setQuery("");
-                    setStatusFilter("all");
-                    setMinAmount(0);
-                  }}
-                >
-                  Reset filters
+
+              {search && (
+                <button type="button" className="dt-btn" onClick={resetSearch}>
+                  Clear search
                 </button>
               )}
             </div>
           )}
         </div>
 
-        {!loading && !error && visible.length > 0 && (
+        {/* PAGINATION */}
+        {!loading && !error && pagination.totalRecords > 0 && (
           <div className="dt-pager">
             <span>
-              {(page - 1) * pageSize + 1}–
-              {Math.min(page * pageSize, visible.length)} of {visible.length}{" "}
-              {noun}
+              Showing{" "}
+              <b>
+                {currentStart}–{currentEnd}
+              </b>{" "}
+              of <b>{pagination.totalRecords}</b> records
             </span>
-            <div>
-              <label className="dt-field">
-                <span className="dt-sr">Rows per page</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => setPageSize(+e.target.value)}
-                >
-                  {[10, 25, 50].map((n) => (
-                    <option key={n} value={n}>
-                      {n} per page
-                    </option>
-                  ))}
-                </select>
-              </label>
+
+            <div className="dt-pager-actions">
               <button
-                className="dt-btn sm"
-                disabled={page === 1}
-                onClick={() => setPage(page - 1)}
+                type="button"
+                className="dt-btn sm icon"
+                onClick={previousPage}
+                disabled={!pagination.hasPrevPage || loading}
+                aria-label="Previous page"
               >
-                Previous
+                <Icon name="left" />
               </button>
+
+              <span className="dt-page-number">
+                Page <b>{pagination.currentPage}</b> of{" "}
+                <b>{pagination.totalPages}</b>
+              </span>
+
               <button
-                className="dt-btn sm"
-                disabled={page === pages}
-                onClick={() => setPage(page + 1)}
+                type="button"
+                className="dt-btn sm icon"
+                onClick={nextPage}
+                disabled={!pagination.hasNextPage || loading}
+                aria-label="Next page"
               >
-                Next
+                <Icon name="right" />
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Detail drawer */}
-      {active && (
+      {/* DETAIL DRAWER */}
+      {activeRow && (
         <>
           <div className="dt-scrim" onClick={closeDrawer} />
+
           <aside
             className="dt-drawer"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="dt-dr-title"
+            aria-labelledby="dt-drawer-title"
             ref={drawerRef}
-            onKeyDown={trapTab}
+            onKeyDown={trapDrawerTab}
           >
-            <div className="dt-dr-top">
-              <div className="dt-dr-nav">
-                <button
-                  className="dt-btn icon sm"
-                  onClick={() => setActiveId(visible[activeIdx - 1].id)}
-                  disabled={activeIdx <= 0}
-                  aria-label="Previous account"
+            <div className="dt-drawer-header">
+              <div className="dt-drawer-id">
+                <span
+                  className={`dt-avatar lg ${activeRow.accountType.toLowerCase()}`}
                 >
-                  <Icon name="up" />
-                </button>
-                <button
-                  className="dt-btn icon sm"
-                  onClick={() => setActiveId(visible[activeIdx + 1].id)}
-                  disabled={activeIdx < 0 || activeIdx >= visible.length - 1}
-                  aria-label="Next account"
-                >
-                  <Icon name="down" />
-                </button>
-                {activeIdx >= 0 && (
-                  <span>
-                    {activeIdx + 1} of {visible.length}
+                  {getInitials(activeRow.displayName)}
+                </span>
+
+                <div>
+                  <span className="dt-label">
+                    {activeRow.accountType === "CORPORATE"
+                      ? "Corporate account"
+                      : "Customer account"}
                   </span>
-                )}
+
+                  <h3 id="dt-drawer-title">{activeRow.displayName}</h3>
+
+                  <small>{activeRow.displayId}</small>
+                </div>
               </div>
+
               <button
                 ref={closeRef}
+                type="button"
                 className="dt-btn icon sm"
                 onClick={closeDrawer}
                 aria-label="Close details"
@@ -1135,145 +1125,169 @@ export default function DueTrackerPro({
               </button>
             </div>
 
-            <div className="dt-dr-body">
-              <div className="dt-dr-id">
-                <h3 id="dt-dr-title">
-                  {active.name || active.userId || active.corpoAccId}
-                </h3>
-                <small>
-                  {active.userId || active.corpoAccId} ·{" "}
-                  {monthLabel(active.month || month)}
-                </small>
+            <div className="dt-drawer-body">
+              <div className="dt-detail-month">
+                <span className="dt-label">Register month</span>
+
+                <strong>{monthLabel(activeRow.month)}</strong>
               </div>
 
-              <div className="dt-dr-amount">
-                <div>
-                  <span className="dt-label">Amount due</span>
-                  <strong className={active.dueAmount > 0 ? "" : "zero"}>
-                    {inr(active.dueAmount)}
-                  </strong>
-                </div>
-                <StatusBadge status={active._a.status} />
+              <div className="dt-detail-hero">
+                <span className="dt-label">Current month due</span>
+
+                <strong className={activeRow.currentDue > 0 ? "" : "zero"}>
+                  {inr(activeRow.currentDue)}
+                </strong>
               </div>
 
-              {active._a.billed > 0 && (
-                <div className="dt-sec">
-                  <div className="dt-sum">
-                    <span>
-                      Billed <b>{inr(active._a.billed)}</b>
-                    </span>
-                    <span>
-                      Paid offline <b>{inr(active._a.paid)}</b>
-                    </span>
-                  </div>
-                  <i className="dt-bar lg paid">
-                    <em
-                      style={{
-                        width: `${(active._a.paid / active._a.billed) * 100}%`,
-                      }}
-                    />
-                  </i>
-                </div>
-              )}
+              <div className="dt-detail-grid">
+                <div className="dt-detail-card">
+                  <span>Previous due</span>
 
-              {active._a.logs.length > 0 && (
-                <div className="dt-sec">
-                  <h4>{isSub ? "Subscriptions" : "Corporate orders"}</h4>
-                  <div className="dt-ledger">
-                    {active._a.logs.map((l, i) =>
-                      l.raw ? (
-                        <p key={i} className="dt-raw">
-                          {l.raw}
-                        </p>
-                      ) : (
-                        <div key={i} className="dt-lrow">
-                          <span className="dt-lid">
-                            {l.kind === "Sub" ? "Subscription" : "Order"} #
-                            {l.id}
-                          </span>
-                          <b>{inr(l.due)}</b>
-                          <i className="dt-bar paid">
-                            <em
-                              style={{
-                                width: `${l.total ? (l.paid / l.total) * 100 : 0}%`,
-                              }}
-                            />
-                          </i>
-                          <small>
-                            {inr(l.paid)} paid of {inr(l.total)}
-                          </small>
-                        </div>
-                      ),
-                    )}
-                  </div>
+                  <strong>{inr(activeRow.previousDue)}</strong>
                 </div>
-              )}
 
-              {isSub ? (
-                <>
-                  {active._a.logs.length === 0 && (
-                    <Chips
-                      title="Subscriptions"
-                      ids={active.details?.unpaidSubscriptions}
-                      prefix="SUB"
-                    />
+                <div className="dt-detail-card highlight">
+                  <span>Cumulative due</span>
+
+                  <strong>{inr(activeRow.cumulativeDue)}</strong>
+                </div>
+              </div>
+
+              <div className="dt-detail-section">
+                <h4>Account information</h4>
+
+                <div className="dt-info-list">
+                  <div>
+                    <span>Account type</span>
+
+                    <TypeBadge type={activeRow.accountType} />
+                  </div>
+
+                  {activeRow.userId && (
+                    <>
+                      <div>
+                        <span>Customer</span>
+
+                        <b>{activeRow.user?.customer_name}</b>
+                      </div>
+
+                      <div>
+                        <span>Phone</span>
+
+                        <b>{activeRow.user?.phone_num}</b>
+                      </div>
+                    </>
                   )}
-                  <Chips
-                    title="Delivered orders awaiting payment"
-                    ids={active.details?.unpaidOrders}
-                    prefix="ORD"
-                  />
-                </>
-              ) : (
-                active._a.logs.length === 0 && (
-                  <Chips
-                    title="Corporate orders"
-                    ids={active.details?.unpaidCorporateOrders}
-                    prefix="ORD"
-                  />
-                )
-              )}
 
-              {active.dueAmount <= 0 && (
-                <p className="dt-none">Nothing owed for this month.</p>
-              )}
+                  {activeRow.corpoAccId && (
+                    <>
+                      <div>
+                        <span>Company</span>
 
-              <p className="dt-foot">
-                Calculated{" "}
-                {new Date(active.lastCalculated).toLocaleString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
+                        <b>{activeRow.corpAcc?.businessName}</b>
+                      </div>
+
+                      <div>
+                        <span>Contact</span>
+
+                        <b>{activeRow.corpAcc?.contactNo}</b>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="dt-detail-section">
+                <h4>Breakdown</h4>
+
+                <div className="dt-timeline">
+                  <div>
+                    <span className="dot current" />
+
+                    <div>
+                      <strong>Current month</strong>
+
+                      <small>{monthLabel(activeRow.month)}</small>
+                    </div>
+
+                    <b>{inr(activeRow.currentDue)}</b>
+                  </div>
+
+                  <div>
+                    <span className="dot previous" />
+
+                    <div>
+                      <strong>Previous dues</strong>
+
+                      <small>Before {monthLabel(activeRow.month)}</small>
+                    </div>
+
+                    <b>{inr(activeRow.previousDue)}</b>
+                  </div>
+
+                  <div>
+                    <span className="dot cumulative" />
+
+                    <div>
+                      <strong>Cumulative</strong>
+
+                      <small>Total outstanding</small>
+                    </div>
+
+                    <b>{inr(activeRow.cumulativeDue)}</b>
+                  </div>
+                </div>
+              </div>
+
+              <div className="dt-detail-section">
+                <h4>Record information</h4>
+
+                <div className="dt-info-list">
+                  <div>
+                    <span>Created</span>
+                    <b>{formatDate(activeRow.createdAt)}</b>
+                  </div>
+
+                  <div>
+                    <span>Updated</span>
+                    <b>{formatDate(activeRow.updatedAt)}</b>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="dt-dr-actions">
-              {canPay && (
+            <div className="dt-drawer-actions">
+              {onRecordPayment && (
                 <button
+                  type="button"
                   className="dt-btn primary"
-                  onClick={() => recordPayment(active)}
-                  disabled={active.dueAmount <= 0}
+                  disabled={activeRow.currentDue <= 0}
+                  onClick={() => handleRecordPayment(activeRow)}
                 >
                   Record payment
                 </button>
               )}
-              {canRemind && (
+
+              {onSendReminder && (
                 <button
+                  type="button"
                   className="dt-btn"
-                  onClick={() => remind([active])}
-                  disabled={active.dueAmount <= 0}
+                  disabled={activeRow.currentDue <= 0}
+                  onClick={() => handleReminder([activeRow])}
                 >
-                  <Icon name="send" size={14} /> Send reminder
+                  <Icon name="send" size={14} />
+                  Send reminder
                 </button>
               )}
-              {canOpen && (
+
+              {onOpenAccount && (
                 <button
+                  type="button"
                   className="dt-btn ghost"
-                  onClick={() => openAccount(active)}
+                  onClick={() => handleOpenAccount(activeRow)}
                 >
-                  Open {isSub ? "customer" : "account"}
+                  Open account
                 </button>
               )}
             </div>
@@ -1281,184 +1295,1173 @@ export default function DueTrackerPro({
         </>
       )}
 
+      {/* TOAST */}
       {toast && (
         <div className={`dt-toast ${toast.tone}`} role="status">
-          {toast.msg}
+          {toast.message}
         </div>
       )}
     </section>
   );
 }
 
-/* ───────────── styles (all scoped under .dt; inherits the host app's font) ───────────── */
 const DARK_VARS = `
-  --bg:#0b1220;--surface:#111a2b;--raise:#16223a;--ink:#e8edf5;--mut:#93a1b5;--line:#24314a;--line2:#1b2740;
-  --unpaid:#f97066;--unpaid-bg:#3b1614;--partial:#fdb022;--partial-bg:#3a2a0a;--clear:#47cd89;--clear-bg:#0f2e22;
-  --focus:#7aa7ff;--shadow:0 12px 40px rgba(0,0,0,.5);`;
+  --bg:#0a1216;
+  --surface:#111c22;
+  --raise:#16252d;
+  --ink:#e6eef0;
+  --mut:#8ea3aa;
+  --line:#233640;
+  --line2:#1a2a32;
+  --focus:#4fd1c1;
+  --accent:#4fd1c1;
+  --accent-soft:rgba(79,209,193,.14);
+  --warn:#f0a35e;
+  --danger:#f0776b;
+  --success:#5ad39a;
+  --shadow:0 16px 48px rgba(0,0,0,.55);
+`;
 
 const CSS = `
-.dt{--bg:#f5f6f8;--surface:#fff;--raise:#fafbfc;--ink:#0e1a2b;--mut:#5f6b7a;--line:#e4e8ee;--line2:#eef1f5;
-  --unpaid:#b42318;--unpaid-bg:#fee4e2;--partial:#b54708;--partial-bg:#fef0c7;--clear:#067647;--clear-bg:#d1fadf;
-  --focus:#2e6be6;--shadow:0 12px 40px rgba(14,26,43,.18);
-  position:relative;font-family:var(--dt-font,inherit);font-size:14px;line-height:1.45;color:var(--ink);background:var(--bg);
-  padding:24px;border-radius:14px;max-width:1180px;margin:0 auto;font-variant-numeric:tabular-nums}
-@media (prefers-color-scheme:dark){.dt[data-theme="auto"]{${DARK_VARS}}}
-.dt[data-theme="dark"]{${DARK_VARS}}
-.dt *{box-sizing:border-box}
-.dt button,.dt input,.dt select{font:inherit;color:inherit}
-.dt button{cursor:pointer}
-.dt :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.dt-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dt {
+  --bg:#f3f6f6;
+  --surface:#ffffff;
+  --raise:#f8fafa;
+  --ink:#10222a;
+  --mut:#5b6e75;
+  --line:#dde5e7;
+  --line2:#ebf0f1;
+  --focus:#0f766e;
+  --accent:#0f766e;
+  --accent-soft:rgba(15,118,110,.10);
+  --warn:#b45309;
+  --danger:#c2410c;
+  --success:#067647;
+  --shadow:0 16px 48px rgba(16,34,42,.20);
 
-.dt-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}
-.dt-head h2{margin:0;font-size:24px;letter-spacing:-.02em}
-.dt-lead{margin:4px 0 0;color:var(--mut);max-width:62ch}
-.dt-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.dt-field select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 10px;height:36px}
-.dt-btn{display:inline-flex;gap:6px;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 12px;height:36px;white-space:nowrap}
-.dt-btn:hover:not(:disabled){border-color:var(--mut)}
-.dt-btn:disabled{opacity:.45;cursor:not-allowed}
-.dt-btn.icon{padding:0;width:36px}
-.dt-btn.sm{height:32px;padding:0 10px}
-.dt-btn.icon.sm{width:32px;padding:0}
-.dt-btn.primary{background:var(--ink);border-color:var(--ink);color:var(--surface);font-weight:600}
-.dt-btn.primary:hover:not(:disabled){opacity:.9;border-color:var(--ink)}
-.dt-btn.ghost{background:transparent;border-color:transparent;color:var(--mut)}
-.dt-btn.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--line)}
+  position:relative;
+  max-width:1280px;
+  margin:0 auto;
+  padding:28px;
+  color:var(--ink);
+  background:var(--bg);
+  border-radius:16px;
+  font-size:14px;
+  line-height:1.45;
+  font-variant-numeric:tabular-nums;
+}
 
-.dt-tabs{display:flex;gap:2px;margin:20px 0 16px;border-bottom:1px solid var(--line)}
-.dt-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--mut);margin-bottom:-1px}
-.dt-tabs button:hover{color:var(--ink)}
-.dt-tabs button.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+@media (prefers-color-scheme:dark) {
+  .dt[data-theme="auto"] {
+    ${DARK_VARS}
+  }
+}
 
-.dt-card{background:var(--surface);border:1px solid var(--line);border-radius:12px}
-.dt-overview{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px}
-.dt-overview.solo{grid-template-columns:1fr}
-.dt-kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.dt-kpi{padding:16px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
-.dt-kpi.hero{grid-column:1/-1;padding:20px 22px}
-.dt-label{color:var(--mut);font-size:13px}
-.dt-kpi strong{font-size:26px;letter-spacing:-.02em;line-height:1.2}
-.dt-kpi.hero strong{font-size:40px;line-height:1.1}
-.dt-delta{font-size:12.5px;font-weight:500}
-.dt-delta.up{color:var(--unpaid)}.dt-delta.down{color:var(--clear)}.dt-delta.flat{color:var(--mut);font-weight:400}
+.dt[data-theme="dark"] {
+  ${DARK_VARS}
+}
 
-.dt-trend{padding:16px 18px;display:flex;flex-direction:column}
-.dt-trend h3{margin:0 0 8px;font-size:13px;font-weight:500;color:var(--mut)}
-.dt-bars{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-height:150px}
-.dt-col{display:grid;grid-template-rows:18px 1fr 20px;background:none;border:0;padding:0;border-radius:8px;min-width:0}
-.dt-colval{font-size:12px;font-weight:600;text-align:center}
-.dt-colbar{display:flex;align-items:flex-end;justify-content:center}
-.dt-colbar i{display:block;width:70%;max-width:44px;background:var(--line);border-radius:5px 5px 2px 2px;transition:height .25s ease,background .15s}
-.dt-col:hover .dt-colbar i{background:var(--mut)}
-.dt-col.on .dt-colbar i{background:var(--ink)}
-.dt-collbl{font-size:12px;color:var(--mut);text-align:center;padding-top:4px}
-.dt-col.on .dt-collbl{color:var(--ink);font-weight:600}
+.dt * {
+  box-sizing:border-box;
+}
 
-.dt-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 10px}
-.dt-search{display:flex;align-items:center;gap:8px;flex:1 1 240px;max-width:340px;height:36px;padding:0 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--mut)}
-.dt-search:focus-within{border-color:var(--focus)}
-.dt-search input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--ink)}
-.dt-search kbd{font:inherit;font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--mut)}
-.dt-seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:2px;gap:2px;flex-wrap:wrap}
-.dt-seg button{background:none;border:0;border-radius:6px;height:30px;padding:0 10px;color:var(--mut);display:flex;gap:6px;align-items:center}
-.dt-seg button span{font-size:12px;opacity:.75}
-.dt-seg button:hover{color:var(--ink)}
-.dt-seg button.on{background:var(--ink);color:var(--surface)}
-.dt-seg.tight{margin-left:auto}
+.dt button,
+.dt input,
+.dt select {
+  font:inherit;
+  color:inherit;
+}
 
-.dt-bulk{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--ink);color:var(--surface);border-radius:10px;padding:8px 8px 8px 16px;margin-bottom:10px}
-.dt-bulk>div{display:flex;gap:6px;flex-wrap:wrap}
-.dt-bulk .dt-btn{background:transparent;color:var(--surface);border-color:color-mix(in srgb,var(--surface) 30%,transparent)}
-.dt-bulk .dt-btn:hover:not(:disabled){border-color:var(--surface)}
-.dt-bulk .dt-btn.ghost{border-color:transparent}
+/* ---------- Cursor: everything clickable gets a pointer ---------- */
+.dt button,
+.dt [role="tab"],
+.dt select,
+.dt label,
+.dt input[type="checkbox"],
+.dt input[type="month"],
+.dt input[type="month"]::-webkit-calendar-picker-indicator,
+.dt-scrim,
+.dt-table tbody tr:not(.dt-skeleton-row),
+.dt-sortbtn {
+  cursor:pointer;
+}
 
-.dt-tablecard{overflow:hidden}
-.dt-tablewrap{overflow:auto;max-height:min(68vh,720px)}
-.dt-table{width:100%;border-collapse:separate;border-spacing:0}
-.dt-table th{position:sticky;top:0;z-index:1;background:var(--raise);border-bottom:1px solid var(--line);text-align:left;font-weight:500;color:var(--mut);font-size:12.5px;padding:0 14px;height:40px;white-space:nowrap}
-.dt-table td{padding:14px;border-bottom:1px solid var(--line2);vertical-align:middle}
-.dt-table.compact td{padding:7px 14px}
-.dt-table .num{text-align:right}
-.dt-table .c-check{width:44px;padding-right:0}
-.dt-table .mut{color:var(--mut)}
-.dt-table tbody tr:not(.skel){cursor:pointer}
-.dt-table tbody tr:not(.skel):hover{background:var(--raise)}
-.dt-table tbody tr.sel{background:color-mix(in srgb,var(--focus) 8%,transparent)}
-.dt-table tbody tr.active{box-shadow:inset 3px 0 0 var(--ink)}
-.dt-table tbody tr:focus-visible{outline-offset:-2px}
-.dt-table input[type=checkbox]{width:16px;height:16px;accent-color:var(--ink)}
-.dt-sortbtn{display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;color:inherit;height:100%}
-.dt-sortbtn svg{opacity:.4}
-.dt-sortbtn.on{color:var(--ink)}.dt-sortbtn.on svg{opacity:1}
-.dt-table th.num .dt-sortbtn{flex-direction:row-reverse}
-.dt-who{display:flex;flex-direction:column;min-width:0}
-.dt-who b{font-weight:600}
-.dt-who small{color:var(--mut)}
-.dt-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px 2px 8px;font-size:12.5px;font-weight:500;white-space:nowrap}
-.dt-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.dt-badge.unpaid{color:var(--unpaid);background:var(--unpaid-bg)}
-.dt-badge.partial{color:var(--partial);background:var(--partial-bg)}
-.dt-badge.clear{color:var(--clear);background:var(--clear-bg)}
-.dt-amt{display:flex;flex-direction:column;gap:5px;align-items:flex-end;min-width:110px}
-.dt-amt b{font-size:15px}
-.dt-amt b.zero{color:var(--clear);font-weight:500}
-.dt-bar{display:block;width:100%;height:4px;background:var(--line2);border-radius:2px;overflow:hidden}
-.dt-bar em{display:block;height:100%;background:var(--unpaid);border-radius:2px}
-.dt-bar.paid em{background:var(--clear)}
-.dt-bar.lg{height:8px;border-radius:4px}
-.dt-amt .dt-bar{max-width:140px}
-.dt-table tr.skel td{padding:10px 14px}
-.dt-table tr.skel span{display:block;height:34px;border-radius:6px;background:linear-gradient(90deg,var(--line2) 25%,var(--raise) 50%,var(--line2) 75%);background-size:200% 100%;animation:dt-sh 1.3s linear infinite}
-@keyframes dt-sh{to{background-position:-200% 0}}
-.dt-state{padding:48px 16px;text-align:center;display:grid;gap:8px;justify-items:center}
-.dt-state p{margin:0;color:var(--mut);max-width:44ch}
-.dt-state .dt-btn{margin-top:6px}
-.dt-pager{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);color:var(--mut)}
-.dt-pager>div{display:flex;gap:8px;align-items:center}
-.dt-pager .dt-field select{height:32px}
+.dt input[type="text"],
+.dt input[type="search"] {
+  cursor:text;
+}
 
-.dt-scrim{position:fixed;inset:0;background:rgba(8,14,26,.45);z-index:40;animation:dt-fade .18s ease-out}
-.dt-drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);z-index:41;background:var(--surface);color:var(--ink);box-shadow:var(--shadow);display:flex;flex-direction:column;animation:dt-slide .2s ease-out}
-@keyframes dt-fade{from{opacity:0}}
-@keyframes dt-slide{from{transform:translateX(24px);opacity:0}}
-.dt-dr-top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
-.dt-dr-nav{display:flex;gap:6px;align-items:center;color:var(--mut);font-size:12.5px}
-.dt-dr-nav span{margin-left:6px}
-.dt-dr-body{flex:1;overflow:auto;padding:20px;display:grid;gap:20px;align-content:start}
-.dt-dr-id h3{margin:0;font-size:20px;letter-spacing:-.01em}
-.dt-dr-id small{color:var(--mut)}
-.dt-dr-amount{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-.dt-dr-amount strong{display:block;font-size:34px;letter-spacing:-.02em;line-height:1.15;color:var(--unpaid)}
-.dt-dr-amount strong.zero{color:var(--clear)}
-.dt-sec h4{margin:0 0 8px;font-size:13px;font-weight:600}
-.dt-sum{display:flex;justify-content:space-between;color:var(--mut);margin-bottom:8px}
-.dt-sum b{color:var(--ink);margin-left:4px}
-.dt-ledger{border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.dt-lrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 14px}
-.dt-lrow+.dt-lrow{border-top:1px solid var(--line2)}
-.dt-lrow .dt-bar{grid-column:1/-1}
-.dt-lrow small{grid-column:1/-1;color:var(--mut)}
-.dt-lid{font-weight:600}
-.dt-lrow b{color:var(--unpaid)}
-.dt-raw{margin:0;padding:10px 14px;color:var(--mut);font-size:12.5px}
-.dt-chips{display:flex;flex-wrap:wrap;gap:6px}
-.dt-chip{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:12.5px}
-.dt-none{margin:0;color:var(--mut)}
-.dt-foot{margin:0;color:var(--mut);font-size:12.5px}
-.dt-dr-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:var(--raise)}
-.dt-dr-actions .primary{flex:1 1 140px}
+.dt button:disabled,
+.dt input:disabled,
+.dt select:disabled {
+  cursor:not-allowed;
+}
 
-.dt-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);animation:dt-slide .2s ease-out;max-width:calc(100vw - 32px)}
-.dt-toast.err{background:var(--unpaid);color:#fff}
+.dt-search-icon {
+  cursor:text;
+}
 
-@media (prefers-reduced-motion:reduce){.dt *{animation:none!important;transition:none!important}}
-@media (max-width:980px){.dt-overview{grid-template-columns:1fr}.hide-md{display:none}}
-@media (max-width:640px){
-  .dt{padding:14px;border-radius:0}
-  .hide-sm{display:none}
-  .dt-kpi.hero strong{font-size:32px}
-  .dt-seg.tight{margin-left:0}
-  .dt-search{max-width:none}
+.dt :focus-visible {
+  outline-offset:2px;
+}
+
+.dt-sr {
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+}
+
+/* ---------- Header ---------- */
+.dt-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.dt-title-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.dt-head h2 {
+  margin:0;
+  font-size:26px;
+  line-height:1.2;
+  letter-spacing:-.03em;
+}
+
+.dt-record-count {
+  padding:3px 10px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-size:12px;
+  font-weight:600;
+}
+
+.dt-lead {
+  margin:6px 0 0;
+  color:var(--mut);
+}
+
+.dt-lead strong {
+  color:var(--ink);
+}
+
+.dt-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.dt-field {
+  position:relative;
+}
+
+.dt-field input,
+.dt-field select {
+  height:38px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:10px;
+  padding:0 12px;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+
+.dt-field input:hover,
+.dt-field select:hover {
+  border-color:var(--mut);
+}
+
+.dt-field input:focus,
+.dt-field select:focus {
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+
+/* ---------- Buttons ---------- */
+.dt-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  height:38px;
+  padding:0 14px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:10px;
+  white-space:nowrap;
+  transition:border-color .15s, background .15s, transform .05s;
+}
+
+.dt-btn:hover:not(:disabled) {
+  border-color:var(--mut);
+  background:var(--raise);
+}
+
+.dt-btn:active:not(:disabled) {
+  transform:translateY(1px);
+}
+
+.dt-btn:disabled {
+  opacity:.45;
+}
+
+.dt-btn.icon {
+  width:38px;
+  padding:0;
+}
+
+.dt-btn.sm {
+  height:32px;
+  padding:0 10px;
+  border-radius:8px;
+}
+
+.dt-btn.icon.sm {
+  width:32px;
+  padding:0;
+}
+
+.dt-btn.primary {
+  color:#fff;
+  background:var(--accent);
+  border-color:var(--accent);
+  font-weight:600;
+}
+
+.dt-btn.primary:hover:not(:disabled) {
+  background:var(--accent);
+  border-color:var(--accent);
+  filter:brightness(1.1);
+}
+
+.dt[data-theme="dark"] .dt-btn.primary,
+.dt[data-theme="auto"] .dt-btn.primary {
+  color:#06211e;
+}
+
+.dt-btn.ghost {
+  background:transparent;
+  border-color:transparent;
+  color:var(--mut);
+}
+
+.dt-btn.ghost:hover:not(:disabled) {
+  background:var(--line2);
+  border-color:transparent;
+  color:var(--ink);
+}
+
+.dt-spin {
+  display:inline-flex;
+  animation:dt-rotate .8s linear infinite;
+}
+
+@keyframes dt-rotate {
+  to { transform:rotate(360deg); }
+}
+
+/* ---------- Tabs ---------- */
+.dt-tabs {
+  display:inline-flex;
+  gap:2px;
+  margin:22px 0 16px;
+  padding:3px;
+  background:var(--line2);
+  border-radius:11px;
+}
+
+.dt-tabs button {
+  height:34px;
+  padding:0 16px;
+  border:0;
+  border-radius:8px;
+  background:none;
+  color:var(--mut);
+  transition:background .15s, color .15s;
+}
+
+.dt-tabs button:hover {
+  color:var(--ink);
+}
+
+.dt-tabs button.on {
+  color:var(--ink);
+  background:var(--surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.08);
+  font-weight:600;
+}
+
+/* ---------- Summary ---------- */
+.dt-summary-grid {
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.dt-card {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+
+.dt-summary-card {
+  min-height:118px;
+  padding:16px 18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+}
+
+.dt-summary-card.highlight {
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+
+.dt[data-theme="dark"] .dt-summary-card.highlight {
+  color:#06211e;
+}
+
+@media (prefers-color-scheme:dark) {
+  .dt[data-theme="auto"] .dt-summary-card.highlight {
+    color:#06211e;
+  }
+}
+
+.dt-summary-card.highlight .dt-label,
+.dt-summary-card.highlight small {
+  color:inherit;
+  opacity:.75;
+}
+
+.dt-summary-card strong {
+  font-size:26px;
+  line-height:1.15;
+  letter-spacing:-.03em;
+}
+
+.dt-summary-card.highlight strong {
+  font-size:32px;
+}
+
+.dt-summary-card small,
+.dt-label {
+  color:var(--mut);
+  font-size:12.5px;
+}
+
+.dt-label {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+}
+
+.dt-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--mut);
+  display:inline-block;
+}
+
+.dt-dot.current { background:var(--accent); }
+.dt-dot.previous { background:var(--warn); }
+.dt-dot.total { background:var(--mut); }
+
+/* ---------- Toolbar / Search ---------- */
+.dt-toolbar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 12px;
+}
+
+.dt-search {
+  position:relative;
+  height:42px;
+  flex:1 1 320px;
+  max-width:460px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 10px 0 14px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:12px;
+  color:var(--mut);
+  box-shadow:0 1px 2px rgba(16,34,42,.04);
+  transition:border-color .15s, box-shadow .15s, color .15s;
+}
+
+.dt-search:hover {
+  border-color:var(--mut);
+}
+
+.dt-search:focus-within {
+  border-color:var(--focus);
+  color:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-soft);
+}
+
+.dt-search-icon {
+  display:inline-flex;
+  align-items:center;
+  color:inherit;
+}
+
+.dt-search input {
+  flex:1;
+  min-width:0;
+  height:100%;
+  border:0;
+  outline:0;
+  background:none;
+  color:var(--ink);
+  font-size:14px;
+}
+
+.dt-search input::placeholder {
+  color:var(--mut);
+  opacity:.85;
+}
+
+.dt-search kbd {
+  padding:1px 7px;
+  border:1px solid var(--line);
+  border-bottom-width:2px;
+  border-radius:6px;
+  background:var(--raise);
+  color:var(--mut);
+  font:inherit;
+  font-size:11.5px;
+  line-height:1.5;
+}
+
+.dt-search:focus-within kbd {
+  display:none;
+}
+
+.dt-search-clear {
+  width:24px;
+  height:24px;
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:var(--line2);
+  color:var(--mut);
+  transition:background .15s, color .15s;
+}
+
+.dt-search-clear:hover {
+  background:var(--mut);
+  color:var(--surface);
+}
+
+.dt-search-spinner {
+  width:15px;
+  height:15px;
+  flex:none;
+  border:2px solid var(--line);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:dt-rotate .7s linear infinite;
+}
+
+.dt-search-meta {
+  color:var(--mut);
+  font-size:13px;
+}
+
+.dt-search-meta b {
+  color:var(--ink);
+  font-weight:600;
+}
+
+/* ---------- Bulk bar ---------- */
+.dt-bulk {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:8px 8px 8px 16px;
+  margin-bottom:12px;
+  background:var(--ink);
+  color:var(--surface);
+  border-radius:12px;
+}
+
+.dt-bulk > div {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.dt-bulk .dt-btn {
+  background:transparent;
+  color:var(--surface);
+  border-color:rgba(255,255,255,.25);
+}
+
+.dt-bulk .dt-btn:hover:not(:disabled) {
+  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.5);
+}
+
+.dt-bulk .dt-btn.ghost {
+  border-color:transparent;
+  opacity:.8;
+}
+
+/* ---------- Table ---------- */
+.dt-tablecard {
+  overflow:hidden;
+}
+
+.dt-tablewrap {
+  width:100%;
+  overflow:auto;
+}
+
+.dt-table {
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+.dt-table th {
+  position:sticky;
+  top:0;
+  z-index:2;
+  height:44px;
+  padding:0 14px;
+  text-align:left;
+  background:var(--raise);
+  border-bottom:1px solid var(--line);
+  color:var(--mut);
+  font-size:12.5px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.dt-table td {
+  padding:13px 14px;
+  border-bottom:1px solid var(--line2);
+  vertical-align:middle;
+}
+
+.dt-table tbody tr:last-child td {
+  border-bottom:0;
+}
+
+.dt-table.compact td {
+  padding:8px 14px;
+}
+
+.dt-table .num {
+  text-align:right;
+}
+
+.dt-table .num .dt-sortbtn {
+  margin-left:auto;
+}
+
+.dt-table .c-check {
+  width:44px;
+  padding-right:0;
+}
+
+.dt-table tbody tr:not(.dt-skeleton-row) {
+  transition:background .12s;
+}
+
+.dt-table tbody tr:not(.dt-skeleton-row):hover {
+  background:var(--raise);
+}
+
+.dt-table tbody tr.selected {
+  background:var(--accent-soft);
+}
+
+.dt-table tbody tr:focus-visible {
+  outline-offset:-2px;
+}
+
+.dt-table input[type="checkbox"] {
+  width:16px;
+  height:16px;
+  accent-color:var(--accent);
+}
+
+.dt-sortbtn {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  height:100%;
+  padding:0;
+  border:0;
+  background:none;
+  color:inherit;
+  font-weight:inherit;
+}
+
+.dt-sortbtn:hover {
+  color:var(--ink);
+}
+
+.dt-sortbtn.active {
+  color:var(--accent);
+}
+
+.dt-account-cell {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.dt-avatar {
+  width:34px;
+  height:34px;
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--line2);
+  color:var(--mut);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+
+.dt-avatar.user {
+  background:rgba(37,99,235,.12);
+  color:#2557c4;
+}
+
+.dt-avatar.corporate {
+  background:rgba(180,83,9,.13);
+  color:#a34a08;
+}
+
+.dt-avatar.lg {
+  width:44px;
+  height:44px;
+  font-size:14px;
+}
+
+.dt-account {
+  display:flex;
+  flex-direction:column;
+  min-width:150px;
+}
+
+.dt-account strong {
+  font-weight:600;
+}
+
+.dt-account small {
+  margin-top:1px;
+  color:var(--mut);
+  font-size:12px;
+}
+
+.dt-type {
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:999px;
+  background:var(--raise);
+  border:1px solid var(--line);
+  color:var(--mut);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.dt-type.user {
+  color:#2457a6;
+  background:#eaf2ff;
+  border-color:#d6e5ff;
+}
+
+.dt-type.corporate {
+  color:#7a4a00;
+  background:#fff3d6;
+  border-color:#f5dfaa;
+}
+
+.dt-month {
+  color:var(--mut);
+  white-space:nowrap;
+}
+
+.dt-amount {
+  min-width:130px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+}
+
+.dt-amount strong {
+  font-size:14px;
+}
+
+.dt-amount strong.zero {
+  color:var(--success);
+}
+
+.dt-amount-bar {
+  width:100%;
+  max-width:130px;
+  height:4px;
+  overflow:hidden;
+  background:var(--line2);
+  border-radius:4px;
+}
+
+.dt-amount-bar i {
+  display:block;
+  height:100%;
+  background:var(--accent);
+  border-radius:4px;
+  transition:width .3s ease;
+}
+
+.dt-amount-bar i.mid { background:var(--warn); }
+.dt-amount-bar i.high { background:var(--danger); }
+
+.dt-money {
+  color:var(--mut);
+}
+
+.dt-cumulative {
+  font-size:14px;
+}
+
+.dt-muted {
+  color:var(--mut);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.dt-skeleton-row td {
+  padding:10px 14px;
+}
+
+.dt-skeleton-row span {
+  display:block;
+  height:38px;
+  border-radius:8px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--line2) 25%,
+      var(--raise) 50%,
+      var(--line2) 75%
+    );
+  background-size:200% 100%;
+  animation:dt-skeleton 1.3s linear infinite;
+}
+
+@keyframes dt-skeleton {
+  to {
+    background-position:-200% 0;
+  }
+}
+
+.dt-state {
+  display:grid;
+  justify-items:center;
+  gap:8px;
+  padding:56px 16px;
+  text-align:center;
+}
+
+.dt-state strong {
+  font-size:15px;
+}
+
+.dt-state p {
+  max-width:45ch;
+  margin:0 0 6px;
+  color:var(--mut);
+}
+
+.dt-pager {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:12px 14px;
+  color:var(--mut);
+  border-top:1px solid var(--line);
+  background:var(--raise);
+}
+
+.dt-pager-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.dt-page-number {
+  min-width:105px;
+  text-align:center;
+  font-size:12.5px;
+}
+
+/* ---------- Drawer ---------- */
+.dt-scrim {
+  position:fixed;
+  inset:0;
+  z-index:40;
+  background:rgba(8,18,22,.5);
+  backdrop-filter:blur(2px);
+}
+
+.dt-drawer {
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  z-index:41;
+  width:min(470px,100vw);
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  color:var(--ink);
+  box-shadow:var(--shadow);
+  animation:dt-drawer-in .2s ease-out;
+}
+
+@keyframes dt-drawer-in {
+  from {
+    transform:translateX(24px);
+    opacity:0;
+  }
+}
+
+.dt-drawer-header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--line);
+}
+
+.dt-drawer-id {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+}
+
+.dt-drawer-header h3 {
+  margin:2px 0;
+  font-size:20px;
+  letter-spacing:-.02em;
+  overflow-wrap:anywhere;
+}
+
+.dt-drawer-header small {
+  color:var(--mut);
+}
+
+.dt-drawer-body {
+  flex:1;
+  overflow:auto;
+  padding:20px;
+}
+
+.dt-detail-month {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--line2);
+}
+
+.dt-detail-month strong {
+  font-size:13px;
+}
+
+.dt-detail-hero {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  padding:22px 0;
+}
+
+.dt-detail-hero strong {
+  font-size:38px;
+  line-height:1.1;
+  letter-spacing:-.03em;
+}
+
+.dt-detail-hero strong.zero {
+  color:var(--success);
+}
+
+.dt-detail-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.dt-detail-card {
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--raise);
+}
+
+.dt-detail-card.highlight {
+  border-color:var(--accent);
+  background:var(--accent-soft);
+}
+
+.dt-detail-card span {
+  display:block;
+  color:var(--mut);
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.dt-detail-card strong {
+  font-size:17px;
+}
+
+.dt-detail-section {
+  margin-top:24px;
+}
+
+.dt-detail-section h4 {
+  margin:0 0 10px;
+  font-size:13px;
+}
+
+.dt-info-list {
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+
+.dt-info-list > div {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding:11px 13px;
+}
+
+.dt-info-list > div + div {
+  border-top:1px solid var(--line2);
+}
+
+.dt-info-list span {
+  color:var(--mut);
+  font-size:12.5px;
+}
+
+.dt-info-list b {
+  max-width:60%;
+  text-align:right;
+  overflow-wrap:anywhere;
+  font-size:12.5px;
+}
+
+.dt-timeline {
+  display:flex;
+  flex-direction:column;
+}
+
+.dt-timeline > div {
+  position:relative;
+  display:grid;
+  grid-template-columns:18px 1fr auto;
+  gap:10px;
+  align-items:start;
+  padding:9px 0;
+}
+
+.dt-timeline .dot {
+  width:9px;
+  height:9px;
+  margin-top:5px;
+  border-radius:50%;
+  background:var(--mut);
+}
+
+.dt-timeline .dot.current {
+  background:var(--accent);
+}
+
+.dt-timeline .dot.previous {
+  background:var(--warn);
+}
+
+.dt-timeline .dot.cumulative {
+  background:var(--success);
+}
+
+.dt-timeline strong,
+.dt-timeline small {
+  display:block;
+}
+
+.dt-timeline strong {
+  font-size:13px;
+}
+
+.dt-timeline small {
+  color:var(--mut);
+  font-size:11.5px;
+  margin-top:2px;
+}
+
+.dt-timeline b {
+  font-size:12.5px;
+}
+
+.dt-drawer-actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:14px 16px;
+  border-top:1px solid var(--line);
+  background:var(--raise);
+}
+
+.dt-drawer-actions .primary {
+  flex:1 1 140px;
+}
+
+.dt-toast {
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  z-index:60;
+  transform:translateX(-50%);
+  max-width:calc(100vw - 32px);
+  padding:11px 18px;
+  border-radius:10px;
+  background:var(--ink);
+  color:var(--surface);
+  box-shadow:var(--shadow);
+}
+
+.dt-toast.error {
+  background:#b42318;
+  color:#fff;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1050px) {
+  .dt-summary-grid {
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hide-md {
+    display:none;
+  }
+}
+
+@media (max-width:700px) {
+  .dt {
+    padding:14px;
+    border-radius:0;
+  }
+
+  .dt-actions {
+    width:100%;
+  }
+
+  .dt-actions .dt-field {
+    flex:1;
+  }
+
+  .dt-actions .dt-field input {
+    width:100%;
+  }
+
+  .dt-tabs {
+    display:flex;
+    width:100%;
+  }
+
+  .dt-tabs button {
+    flex:1;
+    padding:0 8px;
+  }
+
+  .dt-toolbar {
+    align-items:stretch;
+  }
+
+  .dt-search {
+    max-width:none;
+    flex-basis:100%;
+  }
+
+  .hide-sm {
+    display:none;
+  }
+
+  .dt-pager {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .dt-pager-actions {
+    width:100%;
+    justify-content:space-between;
+  }
+}
+
+@media (max-width:480px) {
+  .dt-summary-grid {
+    grid-template-columns:1fr;
+  }
+
+  .dt-head h2 {
+    font-size:22px;
+  }
+
+  .dt-detail-grid {
+    grid-template-columns:1fr;
+  }
+
+  .dt-drawer {
+    width:100vw;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .dt * {
+    animation:none!important;
+    transition:none!important;
+  }
 }
 `;
