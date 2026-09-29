@@ -15,6 +15,7 @@ import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
 import excelStore from "@/zustand/Store/excelStore";
 import { toast } from "react-toastify";
+import ExportModal from "./ExportExcelModal";
 
 const DATE_PILLS = [
   { label: "All Time", value: "" },
@@ -133,16 +134,12 @@ const ExpenseListing = () => {
   // the very first fetch has kicked in (so we never flash an empty state).
   const showSkeleton = loading || !initialLoadDone;
 
-  const handleExport = () => {
-    if(filters.dateFilter!="" && filters.dateFilter!="custom"){
-      toast.error("Please either select ALL or Custom date range")
-      return;
-    }
-    if((!filters.dateFrom && !filters.dateTo) || (filters.dateFrom && filters.dateTo)){
-      downloadExcel("expense",filters.dateFrom,filters.dateTo);
-    }else{
-      toast.error("Select both To and From Date!!")
-    }
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleExport = async ({ fromDate, toDate }) => {
+    console.log(fromDate)
+    console.log(toDate)
+    downloadExcel("expense", fromDate, toDate);
   };
 
   return (
@@ -167,12 +164,19 @@ const ExpenseListing = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={handleExport} disabled={isDownloading}
+            onClick={() => setIsModalOpen(true)}
+            disabled={isDownloading}
             className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98]"
           >
             <FileSpreadsheet size={18} />
             {isDownloading ? "Exporting..." : "Export To Excel"}
           </button>
+
+          <ExportModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onGenerate={handleExport}
+          />
 
           <button
             type="button"
