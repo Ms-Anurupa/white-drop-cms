@@ -44,6 +44,7 @@ export async function generateFCMToken() {
 export function initializeForegroundListener() {
   return onMessage(messaging, (payload) => {
     console.log('[Foreground message received]:', payload);
+    useNotificationStore.getState().increaseUnreadCount();
     useNotificationStore.getState().getAdminToAdminNotification({ reset: true });
   });
 }

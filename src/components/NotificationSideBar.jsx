@@ -576,6 +576,8 @@ export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
   const getAdminToAdminNotification = useNotificationStore((state) => state.getAdminToAdminNotification);
   const adminNotifications = useNotificationStore((state) => state.adminNotifications);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
+
 
   // Poll for fresh data
   useEffect(() => {
@@ -585,8 +587,6 @@ export const NotificationBell = () => {
     return () => clearInterval(id);
   }, [getAdminToAdminNotification]);
 
-  const unread = (Array.isArray(adminNotifications) ? adminNotifications : [])
-    .filter((n) => isUnread(n) && !isDeleted(n)).length;
 
   return (
     <>
@@ -595,9 +595,9 @@ export const NotificationBell = () => {
         className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition cursor-pointer"
       >
         <Bell size={19} />
-        {unread > 0 && (
+        {unreadCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
-            {unread > 99 ? "99+" : unread}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>

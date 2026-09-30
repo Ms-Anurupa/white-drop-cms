@@ -25,19 +25,8 @@ export const useNotificationStore = create((set, get) => ({
     }
   },
 
-  addNotification: (notification) =>
+  increaseUnreadCount: () =>
     set((state) => ({
-      notifications: [
-        {
-          id: Date.now(),
-          title: notification.title,
-          body: notification.body,
-          data: notification.data || {},
-          receivedAt: new Date().toISOString(),
-          read: false,
-        },
-        ...state.notifications,
-      ],
       unreadCount: state.unreadCount + 1,
     })),
 
