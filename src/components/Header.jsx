@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import authStore from "../zustand/Store/authStore";
-import SpecialOrderSidebar from "@/pages/specialOrderSidebar/SpecialOrderSidebar";
+import NotificationSidebar, { NotificationBell } from "./NotificationSideBar";
 
 const Header = ({ onLogOut }) => {
   const [open, setOpen] = useState(false);
@@ -66,51 +66,7 @@ const Header = ({ onLogOut }) => {
             relative
           "
         >
-          {/* Notification */}
-          <button
-            type="button"
-            aria-label="Notifications"
-            onClick={() => {
-              setNotificationOpen(true);
-              setOpen(false);
-            }}
-            className="
-              relative
-              w-8
-              h-8
-              sm:w-9
-              sm:h-9
-              flex
-              items-center
-              justify-center
-              rounded-full
-              hover:bg-gray-100
-              active:bg-gray-100
-              text-gray-600
-              transition
-              cursor-pointer
-              shrink-0
-            "
-          >
-            <Bell size={18} className="sm:w-[19px] sm:h-[19px]" />
-
-            {/* Notification dot */}
-            <span
-              className="
-                absolute
-                top-0.5
-                right-0.5
-                sm:top-1
-                sm:right-1
-                w-2
-                h-2
-                rounded-full
-                bg-red-500
-                ring-2
-                ring-white
-              "
-            />
-          </button>
+          <NotificationBell/>
 
           {/* User Info */}
           <div
@@ -224,7 +180,7 @@ const Header = ({ onLogOut }) => {
 
       {/* Notification Sidebar */}
       {notificationOpen && (
-        <SpecialOrderSidebar
+        <NotificationSidebar
           open={notificationOpen}
           onClose={() => setNotificationOpen(false)}
         />

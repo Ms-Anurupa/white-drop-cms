@@ -44,12 +44,6 @@ export async function generateFCMToken() {
 export function initializeForegroundListener() {
   return onMessage(messaging, (payload) => {
     console.log('[Foreground message received]:', payload);
-
-    // Push into Zustand store
-    useNotificationStore.getState().addNotification({
-      title: payload.notification?.title || payload.data?.title || 'Notification',
-      body: payload.notification?.body || payload.data?.body || '',
-      data: payload.data,
-    });
+    useNotificationStore.getState().getAdminToAdminNotification({ reset: true });
   });
 }

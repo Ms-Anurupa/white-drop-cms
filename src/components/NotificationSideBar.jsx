@@ -1,149 +1,76 @@
+/* eslint-disable no-useless-assignment */
 import { useEffect, useMemo, useState } from "react";
 import {
   X,
   Bell,
   BellOff,
-  Search,
   RefreshCw,
-  Info,
-  AlertTriangle,
-  AlertOctagon,
-  Siren,
-  CheckCircle2,
-  XCircle,
-  Truck,
-  PackageCheck,
-  ShoppingBag,
-  CreditCard,
-  BadgeCheck,
-  Repeat,
-  Hourglass,
   ChevronDown,
   WifiOff,
   Trash2,
   Loader2,
+  CheckCheckIcon,
+  ShoppingCart,
+  Gift,
+  Gem,
+  PackageCheck
 } from "lucide-react";
 import { useNotificationStore } from "@/zustand/Store/useNotificationStore";
-
 
 /* -------------------------------------------------------------------------- */
 /*  Config                                                                    */
 /* -------------------------------------------------------------------------- */
 
+// Unified config: Handles the Icon, Label, Group, and all Tailwind color states in one place.
+// Unified config
 const TYPE_CONFIG = {
-  DEFAULT: { icon: Bell, tone: "gray", label: "General", group: "general" },
-  INFO: { icon: Info, tone: "blue", label: "Info", group: "general" },
-  ACCEPTED: {
-    icon: CheckCircle2,
-    tone: "green",
-    label: "Accepted",
-    group: "general",
+  DEFAULT: {
+    icon: Bell,
+    label: "General",
+    group: "general", // Fallback
+    iconColors: "bg-gray-100 text-gray-600",
+    badgeColors: "bg-gray-50 text-gray-600 border-gray-200",
+    barColor: "bg-gray-300",
   },
-  REJECTED: { icon: XCircle, tone: "red", label: "Rejected", group: "alerts" },
-  FAILED: { icon: AlertOctagon, tone: "red", label: "Failed", group: "alerts" },
-  WARNING: {
-    icon: AlertTriangle,
-    tone: "amber",
-    label: "Warning",
-    group: "alerts",
+  ADMIN_ORDER_REC: {
+    icon: ShoppingCart,
+    label: "New Order",
+    group: "order", // Changed to match filter
+    iconColors: "bg-blue-100 text-blue-600",
+    badgeColors: "bg-blue-50 text-blue-700 border-blue-200",
+    barColor: "bg-blue-500",
   },
-  ALERT: { icon: Siren, tone: "red", label: "Alert", group: "alerts" },
-  ORDER_REC: {
-    icon: ShoppingBag,
-    tone: "blue",
-    label: "New order",
-    group: "orders",
+  ADMIN_PCK_JOB_FNS: {
+    icon: Gift,
+    label: "Packing Finished",
+    group: "packaging", // Changed to match filter
+    iconColors: "bg-purple-100 text-purple-600",
+    badgeColors: "bg-purple-50 text-purple-700 border-purple-200",
+    barColor: "bg-purple-500",
   },
-  DELIVERY_OUT: {
-    icon: Truck,
-    tone: "indigo",
-    label: "Out for delivery",
-    group: "orders",
+  ADMIN_ADHOC_REC: {
+    icon: Gem,
+    label: "Adhoc Request",
+    group: "adhoc", // Changed to match filter
+    iconColors: "bg-amber-100 text-amber-600",
+    badgeColors: "bg-amber-50 text-amber-700 border-amber-200",
+    barColor: "bg-amber-500",
   },
-  DELIVERY_COMPLETE: {
+  DELIVERY_JOB_COMPLETE: {
     icon: PackageCheck,
-    tone: "green",
-    label: "Delivered",
-    group: "orders",
-  },
-  PAYMENT_OK: {
-    icon: BadgeCheck,
-    tone: "green",
-    label: "Payment received",
-    group: "payments",
-  },
-  PAYMENT_FAILED: {
-    icon: CreditCard,
-    tone: "red",
-    label: "Payment failed",
-    group: "payments",
-  },
-  SUB_STARTED: {
-    icon: Repeat,
-    tone: "teal",
-    label: "Subscription started",
-    group: "subscriptions",
-  },
-  SUB_ENDING: {
-    icon: Hourglass,
-    tone: "amber",
-    label: "Subscription ending",
-    group: "subscriptions",
-  },
-};
-
-const TONES = {
-  gray: {
-    chip: "bg-gray-100 text-gray-600",
-    ring: "ring-gray-200",
-    bar: "bg-gray-300",
-    badge: "bg-gray-50 text-gray-600 border-gray-200",
-  },
-  blue: {
-    chip: "bg-blue-50 text-blue-600",
-    ring: "ring-blue-100",
-    bar: "bg-blue-500",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  green: {
-    chip: "bg-green-50 text-green-600",
-    ring: "ring-green-100",
-    bar: "bg-green-500",
-    badge: "bg-green-50 text-green-700 border-green-200",
-  },
-  red: {
-    chip: "bg-red-50 text-red-600",
-    ring: "ring-red-100",
-    bar: "bg-red-500",
-    badge: "bg-red-50 text-red-700 border-red-200",
-  },
-  amber: {
-    chip: "bg-amber-50 text-amber-600",
-    ring: "ring-amber-100",
-    bar: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
-  },
-  indigo: {
-    chip: "bg-indigo-50 text-indigo-600",
-    ring: "ring-indigo-100",
-    bar: "bg-indigo-500",
-    badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  },
-  teal: {
-    chip: "bg-teal-50 text-teal-600",
-    ring: "ring-teal-100",
-    bar: "bg-teal-500",
-    badge: "bg-teal-50 text-teal-700 border-teal-200",
+    label: "Delivery Complete",
+    group: "order", // Grouping delivery under orders
+    iconColors: "bg-emerald-100 text-emerald-600",
+    badgeColors: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    barColor: "bg-emerald-500",
   },
 };
 
 const FILTERS = [
   { key: "all", label: "All" },
-  { key: "unread", label: "Unread" },
-  { key: "orders", label: "Orders" },
-  { key: "payments", label: "Payments" },
-  { key: "subscriptions", label: "Subscriptions" },
-  { key: "alerts", label: "Alerts" },
+  { key: "order", label: "ORDER" },
+  { key: "adhoc", label: "ADHOC" },
+  { key: "packaging", label: "Packaging Job" },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -151,11 +78,7 @@ const FILTERS = [
 /* -------------------------------------------------------------------------- */
 
 const getConfig = (type) => TYPE_CONFIG[type] || TYPE_CONFIG.DEFAULT;
-
-// PENDING / SENT = not yet read.
 const isUnread = (n) => n?.status === "PENDING" || n?.status === "SENT";
-
-// Hidden once deleted (status DEL, or the isDelete flag returned by the delete API)
 const isDeleted = (n) => n?.status === "DEL" || n?.isDelete === true;
 
 const formatRelative = (date) => {
@@ -168,20 +91,14 @@ const formatRelative = (date) => {
   if (hr < 24) return `${hr}h ago`;
   const day = Math.floor(hr / 24);
   if (day < 7) return `${day}d ago`;
-  return new Date(date).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-  });
+  return new Date(date).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 };
 
 const formatFull = (date) =>
   date
     ? new Date(date).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit",
       })
     : "-";
 
@@ -189,9 +106,7 @@ const dayBucket = (date) => {
   const d = new Date(date);
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
-  const diffDays = Math.floor(
-    (startOfToday - new Date(d).setHours(0, 0, 0, 0)) / 86400000,
-  );
+  const diffDays = Math.floor((startOfToday - new Date(d).setHours(0, 0, 0, 0)) / 86400000);
   if (diffDays <= 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays < 7) return "This week";
@@ -199,9 +114,7 @@ const dayBucket = (date) => {
 };
 
 const BUCKET_ORDER = ["Today", "Yesterday", "This week", "Earlier"];
-
-const senderName = (n) =>
-  n?.from?.customer_name || n?.from?.name || n?.from?.userName || "System";
+const senderName = (n) => n?.from?.customer_name || n?.from?.name || n?.from?.userName || "System";
 
 /* -------------------------------------------------------------------------- */
 /*  Small pieces                                                              */
@@ -210,10 +123,7 @@ const senderName = (n) =>
 const NotificationSkeleton = () => (
   <div className="space-y-2">
     {[0, 1, 2, 3, 4].map((i) => (
-      <div
-        key={i}
-        className="flex animate-pulse gap-3 rounded-xl border border-gray-100 bg-white p-4"
-      >
+      <div key={i} className="flex animate-pulse gap-3 rounded-xl border border-gray-100 bg-white p-4">
         <div className="h-9 w-9 shrink-0 rounded-lg bg-gray-100" />
         <div className="flex-1 space-y-2">
           <div className="h-3 w-2/5 rounded bg-gray-100" />
@@ -255,9 +165,7 @@ const ErrorState = ({ message, onRetry }) => (
     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
       <WifiOff size={22} />
     </div>
-    <p className="mt-4 text-sm font-medium text-gray-700">
-      Couldn't load notifications
-    </p>
+    <p className="mt-4 text-sm font-medium text-gray-700">Couldn't load notifications</p>
     <p className="mt-1 max-w-[260px] text-xs text-gray-400">{message}</p>
     <button
       type="button"
@@ -269,25 +177,46 @@ const ErrorState = ({ message, onRetry }) => (
   </div>
 );
 
-const NotificationItem = ({ notification, onDelete }) => {
+const NotificationIcon = ({ type, unread }) => {
+  const cfg = getConfig(type);
+  const Icon = cfg.icon;
+
+  return (
+    <div
+      className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all ${
+        unread
+          ? `${cfg.iconColors} shadow-sm ring-1 ring-black/5`
+          : "bg-gray-50 text-gray-400 border border-gray-100"
+      }`}
+    >
+      <Icon size={18} strokeWidth={unread ? 2.5 : 2} />
+      {/* {unread && (
+        <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-blue-500" />
+      )} */}
+    </div>
+  );
+};
+
+const NotificationItem = ({ notification, onDelete, onRead }) => {
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const cfg = getConfig(notification.type);
-  const tone = TONES[cfg.tone];
-  const Icon = cfg.icon;
   const unread = isUnread(notification);
   const longBody = (notification.body || "").length > 110;
 
-  const toggle = () => longBody && setExpanded((v) => !v);
+  const handleInteraction = () => {
+    if (unread) onRead(notification.id);
+    if (longBody) setExpanded((v) => !v);
+  };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     setDeleting(true);
     try {
       await onDelete(notification.id);
     } catch {
-      // parent shows the error banner; let the user try again
       setDeleting(false);
       setConfirming(false);
     }
@@ -295,43 +224,28 @@ const NotificationItem = ({ notification, onDelete }) => {
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-xl border transition-colors ${
-        unread
-          ? "border-blue-200 bg-blue-50/70 shadow-sm"
-          : "border-gray-200 bg-white"
+      className={`group relative overflow-hidden rounded-xl border transition-colors cursor-pointer ${
+        unread ? "border-blue-200 bg-blue-50/70 shadow-sm" : "border-gray-200 bg-white"
       } ${deleting ? "pointer-events-none opacity-60" : ""}`}
     >
-      {/* Type-coloured edge marks unread */}
-      {unread && (
-        <span className={`absolute inset-y-0 left-0 w-1 ${tone.bar}`} />
-      )}
+      {unread && <span className={`absolute inset-y-0 left-0 w-1 ${cfg.barColor}`} />}
 
       <div className="flex gap-3 p-4">
-        {/* Icon: full colour when unread, muted grey when read */}
-        <div
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-4 ${
-            unread
-              ? `${tone.chip} ${tone.ring}`
-              : "bg-gray-100 text-gray-400 ring-gray-50"
-          }`}
-        >
-          <Icon size={17} />
-        </div>
+        
+        <NotificationIcon type={notification.type} unread={unread} />
 
         <div className="min-w-0 flex-1">
           <div
-            role={longBody ? "button" : undefined}
-            tabIndex={longBody ? 0 : undefined}
-            onClick={toggle}
-            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && toggle()}
-            className={longBody ? "cursor-pointer" : ""}
+            role="button"
+            tabIndex={0}
+            onClick={handleInteraction}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleInteraction()}
+            className="cursor-pointer"
           >
             <div className="flex items-start justify-between gap-2">
               <p
                 className={`text-sm leading-snug ${
-                  unread
-                    ? "font-semibold text-gray-900"
-                    : "font-medium text-gray-500"
+                  unread ? "font-semibold text-gray-900" : "font-medium text-gray-500"
                 }`}
               >
                 {notification.title}
@@ -353,20 +267,11 @@ const NotificationItem = ({ notification, onDelete }) => {
             >
               {notification.body}
             </p>
-
-            {expanded && (
-              <p className="mt-2 text-[11px] text-gray-400">
-                {formatFull(notification.createdAt)}
-              </p>
-            )}
           </div>
 
-          {/* Footer */}
           {confirming ? (
             <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-              <p className="text-xs font-medium text-red-700">
-                Delete this notification?
-              </p>
+              <p className="text-xs font-medium text-red-700">Delete this notification?</p>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -391,40 +296,30 @@ const NotificationItem = ({ notification, onDelete }) => {
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-                  unread
-                    ? tone.badge
-                    : "border-gray-200 bg-gray-50 text-gray-500"
+                  unread ? cfg.badgeColors : "border-gray-200 bg-gray-50 text-gray-500"
                 }`}
               >
                 {cfg.label}
               </span>
               <span className="text-[11px] text-gray-400">
                 from {senderName(notification)}
-                {notification.role
-                  ? ` · ${String(notification.role).replace(/_/g, " ").toLowerCase()}`
-                  : ""}
               </span>
 
               <div className="ml-auto flex items-center gap-1">
                 {longBody && (
                   <button
                     type="button"
-                    onClick={toggle}
-                    aria-label={expanded ? "Collapse" : "Expand"}
-                    className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-gray-400 transition hover:bg-black/5 hover:text-gray-600"
+                    onClick={() => setExpanded((v) => !v)}
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-black/5 hover:text-gray-600 cursor-pointer"
                   >
-                    <ChevronDown
-                      size={15}
-                      className={`transition-transform ${expanded ? "rotate-180" : ""}`}
-                    />
+                    <ChevronDown size={15} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => setConfirming(true)}
-                  aria-label="Delete notification"
                   title="Delete"
-                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-600 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-600 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -432,13 +327,6 @@ const NotificationItem = ({ notification, onDelete }) => {
             </div>
           )}
         </div>
-
-        {unread && (
-          <span
-            className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500"
-            aria-label="Unread"
-          />
-        )}
       </div>
     </div>
   );
@@ -449,40 +337,56 @@ const NotificationItem = ({ notification, onDelete }) => {
 /* -------------------------------------------------------------------------- */
 
 const NotificationSidebar = ({ open, onClose }) => {
-  const getAdminToAdminNotification = useNotificationStore(
-    (state) => state.getAdminToAdminNotification,
-  );
-  const deleteAdminNotification = useNotificationStore(
-    (state) => state.deleteAdminNotification,
-  );
-  const adminNotifications = useNotificationStore(
-    (state) => state.adminNotifications,
-  );
-  const loading = useNotificationStore((state) => state.loading);
-  const error = useNotificationStore((state) => state.error);
+  const {
+    adminNotifications,
+    nextCursor,
+    loading,
+    fetchingMore,
+    error,
+    getAdminToAdminNotification,
+    changeAdminNotificationStatus,
+  } = useNotificationStore();
 
   const [filter, setFilter] = useState("all");
-  const [query, setQuery] = useState("");
   const [actionError, setActionError] = useState("");
+
+  const handleRead = async (notiId) => {
+    try {
+      await changeAdminNotificationStatus({ ids: [notiId], status: "READ" });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await changeAdminNotificationStatus({ markAllRead: true });
+    } catch (err) {
+      console.log(err)
+      setActionError("Couldn't mark all as read.");
+    }
+  };
 
   const handleDelete = async (notiId) => {
     setActionError("");
     try {
-      await deleteAdminNotification(notiId);
+      await changeAdminNotificationStatus({ ids: [notiId], status: "DEL" });
     } catch (err) {
-      setActionError(
-        err?.response?.data?.message ||
-          "Couldn't delete the notification. Try again.",
-      );
-      throw err; // lets the item reset its own state
+      setActionError("Couldn't delete the notification. Try again.");
+      throw err;
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (nextCursor && !fetchingMore) {
+      getAdminToAdminNotification({ cursor: nextCursor, reset: false });
     }
   };
 
   useEffect(() => {
-    if (open) getAdminToAdminNotification();
+    if (open) getAdminToAdminNotification({ reset: true });
   }, [open, getAdminToAdminNotification]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -495,18 +399,17 @@ const NotificationSidebar = ({ open, onClose }) => {
       (Array.isArray(adminNotifications) ? adminNotifications : [])
         .filter((n) => !isDeleted(n))
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [adminNotifications],
+    [adminNotifications]
   );
 
   const counts = useMemo(() => {
-    const c = {
-      all: visible.length,
-      unread: 0,
-      orders: 0,
-      payments: 0,
-      subscriptions: 0,
-      alerts: 0,
-    };
+    // 1. Dynamically build the counts object based on your FILTERS array
+    const c = { all: visible.length, unread: 0 };
+    FILTERS.forEach((f) => {
+      if (f.key !== "all" && f.key !== "unread") c[f.key] = 0;
+    });
+
+    // 2. Tally them up
     visible.forEach((n) => {
       if (isUnread(n)) c.unread += 1;
       const g = getConfig(n.type).group;
@@ -516,18 +419,14 @@ const NotificationSidebar = ({ open, onClose }) => {
   }, [visible]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    
     return visible.filter((n) => {
+      // Filter by category tab
       if (filter === "unread" && !isUnread(n)) return false;
-      if (
-        !["all", "unread"].includes(filter) &&
-        getConfig(n.type).group !== filter
-      )
-        return false;
-      if (q && !`${n.title} ${n.body}`.toLowerCase().includes(q)) return false;
+      if (!["all", "unread"].includes(filter) && getConfig(n.type).group !== filter) return false;
       return true;
     });
-  }, [visible, filter, query]);
+  }, [visible, filter]);
 
   const grouped = useMemo(() => {
     const map = {};
@@ -535,15 +434,11 @@ const NotificationSidebar = ({ open, onClose }) => {
       const b = dayBucket(n.createdAt);
       (map[b] = map[b] || []).push(n);
     });
-    return BUCKET_ORDER.filter((b) => map[b]).map((b) => ({
-      bucket: b,
-      items: map[b],
-    }));
+    return BUCKET_ORDER.filter((b) => map[b]).map((b) => ({ bucket: b, items: map[b] }));
   }, [filtered]);
 
   if (!open) return null;
-
-  const hasFilters = filter !== "all" || query.trim() !== "";
+  const hasFilters = filter !== "all";
   const firstLoad = loading && visible.length === 0;
 
   return (
@@ -556,69 +451,44 @@ const NotificationSidebar = ({ open, onClose }) => {
           <div className="flex h-16 items-center justify-between px-5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-gray-900">
-                  Notifications
-                </h2>
+                <h2 className="text-base font-semibold text-gray-900">Notifications</h2>
                 {counts.unread > 0 && (
                   <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-semibold text-white">
                     {counts.unread} new
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 text-xs text-gray-400">
-                Updates from other admins
-              </p>
+              <p className="mt-0.5 text-xs text-gray-400">Event Updates</p>
             </div>
 
             <div className="flex items-center gap-1">
+              {counts.unread > 0 && (
+                <button
+                  onClick={handleMarkAllRead}
+                  title="Mark all as read"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                >
+                  <CheckCheckIcon size={18} />
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => getAdminToAdminNotification()}
+                onClick={() => getAdminToAdminNotification({ reset: true })}
                 disabled={loading}
                 title="Refresh"
-                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 cursor-pointer"
               >
-                <RefreshCw
-                  size={16}
-                  className={loading ? "animate-spin" : ""}
-                />
+                <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
               </button>
               <button
-                type="button"
                 onClick={onClose}
-                title="Close"
-                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
           </div>
-
-          {/* Search */}
-          <div className="px-5 pb-3">
-            <div className="relative">
-              <Search
-                size={15}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search notifications"
-                className="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-8 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  className="absolute right-2 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-
+          
           {/* Filters */}
           <div className="flex gap-1.5 overflow-x-auto px-5 pb-3 [scrollbar-width:none]">
             {FILTERS.map((f) => {
@@ -636,7 +506,7 @@ const NotificationSidebar = ({ open, onClose }) => {
                 >
                   {f.label}
                   <span className={active ? "text-gray-300" : "text-gray-400"}>
-                    {counts[f.key]}
+                    {counts[f.key] || 0}
                   </span>
                 </button>
               );
@@ -647,52 +517,49 @@ const NotificationSidebar = ({ open, onClose }) => {
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4">
           {actionError && (
-            <div className="mb-3 flex items-start justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-              <p className="text-xs text-red-700">{actionError}</p>
-              <button
-                type="button"
-                onClick={() => setActionError("")}
-                className="cursor-pointer text-red-400 hover:text-red-600"
-                aria-label="Dismiss"
-              >
-                <X size={14} />
-              </button>
+            <div className="mb-3 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              <p>{actionError}</p>
+              <button onClick={() => setActionError("")} className="cursor-pointer"><X size={14} /></button>
             </div>
           )}
 
           {firstLoad ? (
             <NotificationSkeleton />
           ) : error && visible.length === 0 ? (
-            <ErrorState
-              message={error}
-              onRetry={() => getAdminToAdminNotification()}
-            />
+            <ErrorState message={error} onRetry={() => getAdminToAdminNotification({ reset: true })} />
           ) : filtered.length === 0 ? (
-            <EmptyState
-              filtered={hasFilters}
-              onReset={() => {
-                setFilter("all");
-                setQuery("");
-              }}
-            />
+            <EmptyState filtered={hasFilters} onReset={() => { setFilter("all"); setQuery(""); }} />
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-5 pb-6">
               {grouped.map(({ bucket, items }) => (
                 <section key={bucket}>
-                  <h3 className="mb-2 px-1 text-xs font-medium text-gray-400">
-                    {bucket}
-                  </h3>
+                  <h3 className="mb-2 px-1 text-xs font-medium text-gray-400">{bucket}</h3>
                   <div className="space-y-2">
                     {items.map((n) => (
                       <NotificationItem
                         key={n.id}
                         notification={n}
+                        onRead={handleRead}
                         onDelete={handleDelete}
                       />
                     ))}
                   </div>
                 </section>
               ))}
+
+              {/* Pagination Load More Button */}
+              {nextCursor && !hasFilters && (
+                <div className="pt-4 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={fetchingMore}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {fetchingMore && <Loader2 size={16} className="animate-spin" />}
+                    {fetchingMore ? "Loading..." : "Load older notifications"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -707,32 +574,25 @@ const NotificationSidebar = ({ open, onClose }) => {
 
 export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
+  const getAdminToAdminNotification = useNotificationStore((state) => state.getAdminToAdminNotification);
+  const adminNotifications = useNotificationStore((state) => state.adminNotifications);
 
-  const getAdminToAdminNotification = useNotificationStore(
-    (state) => state.getAdminToAdminNotification,
-  );
-  const adminNotifications = useNotificationStore(
-    (state) => state.adminNotifications,
-  );
-
-  // Fetch once on mount, then poll so the badge stays fresh
+  // Poll for fresh data
   useEffect(() => {
-    getAdminToAdminNotification();
-    const id = setInterval(getAdminToAdminNotification, 60000);
+    getAdminToAdminNotification({ reset: true });
+    // Refetch the first page every minute to check for new notifications
+    const id = setInterval(() => getAdminToAdminNotification({ reset: true }), 60000);
     return () => clearInterval(id);
   }, [getAdminToAdminNotification]);
 
-  const unread = (
-    Array.isArray(adminNotifications) ? adminNotifications : []
-  ).filter((n) => isUnread(n) && !isDeleted(n)).length;
+  const unread = (Array.isArray(adminNotifications) ? adminNotifications : [])
+    .filter((n) => isUnread(n) && !isDeleted(n)).length;
 
   return (
     <>
       <button
-        type="button"
         onClick={() => setOpen(true)}
-        title="Notifications"
-        className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition cursor-pointer"
       >
         <Bell size={19} />
         {unread > 0 && (
@@ -741,7 +601,6 @@ export const NotificationBell = () => {
           </span>
         )}
       </button>
-
       <NotificationSidebar open={open} onClose={() => setOpen(false)} />
     </>
   );
