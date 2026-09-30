@@ -1,13 +1,11 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layout/DashboardLayout";
 import Product from "./pages/Product/Product";
 import Customer from "./pages/Customer/Customer";
 import Order from "./pages/Order/Order";
-import Production from "./pages/Production/Production";
 import Deliveries from "./pages/Deliveries/Deliveries";
-import Support from "./pages/Support/Support";
 import Inventory from "./pages/Inventory/Inventory";
 import CustomerHelpLine from "./pages/CustomerHelpLine/CustomerHelpLine";
 import AddProduct from "./components/AddProduct";
@@ -55,6 +53,7 @@ import CreateExpense from "./components/CreateExpense";
 import ExpenseCategory from "./components/ExpenseCategory";
 import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
 import DueRegister from "./components/DueRegister";
+import PublicRoute from "./components/PublicRoute";
 
 const App = () => {
   return (
@@ -69,15 +68,17 @@ const App = () => {
         <BrowserRouter>
           <GlobalLoader />
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/verify-mail" element={<VerifyMail />} />
+            <Route element={<PublicRoute />}>
+              <Route path="/" element={<Login />} />
+              <Route path="/verify-mail" element={<VerifyMail />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Route>
+
             <Route
               path="/location-tracker/:driverId"
               element={<LocationTracker />}
             />
-
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -91,22 +92,52 @@ const App = () => {
                 />
                 <Route path="customer" element={<Customer />} />
                 <Route path="sales" element={<Sales />} />
-                <Route path="due-register" element={<DueRegister theme="light" />} />
+                <Route
+                  path="due-register"
+                  element={<DueRegister theme="light" />}
+                />
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="expense-category" element={<ExpenseCategory />} />
-                <Route path="customer/customerDetails/:customerId" element={<CustomerDetails />} />
+                <Route
+                  path="customer/customerDetails/:customerId"
+                  element={<CustomerDetails />}
+                />
                 <Route path="orders" element={<Order />} />
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
-                <Route path="subscription-orders" element={<SubscriptionOrder />} />
-                <Route path="subscription-details/:subId" element={<ViewSubscriptionDetails />} />
-                <Route path="special-orders" element={<SpecialOrderListing />} />
+                <Route
+                  path="subscription-orders"
+                  element={<SubscriptionOrder />}
+                />
+                <Route
+                  path="subscription-details/:subId"
+                  element={<ViewSubscriptionDetails />}
+                />
+                <Route
+                  path="special-orders"
+                  element={<SpecialOrderListing />}
+                />
                 <Route path="corporate-orders" element={<CorporateOrder />} />
-                <Route path="corporate-orders/details/:id" element={<CorporateOrderView />} />
-                <Route path="corporate-orders/edit/:id" element={<CorporateOrderEdit />} />
-                <Route path="corporate-accounts" element={<CorporateAccounts />} />
-                <Route path="corporate-orders/create-corporate-order" element={<CreateCorporateOrder />} />
-                <Route path="corporate-accounts/create-corporate-account" element={<CreateCorporateAccount />} />
+                <Route
+                  path="corporate-orders/details/:id"
+                  element={<CorporateOrderView />}
+                />
+                <Route
+                  path="corporate-orders/edit/:id"
+                  element={<CorporateOrderEdit />}
+                />
+                <Route
+                  path="corporate-accounts"
+                  element={<CorporateAccounts />}
+                />
+                <Route
+                  path="corporate-orders/create-corporate-order"
+                  element={<CreateCorporateOrder />}
+                />
+                <Route
+                  path="corporate-accounts/create-corporate-account"
+                  element={<CreateCorporateAccount />}
+                />
                 <Route
                   path="orders/orderDetails/:id"
                   element={<OrderViewDetails />}
@@ -115,15 +146,30 @@ const App = () => {
                   path="special-orders/specialOrderDetails/:id"
                   element={<SpecialOrderDetails />}
                 />
-                <Route path="packaging-job" element={<PackagingJob/>}/>
+                <Route path="packaging-job" element={<PackagingJob />} />
                 <Route path="inventory" element={<Inventory />} />
-                <Route path="inventory/add-inventory" element={<AddInventory />} />
-                <Route path="inventory/update-inventory/:id" element={<UpdateInventory />} />
+                <Route
+                  path="inventory/add-inventory"
+                  element={<AddInventory />}
+                />
+                <Route
+                  path="inventory/update-inventory/:id"
+                  element={<UpdateInventory />}
+                />
                 <Route path="delivery-tracking" element={<Deliveries />} />
                 <Route path="delivery-job" element={<DeliveryJob />} />
-                <Route path="delivery-job/add-delivery-job" element={<AddDeliveryJob />} />
-                <Route path="delivery-job/:id/assign-partner" element={<AssignDeliveryPartner />} />
-                <Route path="delivery-job/:id/add-orders" element={<AssignOrderToDeliveryJob />} />
+                <Route
+                  path="delivery-job/add-delivery-job"
+                  element={<AddDeliveryJob />}
+                />
+                <Route
+                  path="delivery-job/:id/assign-partner"
+                  element={<AssignDeliveryPartner />}
+                />
+                <Route
+                  path="delivery-job/:id/add-orders"
+                  element={<AssignOrderToDeliveryJob />}
+                />
                 <Route
                   path="deliveryPartners"
                   element={<DeliveryPartnerList />}
@@ -149,24 +195,14 @@ const App = () => {
                   path="createDeliveryPartner"
                   element={<CreateDeliveryPartner />}
                 />
-                <Route
-                  path="offers"
-                  element={<OfferList />}
-                />
-                <Route
-                  path="offers/create"
-                  element={<CreateOffer />}
-                />
-                <Route
-                  path="offerType"
-                  element={<OfferType />}
-                />
-                <Route
-                  path="offers/edit/:offerId"
-                  element={<EditOffer />}
-                />
+                <Route path="offers" element={<OfferList />} />
+                <Route path="offers/create" element={<CreateOffer />} />
+                <Route path="offerType" element={<OfferType />} />
+                <Route path="offers/edit/:offerId" element={<EditOffer />} />
               </Route>
             </Route>
+
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </BrowserRouter>
       </ConfirmProvider>

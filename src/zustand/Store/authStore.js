@@ -51,11 +51,6 @@ const authStore = create(
             authToken: access_token,
           });
 
-          // store in localStorage
-          localStorage.setItem("admin_user", JSON.stringify(userData));
-          localStorage.setItem("admin_token", access_token);
-          localStorage.setItem("admin_privilege", admin.privilege);
-
           return res.data;
         } catch (error) {
           throw error;
@@ -150,9 +145,6 @@ const authStore = create(
         });
 
         localStorage.removeItem("auth-storage");
-        localStorage.removeItem("admin_user");
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_privilege");
       },
     }),
 
