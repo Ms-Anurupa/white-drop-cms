@@ -4,21 +4,24 @@ import api from '../axios';
 
 export const useNotificationStore = create((set) => ({
   notifications: [],
+  adminNotifications: [],
   unreadCount: 0,
-  
+
   syncFCMToken: async (fcmToken) => {
     try {
-
-      const res = await api.patch("/admin/saveAdminFcmToken", {fcmToken}, {
-        withAuth: true, 
-      });
+      const res = await api.patch(
+        "/admin/saveAdminFcmToken",
+        { fcmToken },
+        {
+          withAuth: true,
+        },
+      );
       return res.data;
     } catch (error) {
-      Toast.error(error)
+      Toast.error(error);
       return;
     }
   },
-
 
   addNotification: (notification) =>
     set((state) => ({
@@ -43,4 +46,53 @@ export const useNotificationStore = create((set) => ({
     })),
 
   clearNotifications: () => set({ notifications: [], unreadCount: 0 }),
+
+  getAdminToAdminNotification: async () => {
+    try {
+      set({ loading: true, error: null });
+      const res = await api.get("/admin/getAdminToAdminNoti", {
+        withAuth: true,
+      });
+
+      set({
+        adminNotifications: res.data?.notifications || [],
+        loading: false,
+      });
+
+      return res.data?.notifications || [];
+    } catch (error) {
+      console.error("Error fetching admin notifications:", error);
+      set({
+        loading: false,
+        error:
+          error?.response?.data?.message || "Failed to fetch notifications",
+      });
+      return [];
+    }
+  },
+
+  deleteAdminNotification: async (notiId) => {
+    try {
+      const res = await api.post(
+        "/admin/deleteAdminNoti",
+        { notiId },
+        { withAuth: true },
+      );
+
+      set((state) => ({
+        adminNotifications: state.adminNotifications.map((n) =>
+          n.id === notiId ? { ...n, isDelete: res.data.result.isDelete } : n,
+        ),
+      }));
+
+      return res.data;
+    } catch (error) {
+      console.error(error);
+      set({
+        error:
+          error?.response?.data?.message || "Failed to delete notification",
+      });
+      throw error;
+    }
+  },
 }));

@@ -718,7 +718,7 @@ export default function DueTrackerPro({
             <i className="dt-dot current" />
             Current month
           </span>
-
+ 
           <strong>{loading ? "—" : inr(pageCurrentTotal)}</strong>
 
           <small>{pagination.pageSize} records per page</small>
