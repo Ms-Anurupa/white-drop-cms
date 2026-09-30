@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import authStore from "../../zustand/Store/authStore";
 import { toast } from "react-toastify";
 import loaderStore from "../../zustand/Store/loaderStore";
+import { generateFCMToken,  initializeForegroundListener } from '../../Service/firebaseMessagingService';
+import { useNotificationStore } from "@/zustand/Store/useNotificationStore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,8 +15,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const adminLogin = authStore((state) => state.adminLogin);
   const { showLoader, hideLoader } = loaderStore();
-  const navigate = useNavigate();
+  const syncFCMToken = useNotificationStore((state)=>state.syncFCMToken)
 
+  const navigate = useNavigate();
   const handleLogin = async () => {
     try {
       if(!email) {
@@ -29,8 +32,11 @@ const Login = () => {
         password: password,
       };
       await adminLogin(loginData);
-      // console.log("res", res.data);
-      console.log({ email, password });
+      const fcmToken = await generateFCMToken();
+      console.log("34",fcmToken)
+      if(fcmToken){
+        await syncFCMToken(fcmToken)
+      }
       navigate("/dashboard");
     } catch {
       toast.error("Login Failed");
