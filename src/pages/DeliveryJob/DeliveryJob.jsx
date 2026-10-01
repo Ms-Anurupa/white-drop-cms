@@ -713,6 +713,14 @@ const DeliveryJob = () => {
                                       : "orders"}
                                   </span>
                                 </p>
+                                <p className="text-sm font-medium text-slate-800 mt-0.5">
+                                  {job.subs?.length || 0}{" "}
+                                  <span className="text-slate-400 font-normal">
+                                    {(job.subs?.length || 0) === 1
+                                      ? "subscription"
+                                      : "subs"}
+                                  </span>
+                                </p>
                               </div>
                             </div>
 

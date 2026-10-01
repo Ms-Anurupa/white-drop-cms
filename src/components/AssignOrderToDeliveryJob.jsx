@@ -15,7 +15,8 @@ import {
   UserRound,
   X,
   Phone,
-  Clock3
+  Clock3,
+  Repeat // <-- Added for Subscription Icon
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -41,7 +42,6 @@ const getStatusStyle = (status) =>
 
 const formatDate = (date) => {
   if (!date) return "—";
-
   return new Date(date).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -50,32 +50,38 @@ const formatDate = (date) => {
 };
 
 const getOrderId = (order) => order?.id;
-
 const getOrderNumber = (order) => order?.orderId;
-
-const getCustomerName = (order) => {
-  const name = order?.user?.customer_name;
-
-  return name?.trim() || "Customer";
-};
+const getCustomerName = (order) => order?.user?.customer_name?.trim() || "Customer";
 
 const getOrderAmount = (order) => {
+  // Subscriptions don't show money here
+  if (order?.type === "SUBSCRIPTION") return null;
+  
   const amount = order?.orderTotal;
-
-  if (amount === null || amount === undefined) {
-    return "—";
-  }
-
+  if (amount === null || amount === undefined) return "—";
   return `₹${Number(amount).toLocaleString("en-IN")}`;
 };
 
-const getOrderStatus = (order) => order?.orderStatus;
+const getOrderQuantity = (order) => {
+  if (!order) return "—";
 
+  if (order.type === "SUBSCRIPTION") {
+    const qty = order.orderTotal;
+    if (qty === null || qty === undefined) return "—";
+    return `${qty} Unit${qty !== 1 ? 's' : ''}`;
+  }
+
+  if (order.type === "ORDER") {
+    if (!order.orderItems || order.orderItems.length === 0) return "0 Units";
+    const totalQty = order.orderItems.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+    return `${totalQty} Unit${totalQty !== 1 ? 's' : ''}`;
+  }
+
+  return "—";
+};
 const getOrderAddress = (order) => {
   const address = order?.shippingAddress;
-
   if (!address) return "";
-
   return [address.apartment, address.locality].filter(Boolean).join(", ");
 };
 
@@ -85,18 +91,11 @@ const isOrderAssociated = (order, deliveryJobId) =>
 const AssignOrderToDeliveryJob = () => {
   const navigate = useNavigate();
   const { id: deliveryJobId } = useParams();
-
   const location = useLocation();
   const job = location.state?.job;
-  console.log(job)
-  const associateOrderToDeliveryJob = deliveryJobStore(
-    (state) => state.associateOrderToDeliveryJob,
-  );
 
-  const getAssignableOrders = orderDataStore(
-    (state) => state.getAssignableOrders
-  );
-
+  const associateOrderToDeliveryJob = deliveryJobStore((state) => state.associateOrderToDeliveryJob);
+  const getAssignableOrders = orderDataStore((state) => state.getAssignableOrders);
   const orders = orderDataStore((state) => state.orders);
 
   const [search, setSearch] = useState("");
@@ -112,7 +111,6 @@ const AssignOrderToDeliveryJob = () => {
   const [associationFilter, setAssociationFilter] = useState("all");
   const hydratedOrders = Array.isArray(orders) ? orders : [];
 
-  // Fetch orders specifically for this delivery job using the new API
   useEffect(() => {
     if (deliveryJobId) {
       getAssignableOrders({ deliJobId: deliveryJobId });
@@ -120,37 +118,17 @@ const AssignOrderToDeliveryJob = () => {
   }, [getAssignableOrders, deliveryJobId]);
 
   useEffect(() => {
-    if (!hydratedOrders.length) {
-      return;
-    }
+    if (!hydratedOrders.length) return;
 
     const associatedOrderIds = hydratedOrders
       .filter((order) => isOrderAssociated(order, deliveryJobId))
       .map((order) => getOrderId(order))
       .filter(Boolean);
 
-    setInitialAssociatedOrders((prev) => {
-      const next = new Set(prev);
-
-      associatedOrderIds.forEach((id) => {
-        next.add(id);
-      });
-
-      return [...next];
-    });
-
-    setSelectedOrders((prev) => {
-      const next = new Set(prev);
-
-      associatedOrderIds.forEach((id) => {
-        next.add(id);
-      });
-
-      return [...next];
-    });
+    setInitialAssociatedOrders([...associatedOrderIds]);
+    setSelectedOrders([...associatedOrderIds]);
   }, [hydratedOrders, deliveryJobId]);
 
-  // Client-side filtering logic to replace backend filters without changing the UI
   const baseFilteredOrders = useMemo(() => {
     let result = hydratedOrders;
 
@@ -162,207 +140,121 @@ const AssignOrderToDeliveryJob = () => {
           order.user?.customer_name?.toLowerCase().includes(lowerSearch)
       );
     }
-
     if (status) {
       result = result.filter((order) => order.orderStatus === status);
     }
-
     if (fromDate) {
       const from = new Date(fromDate);
       from.setHours(0, 0, 0, 0);
       result = result.filter((order) => new Date(order.createdAt) >= from);
     }
-
     if (toDate) {
       const to = new Date(toDate);
       to.setHours(23, 59, 59, 999);
       result = result.filter((order) => new Date(order.createdAt) <= to);
     }
-
     if (associationFilter === "associated") {
-      result = result.filter((order) =>
-        isOrderAssociated(order, deliveryJobId),
-      );
+      result = result.filter((order) => isOrderAssociated(order, deliveryJobId));
     } else if (associationFilter === "non-associated") {
-      result = result.filter(
-        (order) => !isOrderAssociated(order, deliveryJobId),
-      );
+      result = result.filter((order) => !isOrderAssociated(order, deliveryJobId));
     }
 
     return result;
   }, [hydratedOrders, search, status, fromDate, toDate, associationFilter, deliveryJobId]);
 
-  // Client-side pagination logic
   const totalPages = Math.ceil(baseFilteredOrders.length / pageSize) || 1;
-  
   const filteredOrders = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
     return baseFilteredOrders.slice(startIndex, startIndex + pageSize);
   }, [baseFilteredOrders, page, pageSize]);
 
-  const associatedCount = useMemo(
-    () =>
-      hydratedOrders.filter((order) => isOrderAssociated(order, deliveryJobId))
-        .length,
-    [hydratedOrders, deliveryJobId],
-  );
+  const associatedCount = hydratedOrders.filter((order) => isOrderAssociated(order, deliveryJobId)).length;
+  const nonAssociatedCount = hydratedOrders.filter((order) => !isOrderAssociated(order, deliveryJobId)).length;
 
-  const nonAssociatedCount = useMemo(
-    () =>
-      hydratedOrders.filter((order) => !isOrderAssociated(order, deliveryJobId))
-        .length,
-    [hydratedOrders, deliveryJobId],
-  );
-
-  const initialAssociatedSet = useMemo(
-    () => new Set(initialAssociatedOrders),
-    [initialAssociatedOrders],
-  );
-
+  const initialAssociatedSet = useMemo(() => new Set(initialAssociatedOrders), [initialAssociatedOrders]);
   const selectedSet = useMemo(() => new Set(selectedOrders), [selectedOrders]);
 
-  const ordersToAssociate = useMemo(
-    () =>
-      selectedOrders.filter((orderId) => !initialAssociatedSet.has(orderId)),
-    [selectedOrders, initialAssociatedSet],
-  );
+  const ordersToAssociate = useMemo(() => selectedOrders.filter((id) => !initialAssociatedSet.has(id)), [selectedOrders, initialAssociatedSet]);
+  const ordersToRemove = useMemo(() => initialAssociatedOrders.filter((id) => !selectedSet.has(id)), [initialAssociatedOrders, selectedSet]);
 
-  const ordersToRemove = useMemo(
-    () =>
-      initialAssociatedOrders.filter((orderId) => !selectedSet.has(orderId)),
-    [initialAssociatedOrders, selectedSet],
-  );
-
-  const hasAssociationChanges =
-    ordersToAssociate.length > 0 || ordersToRemove.length > 0;
+  const hasAssociationChanges = ordersToAssociate.length > 0 || ordersToRemove.length > 0;
 
   const toggleOrder = (order) => {
     const orderId = getOrderId(order);
-
     if (!orderId) return;
 
     setSelectedOrders((prev) => {
-      // Allow deselection
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      }
-
-      // Prevent selecting more than 20 orders
+      if (prev.includes(orderId)) return prev.filter((id) => id !== orderId);
       if (prev.length >= MAX_ORDERS) {
-        toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
+        toast.warning(`You can assign a maximum of ${MAX_ORDERS} tasks.`);
         return prev;
       }
-
       return [...prev, orderId];
     });
   };
 
-  const visibleSelectableOrderIds = filteredOrders
-    .map((order) => getOrderId(order))
-    .filter(Boolean);
-
-  const allVisibleSelected =
-    visibleSelectableOrderIds.length > 0 &&
-    visibleSelectableOrderIds.every((id) => selectedOrders.includes(id));
+  const visibleSelectableOrderIds = filteredOrders.map((order) => getOrderId(order)).filter(Boolean);
+  const allVisibleSelected = visibleSelectableOrderIds.length > 0 && visibleSelectableOrderIds.every((id) => selectedOrders.includes(id));
 
   const toggleSelectAll = () => {
     if (!visibleSelectableOrderIds.length) {
-      toast.info("There are no orders to select");
+      toast.info("There are no tasks to select");
       return;
     }
-
     if (allVisibleSelected) {
-      setSelectedOrders((prev) =>
-        prev.filter((id) => !visibleSelectableOrderIds.includes(id)),
-      );
-
+      setSelectedOrders((prev) => prev.filter((id) => !visibleSelectableOrderIds.includes(id)));
       return;
     }
-
-    // Select All is only allowed when visible orders are <= 20
     if (visibleSelectableOrderIds.length > MAX_ORDERS) {
-      toast.warning(
-        `Select All is available only when there are ${MAX_ORDERS} or fewer orders.`,
-      );
+      toast.warning(`Select All is available only when there are ${MAX_ORDERS} or fewer tasks.`);
       return;
     }
 
     const availableSlots = MAX_ORDERS - selectedOrders.length;
-
-    if (availableSlots <= 0) {
-      toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
+    if (availableSlots <= 0 || visibleSelectableOrderIds.length > availableSlots) {
+      toast.warning(`You can assign a maximum of ${MAX_ORDERS} tasks.`);
       return;
     }
 
-    if (visibleSelectableOrderIds.length > availableSlots) {
-      toast.warning(`You can select a maximum of ${MAX_ORDERS} orders.`);
-      return;
-    }
-
-    setSelectedOrders((prev) => [
-      ...new Set([...prev, ...visibleSelectableOrderIds]),
-    ]);
+    setSelectedOrders((prev) => [...new Set([...prev, ...visibleSelectableOrderIds])]);
   };
 
-  const clearSelection = () => {
-    setSelectedOrders([...initialAssociatedOrders]);
-  };
+  const clearSelection = () => setSelectedOrders([...initialAssociatedOrders]);
 
   const handleAssociateOrder = async () => {
-    if (!deliveryJobId) {
-      toast.error("Delivery job ID is missing");
-      return;
-    }
-
-    if (!hasAssociationChanges) {
-      toast.info("No association changes to save");
-      return;
-    }
+    if (!deliveryJobId || !hasAssociationChanges) return;
 
     try {
       setIsAssociating(true);
 
-      // Send the absolute final list of checked order IDs 
-      // for the backend to run a complete replace operation
-      await associateOrderToDeliveryJob({
-        deliveryJobId,
-        orderIds: selectedOrders,
+      // --- NEW: Map the string IDs back into { id, type } objects ---
+      const payloadTasks = selectedOrders.map((id) => {
+        const originalObj = hydratedOrders.find((o) => getOrderId(o) === id);
+        return { 
+          id: id, 
+          type: originalObj.type 
+        };
       });
 
-      // Update our baseline reference to match what we just saved
-      setInitialAssociatedOrders([...selectedOrders]);
-      
-      // No need to update setSelectedOrders here because it already 
-      // holds the correct state (the user's final selections)
+      // Send the new payload shape to your Zustand store
+      await associateOrderToDeliveryJob({
+        deliveryJobId,
+        tasks: payloadTasks, // Changed from orderIds to tasks
+      });
 
-      // Refetch the unified list to ensure UI is perfectly synced with the DB
+      setInitialAssociatedOrders([...selectedOrders]);
       await getAssignableOrders({ deliJobId: deliveryJobId });
 
-      // Keep the granular success messages for good UX
       if (ordersToAssociate.length > 0 && ordersToRemove.length > 0) {
-        toast.success(
-          `${ordersToAssociate.length} order${
-            ordersToAssociate.length === 1 ? "" : "s"
-          } added and ${ordersToRemove.length} order${
-            ordersToRemove.length === 1 ? "" : "s"
-          } removed`,
-        );
+        toast.success(`${ordersToAssociate.length} added · ${ordersToRemove.length} removed`);
       } else if (ordersToAssociate.length > 0) {
-        toast.success(
-          `${ordersToAssociate.length} order${
-            ordersToAssociate.length === 1 ? "" : "s"
-          } added to delivery job`,
-        );
+        toast.success(`${ordersToAssociate.length} task(s) added to route`);
       } else {
-        toast.success(
-          `${ordersToRemove.length} order${
-            ordersToRemove.length === 1 ? "" : "s"
-          } removed from delivery job`,
-        );
+        toast.success(`${ordersToRemove.length} task(s) removed from route`);
       }
     } catch (error) {
-      console.error("Failed to update delivery job orders:", error);
-      toast.error("Failed to update delivery job orders");
+      console.error("Failed to update route:", error);
+      toast.error("Failed to update delivery route");
     } finally {
       setIsAssociating(false);
     }
@@ -375,52 +267,26 @@ const AssignOrderToDeliveryJob = () => {
     setToDate("");
     setAssociationFilter("all");
     setPage(1);
-
     setSelectedOrders([...initialAssociatedOrders]);
   };
 
-  const hasFilters =
-    Boolean(search) ||
-    Boolean(status) ||
-    Boolean(fromDate) ||
-    Boolean(toDate) ||
-    associationFilter !== "all";
-
+  const hasFilters = Boolean(search) || Boolean(status) || Boolean(fromDate) || Boolean(toDate) || associationFilter !== "all";
   const hasNextPage = page < totalPages;
-
   const hasPreviousPage = page > 1;
 
   return (
     <div className="w-full min-h-full bg-slate-50 p-4 sm:p-5">
       <div className="max-w-7xl mx-auto">
-        {/* =====================================================
-            TOP HEADER
-        ====================================================== */}
-
+        
+        {/* TOP HEADER */}
         <div className="relative overflow-hidden rounded-2xl bg-[#3B5CCC] px-5 sm:px-7 py-5 mb-4">
-          <svg
-            className="absolute inset-0 w-full h-full opacity-[0.12] pointer-events-none"
-            preserveAspectRatio="none"
-            viewBox="0 0 800 200"
-            aria-hidden="true"
-          >
-            <path
-              d="M -20 160 C 150 40, 300 220, 450 90 S 700 40, 860 100"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="2"
-              strokeDasharray="6 8"
-            />
+          <svg className="absolute inset-0 w-full h-full opacity-[0.12] pointer-events-none" preserveAspectRatio="none" viewBox="0 0 800 200">
+            <path d="M -20 160 C 150 40, 300 220, 450 90 S 700 40, 860 100" fill="none" stroke="#ffffff" strokeWidth="2" strokeDasharray="6 8" />
           </svg>
 
           <div className="relative">
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard/delivery-job")}
-              className="inline-flex items-center gap-2 text-xs font-medium text-blue-100 hover:text-white mb-4 cursor-pointer transition-colors"
-            >
-              <ArrowLeft size={15} />
-              Delivery Jobs
+            <button onClick={() => navigate("/dashboard/delivery-job")} className="inline-flex items-center gap-2 text-xs font-medium text-blue-100 hover:text-white mb-4 transition-colors cursor-pointer">
+              <ArrowLeft size={15} /> Delivery Jobs
             </button>
 
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
@@ -428,44 +294,22 @@ const AssignOrderToDeliveryJob = () => {
                 <div className="w-12 h-12 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white shrink-0 mt-1">
                   <Package size={22} />
                 </div>
-
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      {job?.name || "Add Orders"}
-                    </h1>
-
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] font-semibold text-blue-100">
-                      <ShoppingBag size={11} />
-                      Order Assignment
-                    </span>
+                    <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{job?.name || "Route Assignment"}</h1>
                   </div>
-
-                  {/* Metadata Row: Area, Partner Name, Phone */}
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-blue-100">
                     {job?.area && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <MapPin size={14} className="text-blue-200" />
-                        {job.area}
-                      </span>
+                      <span className="inline-flex items-center gap-1.5"><MapPin size={14} className="text-blue-200" />{job.area}</span>
                     )}
-
                     {job?.deliveryPartner && (
                       <>
                         <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
-                        <span className="inline-flex items-center gap-1.5">
-                          <UserRound size={14} className="text-blue-200" />
-                          {job.deliveryPartner.firstName}{" "}
-                          {job.deliveryPartner.lastName}
-                        </span>
-
+                        <span className="inline-flex items-center gap-1.5"><UserRound size={14} className="text-blue-200" />{job.deliveryPartner.firstName} {job.deliveryPartner.lastName}</span>
                         {job.deliveryPartner.phoneNo && (
                           <>
                             <span className="w-1 h-1 rounded-full bg-blue-300/40 hidden sm:block" />
-                            <span className="inline-flex items-center gap-1.5">
-                              <Phone size={14} className="text-blue-200" />
-                              {job.deliveryPartner.phoneNo}
-                            </span>
+                            <span className="inline-flex items-center gap-1.5"><Phone size={14} className="text-blue-200" />{job.deliveryPartner.phoneNo}</span>
                           </>
                         )}
                       </>
@@ -473,841 +317,185 @@ const AssignOrderToDeliveryJob = () => {
                   </div>
                 </div>
               </div>
-
-              {hasAssociationChanges && (
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="px-4 py-2.5 rounded-xl bg-white/10 border border-white/15">
-                    <p className="text-[10px] uppercase tracking-wide text-blue-100">
-                      Changes
-                    </p>
-
-                    <p className="text-sm font-bold text-white">
-                      {ordersToAssociate.length > 0 && ordersToRemove.length > 0
-                        ? `${ordersToAssociate.length} Add · ${ordersToRemove.length} Remove`
-                        : ordersToAssociate.length > 0
-                          ? `${ordersToAssociate.length} Add`
-                          : `${ordersToRemove.length} Remove`}
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* =====================================================
-            FILTER / SEARCH CARD
-        ====================================================== */}
-
+        {/* FILTER CARD */}
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm mb-4">
           <div className="p-4 sm:p-5">
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-              {/* Search */}
-
               <div className="relative flex-1">
-                <Search
-                  size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                    setSelectedOrders([...initialAssociatedOrders]);
-                  }}
-                  placeholder="Search order number, customer..."
-                  className="
-                    w-full
-                    pl-10 pr-4 py-2.5
-                    rounded-xl
-                    border border-slate-200
-                    bg-slate-50
-                    text-sm text-slate-800
-                    placeholder:text-slate-400
-                    outline-none
-                    transition-all
-                    focus:bg-white
-                    focus:border-blue-400
-                    focus:ring-4
-                    focus:ring-blue-50
-                  "
-                />
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search order number, customer..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50" />
               </div>
 
-              {/* Status */}
-
               <div className="relative">
-                <select
-                  value={status}
-                  onChange={(e) => {
-                    setStatus(e.target.value);
-                    setPage(1);
-                    setSelectedOrders([...initialAssociatedOrders]);
-                  }}
-                  className="
-                    appearance-none
-                    w-full lg:w-44
-                    px-4 pr-9 py-2.5
-                    rounded-xl
-                    border border-slate-200
-                    bg-slate-50
-                    text-sm text-slate-700
-                    outline-none
-                    cursor-pointer
-                    focus:bg-white
-                    focus:border-blue-400
-                    focus:ring-4
-                    focus:ring-blue-50
-                  "
-                >
+                <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="appearance-none w-full lg:w-44 px-4 pr-9 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none cursor-pointer focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50">
                   <option value="">All Status</option>
                   <option value="PLACED">Placed</option>
                   <option value="PROCESSING">Processing</option>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="SHIPPED">Shipped</option>
                   <option value="INTRANSIT">In Transit</option>
                   <option value="DELIVERED">Delivered</option>
                   <option value="CANCELLED">Cancelled</option>
-                  <option value="FAILED">Failed</option>
                 </select>
-
-                <ChevronRight
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 pointer-events-none"
-                />
+                <ChevronRight size={14} className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 pointer-events-none" />
               </div>
-
-              {/* Filter */}
-
-              <button
-                type="button"
-                onClick={() => setShowFilters((prev) => !prev)}
-                className={`
-                  inline-flex items-center justify-center gap-2
-                  px-4 py-2.5
-                  rounded-xl
-                  border
-                  text-sm font-semibold
-                  cursor-pointer
-                  transition-all
-                  ${
-                    showFilters || fromDate || toDate
-                      ? "bg-blue-50 text-blue-700 border-blue-200"
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                  }
-                `}
-              >
-                <Filter size={15} />
-                Filters
-              </button>
-
-              {hasFilters && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-slate-500 hover:text-rose-600 cursor-pointer"
-                >
-                  <X size={14} />
-                  Clear
-                </button>
-              )}
-            </div>
-
-            {/* Date filters */}
-
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {/* From Date */}
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
-                    From Date
-                  </label>
-
-                  <div className="relative">
-                    <CalendarDays
-                      size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-
-                    <input
-                      type="date"
-                      value={fromDate}
-                      onChange={(e) => {
-                        setFromDate(e.target.value);
-                        setPage(1);
-                        setSelectedOrders([...initialAssociatedOrders]);
-                      }}
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:border-blue-400"
-                    />
-                  </div>
-                </div>
-
-                {/* To Date */}
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
-                    To Date
-                  </label>
-
-                  <div className="relative">
-                    <CalendarDays
-                      size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    />
-
-                    <input
-                      type="date"
-                      value={toDate}
-                      onChange={(e) => {
-                        setToDate(e.target.value);
-                        setPage(1);
-                        setSelectedOrders([...initialAssociatedOrders]);
-                      }}
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:border-blue-400"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* =====================================================
-            ORDERS
-        ====================================================== */}
-
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-          {/* List Header */}
-
-          <div className="px-5 sm:px-6 py-4 border-b border-slate-100">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-base font-semibold text-slate-900">
-                      Available Orders
-                    </h2>
-
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
-                      {baseFilteredOrders.length}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Choose the orders you want to add or remove from this
-                    delivery job
-                  </p>
-                </div>
-
-                {filteredOrders.length > 0 &&
-                  visibleSelectableOrderIds.length <= MAX_ORDERS && (
-                    <button
-                      type="button"
-                      onClick={toggleSelectAll}
-                      className={`
-                      inline-flex items-center gap-2
-                      px-3 py-2
-                      rounded-lg
-                      border
-                      text-xs font-semibold
-                      cursor-pointer
-                      transition-all
-                      ${
-                        allVisibleSelected
-                          ? "bg-blue-50 text-blue-700 border-blue-200"
-                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                      }
-                    `}
-                    >
-                      <span
-                        className={`
-                        w-4 h-4 rounded border flex items-center justify-center
-                        ${
-                          allVisibleSelected
-                            ? "bg-blue-600 border-blue-600 text-white"
-                            : "border-slate-300 bg-white"
-                        }
-                      `}
-                      >
-                        {allVisibleSelected && (
-                          <Check size={11} strokeWidth={3} />
-                        )}
-                      </span>
-
-                      {allVisibleSelected ? "Deselect All" : "Select All"}
-                    </button>
-                  )}
-              </div>
-
-              {/* Association Filter */}
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mr-1">
-                  Show
-                </span>
-
-                {/* All */}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAssociationFilter("all");
-                    setSelectedOrders([...initialAssociatedOrders]);
-                  }}
-                  className={`
-                    inline-flex items-center gap-2
-                    px-3 py-1.5
-                    rounded-lg
-                    border
-                    text-xs font-semibold
-                    transition-all
-                    cursor-pointer
-                    ${
-                      associationFilter === "all"
-                        ? "bg-slate-900 text-white border-slate-900"
-                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                    }
-                  `}
-                >
-                  All
-                  <span
-                    className={`
-                      px-1.5 py-0.5 rounded-full text-[10px]
-                      ${
-                        associationFilter === "all"
-                          ? "bg-white/15 text-white"
-                          : "bg-slate-100 text-slate-500"
-                      }
-                    `}
-                  >
-                    {hydratedOrders.length}
-                  </span>
-                </button>
-
-                {/* Associated */}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAssociationFilter("associated");
-                    setSelectedOrders([...initialAssociatedOrders]);
-                  }}
-                  className={`
-                    inline-flex items-center gap-2
-                    px-3 py-1.5
-                    rounded-lg
-                    border
-                    text-xs font-semibold
-                    transition-all
-                    cursor-pointer
-                    ${
-                      associationFilter === "associated"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                    }
-                  `}
-                >
-                  <CheckCircle2 size={13} />
-                  Associated
-                  <span
-                    className={`
-                      px-1.5 py-0.5 rounded-full text-[10px]
-                      ${
-                        associationFilter === "associated"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-500"
-                      }
-                    `}
-                  >
-                    {associatedCount}
-                  </span>
-                </button>
-
-                {/* Non-associated */}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAssociationFilter("non-associated");
-                    setSelectedOrders([...initialAssociatedOrders]);
-                  }}
-                  className={`
-                    inline-flex items-center gap-2
-                    px-3 py-1.5
-                    rounded-lg
-                    border
-                    text-xs font-semibold
-                    transition-all
-                    cursor-pointer
-                    ${
-                      associationFilter === "non-associated"
-                        ? "bg-blue-50 text-blue-700 border-blue-200"
-                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                    }
-                  `}
-                >
-                  <Package size={13} />
-                  Non-associated
-                  <span
-                    className={`
-                      px-1.5 py-0.5 rounded-full text-[10px]
-                      ${
-                        associationFilter === "non-associated"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-slate-100 text-slate-500"
-                      }
-                    `}
-                  >
-                    {nonAssociatedCount}
-                  </span>
-                </button>
+                <button type="button" onClick={() => setAssociationFilter("all")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${associationFilter === "all" ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200"}`}>All</button>
+                <button type="button" onClick={() => setAssociationFilter("associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "associated" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-white text-slate-600 border-slate-200"}`}>Associated <span className="bg-white/50 px-1 rounded-sm">{associatedCount}</span></button>
+                <button type="button" onClick={() => setAssociationFilter("non-associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "non-associated" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-white text-slate-600 border-slate-200"}`}>Available <span className="bg-white/50 px-1 rounded-sm">{nonAssociatedCount}</span></button>
               </div>
             </div>
           </div>
-
-          {/* EMPTY */}
-
-          {!filteredOrders.length ? (
-            <div className="py-16 px-6 text-center">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-4">
-                <Package size={25} />
-              </div>
-
-              <h3 className="text-sm font-semibold text-slate-900">
-                {associationFilter === "associated"
-                  ? "No associated orders"
-                  : associationFilter === "non-associated"
-                    ? "No non-associated orders"
-                    : "No orders found"}
-              </h3>
-
-              <p className="text-xs text-slate-500 mt-1">
-                {associationFilter === "associated"
-                  ? "There are no orders already associated with a delivery job."
-                  : associationFilter === "non-associated"
-                    ? "All available orders are already associated."
-                    : "Try changing your search or filter criteria."}
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* ORDER LIST */}
-
-              <div className="divide-y divide-slate-100">
-                {filteredOrders.map((order) => {
-                  const orderId = getOrderId(order);
-
-                  const isSelected = selectedOrders.includes(orderId);
-
-                  /*
-                   * Original backend state.
-                   */
-                  const isOriginallyAssociated =
-                    initialAssociatedSet.has(orderId);
-
-                  /*
-                   * Current backend association.
-                   */
-                  const isAssociated = isOrderAssociated(order, deliveryJobId);
-
-                  /*
-                   * Existing associated order
-                   * that user unchecked.
-                   */
-                  const isMarkedForRemoval =
-                    isOriginallyAssociated && !isSelected;
-
-                  /*
-                   * New order user selected.
-                   */
-                  const isMarkedForAssociation =
-                    !isOriginallyAssociated && isSelected;
-
-                  const orderStatus = getOrderStatus(order);
-
-                  
-
-                  return (
-                    <button
-                      key={orderId}
-                      type="button"
-                      onClick={() => toggleOrder(order)}
-                      className={`
-                        relative
-                        w-full
-                        text-left
-                        px-5 sm:px-6
-                        py-4
-                        cursor-pointer
-                        transition-all
-                        ${
-                          isSelected
-                            ? "bg-blue-50/60"
-                            : isMarkedForRemoval
-                              ? "bg-rose-50/40"
-                              : "hover:bg-slate-50/70"
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Checkbox */}
-
-                        <div
-                          className={`
-                            w-5 h-5 rounded-md border
-                            flex items-center justify-center
-                            shrink-0
-                            transition-all
-                            ${
-                              isSelected
-                                ? "bg-blue-600 border-blue-600 text-white"
-                                : "bg-white border-slate-300"
-                            }
-                          `}
-                        >
-                          {isSelected && <Check size={13} strokeWidth={3} />}
-                        </div>
-
-                        {/* Order Icon */}
-
-                        <div
-                          className={`
-                            w-10 h-10 rounded-xl
-                            flex items-center justify-center
-                            shrink-0
-                            ${
-                              isSelected
-                                ? "bg-blue-100 text-blue-600"
-                                : "bg-slate-100 text-slate-500"
-                            }
-                          `}
-                        >
-                          <ShoppingBag size={18} />
-                        </div>
-
-                        {/* Main */}
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-slate-900">
-                              {getOrderNumber(order)}
-                            </p>
-
-                            {/* Status */}
-
-                            <span
-                              className={`
-                                px-2 py-0.5
-                                rounded-full
-                                border
-                                text-[10px]
-                                font-semibold
-                                ${getStatusStyle(orderStatus)}
-                              `}
-                            >
-                              {orderStatus?.replaceAll("_", " ")}
-                            </span>
-
-                            {/* =================================
-                                EXISTING ASSOCIATED
-                            ================================= */}
-
-                            {isAssociated &&
-                              isSelected &&
-                              !isMarkedForRemoval && (
-                                <span
-                                  className="
-                                    inline-flex items-center gap-1
-                                    px-2 py-0.5
-                                    rounded-full
-                                    border border-emerald-100
-                                    bg-emerald-50
-                                    text-emerald-700
-                                    text-[10px]
-                                    font-semibold
-                                  "
-                                >
-                                  <CheckCircle2 size={10} />
-                                  Assigned to this job
-                                </span>
-                              )}
-
-                            {/* =================================
-                                WILL BE REMOVED
-                            ================================= */}
-
-                            {isMarkedForRemoval && (
-                              <span
-                                className="
-                                  inline-flex items-center gap-1
-                                  px-2 py-0.5
-                                  rounded-full
-                                  border border-rose-100
-                                  bg-rose-50
-                                  text-rose-700
-                                  text-[10px]
-                                  font-semibold
-                                "
-                              >
-                                <X size={10} />
-                                Will be removed
-                              </span>
-                            )}
-
-                            {/* =================================
-                                WILL BE ASSIGNED
-                            ================================= */}
-
-                            {isMarkedForAssociation && (
-                              <span
-                                className="
-                                  inline-flex items-center gap-1
-                                  px-2 py-0.5
-                                  rounded-full
-                                  border border-blue-100
-                                  bg-blue-50
-                                  text-blue-700
-                                  text-[10px]
-                                  font-semibold
-                                "
-                              >
-                                <Check size={10} />
-                                Will be assigned
-                              </span>
-                            )}
-
-                            {/* Delivery Slot */}
-                            {order?.deliverySlot?.name && (
-                              <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-                                <span className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                                  {order.deliverySlot?.icon ? (
-                                    <img
-                                      src={resolveFirebaseUrl({
-                                        folderName: "public",
-                                        fileName: order.deliverySlot.icon,
-                                      })}
-                                      alt={order.deliverySlot.name}
-                                      className="w-4 h-4 object-contain"
-                                    />
-                                  ) : (
-                                    <Clock3 size={12} />
-                                  )}
-                                </span>
-
-                                {order.deliverySlot.name}
-                                {order.deliverySlot?.from &&
-                                  order.deliverySlot?.to && (
-                                    <span className="text-slate-400">
-                                      ({order.deliverySlot.from} -{" "}
-                                      {order.deliverySlot.to})
-                                    </span>
-                                  )}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
-                            {/* Customer */}
-
-                            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-                              <UserRound size={12} />
-                              {getCustomerName(order)}
-                            </span>
-
-                            {/* Date */}
-
-                            {order?.createdAt && (
-                              <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-                                <CalendarDays size={12} />
-                                {formatDate(order.createdAt)}
-                              </span>
-                            )}
-
-                            {/* Address */}
-
-                            {getOrderAddress(order) && (
-                              <span
-                                className="inline-flex items-center gap-1.5 text-xs text-slate-400 max-w-105"
-                                title={getOrderAddress(order)}
-                              >
-                                <MapPin size={12} className="shrink-0" />
-
-                                <span className="truncate">
-                                  {getOrderAddress(order)}
-                                </span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Amount */}
-
-                        <div className="text-right shrink-0">
-                          <p className="text-[10px] uppercase tracking-wide text-slate-400">
-                            Total
-                          </p>
-
-                          <p className="text-sm font-bold text-slate-800 mt-0.5">
-                            {getOrderAmount(order)}
-                          </p>
-                        </div>
-
-                        {/* Selected indicator */}
-
-                        {isSelected && (
-                          <CheckCircle2
-                            size={19}
-                            className="text-blue-600 shrink-0"
-                          />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* PAGINATION */}
-
-              <div className="px-5 sm:px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">Rows per page</span>
-
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setPage(1);
-                      setSelectedOrders([...initialAssociatedOrders]);
-                    }}
-                    className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white outline-none cursor-pointer"
-                  >
-                    <option value={8}>8</option>
-                    <option value={16}>16</option>
-                    <option value={24}>24</option>
-                    <option value={32}>32</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    disabled={!hasPreviousPage}
-                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                    className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <ChevronLeft size={15} />
-                  </button>
-
-                  <span className="text-xs font-semibold text-slate-600 px-2">
-                    Page {page} of {totalPages}
-                  </span>
-
-                  <button
-                    type="button"
-                    disabled={!hasNextPage}
-                    onClick={() => setPage((prev) => prev + 1)}
-                    className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <ChevronRight size={15} />
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
-        {/* =====================================================
-            STICKY CHANGE BAR
-        ====================================================== */}
-
-        {hasAssociationChanges && (
-          <div className="sticky bottom-4 z-20 mt-4">
-            <div className="bg-slate-900 rounded-2xl shadow-2xl px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-300 flex items-center justify-center">
-                  <Package size={17} />
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-white">
-                    {ordersToAssociate.length > 0 && ordersToRemove.length > 0
-                      ? `${ordersToAssociate.length} to add · ${ordersToRemove.length} to remove`
-                      : ordersToAssociate.length > 0
-                        ? `${ordersToAssociate.length} ${
-                            ordersToAssociate.length === 1 ? "order" : "orders"
-                          } to add`
-                        : `${ordersToRemove.length} ${
-                            ordersToRemove.length === 1 ? "order" : "orders"
-                          } to remove`}
-                  </p>
-
-                  <p className="text-[11px] text-slate-400">
-                    {ordersToAssociate.length > 0 && ordersToRemove.length > 0
-                      ? "Changes ready to save"
-                      : ordersToAssociate.length > 0
-                        ? "Ready to assign to this delivery job"
-                        : "Ready to remove from this delivery job"}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={clearSelection}
-                  className="ml-2 text-xs text-slate-400 hover:text-white cursor-pointer"
-                >
-                  Clear
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAssociateOrder}
-                disabled={isAssociating || !hasAssociationChanges}
-                className="
-                  inline-flex
-                  items-center
-                  justify-center
-                  gap-2
-                  px-5
-                  py-2.5
-                  rounded-xl
-                  bg-white
-                  hover:bg-blue-50
-                  text-slate-900
-                  text-sm
-                  font-semibold
-                  disabled:opacity-60
-                  disabled:cursor-not-allowed
-                  transition-all
-                  cursor-pointer
-                "
-              >
-                {isAssociating ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin" />
-                    Updating Orders...
-                  </>
-                ) : (
-                  <>
-                    <Check size={16} strokeWidth={2.5} />
-
-                    {ordersToAssociate.length > 0 && ordersToRemove.length > 0
-                      ? "Save Changes"
-                      : ordersToAssociate.length > 0
-                        ? `Associate ${ordersToAssociate.length} ${
-                            ordersToAssociate.length === 1 ? "Order" : "Orders"
-                          }`
-                        : `Remove ${ordersToRemove.length} ${
-                            ordersToRemove.length === 1 ? "Order" : "Orders"
-                          }`}
-                  </>
-                )}
-              </button>
+        {/* TASK LIST */}
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">Available Tasks</h2>
             </div>
+            {filteredOrders.length > 0 && visibleSelectableOrderIds.length <= MAX_ORDERS && (
+              <button onClick={toggleSelectAll} className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                {allVisibleSelected ? "Deselect All" : "Select All Visible"}
+              </button>
+            )}
+          </div>
+
+          {!filteredOrders.length ? (
+            <div className="py-16 text-center text-slate-500 text-sm">No tasks found.</div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredOrders.map((order) => {
+                const orderId = getOrderId(order);
+                const isSelected = selectedOrders.includes(orderId);
+                const isOriginallyAssociated = initialAssociatedSet.has(orderId);
+                const isAssociated = isOrderAssociated(order, deliveryJobId);
+                const isMarkedForRemoval = isOriginallyAssociated && !isSelected;
+                const isMarkedForAssociation = !isOriginallyAssociated && isSelected;
+
+                return (
+                  <button
+                    key={orderId}
+                    onClick={() => toggleOrder(order)}
+                    className={`w-full text-left px-5 sm:px-6 py-4 transition-all flex items-center gap-4 ${isSelected ? "bg-blue-50/60" : isMarkedForRemoval ? "bg-rose-50/40" : "hover:bg-slate-50/70"}`}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-300"}`}
+                    >
+                      {isSelected && <Check size={13} strokeWidth={3} />}
+                    </div>
+
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${order.type === "SUBSCRIPTION" ? "bg-amber-100 text-amber-600" : isSelected ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-500"}`}
+                    >
+                      {order.type === "SUBSCRIPTION" ? (
+                        <Repeat size={18} />
+                      ) : (
+                        <ShoppingBag size={18} />
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-semibold text-slate-900">
+                          {getOrderNumber(order)}
+                        </p>
+
+                        {/* NEW: Subscription Visual Badge */}
+                        {order.type === "SUBSCRIPTION" && (
+                          <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold flex items-center gap-1">
+                            SUBSCRIPTION
+                          </span>
+                        )}
+
+                        <span
+                          className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${getStatusStyle(order.orderStatus)}`}
+                        >
+                          {order.orderStatus?.replaceAll("_", " ")}
+                        </span>
+
+                        {isAssociated && isSelected && !isMarkedForRemoval && (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-semibold flex items-center gap-1">
+                            <CheckCircle2 size={10} /> Assigned
+                          </span>
+                        )}
+                        {isMarkedForRemoval && (
+                          <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-[10px] font-semibold flex items-center gap-1">
+                            <X size={10} /> Will remove
+                          </span>
+                        )}
+                        {isMarkedForAssociation && (
+                          <span className="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-semibold flex items-center gap-1">
+                            <Check size={10} /> Will assign
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+                          <UserRound size={12} /> {getCustomerName(order)}
+                        </span>
+                        {getOrderAddress(order) && (
+                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 truncate max-w-xs">
+                            <MapPin size={12} /> {getOrderAddress(order)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Amount & Quantity */}
+
+                    <div className="text-right shrink-0 flex flex-col items-end">
+                      <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
+                        {order.type === "SUBSCRIPTION" ? "Qty" : "Total / Qty"}
+                      </p>
+
+                      {order.type === "ORDER" && (
+                        <p className="text-sm font-bold text-slate-800">
+                          {getOrderAmount(order)}
+                        </p>
+                      )}
+                      <p className={`
+                          ${
+                            order.type === "ORDER"
+                              ? "text-xs font-semibold text-slate-500"
+                              : "text-sm font-bold text-slate-800"
+                          }
+                        `}
+                      >
+                        {getOrderQuantity(order)}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* PAGINATION */}
+          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-xs text-slate-500">Page {page} of {totalPages}</span>
+            <div className="flex gap-2">
+              <button disabled={!hasPreviousPage} onClick={() => setPage(p => p - 1)} className="p-1 border rounded disabled:opacity-40"><ChevronLeft size={16}/></button>
+              <button disabled={!hasNextPage} onClick={() => setPage(p => p + 1)} className="p-1 border rounded disabled:opacity-40"><ChevronRight size={16}/></button>
+            </div>
+          </div>
+        </div>
+
+        {/* STICKY CHANGE BAR */}
+        {hasAssociationChanges && (
+          <div className="sticky bottom-4 z-20 mt-4 bg-slate-900 rounded-2xl shadow-2xl px-5 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-white">
+                <p className="text-sm font-semibold">{ordersToAssociate.length} to add · {ordersToRemove.length} to remove</p>
+              </div>
+            </div>
+            <button onClick={handleAssociateOrder} disabled={isAssociating} className="px-5 py-2.5 rounded-xl bg-white text-slate-900 text-sm font-semibold disabled:opacity-60">
+              {isAssociating ? "Saving..." : "Save Route Changes"}
+            </button>
           </div>
         )}
       </div>
