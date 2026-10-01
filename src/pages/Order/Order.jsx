@@ -865,7 +865,7 @@ const Order = () => {
                     </div>
 
                     <p className="text-xs text-gray-500 mt-1">
-                      {formatDate(o.createdAt)}
+                      {formatDate(o.deliveryDate)}
                     </p>
 
                     <div className="mt-2 flex items-center gap-2 flex-wrap">
@@ -959,7 +959,7 @@ const Order = () => {
                 </th>
 
                 <th className="w-24 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Created At
+                  Delivery Date
                 </th>
 
                 <th className="w-16 px-2.5 py-2.5 mr-6 text-left text-xs font-semibold text-gray-500">
@@ -1108,11 +1108,11 @@ const Order = () => {
 
                     <td className="px-2.5 py-2.5 whitespace-nowrap">
                       <p className="text-xs text-gray-700">
-                        {formatDateOnly(o.createdAt)}
+                        {formatDateOnly(o.deliveryDate)}
                       </p>
 
                       <p className="text-[10px] text-gray-400">
-                        {formatTimeOnly(o.createdAt)}
+                        {formatTimeOnly(o.deliveryDate)}
                       </p>
                     </td>
 
