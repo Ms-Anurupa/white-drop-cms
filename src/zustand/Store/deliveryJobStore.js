@@ -59,10 +59,10 @@ const deliveryJobStore = create((set) => ({
     }
   },
 
-  getDeliveryJobs: async (id) => {
+  getDeliveryJobs: async (params = {}) => {
     try {
       const res = await api.get("/admin/getDeliveryJobs", {
-        params: { id },
+        params,
         withAuth: true,
       });
 
