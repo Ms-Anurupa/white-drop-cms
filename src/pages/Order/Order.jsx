@@ -12,6 +12,7 @@ import {
   Loader2,
   Clock3,
   RefreshCw,
+  SquarePen
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -737,6 +738,16 @@ const Order = () => {
                 className={refreshing ? "animate-spin" : ""}
               />
               Refresh
+            </button>
+            <button
+              onClick={()=>navigate("/dashboard/orders/add-offline-orders")}
+              disabled={refreshing}
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <SquarePen
+                size={16}
+              />
+              Add Offline Order
             </button>
           </div>
         </div>

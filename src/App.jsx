@@ -54,6 +54,9 @@ import ExpenseCategory from "./components/ExpenseCategory";
 import ViewSubscriptionDetails from "./pages/ViewSubscriptionDetails/ViewSubscriptionDetails";
 import DueRegister from "./components/DueRegister";
 import PublicRoute from "./components/PublicRoute";
+import AddOfflineCustomer from "./pages/Customer/AddOfflineCustomer";
+import AddCustomerAddress from "./components/AddCustomerAddress";
+import AddOfflineOrder from "./pages/Order/AddOfflineOrder";
 
 const App = () => {
   return (
@@ -90,7 +93,18 @@ const App = () => {
                   path="product/editProduct/:product_id"
                   element={<EditProduct />}
                 />
-                <Route path="customer" element={<Customer />} />
+                <Route path="customer">
+                  <Route index element={<Customer />} />
+
+                  <Route
+                    path="add-offline-customer"
+                    element={<AddOfflineCustomer />}
+                  />
+                  <Route
+                    path="add-address/:userUid"
+                    element={<AddCustomerAddress />}
+                  />
+                </Route>
                 <Route path="sales" element={<Sales />} />
                 <Route
                   path="due-register"
@@ -103,7 +117,13 @@ const App = () => {
                   path="customer/customerDetails/:customerId"
                   element={<CustomerDetails />}
                 />
-                <Route path="orders" element={<Order />} />
+                <Route path="orders">
+                  <Route index element={<Order />} />
+                  <Route
+                    path="add-offline-orders"
+                    element={<AddOfflineOrder />}
+                  />
+                </Route>
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
                 <Route
                   path="subscription-orders"

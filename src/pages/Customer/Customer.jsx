@@ -9,6 +9,8 @@ import {
   ChevronsRight,
   Eye,
   Users,
+  UserPlus,
+  MapPinPlus
 } from "lucide-react";
 import customerStore from "../../zustand/Store/customerStore";
 import { toast } from "react-toastify";
@@ -16,6 +18,7 @@ import useDebounce from "../../utils/useDebounce";
 import DateFilter from "../../components/DateFilter";
 import Loader from "../../components/Loader";
 import { useNavigate } from "react-router-dom";
+import { SplitButton, SplitButtonItem } from "@/components/SplitButton";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
@@ -231,6 +234,13 @@ const Customer = () => {
             <Download size={16} />
             Export
           </button>
+          <button
+            onClick={() => navigate("/dashboard/customer/add-offline-customer")}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm cursor-pointer"
+          >
+            <UserPlus size={16} />
+            Add-Customer
+          </button>
         </div>
       </div>
 
@@ -369,7 +379,7 @@ const Customer = () => {
 
                     <td className="px-4 py-3.5">
                       <div className="flex gap-2">
-                        <button
+                        {/* <button
                           onClick={() =>
                             navigate(
                               `/dashboard/customer/customerDetails/${c?.userUid}`,
@@ -379,7 +389,41 @@ const Customer = () => {
                           className="p-2 cursor-pointer rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
                         >
                           <Eye size={15} />
-                        </button>
+                        </button> */}
+                        <SplitButton
+                          variant="outline"
+                          menuWidth="w-48"
+                          className={
+                            "h-9 min-w-[100px] rounded-md border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+                          }
+                          onClick={() =>
+                            navigate(
+                              `/dashboard/customer/customerDetails/${c?.userUid}`,
+                            )
+                          }
+                          menuContent={
+                            c.customer_type == "OFFLINE" ? (
+                              <>
+                                <SplitButtonItem
+                                  destructive={false}
+                                  onClick={() =>
+                                    navigate(
+                                      `/dashboard/customer/add-address/${c?.userUid}`,
+                                    )
+                                  }
+                                >
+                                  <MapPinPlus className="h-4 w-4 shrink-0" />
+                                  <span className="truncate">Add Address</span>
+                                </SplitButtonItem>
+                              </>
+                            ) : null
+                          }
+                        >
+                          <Eye className="mr-1.5 h-3.5 w-3.5 shrink-0 text-zinc-600 dark:text-zinc-300" />
+                          <span className="truncate whitespace-nowrap text-[11px] font-medium">
+                            View
+                          </span>
+                        </SplitButton>
                       </div>
                     </td>
                   </tr>
