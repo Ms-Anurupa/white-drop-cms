@@ -57,6 +57,7 @@ import PublicRoute from "./components/PublicRoute";
 import AddOfflineCustomer from "./pages/Customer/AddOfflineCustomer";
 import AddCustomerAddress from "./components/AddCustomerAddress";
 import AddOfflineOrder from "./pages/Order/AddOfflineOrder";
+import AddOfflineSubscription from "./pages/subscriptionOrder/AddOfflineSubscription";
 
 const App = () => {
   return (
@@ -125,10 +126,15 @@ const App = () => {
                   />
                 </Route>
                 <Route path="adhoc-orders" element={<AdhocOrders />} />
-                <Route
-                  path="subscription-orders"
-                  element={<SubscriptionOrder />}
-                />
+
+                <Route path="subscription-orders">
+                  <Route index element={<SubscriptionOrder />} />
+                  <Route
+                    path="add-subscription-orders"
+                    element={<AddOfflineSubscription />}
+                  />
+                </Route>
+
                 <Route
                   path="subscription-details/:subId"
                   element={<ViewSubscriptionDetails />}

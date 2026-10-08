@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/preserve-manual-memoization */
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useMemo } from "react";
 import { Search, Calendar, Clock, Plus, Minus, X, ShoppingCart, Trash2, } from "lucide-react";
@@ -114,24 +115,42 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
     const variantData = activeProduct.variants.find(v => v.product_item_id === selectedVariant);
     
     setCart(prev => {
-      // Check if variant already exists in cart
       const existingIdx = prev.findIndex(c => c.item.variant_id === selectedVariant);
+
+      const newItem = {
+        item: {
+          product_id: activeProduct.product_id,
+          variant_id: selectedVariant,
+          product_name: activeProduct.product_name,
+          variant_name: variantData?.variant_name || `${variantData?.quantity}${variantData?.unit}`,
+          price: variantData?.price || 0
+        },
+        qty: 1
+      };
+
+      // STRICT MODE: SUBSCRIPTIONS
+      if (mode === "subscription") {
+        if (existingIdx >= 0) {
+          // Same item? Just increase the qtyPerDelivery
+          const newCart = [...prev];
+          newCart[existingIdx].qty += 1;
+          return newCart;
+        } else {
+          // Different item? Replace the entire cart
+          if (prev.length > 0) {
+            toast.info("Subscriptions support 1 product type. Item replaced.");
+          }
+          return [newItem];
+        }
+      }
+
+      // NORMAL MODE: ORDERS
       if (existingIdx >= 0) {
         const newCart = [...prev];
         newCart[existingIdx].qty += 1;
         return newCart;
       }
-      // Add new
-      return [...prev, {
-        item: {
-          product_id: activeProduct.product_id,
-          variant_id: selectedVariant,
-          product_name: activeProduct.product_name, // Keeping names for UI rendering
-          variant_name: variantData?.variant_name || `${variantData?.quantity}${variantData?.unit}`,
-          price: variantData?.price || 0
-        },
-        qty: 1
-      }];
+      return [...prev, newItem];
     });
 
     // Reset selection
