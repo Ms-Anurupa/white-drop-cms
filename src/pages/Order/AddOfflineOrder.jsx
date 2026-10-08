@@ -1,6 +1,66 @@
-import { Hammer } from "lucide-react";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import OfflineSelectionBlock from "@/components/OflineOrderSubSelections/OfflineSelectionBlock";
+import offlineOrderStore from "@/zustand/Store/offlineOrderStore";
 
 const AddOfflineOrder = () => {
+  const navigate = useNavigate();
+  const { createOfflineOrder } = offlineOrderStore();
+  
+  const [formData, setFormData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSelectionChange = useCallback((data) => {
+    setFormData(data);
+  }, []);
+
+  const handleSubmit = async () => {
+    // 1. Validation before sending to the backend
+    if (!formData?.userUid || !formData?.addressId) {
+      toast.error("Please select a customer and an address.");
+      return;
+    }
+    if (!formData?.deliveryDate || !formData?.deliverySlotId) {
+      toast.error("Please select a delivery date and slot.");
+      return;
+    }
+    if (!formData?.cart || formData.cart.length === 0) {
+      toast.error("Please add at least one item to the cart.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Calculate total on the frontend just to pass it to the payload
+      const orderTotal = formData.cart.reduce(
+        (sum, c) => sum + c.item.price * c.qty, 
+        0
+      );
+
+      const payload = {
+        userUid: formData.userUid,
+        addressId: formData.addressId,
+        deliverySlotId: formData.deliverySlotId,
+        deliveryDate: new Date(formData.deliveryDate).toISOString(),
+        orderTotal: orderTotal,
+        cart: formData.cart
+      };
+
+      const res = await createOfflineOrder(payload);
+      
+      if (res.success) {
+        toast.success("Offline Order created successfully!");
+        navigate("/dashboard/orders"); // Send them back to the main orders list
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to create order");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 bg-gray-50 min-h-full">
       <div className="max-w-5xl mx-auto w-full space-y-6">
@@ -15,15 +75,25 @@ const AddOfflineOrder = () => {
           </p>
         </div>
 
-        {/* PLACEHOLDER CARD */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-            <Hammer className="text-blue-600" size={32} />
-          </div>
-          <h2 className="text-lg font-medium text-gray-900 mb-2">Order Creation Coming Soon</h2>
-          <p className="text-sm text-gray-500 max-w-sm mx-auto">
-            This module is currently under construction. You will be able to search for a customer, select products, manage the cart, and assign delivery dates here.
-          </p>
+        {/* THE MODULAR SELECTION BLOCK */}
+        <OfflineSelectionBlock 
+          mode="order" 
+          onChange={handleSelectionChange}
+        />
+
+        {/* SUBMIT ACTION ROW */}
+        <div className="flex justify-end pt-4">
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !formData?.cart?.length}
+            className="px-8 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
+          >
+            {loading ? (
+              "Processing..."
+            ) : (
+              "Place Offline Order"
+            )}
+          </button>
         </div>
 
       </div>
