@@ -85,6 +85,18 @@ const deliveryJobStore = create((set) => ({
       throw error;
     }
   },
+  manualTriggerDeliveryJobs: async () => {
+    try {
+      const res = await api.get("/admin/manualTriggerDeliveryJobs", {
+        withAuth: true,
+      });
+
+      set({ deliverySlots: res.data?.deliverySlots });
+    } catch (error) {
+      // console.log("products", error);
+      throw error;
+    }
+  },
 }));
 
 export default deliveryJobStore;
