@@ -104,7 +104,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel" }) => {
 
       {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-250 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md animate-in fade-in zoom-in-95 rounded-2xl bg-white shadow-xl duration-200">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
