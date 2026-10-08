@@ -243,7 +243,7 @@ const AdhocOrders = () => {
             type="button"
             onClick={() => {
               console.log("Navigating to create adhoc sale");
-              navigate("/dashboard/create-adhoc-sale");
+              navigate("/dashboard/adhoc-orders/create-adhoc-sale");
             }}
             className="cursor-pointer flex h-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 px-3 text-xs font-medium text-white shadow-sm transition hover:bg-blue-600 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           >

@@ -126,12 +126,14 @@ const App = () => {
                     element={<AddOfflineOrder />}
                   />
                 </Route>
-                <Route path="adhoc-orders" element={<AdhocOrders />} />
+                <Route path="adhoc-orders">
+                  <Route index element={<AdhocOrders />} />
+                  <Route path="create-adhoc-sale" element={<AdHocSaleForm />} />
+                </Route>
 
                 <Route path="subscription-orders">
                   <Route index element={<SubscriptionOrder />} />
-                  <Route path="/dashboard/create-adhoc-sale" element={<AdHocSaleForm />} />
-                <Route
+                  <Route
                     path="add-subscription-orders"
                     element={<AddOfflineSubscription />}
                   />
