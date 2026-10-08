@@ -714,7 +714,7 @@ const handleExport = async () => {
       <PageStyles />
 
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="relative z-[10000] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Order Management
@@ -955,7 +955,7 @@ const handleExport = async () => {
         {/* DESKTOP TABLE */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
-            <thead className="order-table-head sticky top-0 z-10 relative">
+            <thead className="order-table-head sticky top-0  relative" style={{zIndex:'999999'}}>
               <tr className="border-b border-transparent">
                 <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
                   Sl No.
@@ -977,7 +977,7 @@ const handleExport = async () => {
                   Customer
                 </th>
 
-                <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
+                <th className="w-34 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Order Status
                 </th>
 
