@@ -21,6 +21,7 @@ const AddOfflinePaymentModal = ({
   const addOfflinePayment = orderDataStore((state) => state.addOfflinePayment);
   const [paymentRec, setPaymentRec] = useState("");
   const [payMode, setPayMode] = useState("COD");
+  const [transactionId, setTransactionId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -49,6 +50,7 @@ const AddOfflinePaymentModal = ({
     if (isOpen) {
       setPaymentRec("");
       setPayMode("COD");
+      setTransactionId("");
       setError(null);
     }
   }, [isOpen, contextData]);
@@ -81,6 +83,11 @@ const AddOfflinePaymentModal = ({
        return;
     }
 
+    if (payMode !== "COD" && !transactionId.trim()) {
+       setError(`Please enter the ${payMode === "CHECK" ? "Check no" : "Transaction Id"}.`);
+       return;
+    }
+
     // 2. Submit Data
     try {
       setIsLoading(true);
@@ -92,6 +99,7 @@ const AddOfflinePaymentModal = ({
         paymentRec: Number(paymentRec),
         dueAfter,
         payMode,
+        refId: payMode !== "COD" ? transactionId : null,
       };
 
       // Call the Zustand store method
@@ -242,20 +250,47 @@ const AddOfflinePaymentModal = ({
                 />
                 <select
                   value={payMode}
-                  onChange={(e) => setPayMode(e.target.value)}
+                  onChange={(e) => {
+                    setPayMode(e.target.value);
+                    setTransactionId(""); // Clear the transaction ID field when switching modes
+                  }}
                   disabled={dueBefore <= 0}
                   className="h-9 w-full cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white pl-8 pr-8 text-sm text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="COD">COD (Cash on Delivery)</option>
-                  <option value="UPI">UPI Transfer</option>
-                  <option value="CASH">Direct Cash</option>
-                  <option value="CHEQUE">Cheque</option>
+                  <option value="COD">Cash</option>
+                  <option value="PG">UPI</option>
+                  <option value="CHECK">Check</option>
                 </select>
                 <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-l border-gray-200 pl-2">
                   <span className="text-[10px] text-gray-400">▼</span>
                 </div>
               </div>
             </div>
+
+            {/* CONDITIONAL TRANSACTION ID / CHECK NUMBER FIELD */}
+            {payMode !== "COD" && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-gray-600">
+                  {payMode === "CHECK" ? "Check no" : "Transaction Id"} <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <FileText
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    placeholder={payMode === "CHECK" ? "Enter check number" : "Enter transaction ID"}
+                    required
+                    disabled={dueBefore <= 0}
+                    className="h-9 w-full rounded-lg border border-gray-200 pl-8 pr-3 text-sm font-medium text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* FOOTER ACTIONS */}
