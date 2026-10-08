@@ -20,6 +20,7 @@ import {
 import adhocOrderStore from "@/zustand/Store/adhocOrderStore";
 import Loader from "@/components/Loader";
 import { useNavigate } from "react-router-dom";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const AdhocOrders = () => {
   const getAdHocSaleListing = adhocOrderStore(
@@ -221,6 +222,8 @@ const AdhocOrders = () => {
             <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
             Refresh
           </button>
+          <ExportExcelButton type="adhoc-sales" />
+
         </div>
 
         <div className="flex w-full items-center gap-2 lg:w-auto">

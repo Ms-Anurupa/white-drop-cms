@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import corporateDataStore from "../../zustand/Store/corporateDataStore";
 import Loader from "../../components/Loader";
 import { toast } from "react-toastify";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -498,6 +499,8 @@ const CorporateOrder = () => {
             <RefreshCw size={14} />
             Refresh
           </button>
+          <ExportExcelButton type="corp-orders" />
+          
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap gap-2 items-stretch sm:items-center">
