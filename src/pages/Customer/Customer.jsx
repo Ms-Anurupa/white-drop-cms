@@ -101,21 +101,28 @@ const Customer = () => {
   });
 
   useEffect(() => {
-    if (isPartialDateRange) return; // wait for the second date before calling
-    const load = async () => {
+    if (isPartialDateRange) return;
+
+    const loadCustomers = async () => {
       try {
         setLoading(true);
-        await getAllCustomers(buildQueryParams());
-        setPage(1);
+
+        await getAllCustomers({
+          search: debouncedSearch,
+          page,
+          limit: pageSize,
+          fromDate,
+          toDate,
+        });
       } catch (error) {
-        console.log(error);
+        console.error("Failed to load customers:", error);
       } finally {
         setLoading(false);
       }
     };
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, fromDate, toDate, getAllCustomers]);
+
+    loadCustomers();
+  }, [debouncedSearch, fromDate, toDate, page, pageSize, getAllCustomers]);
 
   const clearDates = () => {
     setFromDate("");
@@ -138,10 +145,7 @@ const Customer = () => {
     [customers],
   );
 
-  const totalPages = Math.max(
-    Math.ceil(filteredCustomers.length / pageSize),
-    1,
-  );
+  const totalPages = Math.max(Math.ceil(filteredCustomers.length / pageSize),1);
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * pageSize;
   const paginated = filteredCustomers.slice(start, start + pageSize);
