@@ -23,6 +23,7 @@ import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 import Loader from "@/components/Loader";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
@@ -556,6 +557,9 @@ const SubscriptionOrder = () => {
             <SquarePen size={16} />
             Add Offline Subscription
           </button>
+
+          <ExportExcelButton type="subs" />
+
         </div>
 
         <div className="flex w-full items-center gap-2 lg:w-auto">

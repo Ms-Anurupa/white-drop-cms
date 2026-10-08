@@ -186,7 +186,7 @@ const ViewSubscriptionDetails = () => {
         </p>
         <button
           onClick={() => navigate(-1)}
-          className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
+          className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-blue-700 cursor-pointer"
         >
           Go Back
         </button>
@@ -214,7 +214,7 @@ const ViewSubscriptionDetails = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 cursor-pointer"
             title="Go back"
           >
             <ArrowLeft size={16} />
