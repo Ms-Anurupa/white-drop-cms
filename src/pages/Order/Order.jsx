@@ -955,7 +955,7 @@ const handleExport = async () => {
         {/* DESKTOP TABLE */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
-            <thead className="order-table-head sticky top-0  relative" style={{zIndex:'999999'}}>
+            <thead className="order-table-head sticky top-0  relative" style={{zIndex:'1000'}}>
               <tr className="border-b border-transparent">
                 <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
                   Sl No.
