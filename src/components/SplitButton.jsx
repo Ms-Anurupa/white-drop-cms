@@ -245,7 +245,7 @@ export function SplitButton({
   return (
     <div
       ref={dropdownRef}
-      className={`relative z-[100] inline-flex min-w-0 max-w-full rounded-lg ${className}`}
+      className={`relative z-100 inline-flex min-w-0 max-w-full rounded-lg ${className}`}
     >
       <button
         type="button"
