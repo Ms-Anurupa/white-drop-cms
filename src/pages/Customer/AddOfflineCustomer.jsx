@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { User, Phone, MapPin, CheckCircle2, ChevronRight } from "lucide-react";
+import { User, Phone, MapPin, CheckCircle2, ChevronRight, ArrowLeft } from "lucide-react";
 import Loader from "../../components/Loader";
 import OfflineAddressForm from "@/components/OfflineAddressForm";
 import offlineOrderStore from "@/zustand/Store/offlineOrderStore";
@@ -40,7 +40,16 @@ const AddOfflineCustomer = () => {
       
       {/* 2. THE CENTERING WRAPPER: Limits max width and centers it horizontally */}
       <div className="max-w-5xl mx-auto w-full space-y-6">
-        
+        <button
+          onClick={() => navigate(-1)}
+          className="group mb-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-900"
+        >
+          <ArrowLeft
+            size={16}
+            className="transition-transform group-hover:-translate-x-0.5"
+          />
+          Back
+        </button>
         {/* HEADER */}
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">Add Offline Customer</h1>
