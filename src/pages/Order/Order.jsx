@@ -21,6 +21,8 @@ import Loader from "../../components/Loader";
 import DateFilter from "../../components/DateFilter";
 import { SplitButton, SplitButtonItem } from "../../components/SplitButton";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
+import excelStore from "@/zustand/Store/excelStore";
+import ExportExcelButton from "@/components/ExportExcelButton";
 
 const PAGE_SIZE_OPTIONS = [8, 15, 25, 50];
 
@@ -281,6 +283,7 @@ const PageStyles = () => (
 );
 
 const Order = () => {
+  const { isDownloading, downloadExcel } = excelStore();
   const getOrderListing = orderDataStore((state) => state.getOrderListing);
   const exportOrderDetails = orderDataStore(
     (state) => state.exportOrderDetails,
@@ -326,6 +329,27 @@ const Order = () => {
     setHoveredOrder(null);
     setPopoverPos(null);
   };
+
+const handleExport = async () => {
+  try {
+    await downloadExcel(
+      "order",
+      appliedFromDate || "",
+      appliedToDate || "",
+    );
+
+    toast.success("Order data exported successfully");
+  } catch (error) {
+    console.error("Failed to export orders:", error);
+
+    toast.error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to export order details",
+    );
+  }
+};
+
 
   const showPopover = (e, order, type) => {
     const anchor = e.currentTarget.getBoundingClientRect();
@@ -582,32 +606,32 @@ const Order = () => {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      const file = await exportOrderDetails();
+  // const handleExport = async () => {
+  //   try {
+  //     const file = await exportOrderDetails();
 
-      const url = window.URL.createObjectURL(file);
+  //     const url = window.URL.createObjectURL(file);
 
-      const link = document.createElement("a");
+  //     const link = document.createElement("a");
 
-      link.href = url;
-      link.download = "orders.xlsx";
+  //     link.href = url;
+  //     link.download = "orders.xlsx";
 
-      document.body.appendChild(link);
+  //     document.body.appendChild(link);
 
-      link.click();
+  //     link.click();
 
-      document.body.removeChild(link);
+  //     document.body.removeChild(link);
 
-      window.URL.revokeObjectURL(url);
+  //     window.URL.revokeObjectURL(url);
 
-      toast.success("Order data exported successfully");
-    } catch (error) {
-      console.error("Failed to export orders:", error);
+  //     toast.success("Order data exported successfully");
+  //   } catch (error) {
+  //     console.error("Failed to export orders:", error);
 
-      toast.error("Failed to export order details");
-    }
-  };
+  //     toast.error("Failed to export order details");
+  //   }
+  // };
 
   const handleStatusChange = async (order, newStatus) => {
     if (!newStatus || newStatus === order.orderStatus) {
@@ -690,7 +714,7 @@ const Order = () => {
       <PageStyles />
 
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="relative z-[10000] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
             Order Management
@@ -740,15 +764,15 @@ const Order = () => {
               Refresh
             </button>
             <button
-              onClick={()=>navigate("/dashboard/orders/add-offline-orders")}
+              onClick={() => navigate("/dashboard/orders/add-offline-orders")}
               disabled={refreshing}
               className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <SquarePen
-                size={16}
-              />
+              <SquarePen size={16} />
               Add Offline Order
             </button>
+
+            <ExportExcelButton type="orders" />
           </div>
         </div>
       </div>
@@ -931,7 +955,7 @@ const Order = () => {
         {/* DESKTOP TABLE */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
-            <thead className="order-table-head sticky top-0 z-10 relative">
+            <thead className="order-table-head sticky top-0  relative" style={{zIndex:'1000'}}>
               <tr className="border-b border-transparent">
                 <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
                   Sl No.
@@ -953,7 +977,7 @@ const Order = () => {
                   Customer
                 </th>
 
-                <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
+                <th className="w-34 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
                   Order Status
                 </th>
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-catch */
 import { create } from "zustand";
 import api from "../axios";
 
@@ -6,19 +5,42 @@ const customerStore = create((set) => ({
   customers: [],
   customerDetails: [],
 
-  getAllCustomers: async ({ search = "", fromDate, toDate }) => {
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalCount: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  },
+
+  getAllCustomers: async ({
+    search = "",
+    page = 1,
+    limit = 10,
+    fromDate = "",
+    toDate = "",
+  } = {}) => {
     try {
       const res = await api.get("/admin/getAllCustomers", {
         params: {
           search,
-          fromDate,
-          toDate,
+          page,
+          limit,
+          fromDate: fromDate || undefined,
+          toDate: toDate || undefined,
         },
         withAuth: true,
       });
+
+      const responseData = res.data?.data ?? res.data;
+
       set({
-        customers: res.data?.customers,
+        customers: responseData?.customers ?? [],
+        pagination: responseData?.pagination ?? {},
       });
+
+      return responseData;
     } catch (error) {
       throw error;
     }
