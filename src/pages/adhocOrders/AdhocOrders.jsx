@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import adhocOrderStore from "@/zustand/Store/adhocOrderStore";
 import Loader from "@/components/Loader";
+import { useNavigate } from "react-router-dom";
 
 const AdhocOrders = () => {
   const getAdHocSaleListing = adhocOrderStore(
@@ -37,6 +38,7 @@ const AdhocOrders = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const navigate = useNavigate();
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
@@ -236,6 +238,17 @@ const AdhocOrders = () => {
               className="h-8 w-full rounded-lg border border-gray-200 bg-white pl-8 pr-3 text-xs text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-500"
             />
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              console.log("Navigating to create adhoc sale");
+              navigate("/dashboard/create-adhoc-sale");
+            }}
+            className="cursor-pointer flex h-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 px-3 text-xs font-medium text-white shadow-sm transition hover:bg-blue-600 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          >
+            + Create Adhoc Sale
+          </button>
         </div>
       </div>
 
