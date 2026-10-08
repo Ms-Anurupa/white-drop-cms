@@ -10,15 +10,16 @@ import {
   Search,
   Truck,
   UserRound,
+  Download,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import deliveryJobStore from "../../zustand/Store/deliveryJobStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
 import Loader from "../../components/Loader";
 import { toast } from "react-toastify";
+import deliveryJobStore from "@/zustand/Store/deliveryJobStore";
 
-const DATE_FILTERS = ["TODAY", "UPCOMING", "HISTORY", "ALL"];
+const DATE_FILTERS = ["UPCOMING", "TODAY", "HISTORY", "ALL"];
 
 const STATUS_FILTERS = [
   "ALL",
@@ -94,13 +95,20 @@ const getStatusStyle = (status) =>
 
 const getStatusLabel = (status) => {
   switch (status) {
-    case "CREATED": return "Created";
-    case "ASSIGNED": return "Assigned";
-    case "PICKED_UP": return "Picked Up";
-    case "DELIVERED": return "Delivered";
-    case "FAILED": return "Failed";
-    case "CANCELLED": return "Cancelled";
-    default: return status || "Unknown";
+    case "CREATED":
+      return "Created";
+    case "ASSIGNED":
+      return "Assigned";
+    case "PICKED_UP":
+      return "Picked Up";
+    case "DELIVERED":
+      return "Delivered";
+    case "FAILED":
+      return "Failed";
+    case "CANCELLED":
+      return "Cancelled";
+    default:
+      return status || "Unknown";
   }
 };
 
@@ -125,23 +133,30 @@ const DeliveryJob = () => {
 
   const getDeliveryJobs = deliveryJobStore((state) => state.getDeliveryJobs);
   const deliveryJobs = deliveryJobStore((state) => state.deliveryJobs);
-  const changeDelijobStatus = deliveryJobStore((state) => state.changeDelijobStatus);
+  const changeDelijobStatus = deliveryJobStore(
+    (state) => state.changeDelijobStatus,
+  );
 
-  const manualTriggerDeliveryJobs = deliveryJobStore((state)=>state.manualTriggerDeliveryJobs)
+  const manualTriggerDeliveryJobs = deliveryJobStore(
+    (state) => state.manualTriggerDeliveryJobs,
+  );
 
   const [query, setQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState("TODAY");
+  const [dateFilter, setDateFilter] = useState("UPCOMING");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  
+
   const [loading, setLoading] = useState(true);
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
+
+  const getDeliveryJobRunSheetPdf = deliveryJobStore((state) => state.getDeliveryJobRunSheetPdf);
 
   // 1. Fetch from server whenever dateFilter changes
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
-        const filterParam = dateFilter === "ALL" ? undefined : dateFilter.toLowerCase();
+        const filterParam =
+          dateFilter === "ALL" ? undefined : dateFilter.toLowerCase();
         await getDeliveryJobs({ filter: filterParam });
       } catch (error) {
         console.error("Failed to load delivery jobs:", error);
@@ -156,7 +171,8 @@ const DeliveryJob = () => {
   // 2. Client-side filtering for status and search query
   const filteredJobs = useMemo(() => {
     return (deliveryJobs || []).filter((job) => {
-      const matchesStatus = statusFilter === "ALL" || job.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "ALL" || job.status === statusFilter;
       const q = query.trim().toLowerCase();
       const matchesQuery =
         !q ||
@@ -168,12 +184,15 @@ const DeliveryJob = () => {
   }, [deliveryJobs, statusFilter, query]);
 
   const totalJobs = deliveryJobs?.length || 0;
-  const assignedCount = deliveryJobs?.filter((job) => job.deliveryPartner).length || 0;
+  const assignedCount =
+    deliveryJobs?.filter((job) => job.deliveryPartner).length || 0;
 
   // Updated to count both orders and subscriptions!
-  const totalDeliveries = deliveryJobs?.reduce(
-      (total, job) => total + (job.orders?.length || 0) + (job.subs?.length || 0),
-      0
+  const totalDeliveries =
+    deliveryJobs?.reduce(
+      (total, job) =>
+        total + (job.orders?.length || 0) + (job.subs?.length || 0),
+      0,
     ) || 0;
 
   const stats = [
@@ -202,29 +221,40 @@ const DeliveryJob = () => {
 
   const canChangeStatus = (job) => {
     const hasDeliveryPartner = Boolean(job?.deliveryPartner);
-    const hasTasks = (job?.orders?.length || 0) > 0 || (job?.subs?.length || 0) > 0;
+    const hasTasks =
+      (job?.orders?.length || 0) > 0 || (job?.subs?.length || 0) > 0;
     return hasDeliveryPartner && hasTasks;
   };
 
   const isOrderAdditionLocked = (job) => {
-    return ["PICKED_UP", "DELIVERED", "FAILED", "CANCELLED"].includes(job?.status);
+    return ["PICKED_UP", "DELIVERED", "FAILED", "CANCELLED"].includes(
+      job?.status,
+    );
   };
 
   const getAddOrderDisabledMessage = (job) => {
-    if (job?.status === "PICKED_UP") return "Tasks cannot be added after the job is picked up.";
-    if (job?.status === "DELIVERED") return "Tasks cannot be added to a delivered job.";
-    if (job?.status === "FAILED") return "Tasks cannot be added to a failed job.";
-    if (job?.status === "CANCELLED") return "Tasks cannot be added to a cancelled job.";
+    if (job?.status === "PICKED_UP")
+      return "Tasks cannot be added after the job is picked up.";
+    if (job?.status === "DELIVERED")
+      return "Tasks cannot be added to a delivered job.";
+    if (job?.status === "FAILED")
+      return "Tasks cannot be added to a failed job.";
+    if (job?.status === "CANCELLED")
+      return "Tasks cannot be added to a cancelled job.";
     return "";
   };
 
   const getStatusDisabledMessage = (job) => {
     const hasDeliveryPartner = Boolean(job?.deliveryPartner);
-    const hasTasks = (job?.orders?.length || 0) > 0 || (job?.subs?.length || 0) > 0;
+    const hasTasks =
+      (job?.orders?.length || 0) > 0 || (job?.subs?.length || 0) > 0;
 
-    if (!hasDeliveryPartner && !hasTasks) return "Assign a partner and add at least one task to change status.";
-    if (!hasDeliveryPartner) return "Assign a delivery partner to change the status.";
-    if (!hasTasks) return "Add at least one delivery task to change the status.";
+    if (!hasDeliveryPartner && !hasTasks)
+      return "Assign a partner and add at least one task to change status.";
+    if (!hasDeliveryPartner)
+      return "Assign a delivery partner to change the status.";
+    if (!hasTasks)
+      return "Add at least one delivery task to change the status.";
     return "";
   };
 
@@ -245,16 +275,70 @@ const DeliveryJob = () => {
     try {
       setUpdatingStatusId(deliveryJobId);
       await changeDelijobStatus({ jobId: deliveryJobId, status: newStatus });
-      toast.success(`Delivery job status changed to ${getStatusLabel(newStatus)}.`);
-      
+      toast.success(
+        `Delivery job status changed to ${getStatusLabel(newStatus)}.`,
+      );
+
       // Re-fetch with current date filter
-      const filterParam = dateFilter === "ALL" ? undefined : dateFilter.toLowerCase();
+      const filterParam =
+        dateFilter === "ALL" ? undefined : dateFilter.toLowerCase();
       await getDeliveryJobs({ filter: filterParam });
     } catch (error) {
       console.error("Failed to update status:", error);
-      toast.error(error?.response?.data?.message || "Failed to update delivery job status.");
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to update delivery job status.",
+      );
     } finally {
       setUpdatingStatusId(null);
+    }
+  };
+  
+  const handleDownloadJobSheet = async (jobId, jobName, e) => {
+    e.stopPropagation(); // Prevent card clicks if you have them
+
+    const toastId = toast.loading("Generating Run Sheet...");
+
+    try {
+      const pdfBlob = await getDeliveryJobRunSheetPdf(jobId);
+
+      if (!pdfBlob) {
+        throw new Error("PDF data is empty.");
+      }
+
+      // Ensure we have a Blob
+      const blob = pdfBlob instanceof Blob
+          ? pdfBlob
+          : new Blob([pdfBlob], { type: "application/pdf" });
+
+      // Create a temporary URL
+      const pdfUrl = window.URL.createObjectURL(blob);
+
+      // Open the PDF in a new tab
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      
+      // Cleanup the URL object after a minute to free memory
+      setTimeout(() => {
+        window.URL.revokeObjectURL(pdfUrl);
+      }, 60000);
+
+      toast.update(toastId, { 
+        render: "Run Sheet generated successfully!", 
+        type: "success", 
+        isLoading: false, 
+        autoClose: 2000 
+      });
+
+    } catch (error) {
+      toast.dismiss();
+      
+      // Handle the IDM extension hijack
+      if (error.message === "Network Error" || error.code === "ERR_NETWORK") {
+        toast.success("Download started via Download Manager.", { autoClose: 3000 });
+      } else {
+        console.error("Failed to generate Run Sheet PDF:", error);
+        toast.error("Failed to generate the run sheet.");
+      }
     }
   };
 
@@ -266,7 +350,7 @@ const DeliveryJob = () => {
     <div className="w-full min-h-full bg-slate-50 p-4 sm:p-4 lg:p-4">
       <div className="max-w-7xl mx-auto">
         {/* ================= HEADER ================= */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#3B5CCC] hover:bg-[#334FB3] mb-2 px-6 sm:px-8 py-4">
+        <div className="relative overflow-hidden rounded-2xl bg-[#3B5CCC] hover:bg-[#334FB3] mb-2 px-6 sm:px-8 py-4 cursor-default">
           <svg
             className="absolute inset-0 w-full h-full opacity-[0.15] pointer-events-none"
             preserveAspectRatio="none"
@@ -293,7 +377,7 @@ const DeliveryJob = () => {
                   <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                     Delivery Jobs
                   </h1>
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full cursor-default">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
@@ -301,15 +385,13 @@ const DeliveryJob = () => {
                     Live
                   </span>
                 </div>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-slate-400 mt-1 cursor-default">
                   Manage delivery jobs and assign delivery partners
                 </p>
               </div>
             </div>
             <button
-              onClick={() =>
-                manualTriggerDeliveryJobs()
-              }
+              onClick={() => manualTriggerDeliveryJobs()}
               className="h-8 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <RefreshCcw size={16} />
@@ -330,7 +412,7 @@ const DeliveryJob = () => {
         </div>
 
         {/* ================= SUMMARY ================= */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-2">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-2 cursor-default">
           {stats.map(({ label, value, icon: Icon, tint, chip }) => (
             <div
               key={label}
@@ -358,7 +440,7 @@ const DeliveryJob = () => {
           {/* List Header + Double Filters Row */}
           <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex flex-col gap-4">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
+              <div className="cursor-default">
                 <h2 className="text-base font-semibold text-slate-900">
                   Delivery Jobs
                 </h2>
@@ -379,12 +461,12 @@ const DeliveryJob = () => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search by job or area"
-                    className="w-full sm:w-56 pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                    className="cursor-text w-full sm:w-56 pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
                   />
                 </div>
 
                 <div className="flex items-center gap-1.5 overflow-x-auto">
-                  <span className="text-xs text-slate-400 font-medium px-1">
+                  <span className="text-xs text-slate-400 font-medium px-1 cursor-default">
                     Date:
                   </span>
                   {DATE_FILTERS.map((d) => (
@@ -409,7 +491,7 @@ const DeliveryJob = () => {
 
             {/* STATUS FILTERS (Client-side) */}
             <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-slate-50">
-              <span className="text-xs text-slate-400 font-medium px-1">
+              <span className="text-xs text-slate-400 font-medium px-1 cursor-default">
                 Status:
               </span>
               {STATUS_FILTERS.map((s) => (
@@ -435,7 +517,7 @@ const DeliveryJob = () => {
               <Loader2 className="animate-spin text-blue-500" size={30} />
             </div>
           ) : !filteredJobs?.length ? (
-            <div className="py-16 px-6 text-center">
+            <div className="py-16 px-6 text-center cursor-default">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
                 <Truck size={25} />
               </div>
@@ -467,25 +549,32 @@ const DeliveryJob = () => {
                     <span
                       className={`absolute left-0 top-0 bottom-0 w-1 ${style.bar} opacity-70 group-hover:opacity-100 transition-opacity`}
                     />
-                    <div className="flex flex-col xl:flex-row xl:items-center gap-5">
-                      <div className="flex-1 min-w-0">
-                        {/* Job name + status */}
-                        <div className="flex items-center justify-between gap-3 mb-4 w-full">
-                          <h3 className="text-sm sm:text-base font-semibold text-slate-900 shrink-0">
+                    <div className="flex flex-col gap-4">
+                      {/* ================= JOB CARD HEADER (Refactored for Responsiveness) ================= */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 w-full">
+                        {/* Title and Download Button side */}
+                        <div className="flex items-center justify-between md:justify-start gap-4">
+                          <h3 className="text-sm sm:text-base font-semibold text-slate-900 shrink-0 truncate cursor-default">
                             {job.name}
                           </h3>
+                        </div>
 
-                          <div className="flex-1 flex justify-center px-3 min-w-0">
-                            {!statusChangeAllowed && (
-                              <div className="flex items-center gap-1 text-[10px] text-amber-600 text-center truncate">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                                <span className="truncate">
-                                  {statusDisabledMessage}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                        {/* Status Select & Download Button side */}
+                        <div className="flex items-center gap-2 shrink-0 self-start md:self-auto">
+                          {/* New Download Job Sheet Button */}
+                          <button
+                            type="button"
+                            title="Download Job Sheet"
+                            onClick={(e) => handleDownloadJobSheet(job.id, job.name, e)}
+                            className="cursor-pointer inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all"
+                          >
+                            <Download size={14} className="sm:mr-1.5" />
+                            <span className="hidden sm:inline text-xs font-semibold">
+                              Sheet
+                            </span>
+                          </button>
 
+                          {/* Status Dropdown */}
                           <div className="relative flex items-center shrink-0">
                             {isUpdating && (
                               <Loader2
@@ -506,7 +595,11 @@ const DeliveryJob = () => {
                               }
                               className={`
                                 rounded-lg border px-3 py-1.5 text-xs font-semibold outline-none transition-all
-                                ${statusChangeAllowed ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
+                                ${
+                                  statusChangeAllowed
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed opacity-60"
+                                }
                                 disabled:cursor-not-allowed
                                 ${
                                   job.status === "PICKED_UP"
@@ -531,206 +624,217 @@ const DeliveryJob = () => {
                             </select>
                           </div>
                         </div>
+                      </div>
 
-                        {/* ================= INFORMATION ================= */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
-                          {/* Area */}
-                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
-                            <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-                              <MapPin size={17} className="text-slate-500" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">
-                                Area
-                              </p>
-                              <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
-                                {job.area || "—"}
-                              </p>
-                            </div>
+                      {/* Warning message detached from top flex row to prevent crowding */}
+                      {!statusChangeAllowed && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-amber-600 bg-amber-50 px-2 py-1 rounded-md w-fit max-w-full cursor-default">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="truncate">
+                            {statusDisabledMessage}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* ================= INFORMATION GRID (Refactored for Responsiveness) ================= */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-stretch cursor-default mt-2">
+                        {/* Area */}
+                        <div className="flex items-start gap-3 p-2">
+                          <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                            <MapPin size={17} className="text-slate-500" />
                           </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wide">
+                              Area
+                            </p>
+                            <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
+                              {job.area || "—"}
+                            </p>
+                          </div>
+                        </div>
 
-                          {/* Date */}
-                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
-                            <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-                              <CalendarDays
-                                size={17}
-                                className="text-slate-500"
+                        {/* Date */}
+                        <div className="flex items-start gap-3 p-2">
+                          <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
+                            <CalendarDays
+                              size={17}
+                              className="text-slate-500"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wide">
+                              Delivery Date
+                            </p>
+                            <p className="text-sm font-medium text-slate-800 mt-0.5">
+                              {formatDate(job.deliveryDate)}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Slot */}
+                        <div className="flex items-start gap-3 p-2">
+                          <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
+                            {job.slot?.icon ? (
+                              <img
+                                src={resolveFirebaseUrl({
+                                  folderName: "public",
+                                  fileName: job.slot.icon,
+                                })}
+                                alt={job.slot.name}
+                                className="w-6 h-6 object-contain"
                               />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">
-                                Delivery Date
-                              </p>
-                              <p className="text-sm font-medium text-slate-800 mt-0.5">
-                                {formatDate(job.deliveryDate)}
-                              </p>
-                            </div>
+                            ) : (
+                              <Clock3 size={17} className="text-blue-600" />
+                            )}
                           </div>
-
-                          {/* Slot */}
-                          <div className="flex items-start gap-3 p-2.5 -m-2.5">
-                            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
-                              {job.slot?.icon ? (
-                                <img
-                                  src={resolveFirebaseUrl({
-                                    folderName: "public",
-                                    fileName: job.slot.icon,
-                                  })}
-                                  alt={job.slot.name}
-                                  className="w-6 h-6 object-contain"
-                                />
-                              ) : (
-                                <Clock3 size={17} className="text-blue-600" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">
-                                Delivery Slot
+                          <div className="min-w-0">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wide">
+                              Delivery Slot
+                            </p>
+                            <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
+                              {job.slot?.name || "—"}
+                            </p>
+                            {job.slot?.from && job.slot?.to && (
+                              <p className="text-xs text-slate-400 mt-0.5">
+                                {job.slot.from} - {job.slot.to}
                               </p>
-                              <p className="text-sm font-medium text-slate-800 mt-0.5 truncate">
-                                {job.slot?.name || "—"}
-                              </p>
-                              {job.slot?.from && job.slot?.to && (
-                                <p className="text-xs text-slate-400 mt-0.5">
-                                  {job.slot.from} - {job.slot.to}
-                                </p>
-                              )}
-                            </div>
+                            )}
                           </div>
+                        </div>
 
-                          {/* Orders */}
-                          <div
-                            className={`flex flex-col gap-2 px-2.5 py-2 -m-2.5 rounded-xl border transition-colors duration-200 ${
-                              isOrderAdditionLocked(job)
-                                ? "border-slate-100 bg-slate-50/50"
-                                : "border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/60"
-                            }`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div
-                                className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                                  isOrderAdditionLocked(job)
-                                    ? "bg-slate-100"
-                                    : "bg-emerald-50"
-                                }`}
-                              >
-                                <Package
-                                  size={17}
-                                  className={
-                                    isOrderAdditionLocked(job)
-                                      ? "text-slate-400"
-                                      : "text-emerald-600"
-                                  }
-                                />
-                              </div>
-
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-slate-800 mt-0.5">
-                                  {job.orders?.length || 0}{" "}
-                                  <span className="text-slate-400 font-normal">
-                                    {(job.orders?.length || 0) === 1
-                                      ? "order"
-                                      : "orders"}
-                                  </span>
-                                </p>
-                                <p className="text-sm font-medium text-slate-800 mt-0.5">
-                                  {job.subs?.length || 0}{" "}
-                                  <span className="text-slate-400 font-normal">
-                                    {(job.subs?.length || 0) === 1
-                                      ? "subscription"
-                                      : "subs"}
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-
-                            <button
-                              type="button"
-                              disabled={isOrderAdditionLocked(job)}
-                              title={
-                                isOrderAdditionLocked(job)
-                                  ? getAddOrderDisabledMessage(job)
-                                  : "Add order"
-                              }
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isOrderAdditionLocked(job)) {
-                                  toast.warning(
-                                    getAddOrderDisabledMessage(job),
-                                  );
-                                  return;
-                                }
-                                navigate(
-                                  `/dashboard/delivery-job/${job.id}/add-orders`,
-                                  { state: { job } },
-                                );
-                              }}
-                              className={`
-                                w-full inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-150
-                                ${
-                                  isOrderAdditionLocked(job)
-                                    ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                                    : "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] cursor-pointer"
-                                }
-                              `}
-                            >
-                              <Plus size={13} strokeWidth={2.5} />
-                              <span>
-                                {isOrderAdditionLocked(job)
-                                  ? "Tasks Locked"
-                                  : "Add Task"}
-                              </span>
-                            </button>
-                          </div>
-
-                          {/* Delivery Partner */}
-                          <div className="flex items-start gap-3 p-2.5 -m-2.5 rounded-xl border border-slate-100 hover:border-violet-200 hover:bg-violet-50/60 transition-colors duration-200">
+                        {/* Orders */}
+                        <div
+                          className={`flex flex-col gap-2 p-3 rounded-xl border transition-colors duration-200 ${
+                            isOrderAdditionLocked(job)
+                              ? "border-slate-100 bg-slate-50/50"
+                              : "border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/60"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
                             <div
-                              className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold ${
-                                job.deliveryPartner
-                                  ? "bg-violet-100 text-violet-700"
-                                  : "bg-slate-200 text-slate-500"
+                              className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                                isOrderAdditionLocked(job)
+                                  ? "bg-slate-100"
+                                  : "bg-emerald-50"
                               }`}
                             >
-                              {getInitials(job.deliveryPartner)}
+                              <Package
+                                size={17}
+                                className={
+                                  isOrderAdditionLocked(job)
+                                    ? "text-slate-400"
+                                    : "text-emerald-600"
+                                }
+                              />
                             </div>
+
                             <div className="min-w-0 flex-1">
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wide">
-                                Delivery Partner
+                              <p className="text-sm font-medium text-slate-800 mt-0.5">
+                                {job.orders?.length || 0}{" "}
+                                <span className="text-slate-400 font-normal">
+                                  {(job.orders?.length || 0) === 1
+                                    ? "order"
+                                    : "orders"}
+                                </span>
                               </p>
-                              <div className="flex items-center justify-between gap-2 mt-0.5">
-                                <p className="text-sm font-medium text-slate-800 truncate">
-                                  {job.deliveryPartner
-                                    ? `${job.deliveryPartner.firstName || job.deliveryPartner.first_name || ""} ${
-                                        job.deliveryPartner.lastName ||
-                                        job.deliveryPartner.last_name ||
-                                        ""
-                                      }`.trim() || "Assigned"
-                                    : "Not Assigned"}
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(
-                                      `/dashboard/delivery-job/${job.id}/assign-partner`,
-                                    );
-                                  }}
-                                  className="
-                                    shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full
-                                    bg-white border border-violet-200 text-violet-600
-                                    hover:bg-violet-600 hover:text-white hover:border-violet-600
-                                    active:scale-95 transition-all duration-150 cursor-pointer
-                                  "
-                                  title={
-                                    job.deliveryPartner
-                                      ? "View job"
-                                      : "Assign partner"
-                                  }
-                                >
-                                  <ChevronRight size={13} />
-                                </button>
-                              </div>
+                              <p className="text-sm font-medium text-slate-800 mt-0.5">
+                                {job.subs?.length || 0}{" "}
+                                <span className="text-slate-400 font-normal">
+                                  {(job.subs?.length || 0) === 1
+                                    ? "subscription"
+                                    : "subs"}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={isOrderAdditionLocked(job)}
+                            title={
+                              isOrderAdditionLocked(job)
+                                ? getAddOrderDisabledMessage(job)
+                                : "Add order"
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isOrderAdditionLocked(job)) {
+                                toast.warning(getAddOrderDisabledMessage(job));
+                                return;
+                              }
+                              navigate(
+                                `/dashboard/delivery-job/${job.id}/add-orders`,
+                                {
+                                  state: { job },
+                                },
+                              );
+                            }}
+                            className={`
+        w-full inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-150
+        ${
+          isOrderAdditionLocked(job)
+            ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+            : "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98] cursor-pointer"
+        }
+      `}
+                          >
+                            <Plus size={13} strokeWidth={2.5} />
+                            <span>
+                              {isOrderAdditionLocked(job)
+                                ? "Tasks Locked"
+                                : "Add Task"}
+                            </span>
+                          </button>
+                        </div>
+
+                        {/* Delivery Partner */}
+                        <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:border-violet-200 hover:bg-violet-50/60 transition-colors duration-200">
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold ${
+                              job.deliveryPartner
+                                ? "bg-violet-100 text-violet-700"
+                                : "bg-slate-200 text-slate-500"
+                            }`}
+                          >
+                            {getInitials(job.deliveryPartner)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wide">
+                              Delivery Partner
+                            </p>
+                            <div className="flex items-center justify-between gap-2 mt-0.5">
+                              <p className="text-sm font-medium text-slate-800 truncate">
+                                {job.deliveryPartner
+                                  ? `${job.deliveryPartner.firstName || job.deliveryPartner.first_name || ""} ${
+                                      job.deliveryPartner.lastName ||
+                                      job.deliveryPartner.last_name ||
+                                      ""
+                                    }`.trim() || "Assigned"
+                                  : "Not Assigned"}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(
+                                    `/dashboard/delivery-job/${job.id}/assign-partner`,
+                                  );
+                                }}
+                                className="
+            cursor-pointer
+            shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full
+            bg-white border border-violet-200 text-violet-600
+            hover:bg-violet-600 hover:text-white hover:border-violet-600
+            active:scale-95 transition-all duration-150
+          "
+                                title={
+                                  job.deliveryPartner
+                                    ? "View job"
+                                    : "Assign partner"
+                                }
+                              >
+                                <ChevronRight size={13} />
+                              </button>
                             </div>
                           </div>
                         </div>

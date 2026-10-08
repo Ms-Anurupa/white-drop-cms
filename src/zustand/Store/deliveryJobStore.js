@@ -97,6 +97,23 @@ const deliveryJobStore = create((set) => ({
       throw error;
     }
   },
+
+  getDeliveryJobRunSheetPdf: async (id) => {
+    try {
+      const res = await api.get("/admin/getDeliJobRunSheet", {
+        params: {
+          deliveryJobId: id,
+        },
+        withAuth: true,
+        responseType: "blob",
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("PDF API error:", error);
+      throw error;
+    }
+  },
 }));
 
 export default deliveryJobStore;
