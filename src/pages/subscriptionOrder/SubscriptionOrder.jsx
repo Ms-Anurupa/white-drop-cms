@@ -17,6 +17,7 @@ import {
   Repeat,
   Undo2,
   X,
+  SquarePen,
 } from "lucide-react";
 import subscriptionStore from "../../zustand/Store/subscriptionStore";
 import { resolveFirebaseUrl } from "../../utils/resolveUrl";
@@ -275,7 +276,7 @@ const SubscriptionOrder = () => {
   const itemsPerPage = Math.max(1, Number(paginationData?.itemsPerPage));
   const dateCounts = paginationData?.dateCounts || {};
   const [loading, setLoading] = useState(true);
-const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   const getDateCount = (key) => {
     if (key === "all") {
@@ -328,10 +329,10 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
         setPage(1);
       } catch (error) {
         console.error("Failed to load subscriptions:", error);
-      }finally {
-      setLoading(false);
-      setInitialLoadDone(true);
-    }
+      } finally {
+        setLoading(false);
+        setInitialLoadDone(true);
+      }
     }, 400);
 
     return () => clearTimeout(timer);
@@ -513,9 +514,9 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
     return <Loader text="Loading subscription order history lists..." />;
   }
 
-  const  handleDetailsNavigate = ((subId)=>{
-    navigate(`/dashboard/subscription-details/${subId}`)
-  })
+  const handleDetailsNavigate = (subId) => {
+    navigate(`/dashboard/subscription-details/${subId}`);
+  };
 
   return (
     <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3">
@@ -547,6 +548,13 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
               className={subscriptionLoading ? "animate-spin" : ""}
             />
             Refresh
+          </button>
+          <button
+            onClick={() => navigate("/dashboard/subscription-orders/add-subscription-orders")}
+            className="h-8 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <SquarePen size={16} />
+            Add Offline Subscription
           </button>
         </div>
 
@@ -1074,55 +1082,58 @@ const [initialLoadDone, setInitialLoadDone] = useState(false);
                       </td>
 
                       {/* STATUS */}
-                      <td className="px-2 py-2">
-                        <SplitButton
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => {}}
-                          menuContent={
-                            <div className="relative z-[100]">
-                              {STATUS_OPTIONS.map((option) => (
-                                <SplitButtonItem
-                                  key={option.value}
-                                  onClick={(e) =>{
-                                    e.stopPropagation();
-                                    handleStatusChange(item, option.value);
-                                  }}
-                                >
-                                  <div className="flex w-full items-center justify-between gap-3">
-                                    <div className="flex items-center gap-2">
-                                      <span
-                                        className={`h-1.5 w-1.5 rounded-full ${option.dot}`}
-                                      />
-
-                                      <span>{option.label}</span>
-                                    </div>
-
-                                    {rowStatus === option.value && (
-                                      <span className="text-blue-600">✓</span>
-                                    )}
-                                  </div>
-                                </SplitButtonItem>
-                              ))}
-                            </div>
-                          }
+                      <td className="px-1 py-3">
+                        {" "}
+                        {/* or whatever your td classes are */}
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                         >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                STATUS_DOTS[rowStatus] || "bg-gray-400"
-                              }`}
-                            />
+                          <SplitButton
+                            variant="outline"
+                            className="w-full"
+                            menuContent={
+                              <div className="relative z-[100]">
+                                {STATUS_OPTIONS.map((option) => (
+                                  <SplitButtonItem
+                                    key={option.value}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      handleStatusChange(item, option.value);
+                                    }}
+                                  >
+                                    <div className="flex w-full items-center justify-between gap-3">
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          className={`h-1.5 w-1.5 rounded-full ${option.dot}`}
+                                        />
+                                        <span>{option.label}</span>
+                                      </div>
 
-                            <span className="truncate">
-                              {formatStatusLabel(rowStatus)}
-                            </span>
-                          </div>
-                        </SplitButton>
-
-                        <p className="mt-1 truncate text-[10px] text-gray-400">
-                          Created {formatShortDate(item?.createdAt)}
-                        </p>
+                                      {rowStatus === option.value && (
+                                        <span className="text-blue-600">✓</span>
+                                      )}
+                                    </div>
+                                  </SplitButtonItem>
+                                ))}
+                              </div>
+                            }
+                          >
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`h-1.5 w-1.5 rounded-full ${
+                                  STATUS_DOTS[rowStatus] || "bg-gray-400"
+                                }`}
+                              />
+                              <span className="truncate">
+                                {formatStatusLabel(rowStatus)}
+                              </span>
+                            </div>
+                          </SplitButton>
+                        </div>
                       </td>
                     </tr>
                   );

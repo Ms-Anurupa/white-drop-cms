@@ -5,6 +5,7 @@ import api from "../axios";
 
 const offlineOrderStore = create((set) => ({
   customers: [],
+  activeSubPlans: [],
   searchMeta: {
     nextCursor: null,
     hasNextPage: false,
@@ -106,6 +107,48 @@ const offlineOrderStore = create((set) => ({
 
       return res.data;
     } catch (error) {
+      throw error;
+    }
+  },
+  fetchActiveSubPlans: async () => {
+    try {
+      const res = await api.get("/admin/getActiveSubPlans", {
+        withAuth: true,
+      });
+
+      // Assuming your backend returns { success: true, data: [...] }
+      const plans = res.data?.subPlans || [];
+      
+      set({ activeSubPlans: plans });
+      return plans;
+      
+    } catch (error) {
+      console.error("Failed to fetch active subscription plans:", error);
+      throw error;
+    }
+  },
+
+  getSubscriptionPricing: async (payload) => {
+    try {
+      const res = await api.post("/admin/getSubscriptionPricing", payload, {
+        withAuth: true, 
+      });
+      return res.data; 
+    } catch (error) {
+      console.error("Failed to fetch subscription pricing:", error);
+      throw error;
+    }
+  },
+
+  createOfflineSubscription: async (payload) => {
+    try {
+      const res = await api.post("/admin/createOfflineSubscription", payload, {
+        withAuth: true,
+      });
+      
+      return res.data;
+    } catch (error) {
+      console.error("Failed to create offline subscription:", error);
       throw error;
     }
   },
