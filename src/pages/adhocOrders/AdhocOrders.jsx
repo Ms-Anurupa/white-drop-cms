@@ -90,11 +90,10 @@ const AdhocOrders = () => {
   const endItem =
     totalCount === 0 ? 0 : Math.min(offset + orders.length, totalCount);
   const hasPrevious = page > 1;
-  const hasNext = Boolean(meta?.hasMore) || page < totalPages;
+  const hasNext = page < totalPages;
 
   const formatCurrency = (value) => {
     const amount = Number(value);
-
     if (Number.isNaN(amount)) {
       return "₹0";
     }
@@ -242,7 +241,6 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => {
-              console.log("Navigating to create adhoc sale");
               navigate("/dashboard/adhoc-orders/create-adhoc-sale");
             }}
             className="cursor-pointer flex h-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 px-3 text-xs font-medium text-white shadow-sm transition hover:bg-blue-600 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/30"
@@ -408,12 +406,8 @@ const AdhocOrders = () => {
       </div>
 
       {/* TABLE */}
-      <div
-        className={`overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb] dark:border-slate-800 ${
-          orders.length > 0 ? "max-h-[calc(100vh-245px)]" : ""
-        }`}
-      >
-        <div className="overflow-auto">
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb] dark:border-slate-800">
+        <div className="min-h-0 flex-1 overflow-auto">
           <table className="w-full min-w-[1050px] table-fixed text-xs">
             <thead className="sticky top-0 z-10 bg-[#274de4]">
               <tr className="border-b border-gray-300">
@@ -562,7 +556,9 @@ const AdhocOrders = () => {
                           {getItemCount(order)}
                         </span>
 
-                        <span className="text-[10px] text-gray-400">qty</span>
+                        <span className="text-[10px] font-medium text-gray-500 dark:text-slate-400">
+                          {order?.details?.[0]?.unit || "Unit"}
+                        </span>
                       </div>
                     </td>
 
@@ -677,7 +673,7 @@ const AdhocOrders = () => {
             <button
               type="button"
               disabled={!hasNext || isLoading}
-              onClick={() => setPage(totalPages > 0 ? totalPages : page)}
+              onClick={() => setPage(totalPages)}
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
             >
               <ChevronsRight size={14} />
@@ -702,10 +698,6 @@ const AdhocOrders = () => {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Adhoc Order Details
                 </h2>
-
-                {/* <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
-                  Order ID: {selectedOrder?.id || "-"}
-                </p> */}
               </div>
 
               <button
@@ -832,7 +824,7 @@ const AdhocOrders = () => {
                         selectedOrder.details.length === 0) && (
                         <tr>
                           <td
-                            colSpan={6}
+                            colSpan={4}
                             className="px-4 py-8 text-center text-sm text-gray-500 dark:text-slate-400"
                           >
                             No item details available

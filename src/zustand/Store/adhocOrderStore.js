@@ -5,7 +5,7 @@ import api from "../axios";
 
 const adhocOrderStore = create((set) => ({
   orders: [],
-
+  meta: {},
   loading: false,
 
   meta: {
@@ -20,54 +20,28 @@ const adhocOrderStore = create((set) => ({
   },
   status: { type: null, message: "", errors: null },
 
-  getAdHocSaleListing: async ({
-    search = "",
-    page = 1,
-    limit = 10,
-    dateFilter = "",
-    startDate = "",
-    endDate = "",
-  } = {}) => {
+  getAdHocSaleListing: async (params) => {
     try {
       set({ loading: true });
 
-      const res = await api.get("/admin/getAdHocSaleListing", {
+      const response = await api.get("/admin/getAdHocSaleListing", {
+        params,
         withAuth: true,
-        params: {
-          search,
-          page,
-          limit,
-          dateFilter,
-          startDate,
-          endDate,
-        },
       });
 
-      const responseData = res?.data?.data || {};
-
-      const list = Array.isArray(responseData?.list) ? responseData.list : [];
-
-      const pagination = responseData?.pagination || {};
-      const summary = responseData?.meta || {};
+      const result = response?.data?.data;
 
       set({
-        orders: list,
-
+        orders: result?.list || [],
         meta: {
-          totalCount: Number(pagination?.totalCount ?? 0),
-          limit: Number(pagination?.limit ?? limit),
-          offset: Number(pagination?.offset ?? (page - 1) * limit),
-          hasMore: Boolean(pagination?.hasMore),
-
-          today: Number(summary?.today ?? 0),
-          yesterday: Number(summary?.yesterday ?? 0),
-          thisWeek: Number(summary?.thisWeek ?? 0),
-          thisMonth: Number(summary?.thisMonth ?? 0),
+          ...result?.meta,
+          ...result?.pagination,
         },
       });
 
-      return res?.data;
+      return result;
     } catch (error) {
+      console.error("Failed to fetch adhoc sales:", error);
       throw error;
     } finally {
       set({ loading: false });
