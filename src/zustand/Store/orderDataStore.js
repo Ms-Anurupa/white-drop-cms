@@ -26,6 +26,7 @@ const orderDataStore = create((set) => ({
     limit = 10,
     fromDate = "",
     toDate = "",
+    dateFilterType
   } = {}) => {
     try {
       set({ loading: true });
@@ -39,6 +40,7 @@ const orderDataStore = create((set) => ({
           limit,
           fromDate,
           toDate,
+          dateFilterType
         },
       });
 

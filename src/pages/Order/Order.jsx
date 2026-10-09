@@ -308,6 +308,7 @@ const Order = () => {
   const [popoverPos, setPopoverPos] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [dateFilterType, setDateFilterType] = useState("createdAt");
 
   const popoverRef = useRef(null);
 
@@ -418,6 +419,7 @@ const handleExport = async () => {
   }, [search]);
 
   useEffect(() => {
+    const hasDateRange = Boolean(appliedFromDate && appliedToDate);
     const timer = setTimeout(() => {
       getOrderListing({
         status: status || "",
@@ -426,6 +428,7 @@ const handleExport = async () => {
         limit: pageSize,
         fromDate: appliedFromDate || "",
         toDate: appliedToDate || "",
+        dateFilterType: hasDateRange ? dateFilterType : "",
       }).finally(() => {
         setInitialLoadDone(true);
       });
@@ -442,6 +445,7 @@ const handleExport = async () => {
     pageSize,
     appliedFromDate,
     appliedToDate,
+    dateFilterType
   ]);
 
   const handlePillFilterChange = (key) => {
@@ -792,6 +796,15 @@ const handleExport = async () => {
             onFromDateChange={handleFromDateChange}
             onToDateChange={handleToDateChange}
             onClear={fromDate || toDate ? clearDates : undefined}
+            dateFilterType={dateFilterType}
+            onDateTypeChange={(value) => {
+              setDateFilterType(value);
+              setPage(1);
+            }}
+            dateTypeOptions={[
+              { value: "createdAt", label: "Created Date" },
+              { value: "deliveryDate", label: "Delivery Date" },
+            ]}
             bare
           />
 
@@ -955,7 +968,10 @@ const handleExport = async () => {
         {/* DESKTOP TABLE */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
           <table className="w-full table-fixed text-sm">
-            <thead className="order-table-head sticky top-0  relative" style={{zIndex:'1000'}}>
+            <thead
+              className="order-table-head sticky top-0  relative"
+              style={{ zIndex: "1000" }}
+            >
               <tr className="border-b border-transparent">
                 <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
                   Sl No.
