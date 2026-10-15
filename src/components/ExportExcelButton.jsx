@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import excelStore from "@/zustand/Store/excelStore"; // Adjust this import path to match your project structure
 
 const ExportExcelButton = ({ type, buttonText = "Export To Excel" }) => {
+  console.log("type", type)
   const [isOpen, setIsOpen] = useState(false);
   
   // Connect directly to your Zustand store

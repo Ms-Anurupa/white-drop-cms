@@ -95,6 +95,7 @@ const ExpenseListing = () => {
   const setDateFilter = expenseStore((s) => s.setDateFilter);
   const setPage = expenseStore((s) => s.setPage);
   const resetFilters = expenseStore((s) => s.resetFilters);
+  const categories = expenseStore((s) => s.categories)
 
   const { downloadExcel, isDownloading } = excelStore();
 
@@ -134,7 +135,12 @@ const ExpenseListing = () => {
   // True while the store is fetching, and also for the brief window before
   // the very first fetch has kicked in (so we never flash an empty state).
   const showSkeleton = loading || !initialLoadDone;
-
+  const selectedCategory = categories.find(
+    (category) => category.id === filters.category,
+  );
+  const exportType = selectedCategory?.name?.toLowerCase() === "salary" ? "salary" : "expense";
+  console.log(exportType);
+  console.log(selectedCategory);
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
@@ -154,9 +160,14 @@ const ExpenseListing = () => {
           </p>
         </div>
 
+        
         {/* Button Group Container */}
         <div className="flex items-center gap-3">
-          <ExportExcelButton type="expense" />
+          {(!selectedCategory || exportType === 'salary') && <ExportExcelButton
+            type={
+              exportType
+            }
+          />}
 
           <button
             type="button"
