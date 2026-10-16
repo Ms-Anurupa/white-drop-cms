@@ -59,6 +59,8 @@ import AddCustomerAddress from "./components/AddCustomerAddress";
 import AddOfflineOrder from "./pages/Order/AddOfflineOrder";
 import AddOfflineSubscription from "./pages/subscriptionOrder/AddOfflineSubscription";
 import AdHocSaleForm from "./components/CreateAdhocSale";
+import EmployeeList from "./pages/Employee/EmployeeList";
+import EmployeeSalary from "./pages/Employee/EmployeeSalary";
 
 const App = () => {
   return (
@@ -113,6 +115,9 @@ const App = () => {
                   element={<DueRegister theme="light" />}
                 />
                 <Route path="expense" element={<ExpenseListing />} />
+                <Route path="employee-list" element={<EmployeeList />} />
+                <Route path="employee-salary" element={<EmployeeSalary />} />
+                <Route path="create-salary" element={<ExpenseListing />} />
                 <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="expense-category" element={<ExpenseCategory />} />
                 <Route

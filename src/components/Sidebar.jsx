@@ -43,6 +43,8 @@ const sections = [
         icon: HandCoins,
         children: [
           { name: "Expenses List", path: "expense" },
+          { name: "Employee List", path: "employee-list" },
+          { name: "Employee Salary", path: "employee-salary" },
           {
             name: "Categories",
             path: "expense-category",
