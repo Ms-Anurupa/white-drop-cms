@@ -56,11 +56,11 @@ const employeeStore = create((set) => ({
     },
 
     // Create employee salary
-    createEmployeeSalary: async (salaryData) => {
+    addEmployeeSalary: async (salaryData) => {
         set({ loading: true, error: null });
 
         try {
-            const response = await api.post("/admin/createEmployeeSalary", salaryData,
+            const response = await api.post("/admin/addEmployeeSalary", salaryData,
                 { withAuth: true },
             );
 
