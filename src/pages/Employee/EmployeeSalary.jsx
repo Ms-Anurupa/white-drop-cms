@@ -2,11 +2,8 @@ import employeeStore from "@/zustand/Store/employeeStore";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
-
 const PAGE_SIZE = 10;
-const BACK_ROUTE = "/employees"; // TODO: your employee list route
-
-
+const BACK_ROUTE = "/dashboard/employees";
 
 /* ---------- helpers ---------- */
 
@@ -16,14 +13,11 @@ const inr = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
 });
 
-// Prisma Decimal arrives as a string in JSON
 const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
-// Works with both `baseSalary` (history schema) and `salary` (current controller)
 const base = (r) => num(r.baseSalary ?? r.salary);
 const net = (r) => base(r) + num(r.bonus) + num(r.overtime) - num(r.deductions);
 
-// Use `period` when the schema has it, otherwise fall back to createdAt
 const dateLabel = (r) =>
   r.period
     ? new Date(r.period).toLocaleDateString("en-IN", {
@@ -46,7 +40,6 @@ const initials = (name = "") =>
     .join("") || "?";
 
 const money = (n) => inr.format(n);
-
 const signed = (n) => `${n > 0 ? "+" : "−"}${money(Math.abs(n))}`;
 
 /* ---------- small pieces ---------- */
@@ -83,7 +76,6 @@ function Delta({ value }) {
   );
 }
 
-// Net pay over time, oldest on the left
 function TrendChart({ records }) {
   const points = useMemo(
     () =>
@@ -151,47 +143,45 @@ function Skeleton() {
 /* ---------- main ---------- */
 
 const EmployeeSalary = () => {
-  const { employeeId } = useParams();
+  const params = useParams();
   const location = useLocation();
-  
+  const targetId = params.employeeId || location.state?.employeeId;
 
   const employees = employeeStore((s) => s.employees);
   const salaryRecords = employeeStore((s) => s.salaryRecords);
   const salaryPagination = employeeStore((s) => s.salaryPagination);
   const loading = employeeStore((s) => s.loading);
   const error = employeeStore((s) => s.error);
-  const getEmployeeSalariesById = employeeStore(
-    (s) => s.getEmployeeSalariesById,
-  );
 
-  // `ready` flips once the first fetch for THIS employee settles, so you never
-  // see the previous employee's records flash while the new ones load.
+  const fetchLogs =
+    employeeStore((s) => s.getSalaryPaymentLogsById) ||
+    employeeStore((s) => s.getEmployeeSalariesById);
+
   const [ready, setReady] = useState(false);
 
-  const load = async (params = {}, append = false) => {
+  const load = async (extraParams = {}, append = false) => {
+    if (!targetId || !fetchLogs) return;
     try {
-      await getEmployeeSalariesById(
-        employeeId,
-        { limit: PAGE_SIZE, ...params },
-        append,
-      );
+      await fetchLogs(targetId, { limit: PAGE_SIZE, ...extraParams }, append);
     } catch {
-      /* the store already put the message in `error` */
+      /* Handled in store */
     }
   };
 
   useEffect(() => {
     setReady(false);
-    load().finally(() => setReady(true));
+    if (targetId) {
+      load().finally(() => setReady(true));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId]);
+  }, [targetId]);
 
   const employee = useMemo(
     () =>
-      employees.find((e) => e.id === employeeId) ||
+      employees.find((e) => e.id === targetId) ||
       location.state?.employee ||
       null,
-    [employees, employeeId, location.state],
+    [employees, targetId, location.state],
   );
 
   const records = ready ? salaryRecords : [];
@@ -271,7 +261,7 @@ const EmployeeSalary = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
-          {/* Summary */}
+          {/* Summary Stats */}
           <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             <div className="px-5 py-4 sm:px-6">
               <dt className="text-sm text-stone-500">Latest net pay</dt>
@@ -304,7 +294,7 @@ const EmployeeSalary = () => {
             <TrendChart records={records} />
           </div>
 
-          {/* Ledger */}
+          {/* Ledger Table */}
           <div className="overflow-x-auto border-t border-stone-200">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="bg-stone-50 text-xs text-stone-500">
@@ -318,7 +308,7 @@ const EmployeeSalary = () => {
                   <th className="px-3 py-3 text-right font-medium">
                     Deductions
                   </th>
-                  <th className="px-3 py-3 text-right font-medium">Net pay</th>
+                  <th className="px-3 py-3 text-right font-medium">Salary</th>
                   <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
                     Change
                   </th>
@@ -330,7 +320,7 @@ const EmployeeSalary = () => {
                   const diff = prev ? net(r) - net(prev) : null;
                   return (
                     <tr
-                      key={r.id}
+                      key={r.id || i}
                       className={`border-t border-stone-200 ${i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"}`}
                     >
                       <td className="py-3 pl-5 pr-3 sm:pl-6">
@@ -361,7 +351,7 @@ const EmployeeSalary = () => {
                           : money(0)}
                       </td>
                       <td className="px-3 py-3 text-right font-semibold text-stone-900">
-                        {money(net(r))}
+                        {money(num(r.paidAmount))}
                       </td>
                       <td className="py-3 pl-3 pr-5 text-right text-xs sm:pr-6">
                         <Delta value={diff} />

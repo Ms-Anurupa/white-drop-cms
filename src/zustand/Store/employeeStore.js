@@ -13,9 +13,9 @@ const employeeStore = create((set) => ({
         set({ loading: true, error: null });
 
         try {
-            const response = await api.post("/admin/registerEmployee", employeeData,
-                { withAuth: true },
-            );
+            const response = await api.post("/admin/registerEmployee", employeeData, {
+                withAuth: true,
+            });
 
             set({ loading: false });
 
@@ -60,9 +60,9 @@ const employeeStore = create((set) => ({
         set({ loading: true, error: null });
 
         try {
-            const response = await api.post("/admin/addEmployeeSalary", salaryData,
-                { withAuth: true },
-            );
+            const response = await api.post("/admin/addEmployeeSalary", salaryData, {
+                withAuth: true,
+            });
 
             set({ loading: false });
 
@@ -70,27 +70,31 @@ const employeeStore = create((set) => ({
         } catch (error) {
             set({
                 loading: false,
-                error: error.response?.data?.message || "Failed to create salary record",
+                error:
+                    error.response?.data?.message || "Failed to create salary record",
             });
             throw error;
         }
     },
 
     // Get employee salaries with cursor pagination
-    getEmployeeSalariesById: async (employeeId, params = {}, append = false) => {
+    getSalaryPaymentLogsById: async (employeeId, params = {}, append = false) => {
         set({ loading: true, error: null });
 
         try {
-            const response = await api.get("/admin/getEmployeeSalariesById", {
-              params,
-              withAuth: true,
+            const response = await api.get("/admin/getSalaryPaymentLogsById", {
+                params: { employeeId, ...params },
+                withAuth: true,
             });
 
             const newRecords = response.data.data || [];
 
             set((state) => ({
-                salaryRecords: append ? [...state.salaryRecords, ...newRecords] : newRecords,
-                salaryPagination: response.data.pagination || null,
+                salaryRecords: append
+                    ? [...state.salaryRecords, ...newRecords]
+                    : newRecords,
+                salaryPagination:
+                    response.data.pagination || response.data.meta || null,
                 loading: false,
             }));
 
@@ -98,7 +102,9 @@ const employeeStore = create((set) => ({
         } catch (error) {
             set({
                 loading: false,
-                error: error.response?.data?.message || "Failed to fetch employee salary records",
+                error:
+                    error.response?.data?.message ||
+                    "Failed to fetch employee salary records",
             });
             throw error;
         }

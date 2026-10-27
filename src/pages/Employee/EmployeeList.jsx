@@ -2,8 +2,6 @@ import employeeStore from "@/zustand/Store/employeeStore";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-// Keep in sync with your backend employee status enum
 const STATUS_OPTIONS = [
   { value: "", label: "All" },
   { value: "ACTIVE", label: "Active" },
@@ -20,11 +18,13 @@ const inr = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
 });
 
-// Prisma Decimal arrives as a string in JSON
 const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
 const netPay = (s) =>
-  num(s.baseSalary) + num(s.bonus) + num(s.overtime) - num(s.deductions);
+  num(s.baseSalary ?? s.salary) +
+  num(s.bonus) +
+  num(s.overtime) -
+  num(s.deductions);
 
 const initials = (name = "") =>
   name
@@ -35,13 +35,16 @@ const initials = (name = "") =>
     .join("") || "?";
 
 const fmtPeriod = (d) =>
-  new Date(d).toLocaleDateString("en-IN", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  d
+    ? new Date(d).toLocaleDateString("en-IN", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : "—";
 
-const byPeriodDesc = (a, b) => new Date(b.period) - new Date(a.period);
+const byPeriodDesc = (a, b) =>
+  new Date(b.period || b.createdAt) - new Date(a.period || a.createdAt);
 
 function useDebounce(value, delay = 400) {
   const [debounced, setDebounced] = useState(value);
@@ -112,8 +115,8 @@ function Avatar({ name }) {
   );
 }
 
-function SalaryHistory({ salaries }) {
-    const navigate = useNavigate();
+function SalaryHistory({ salaries, emp }) {
+  const navigate = useNavigate();
   const rows = useMemo(() => [...salaries].sort(byPeriodDesc), [salaries]);
 
   if (!rows.length) {
@@ -136,6 +139,8 @@ function SalaryHistory({ salaries }) {
             <th className="pb-2 text-right font-medium">Deductions</th>
             <th className="pb-2 text-right font-medium">Net pay</th>
             <th className="pb-2 text-right font-medium">Change</th>
+            <th className="pb-2 text-center font-medium">Manage</th>
+            <th className="pb-2 text-center font-medium">Action</th>
           </tr>
         </thead>
 
@@ -146,13 +151,13 @@ function SalaryHistory({ salaries }) {
             const diff = prev === null ? null : net - prev;
 
             return (
-              <tr key={s.id} className="border-t border-stone-200/70">
+              <tr key={s.id || i} className="border-t border-stone-200/70">
                 <td className="py-2 pr-4 font-medium text-stone-800">
-                  {fmtPeriod(s.period)}
+                  {fmtPeriod(s.period || s.createdAt)}
                 </td>
 
                 <td className="py-2 text-right text-stone-600">
-                  {inr.format(num(s.baseSalary))}
+                  {inr.format(num(s.baseSalary ?? s.salary))}
                 </td>
 
                 <td className="py-2 text-right text-stone-600">
@@ -193,8 +198,8 @@ function SalaryHistory({ salaries }) {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate("/create-salary", {
-                        state: { employeeId: emp.id },
+                      navigate("/dashboard/create-salary", {
+                        state: { employeeId: emp.id, employee: emp },
                       })
                     }
                     className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
@@ -207,8 +212,8 @@ function SalaryHistory({ salaries }) {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate("/employee-salary", {
-                        state: { employeeId: emp.id },
+                      navigate("/dashboard/employee-salary", {
+                        state: { employeeId: emp.id, employee: emp },
                       })
                     }
                     className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
@@ -226,7 +231,7 @@ function SalaryHistory({ salaries }) {
 }
 
 function EmployeeRow({ emp, open, onToggle }) {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const latest = useMemo(
     () => [...(emp.salaries || [])].sort(byPeriodDesc)[0],
     [emp.salaries],
@@ -289,7 +294,7 @@ function EmployeeRow({ emp, open, onToggle }) {
               </div>
 
               <div className="text-xs text-stone-500">
-                {fmtPeriod(latest.period)}
+                {fmtPeriod(latest.period || latest.createdAt)}
               </div>
             </>
           ) : (
@@ -305,8 +310,8 @@ function EmployeeRow({ emp, open, onToggle }) {
           <button
             type="button"
             onClick={() =>
-              navigate("/create-salary", {
-                state: { employeeId: emp.id },
+              navigate("/dashboard/create-salary", {
+                state: { employeeId: emp.id, employee: emp },
               })
             }
             className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
@@ -319,11 +324,11 @@ function EmployeeRow({ emp, open, onToggle }) {
           <button
             type="button"
             onClick={() =>
-              navigate("/employee-salary", {
-                state: { employeeId: emp.id },
+              navigate("/dashboard/employee-salary", {
+                state: { employeeId: emp.id, employee: emp },
               })
             }
-            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
           >
             View
           </button>
@@ -333,7 +338,7 @@ function EmployeeRow({ emp, open, onToggle }) {
       {open && (
         <tr id={panelId} className="border-t border-stone-200 bg-stone-50">
           <td colSpan={8} className="p-0">
-            <SalaryHistory salaries={emp.salaries || []} />
+            <SalaryHistory salaries={emp.salaries || []} emp={emp} />
           </td>
         </tr>
       )}
@@ -372,6 +377,9 @@ function SkeletonRows({ count }) {
       <td className="px-3 py-4 pr-4 sm:pr-6">
         <div className="h-5 w-16 animate-pulse rounded-full bg-stone-100" />
       </td>
+
+      <td className="px-3 py-4" />
+      <td className="px-3 py-4" />
     </tr>
   ));
 }
@@ -402,14 +410,11 @@ const EmployeeList = () => {
   const [reloadKey, setReloadKey] = useState(0);
 
   const debouncedSearch = useDebounce(search);
-  
 
-  // Any filter change sends you back to page 1
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, status, limit]);
 
-  // Fetch employee list through Zustand
   useEffect(() => {
     getEmployeeList({
       page,
@@ -420,9 +425,7 @@ const EmployeeList = () => {
       .then(() => {
         setExpandedId(null);
       })
-      .catch(() => {
-        // Error state is managed by the Zustand store
-      });
+      .catch(() => {});
   }, [page, limit, status, debouncedSearch, reloadKey, getEmployeeList]);
 
   const from =
