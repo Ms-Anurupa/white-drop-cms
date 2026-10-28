@@ -1,6 +1,6 @@
 import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useId, useMemo, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 const VIEW_ROUTE = "/dashboard/employee-salary";
 const PAGE_SIZE = 10;
@@ -224,7 +224,7 @@ const ManageSalary = () => {
     const getIncrementLogs = employeeStore((s) => s.getSalaryIncrementLogsById);
     const clearIncrementLogs = employeeStore((s) => s.clearIncrementLogs);
 
-    const [tab, setTab] = useState("payment");
+    const [tab, setTab] = useState("increment");
     const [ready, setReady] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [historyError, setHistoryError] = useState(null);
@@ -288,10 +288,14 @@ const ManageSalary = () => {
         setPayErrors((errs) => ({ ...errs, [key]: undefined }));
     };
 
+    const navigate = useNavigate()
+
     const submitPayment = async (e) => {
+        console.log(e)
         e.preventDefault();
+        console.log(currentBasePay)
         const errs = {};
-        if (!(num(pay.paidAmount) > 0))
+        if (!(num(currentBasePay) > 0))
             errs.paidAmount = "Set the base amount paid. It must be more than ₹0.";
         ["bonus", "overtime", "deductions"].forEach((k) => {
             if (num(pay[k]) < 0) errs[k] = "Can't be negative.";
@@ -321,6 +325,8 @@ const ManageSalary = () => {
               ...EMPTY_PAYMENT,
               paidAmount: currentBasePay,
             });
+
+            navigate("/dashboard/expense");
         } catch (err) {
             setNotice({
                 type: "error",
@@ -553,7 +559,7 @@ const ManageSalary = () => {
                                 inputMode="decimal"
                                 min="0"
                                 step="0.01"
-                                value={currentBasePay} // Pre-fills directly with basePay
+                                value={currentBasePay}
                                 disabled
                                 readOnly
                                 error={payErrors.paidAmount}

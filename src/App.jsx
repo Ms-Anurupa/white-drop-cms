@@ -63,6 +63,7 @@ import EmployeeList from "./pages/Employee/EmployeeList";
 import EmployeeSalary from "./pages/Employee/EmployeeSalary";
 import ManageSalary from "./pages/Employee/ManageSalary";
 import RegisterEmployee from "./pages/Employee/RegisterEmployee";
+import SalaryPaymentLogs from "./pages/Employee/SalaryListing";
 
 const App = () => {
   return (
@@ -119,6 +120,7 @@ const App = () => {
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="register-employee" element={<RegisterEmployee />} />
                 <Route path="employee-list" element={<EmployeeList />} />
+                <Route path="salary-list" element={<SalaryPaymentLogs />} />
                 <Route path="employee-salary" element={<EmployeeSalary />} />
                 <Route path="create-salary" element={<ExpenseListing />} />
                 <Route path="manage-salary" element={<ManageSalary />} />

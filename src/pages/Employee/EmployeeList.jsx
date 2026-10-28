@@ -1,5 +1,5 @@
 import employeeStore from "@/zustand/Store/employeeStore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -20,19 +20,8 @@ const PAGE_SIZES = [10, 25, 50];
 
 /* ---------- helpers ---------- */
 
-const inr = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
 
-const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
-const netPay = (s) =>
-  num(s.baseSalary ?? s.salary) +
-  num(s.bonus) +
-  num(s.overtime) -
-  num(s.deductions);
 
 const initials = (name = "") =>
   name
@@ -42,17 +31,7 @@ const initials = (name = "") =>
     .map((p) => p[0]?.toUpperCase())
     .join("") || "?";
 
-const fmtPeriod = (d) =>
-  d
-    ? new Date(d).toLocaleDateString("en-IN", {
-        month: "short",
-        year: "numeric",
-        timeZone: "UTC",
-      })
-    : "—";
 
-const byPeriodDesc = (a, b) =>
-  new Date(b.period || b.createdAt) - new Date(a.period || a.createdAt);
 
 function useDebounce(value, delay = 400) {
   const [debounced, setDebounced] = useState(value);
@@ -80,28 +59,7 @@ const ICONS = {
   users: Users,
   plus: Plus,
 };
-const STATUS_STYLES = {
-  ACTIVE: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  INACTIVE: "bg-stone-100 text-stone-600 ring-stone-500/20",
-};
 
-function StatusBadge({ status }) {
-  if (!status) return null;
-
-  const style =
-    STATUS_STYLES[status] || "bg-amber-50 text-amber-700 ring-amber-600/20";
-
-  const label =
-    status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, " ");
-
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${style}`}
-    >
-      {label}
-    </span>
-  );
-}
 
 function Avatar({ name }) {
   return (

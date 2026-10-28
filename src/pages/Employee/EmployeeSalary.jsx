@@ -173,17 +173,37 @@ const EmployeeSalary = () => {
       {/* Header */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-700 text-sm font-semibold text-white">
+          {/* Avatar */}
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-700 text-sm font-semibold text-white">
             {initials(employee?.empName)}
           </div>
-          <div>
+
+          {/* Info Container */}
+          <div className="flex flex-col justify-center">
             <h1 className="text-xl font-semibold tracking-tight text-stone-900">
               {employee?.empName || "Employee"}
             </h1>
-            <p className="text-sm text-stone-500">
-              {employee?.empPhone ? `${employee.empPhone} · ` : ""}Salary
-              history
-            </p>
+
+            <div className="flex flex-wrap items-center gap-x-2 text-sm text-stone-500">
+              {employee?.empPhone && <span>{employee.empPhone}</span>}
+
+              {employee?.empPhone && employee?.createdAt && <span>·</span>}
+
+              {employee?.createdAt && (
+                <span>
+                  Joined{" "}
+                  {new Date(employee.createdAt).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              )}
+
+              {(employee?.empPhone || employee?.createdAt) && <span>·</span>}
+
+              <span>Salary history</span>
+            </div>
           </div>
         </div>
         <button

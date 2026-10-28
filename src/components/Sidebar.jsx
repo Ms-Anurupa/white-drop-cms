@@ -35,11 +35,13 @@ const sections = [
       },
       { name: "Product", path: "product", icon: Package },
       {
-        name: "Employee List",
-        path: "employee-list",
+        name: "Human Resources",
+        key: "salaryLogs",
         icon: UserCog2Icon,
-        // other routes that should keep this item highlighted
-        activePaths: ["manage-salary", "employee-salary"],
+        children: [
+          { name: "Employee List", path: "employee-list"},
+          { name: "Salary List", path: "salary-list"}
+        ]
       },
       {
         name: "Expenses",

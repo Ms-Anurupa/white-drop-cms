@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import api from "../axios";
 
-const employeeStore = create((set) => ({
+const employeeStore = create((set, get) => ({
     employees: [],
     employeeMeta: null,
     salaryRecords: [],
@@ -11,6 +11,17 @@ const employeeStore = create((set) => ({
     incrementLogs: [],
     incrementPagination: null,
     currentBasePay: null,
+
+    salaryLogs: [],
+    salaryLogPagination: null,
+    salaryLogSummary: null,
+    salaryFilters: {
+        search: "",
+        month: "",
+        year: new Date().getFullYear(),
+        salaryDate: "",
+        employeeId: "",
+    },
 
     loading: false,
     error: null,
@@ -64,11 +75,15 @@ const employeeStore = create((set) => ({
     // Record a salary payment (addSalaryPaymentLog)
     addEmployeeSalary: async (salaryData) => {
         set({ loading: true, error: null });
-        console.log("enter")
+        console.log("enter");
         try {
-            const response = await api.post("/admin/addSalaryPaymentLog", salaryData, {
-                withAuth: true,
-            });
+            const response = await api.post(
+                "/admin/addSalaryPaymentLog",
+                salaryData,
+                {
+                    withAuth: true,
+                },
+            );
 
             set({ loading: false });
 
@@ -80,6 +95,60 @@ const employeeStore = create((set) => ({
                     error.response?.data?.message || "Failed to create salary record",
             });
             throw error;
+        }
+    },
+
+    // Update filters and automatically trigger fetch for page 1
+    setSalaryFilters: (newFilters) => {
+        set((state) => ({
+            salaryFilters: { ...state.salaryFilters, ...newFilters },
+        }));
+        get().fetchSalaryLogs(1);
+    },
+
+    // Reset salary filters to default (current year)
+    resetSalaryFilters: () => {
+        set({
+            salaryFilters: {
+                search: "",
+                month: "",
+                year: new Date().getFullYear(),
+                salaryDate: "",
+                employeeId: "",
+            },
+        });
+        get().fetchSalaryLogs(1);
+    },
+
+    // Fetch paginated salary logs
+    getSalaryPaymentLogs: async (page = 1, limit = 10) => {
+        set({ loading: true, error: null });
+
+        const { salaryFilters } = get();
+
+        try {
+            const response = await api.get("/admin/getSalaryPaymentLogs", {
+                params: {
+                    page,
+                    limit,
+                    ...salaryFilters,
+                },
+                withAuth: true,
+            });
+
+            const { data, pagination, summary } = response.data;
+
+            set({
+                salaryLogs: data || [],
+                salaryLogPagination: pagination || null,
+                salaryLogSummary: summary || null,
+                loading: false,
+            });
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Failed to fetch salary logs",
+            });
         }
     },
 
