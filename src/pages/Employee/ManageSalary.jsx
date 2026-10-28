@@ -2,7 +2,7 @@ import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useId, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
-const BACK_ROUTE = "/dashboard/employees";
+const BACK_ROUTE = "/dashboard/employee-list";
 const VIEW_ROUTE = "/dashboard/employee-salary";
 const PAGE_SIZE = 10;
 

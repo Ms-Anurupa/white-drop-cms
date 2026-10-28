@@ -5,18 +5,15 @@ import {
   Package,
   Users,
   ShoppingCart,
-  ReceiptText,
-  Factory,
   Boxes,
   Truck,
   HelpingHand,
-  Headset,
   Menu,
   X,
-  PackageCheck,
   PackageIcon,
   ChevronDown,
   HandCoins,
+  UserCog2Icon,
   ChartNoAxesGantt,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
@@ -37,14 +34,13 @@ const sections = [
         end: true,
       },
       { name: "Product", path: "product", icon: Package },
+      { name: "Employee List", path: "employee-list", icon: UserCog2Icon },
       {
         name: "Expenses",
         key: "expenses",
         icon: HandCoins,
         children: [
           { name: "Expenses List", path: "expense" },
-          { name: "Employee List", path: "employee-list" },
-          { name: "Employee Salary", path: "employee-salary" },
           {
             name: "Categories",
             path: "expense-category",
@@ -484,6 +480,7 @@ const Sidebar = ({ onLogOut }) => {
       }),
     );
     if (Object.keys(active).length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpenGroups((prev) => ({ ...prev, ...active }));
     }
   }, [pathname]);
