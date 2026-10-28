@@ -6,6 +6,12 @@ const employeeStore = create((set) => ({
     employeeMeta: null,
     salaryRecords: [],
     salaryPagination: null,
+
+    // NEW: increment history for the Manage Salary page
+    incrementLogs: [],
+    incrementPagination: null,
+    currentBasePay: null,
+
     loading: false,
     error: null,
 
@@ -55,12 +61,12 @@ const employeeStore = create((set) => ({
         }
     },
 
-    // Create employee salary
+    // Record a salary payment (addSalaryPaymentLog)
     addEmployeeSalary: async (salaryData) => {
         set({ loading: true, error: null });
-
+        console.log("enter")
         try {
-            const response = await api.post("/admin/addEmployeeSalary", salaryData, {
+            const response = await api.post("/admin/addSalaryPaymentLog", salaryData, {
                 withAuth: true,
             });
 
@@ -77,7 +83,32 @@ const employeeStore = create((set) => ({
         }
     },
 
-    // Get employee salaries with cursor pagination
+    // NEW: Add a salary increment (addSalaryIncrementLog)
+    // ⚠️ Change the URL to match your router.
+    addSalaryIncrementLog: async (incrementData) => {
+        set({ loading: true, error: null });
+
+        try {
+            const response = await api.post(
+                "/admin/addSalaryIncrementLog",
+                incrementData,
+                { withAuth: true },
+            );
+
+            set({ loading: false });
+
+            return response.data;
+        } catch (error) {
+            set({
+                loading: false,
+                error:
+                    error.response?.data?.message || "Failed to save salary increment",
+            });
+            throw error;
+        }
+    },
+
+    // Get employee salary payments with cursor pagination
     getSalaryPaymentLogsById: async (employeeId, params = {}, append = false) => {
         set({ loading: true, error: null });
 
@@ -110,11 +141,48 @@ const employeeStore = create((set) => ({
         }
     },
 
+    // NEW: Get increment history (cursor = ISO date of last entry)
+    // ⚠️ Change the URL to match your router.
+    getSalaryIncrementLogsById: async (
+        employeeId,
+        params = {},
+        append = false,
+    ) => {
+        // eslint-disable-next-line no-useless-catch
+        try {
+            const response = await api.get("/admin/getSalaryIncrementLogsById", {
+                params: { employeeId, ...params },
+                withAuth: true,
+            });
+
+            const payload = response.data.data || {};
+            const newLogs = payload.increments || [];
+
+            set((state) => ({
+                incrementLogs: append ? [...state.incrementLogs, ...newLogs] : newLogs,
+                incrementPagination: response.data.pagination || null,
+                currentBasePay: payload.currentBasePay ?? 0,
+            }));
+
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // Reset salary records when switching employees
     clearSalaryRecords: () =>
         set({
             salaryRecords: [],
             salaryPagination: null,
+        }),
+
+    // NEW
+    clearIncrementLogs: () =>
+        set({
+            incrementLogs: [],
+            incrementPagination: null,
+            currentBasePay: null,
         }),
 
     clearError: () => set({ error: null }),

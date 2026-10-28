@@ -61,6 +61,7 @@ import AddOfflineSubscription from "./pages/subscriptionOrder/AddOfflineSubscrip
 import AdHocSaleForm from "./components/CreateAdhocSale";
 import EmployeeList from "./pages/Employee/EmployeeList";
 import EmployeeSalary from "./pages/Employee/EmployeeSalary";
+import ManageSalary from "./pages/Employee/ManageSalary";
 
 const App = () => {
   return (
@@ -118,6 +119,7 @@ const App = () => {
                 <Route path="employee-list" element={<EmployeeList />} />
                 <Route path="employee-salary" element={<EmployeeSalary />} />
                 <Route path="create-salary" element={<ExpenseListing />} />
+                <Route path="manage-salary" element={<ManageSalary />} />
                 <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="expense-category" element={<ExpenseCategory />} />
                 <Route

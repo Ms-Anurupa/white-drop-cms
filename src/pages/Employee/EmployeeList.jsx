@@ -1,5 +1,5 @@
 import employeeStore from "@/zustand/Store/employeeStore";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const STATUS_OPTIONS = [
@@ -202,7 +202,7 @@ function SalaryHistory({ salaries, emp }) {
                         state: { employeeId: emp.id, employee: emp },
                       })
                     }
-                    className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    className="cursor-pointer rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                   >
                     Manage Salary
                   </button>
@@ -216,7 +216,7 @@ function SalaryHistory({ salaries, emp }) {
                         state: { employeeId: emp.id, employee: emp },
                       })
                     }
-                    className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                    className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                   >
                     View
                   </button>
@@ -253,7 +253,7 @@ function EmployeeRow({ emp, open, onToggle }) {
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? "Hide" : "Show"} salary history for ${emp.empName}`}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-stone-500 hover:bg-stone-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+            className="cursor-pointer flex h-7 w-7 items-center justify-center rounded-md text-stone-500 hover:bg-stone-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
           >
             <Icon
               d={ICONS.chevron}
@@ -310,27 +310,13 @@ function EmployeeRow({ emp, open, onToggle }) {
           <button
             type="button"
             onClick={() =>
-              navigate("/dashboard/create-salary", {
+              navigate("/dashboard/manage-salary", {
                 state: { employeeId: emp.id, employee: emp },
               })
             }
-            className="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="cursor-pointer rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             Manage Salary
-          </button>
-        </td>
-
-        <td className="px-3 py-3 pr-4 text-center sm:pr-6">
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/dashboard/employee-salary", {
-                state: { employeeId: emp.id, employee: emp },
-              })
-            }
-            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-          >
-            View
           </button>
         </td>
       </tr>
@@ -412,6 +398,7 @@ const EmployeeList = () => {
   const debouncedSearch = useDebounce(search);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [debouncedSearch, status, limit]);
 
@@ -456,7 +443,7 @@ const EmployeeList = () => {
         <button
           type="button"
           onClick={() => setReloadKey((k) => k + 1)}
-          className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
         >
           <Icon
             d={ICONS.refresh}
@@ -496,7 +483,7 @@ const EmployeeList = () => {
               type="button"
               onClick={() => setStatus(o.value)}
               aria-pressed={status === o.value}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
+              className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
                 status === o.value
                   ? "bg-teal-700 text-white"
                   : "text-stone-600 hover:bg-stone-100"
@@ -534,10 +521,6 @@ const EmployeeList = () => {
                 <th className="px-3 py-3 text-center font-medium">
                   Manage Salary
                 </th>
-
-                <th className="px-3 py-3 pr-4 text-center font-medium sm:pr-6">
-                  Salary
-                </th>
               </tr>
             </thead>
 
@@ -572,7 +555,7 @@ const EmployeeList = () => {
             <button
               type="button"
               onClick={() => setReloadKey((k) => k + 1)}
-              className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+              className="cursor-pointer rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
             >
               Try again
             </button>
@@ -605,7 +588,7 @@ const EmployeeList = () => {
                   setSearch("");
                   setStatus("");
                 }}
-                className="mt-2 text-sm font-medium text-teal-700 hover:underline"
+                className="cursor-pointer mt-2 text-sm font-medium text-teal-700 hover:underline"
               >
                 Clear filters
               </button>
@@ -644,7 +627,7 @@ const EmployeeList = () => {
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1 || loading}
                 aria-label="Previous page"
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-stone-300 bg-white hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+                className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-stone-300 bg-white hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
               >
                 <Icon d={ICONS.left} />
               </button>
@@ -658,7 +641,7 @@ const EmployeeList = () => {
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page >= meta.totalPages || loading}
                 aria-label="Next page"
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-stone-300 bg-white hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+                className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-stone-300 bg-white hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
               >
                 <Icon d={ICONS.right} />
               </button>

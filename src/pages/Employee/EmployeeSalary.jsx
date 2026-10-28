@@ -347,7 +347,7 @@ const EmployeeSalary = () => {
                       </td>
                       <td className="px-3 py-3 text-right text-stone-600">
                         {num(r.deductions)
-                          ? `−${money(num(r.deductions))}`
+                          ? `−${money(num(r.deduction))}`
                           : money(0)}
                       </td>
                       <td className="px-3 py-3 text-right font-semibold text-stone-900">
