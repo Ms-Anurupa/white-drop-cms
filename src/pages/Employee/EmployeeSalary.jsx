@@ -15,7 +15,11 @@ const inr = new Intl.NumberFormat("en-IN", {
 
 const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
-const net = (r) => num(r.bonus) + num(r.overtime) - num(r.deductions);
+// Use paidAmount directly from response; fallback to calculated value
+const net = (r) =>
+  r.paidAmount !== undefined
+    ? num(r.paidAmount)
+    : num(r.baseSalary ?? r.salary) + num(r.bonus) + num(r.overtime) - num(r.deduction);
 
 const dateLabel = (r) =>
   r.period
@@ -62,6 +66,7 @@ const ICONS = {
   back: "M15 18l-6-6 6-6",
   refresh: "M20 11a8 8 0 10-2.3 5.7M20 4v7h-7",
   empty: "M3 7h18M3 12h18M3 17h10",
+  filter: "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z",
 };
 
 function Delta({ value }) {
@@ -94,6 +99,7 @@ const EmployeeSalary = () => {
   const employees = employeeStore((s) => s.employees);
   const salaryRecords = employeeStore((s) => s.salaryRecords);
   const salaryPagination = employeeStore((s) => s.salaryPagination);
+  const salarySummary = employeeStore((s) => s.salarySummary); // Assuming store passes `summary`
   const loading = employeeStore((s) => s.loading);
   const error = employeeStore((s) => s.error);
 
@@ -102,11 +108,23 @@ const EmployeeSalary = () => {
     employeeStore((s) => s.getEmployeeSalariesById);
 
   const [ready, setReady] = useState(false);
+  const [selectedYear, setSelectedYear] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const load = async (extraParams = {}, append = false) => {
     if (!targetId || !fetchLogs) return;
+
+    const filterParams = { ...extraParams };
+    if (selectedYear) {
+      filterParams.year = selectedYear;
+    } else {
+      if (startDate) filterParams.startDate = startDate;
+      if (endDate) filterParams.endDate = endDate;
+    }
+
     try {
-      await fetchLogs(targetId, { limit: PAGE_SIZE, ...extraParams }, append);
+      await fetchLogs(targetId, { limit: PAGE_SIZE, ...filterParams }, append);
     } catch {
       /* Handled in store */
     }
@@ -119,7 +137,7 @@ const EmployeeSalary = () => {
       load().finally(() => setReady(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetId]);
+  }, [targetId, selectedYear, startDate, endDate]);
 
   const employee = useMemo(
     () =>
@@ -137,6 +155,10 @@ const EmployeeSalary = () => {
     ? records.reduce((sum, r) => sum + net(r), 0) / records.length
     : 0;
   const hasMore = Boolean(salaryPagination?.hasNextPage);
+
+  // Available year selections for filter dropdown
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => String(currentYear - i));
 
   return (
     <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
@@ -168,7 +190,7 @@ const EmployeeSalary = () => {
           type="button"
           onClick={() => load()}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
         >
           <Icon
             d={ICONS.refresh}
@@ -176,6 +198,67 @@ const EmployeeSalary = () => {
           />
           Refresh
         </button>
+      </div>
+
+      {/* Date & Year Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 sm:px-4">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-wider">
+          <Icon d={ICONS.filter} className="h-3.5 w-3.5" />
+          Filter:
+        </div>
+
+        {/* Filter by Year */}
+        <select
+          value={selectedYear}
+          onChange={(e) => {
+            setSelectedYear(e.target.value);
+            setStartDate("");
+            setEndDate("");
+          }}
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+        >
+          <option className="cursor-pointer" value="">
+            All Years
+          </option>
+          {yearOptions.map((y) => (
+            <option className="cursor-pointer" key={y} value={y}>
+              Year {y}
+            </option>
+          ))}
+        </select>
+
+        <span className="text-xs text-stone-400">or range</span>
+
+        {/* Date Range Inputs */}
+        <input
+          type="date"
+          value={startDate}
+          disabled={Boolean(selectedYear)}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 disabled:bg-stone-100 disabled:text-stone-400 focus:border-teal-600 focus:outline-none"
+        />
+        <span className="text-xs text-stone-400">to</span>
+        <input
+          type="date"
+          value={endDate}
+          disabled={Boolean(selectedYear)}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 disabled:bg-stone-100 disabled:text-stone-400 focus:border-teal-600 focus:outline-none"
+        />
+
+        {(selectedYear || startDate || endDate) && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedYear("");
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="cursor-pointer ml-auto text-xs font-medium text-stone-500 hover:text-stone-800 underline"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       {!ready ? (
@@ -197,23 +280,42 @@ const EmployeeSalary = () => {
             <Icon d={ICONS.empty} className="h-5 w-5" />
           </div>
           <p className="text-sm font-medium text-stone-800">
-            No salary records yet
+            No salary records found
           </p>
           <p className="max-w-sm text-sm text-stone-500">
-            Once a salary record is added for this employee, their pay history
-            and trend will appear here.
+            No salary records match the selected time frame. Try clearing
+            filters or changing dates.
           </p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
           {/* Summary Stats */}
-          <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            {/* Aggregate yearly/filtered total from backend summary */}
+            <div className="px-5 py-4 sm:px-6">
+              <dt className="text-sm text-stone-500">
+                {selectedYear
+                  ? `Total Salary (${selectedYear})`
+                  : "Total Filtered Salary"}
+              </dt>
+              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-teal-700">
+                {money(
+                  salarySummary?.totalYearSalary ??
+                    records.reduce((acc, r) => acc + net(r), 0),
+                )}
+              </dd>
+              <dd className="mt-0.5 text-xs text-stone-500">
+                {salarySummary?.totalRecords ?? records.length} total payments
+              </dd>
+            </div>
+
             <div className="px-5 py-4 sm:px-6">
               <dt className="text-sm text-stone-500">Change from previous</dt>
               <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">
                 <Delta value={change} />
               </dd>
             </div>
+
             <div className="px-5 py-4 sm:px-6">
               <dt className="text-sm text-stone-500">Average net pay</dt>
               <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900">
@@ -234,7 +336,7 @@ const EmployeeSalary = () => {
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">
                     {records[0]?.period ? "Month" : "Date"}
                   </th>
-                  <th className="px-3 py-3 text-right font-medium">Base</th>
+                  <th className="px-3 py-3 text-right font-medium">Net Paid</th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">
@@ -249,10 +351,14 @@ const EmployeeSalary = () => {
                 {records.map((r, i) => {
                   const prev = records[i + 1];
                   const diff = prev ? net(r) - net(prev) : null;
+                  const deductionAmt = num(r.deduction);
+
                   return (
                     <tr
                       key={r.id || i}
-                      className={`border-t border-stone-200 ${i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"}`}
+                      className={`border-t border-stone-200 ${
+                        i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
+                      }`}
                     >
                       <td className="py-3 pl-5 pr-3 sm:pl-6">
                         <div className="font-medium text-stone-900">
@@ -276,12 +382,16 @@ const EmployeeSalary = () => {
                       <td className="px-3 py-3 text-right text-stone-600">
                         {money(num(r.overtime))}
                       </td>
+                      {/* Fixed: Corrected r.deduction usage */}
                       <td className="px-3 py-3 text-right text-stone-600">
-                        {num(r.deductions)
-                          ? `−${money(num(r.deduction))}`
-                          : money(0)}
+                        {deductionAmt > 0 ? (
+                          <span className="text-rose-700">
+                            −{money(deductionAmt)}
+                          </span>
+                        ) : (
+                          money(0)
+                        )}
                       </td>
-
                       <td className="py-3 pl-3 pr-5 text-right text-xs sm:pr-6">
                         <Delta value={diff} />
                       </td>

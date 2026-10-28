@@ -59,11 +59,11 @@ const apiMessage = (err, fallback) => {
 };
 
 const EMPTY_PAYMENT = {
-    paidAmount: "",
-    bonus: "",
-    overtime: "",
-    deductions: "",
-    note: "",
+  paidAmount: "",
+  bonus: "",
+  overtime: "",
+  deductions: "",
+  note: "",
 };
 
 const EMPTY_INCREMENT = { amount: "", date: todayISO(), startingPay: "" };
@@ -230,8 +230,7 @@ const ManageSalary = () => {
     const [historyError, setHistoryError] = useState(null);
     const [notice, setNotice] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-
-    const [pay, setPay] = useState(EMPTY_PAYMENT);
+    const [pay, setPay] = useState({...EMPTY_PAYMENT, paidAmount: currentBasePay});
     const [payErrors, setPayErrors] = useState({});
     const [inc, setInc] = useState(EMPTY_INCREMENT);
     const [incErrors, setIncErrors] = useState({});
@@ -307,7 +306,7 @@ const ManageSalary = () => {
         try {
             await addEmployeeSalary({
                 employeeId: targetId,
-                paidAmount: num(pay.paidAmount),
+                paidAmount: num(currentBasePay),
                 bonus: num(pay.bonus),
                 overtime: num(pay.overtime),
                 deductions: num(pay.deductions),
@@ -318,7 +317,10 @@ const ManageSalary = () => {
                 text: `Payment of ${money(payTotal)} recorded.`,
                 link: true,
             });
-            setPay(EMPTY_PAYMENT);
+            setPay({
+              ...EMPTY_PAYMENT,
+              paidAmount: currentBasePay,
+            });
         } catch (err) {
             setNotice({
                 type: "error",
@@ -551,7 +553,7 @@ const ManageSalary = () => {
                                 inputMode="decimal"
                                 min="0"
                                 step="0.01"
-                                value={basePay} // Pre-fills directly with basePay
+                                value={currentBasePay} // Pre-fills directly with basePay
                                 disabled
                                 readOnly
                                 error={payErrors.paidAmount}
