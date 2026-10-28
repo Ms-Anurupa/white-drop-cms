@@ -1,9 +1,9 @@
 import employeeStore from "@/zustand/Store/employeeStore";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 const PAGE_SIZE = 10;
-const BACK_ROUTE = "/dashboard/employees";
+const BACK_ROUTE = "/dashboard/employee-list";
 
 /* ---------- helpers ---------- */
 
@@ -15,8 +15,7 @@ const inr = new Intl.NumberFormat("en-IN", {
 
 const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
-const base = (r) => num(r.baseSalary ?? r.salary);
-const net = (r) => base(r) + num(r.bonus) + num(r.overtime) - num(r.deductions);
+const net = (r) => num(r.bonus) + num(r.overtime) - num(r.deductions);
 
 const dateLabel = (r) =>
   r.period
@@ -76,61 +75,6 @@ function Delta({ value }) {
   );
 }
 
-function TrendChart({ records }) {
-  const points = useMemo(
-    () =>
-      [...records]
-        .reverse()
-        .map((r) => ({ label: dateLabel(r), value: net(r) })),
-    [records],
-  );
-  if (points.length < 2) return null;
-
-  const W = 640;
-  const H = 120;
-  const gap = 6;
-  const barW = Math.max(6, (W - gap * (points.length - 1)) / points.length);
-  const max = Math.max(...points.map((p) => p.value), 1);
-
-  return (
-    <figure className="px-5 pb-5 pt-4 sm:px-6">
-      <figcaption className="mb-3 text-sm font-medium text-stone-800">
-        Net pay over time
-      </figcaption>
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="h-32 w-full"
-        role="img"
-        aria-label="Bar chart of net pay per salary record, oldest to newest"
-      >
-        {points.map((p, i) => {
-          const h = Math.max(3, (p.value / max) * (H - 4));
-          const last = i === points.length - 1;
-          return (
-            <rect
-              key={i}
-              x={i * (barW + gap)}
-              y={H - h}
-              width={barW}
-              height={h}
-              rx="2"
-              className={
-                last ? "fill-teal-700" : "fill-teal-200 hover:fill-teal-400"
-              }
-            >
-              <title>{`${p.label}: ${money(p.value)}`}</title>
-            </rect>
-          );
-        })}
-      </svg>
-      <div className="mt-1 flex justify-between text-xs text-stone-500">
-        <span>{points[0].label}</span>
-        <span>{points[points.length - 1].label}</span>
-      </div>
-    </figure>
-  );
-}
-
 function Skeleton() {
   return (
     <div className="animate-pulse space-y-4" aria-hidden="true">
@@ -169,6 +113,7 @@ const EmployeeSalary = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(false);
     if (targetId) {
       load().finally(() => setReady(true));
@@ -262,16 +207,7 @@ const EmployeeSalary = () => {
       ) : (
         <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
           {/* Summary Stats */}
-          <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            <div className="px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">Latest net pay</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900">
-                {money(net(latest))}
-              </dd>
-              <dd className="mt-0.5 text-xs text-stone-500">
-                {dateLabel(latest)}
-              </dd>
-            </div>
+          <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <div className="px-5 py-4 sm:px-6">
               <dt className="text-sm text-stone-500">Change from previous</dt>
               <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">
@@ -290,10 +226,6 @@ const EmployeeSalary = () => {
             </div>
           </dl>
 
-          <div className="border-t border-stone-200">
-            <TrendChart records={records} />
-          </div>
-
           {/* Ledger Table */}
           <div className="overflow-x-auto border-t border-stone-200">
             <table className="w-full min-w-[720px] text-left text-sm">
@@ -308,7 +240,6 @@ const EmployeeSalary = () => {
                   <th className="px-3 py-3 text-right font-medium">
                     Deductions
                   </th>
-                  <th className="px-3 py-3 text-right font-medium">Salary</th>
                   <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
                     Change
                   </th>
@@ -336,8 +267,8 @@ const EmployeeSalary = () => {
                           </div>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-right text-stone-600">
-                        {money(base(r))}
+                      <td className="px-3 py-3 text-right font-semibold text-stone-900">
+                        {money(num(r.paidAmount))}
                       </td>
                       <td className="px-3 py-3 text-right text-stone-600">
                         {money(num(r.bonus))}
@@ -350,9 +281,7 @@ const EmployeeSalary = () => {
                           ? `−${money(num(r.deduction))}`
                           : money(0)}
                       </td>
-                      <td className="px-3 py-3 text-right font-semibold text-stone-900">
-                        {money(num(r.paidAmount))}
-                      </td>
+
                       <td className="py-3 pl-3 pr-5 text-right text-xs sm:pr-6">
                         <Delta value={diff} />
                       </td>

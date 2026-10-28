@@ -2,7 +2,6 @@ import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useId, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
-const BACK_ROUTE = "/dashboard/employee-list";
 const VIEW_ROUTE = "/dashboard/employee-salary";
 const PAGE_SIZE = 10;
 
@@ -153,8 +152,8 @@ function Notice({ notice, onDismiss, children }) {
         <div
             role={ok ? "status" : "alert"}
             className={`mb-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${ok
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                    : "border-rose-200 bg-rose-50 text-rose-900"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-rose-200 bg-rose-50 text-rose-900"
                 }`}
         >
             <Icon
@@ -402,11 +401,14 @@ const ManageSalary = () => {
                         Open this page from the employee list to manage their salary.
                     </p>
                     <Link
-                        to={BACK_ROUTE}
-                        className="mt-4 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+                        to="/dashboard/manage-salary"
+                        state={{ employeeId: targetId, employee }}
+                        className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
                     >
-                        Go to employees
+                        <Icon d={ICONS.back} />
+                        Manage salary
                     </Link>
+
                 </div>
             </div>
         );
@@ -415,7 +417,7 @@ const ManageSalary = () => {
     return (
         <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
             <Link
-                to={BACK_ROUTE}
+                to="/dashboard/employee-list"
                 className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
             >
                 <Icon d={ICONS.back} />
@@ -433,7 +435,8 @@ const ManageSalary = () => {
                             {employee?.empName || "Employee"}
                         </h1>
                         <p className="text-sm text-stone-500">
-                            {employee?.empPhone ? `${employee.empPhone} · ` : ""}Manage salary
+                            {employee?.empPhone ? `${employee.empPhone} · ` : ""}Manage
+                            salary
                         </p>
                     </div>
                 </div>
@@ -442,7 +445,7 @@ const ManageSalary = () => {
                     state={{ employeeId: targetId, employee }}
                     className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
                 >
-                    View payment history
+                    View Salary history
                 </Link>
             </div>
 
@@ -592,25 +595,27 @@ const ManageSalary = () => {
                                 error={payErrors.deductions}
                                 hint="Advances, leave cuts or anything taken off this payment."
                             />
-                            {pay?.deductions && <div className="sm:col-span-2">
-                                <label
-                                    htmlFor="pay-note"
-                                    className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
-                                >
-                                    Note
-                                    <span className="text-xs font-normal text-stone-400">
-                                        Optional
-                                    </span>
-                                </label>
-                                <textarea
-                                    id="pay-note"
-                                    rows={3}
-                                    value={pay.note}
-                                    onChange={setPayField("note")}
-                                    placeholder="e.g. October salary, includes Diwali bonus"
-                                    className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
-                                />
-                            </div>}
+                            {pay?.deductions && (
+                                <div className="sm:col-span-2">
+                                    <label
+                                        htmlFor="pay-note"
+                                        className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
+                                    >
+                                        Note
+                                        <span className="text-xs font-normal text-stone-400">
+                                            Optional
+                                        </span>
+                                    </label>
+                                    <textarea
+                                        id="pay-note"
+                                        rows={3}
+                                        value={pay.note}
+                                        onChange={setPayField("note")}
+                                        placeholder="e.g. October salary, includes Diwali bonus"
+                                        className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="mt-6 flex items-center justify-end gap-3">
@@ -640,7 +645,11 @@ const ManageSalary = () => {
                         <dl className="mt-2 text-sm">
                             <SummaryRow label="Base amount" value={num(basePay)} />
                             <SummaryRow label="Bonus" value={num(pay.bonus)} sign="+" />
-                            <SummaryRow label="Overtime" value={num(pay.overtime)} sign="+" />
+                            <SummaryRow
+                                label="Overtime"
+                                value={num(pay.overtime)}
+                                sign="+"
+                            />
                             <SummaryRow
                                 label="Deductions"
                                 value={num(pay.deductions)}
@@ -834,7 +843,9 @@ const ManageSalary = () => {
                                                             +{money(num(r.amount))}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-stone-400">Starting pay</span>
+                                                        <span className="text-stone-400">
+                                                            Starting pay
+                                                        </span>
                                                     )}
                                                 </td>
                                                 <td className="py-3 pl-3 pr-5 text-right font-semibold text-stone-900 sm:pr-6">

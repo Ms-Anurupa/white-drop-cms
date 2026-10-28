@@ -198,7 +198,7 @@ function SalaryHistory({ salaries, emp }) {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate("/dashboard/create-salary", {
+                      navigate("/dashboard/manage-salary", {
                         state: { employeeId: emp.id, employee: emp },
                       })
                     }
@@ -212,7 +212,7 @@ function SalaryHistory({ salaries, emp }) {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate("/dashboard/employee-salary", {
+                      navigate("/dashboard/manage-salary", {
                         state: { employeeId: emp.id, employee: emp },
                       })
                     }
@@ -232,10 +232,6 @@ function SalaryHistory({ salaries, emp }) {
 
 function EmployeeRow({ emp, open, onToggle }) {
   const navigate = useNavigate();
-  const latest = useMemo(
-    () => [...(emp.salaries || [])].sort(byPeriodDesc)[0],
-    [emp.salaries],
-  );
 
   const panelId = `salary-${emp.id}`;
 
@@ -287,21 +283,15 @@ function EmployeeRow({ emp, open, onToggle }) {
         </td>
 
         <td className="px-3 py-3 text-right tabular-nums">
-          {latest ? (
-            <>
-              <div className="font-medium text-stone-900">
-                {inr.format(netPay(latest))}
-              </div>
-
-              <div className="text-xs text-stone-500">
-                {fmtPeriod(latest.period || latest.createdAt)}
-              </div>
-            </>
-          ) : (
-            <span className="text-stone-400">Not set</span>
-          )}
+          <div className="text-xs text-stone-500">
+            Joined{" "}
+            {new Date(emp.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </div>
         </td>
-
         <td className="px-3 py-3 pr-4 sm:pr-6">
           <StatusBadge status={emp.status} />
         </td>
@@ -513,7 +503,7 @@ const EmployeeList = () => {
                 </th>
 
                 <th className="px-3 py-3 text-right font-medium">
-                  Latest net pay
+                  Joining Date
                 </th>
 
                 <th className="px-3 py-3 pr-4 font-medium sm:pr-6">Status</th>

@@ -34,7 +34,13 @@ const sections = [
         end: true,
       },
       { name: "Product", path: "product", icon: Package },
-      { name: "Employee List", path: "employee-list", icon: UserCog2Icon },
+      {
+        name: "Employee List",
+        path: "employee-list",
+        icon: UserCog2Icon,
+        // other routes that should keep this item highlighted
+        activePaths: ["manage-salary", "employee-salary"],
+      },
       {
         name: "Expenses",
         key: "expenses",
@@ -160,7 +166,9 @@ const NavItem = ({ item, onClick, collapsed }) => {
   const isItemActive = (navLinkIsActive) => {
     if (navLinkIsActive) return true;
     if (item.end) return false;
-    return matchesPath(pathname, item.path);
+    return [item.path, ...(item.activePaths || [])].some((p) =>
+      matchesPath(pathname, p),
+    );
   };
 
   return (
