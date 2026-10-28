@@ -62,6 +62,7 @@ import AdHocSaleForm from "./components/CreateAdhocSale";
 import EmployeeList from "./pages/Employee/EmployeeList";
 import EmployeeSalary from "./pages/Employee/EmployeeSalary";
 import ManageSalary from "./pages/Employee/ManageSalary";
+import RegisterEmployee from "./pages/Employee/RegisterEmployee";
 
 const App = () => {
   return (
@@ -116,6 +117,7 @@ const App = () => {
                   element={<DueRegister theme="light" />}
                 />
                 <Route path="expense" element={<ExpenseListing />} />
+                <Route path="register-employee" element={<RegisterEmployee />} />
                 <Route path="employee-list" element={<EmployeeList />} />
                 <Route path="employee-salary" element={<EmployeeSalary />} />
                 <Route path="create-salary" element={<ExpenseListing />} />

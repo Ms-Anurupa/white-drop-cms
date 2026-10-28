@@ -292,7 +292,7 @@ const ManageSalary = () => {
         e.preventDefault();
         const errs = {};
         if (!(num(pay.paidAmount) > 0))
-            errs.paidAmount = "Enter the base amount paid. It must be more than ₹0.";
+            errs.paidAmount = "Set the base amount paid. It must be more than ₹0.";
         ["bonus", "overtime", "deductions"].forEach((k) => {
             if (num(pay[k]) < 0) errs[k] = "Can't be negative.";
         });

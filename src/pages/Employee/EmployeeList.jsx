@@ -1,6 +1,14 @@
 import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  ChevronRight,
+  ChevronLeft,
+  RefreshCw,
+  Users,
+  Plus,
+} from "lucide-react";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All" },
@@ -59,31 +67,19 @@ function useDebounce(value, delay = 400) {
 
 /* ---------- small pieces ---------- */
 
-const Icon = ({ d, className = "h-4 w-4" }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d={d} />
-  </svg>
+const Icon = ({ d: LucidIcon, className = "h-4 w-4" }) => (
+  <LucidIcon className={className} aria-hidden="true" />
 );
 
 const ICONS = {
-  search: "M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z",
-  chevron: "M9 6l6 6-6 6",
-  left: "M15 18l-6-6 6-6",
-  right: "M9 18l6-6-6-6",
-  refresh: "M20 11a8 8 0 10-2.3 5.7M20 4v7h-7",
-  users:
-    "M17 20v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M10 11a4 4 0 100-8 4 4 0 000 8zM21 20v-1a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8",
+  search: Search,
+  chevron: ChevronRight,
+  left: ChevronLeft,
+  right: ChevronRight,
+  refresh: RefreshCw,
+  users: Users,
+  plus: Plus,
 };
-
 const STATUS_STYLES = {
   ACTIVE: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   INACTIVE: "bg-stone-100 text-stone-600 ring-stone-500/20",
@@ -384,7 +380,7 @@ const EmployeeList = () => {
   const [limit, setLimit] = useState(10);
   const [expandedId, setExpandedId] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
-
+  const navigate = useNavigate();
   const debouncedSearch = useDebounce(search);
 
   useEffect(() => {
@@ -415,7 +411,7 @@ const EmployeeList = () => {
   return (
     <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-stone-900">
             Employees
@@ -430,19 +426,32 @@ const EmployeeList = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setReloadKey((k) => k + 1)}
-          className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-        >
-          <Icon
-            d={ICONS.refresh}
-            className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </button>
-      </div>
+        <div className="flex flex-wrap items-end gap-3">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/register-employee")}
+            className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          >
+            <Icon
+              d={ICONS.plus}
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Register New Employee
+          </button>
 
+          <button
+            type="button"
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          >
+            <Icon
+              d={ICONS.refresh}
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+        </div>
+      </div>
       {/* Toolbar */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="relative flex-1">
