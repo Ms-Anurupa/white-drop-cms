@@ -111,148 +111,14 @@ function Avatar({ name }) {
   );
 }
 
-function SalaryHistory({ salaries, emp }) {
+function EmployeeRow({ emp }) {
   const navigate = useNavigate();
-  const rows = useMemo(() => [...salaries].sort(byPeriodDesc), [salaries]);
-
-  if (!rows.length) {
-    return (
-      <p className="px-4 py-5 text-sm text-stone-500 sm:px-6">
-        No salary records yet for this employee.
-      </p>
-    );
-  }
-
-  return (
-    <div className="overflow-x-auto px-4 py-4 sm:px-6">
-      <table className="w-full min-w-[560px] text-sm">
-        <thead>
-          <tr className="text-left text-xs text-stone-500">
-            <th className="pb-2 font-medium">Month</th>
-            <th className="pb-2 text-right font-medium">Base</th>
-            <th className="pb-2 text-right font-medium">Bonus</th>
-            <th className="pb-2 text-right font-medium">Overtime</th>
-            <th className="pb-2 text-right font-medium">Deductions</th>
-            <th className="pb-2 text-right font-medium">Net pay</th>
-            <th className="pb-2 text-right font-medium">Change</th>
-            <th className="pb-2 text-center font-medium">Manage</th>
-            <th className="pb-2 text-center font-medium">Action</th>
-          </tr>
-        </thead>
-
-        <tbody className="tabular-nums">
-          {rows.map((s, i) => {
-            const net = netPay(s);
-            const prev = rows[i + 1] ? netPay(rows[i + 1]) : null;
-            const diff = prev === null ? null : net - prev;
-
-            return (
-              <tr key={s.id || i} className="border-t border-stone-200/70">
-                <td className="py-2 pr-4 font-medium text-stone-800">
-                  {fmtPeriod(s.period || s.createdAt)}
-                </td>
-
-                <td className="py-2 text-right text-stone-600">
-                  {inr.format(num(s.baseSalary ?? s.salary))}
-                </td>
-
-                <td className="py-2 text-right text-stone-600">
-                  {inr.format(num(s.bonus))}
-                </td>
-
-                <td className="py-2 text-right text-stone-600">
-                  {inr.format(num(s.overtime))}
-                </td>
-
-                <td className="py-2 text-right text-stone-600">
-                  {num(s.deductions)
-                    ? `−${inr.format(num(s.deductions))}`
-                    : inr.format(0)}
-                </td>
-
-                <td className="py-2 text-right font-semibold text-stone-900">
-                  {inr.format(net)}
-                </td>
-
-                <td
-                  className={`py-2 text-right text-xs ${
-                    diff === null || diff === 0
-                      ? "text-stone-400"
-                      : diff > 0
-                        ? "text-emerald-700"
-                        : "text-rose-700"
-                  }`}
-                >
-                  {diff === null
-                    ? "—"
-                    : diff === 0
-                      ? "No change"
-                      : `${diff > 0 ? "+" : "−"}${inr.format(Math.abs(diff))}`}
-                </td>
-
-                <td className="px-3 py-3 text-center">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigate("/dashboard/manage-salary", {
-                        state: { employeeId: emp.id, employee: emp },
-                      })
-                    }
-                    className="cursor-pointer rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                  >
-                    Manage Salary
-                  </button>
-                </td>
-
-                <td className="px-3 py-3 pr-4 text-center sm:pr-6">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigate("/dashboard/manage-salary", {
-                        state: { employeeId: emp.id, employee: emp },
-                      })
-                    }
-                    className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EmployeeRow({ emp, open, onToggle }) {
-  const navigate = useNavigate();
-
-  const panelId = `salary-${emp.id}`;
-
   return (
     <>
       <tr
-        className={`border-t border-stone-200 transition-colors ${
-          open ? "bg-teal-50/40" : "hover:bg-stone-50"
-        }`}
+        className={`border-t border-stone-200 transition-colors hover:bg-stone-50`}
       >
-        <td className="py-3 pl-4 pr-2 sm:pl-6">
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={open}
-            aria-controls={panelId}
-            aria-label={`${open ? "Hide" : "Show"} salary history for ${emp.empName}`}
-            className="cursor-pointer flex h-7 w-7 items-center justify-center rounded-md text-stone-500 hover:bg-stone-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-          >
-            <Icon
-              d={ICONS.chevron}
-              className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`}
-            />
-          </button>
-        </td>
+        <td className="py-3 pl-4 pr-2 sm:pl-6"></td>
 
         <td className="px-2 py-3">
           <div className="flex items-center gap-3">
@@ -288,9 +154,6 @@ function EmployeeRow({ emp, open, onToggle }) {
             })}
           </div>
         </td>
-        <td className="px-3 py-3 pr-4 sm:pr-6">
-          <StatusBadge status={emp.status} />
-        </td>
 
         <td className="px-3 py-3 text-center">
           <button
@@ -305,15 +168,21 @@ function EmployeeRow({ emp, open, onToggle }) {
             Manage Salary
           </button>
         </td>
-      </tr>
 
-      {open && (
-        <tr id={panelId} className="border-t border-stone-200 bg-stone-50">
-          <td colSpan={8} className="p-0">
-            <SalaryHistory salaries={emp.salaries || []} emp={emp} />
-          </td>
-        </tr>
-      )}
+        <td className="px-3 py-3 text-center pr-4 sm:pr-6">
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/dashboard/employee-salary", {
+                state: { employeeId: emp.id, employee: emp },
+              })
+            }
+            className="cursor-pointer rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-200 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500"
+          >
+            View
+          </button>
+        </td>
+      </tr>
     </>
   );
 }
@@ -321,8 +190,6 @@ function EmployeeRow({ emp, open, onToggle }) {
 function SkeletonRows({ count }) {
   return Array.from({ length: count }).map((_, i) => (
     <tr key={i} className="border-t border-stone-200">
-      <td className="py-4 pl-4 sm:pl-6" />
-
       <td className="px-2 py-4">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 animate-pulse rounded-full bg-stone-200" />
@@ -515,11 +382,11 @@ const EmployeeList = () => {
                   Joining Date
                 </th>
 
-                <th className="px-3 py-3 pr-4 font-medium sm:pr-6">Status</th>
 
                 <th className="px-3 py-3 text-center font-medium">
                   Manage Salary
                 </th>
+                <th className="px-3 py-3 pr-4 font-medium sm:pr-6">Salary History</th>
               </tr>
             </thead>
 
