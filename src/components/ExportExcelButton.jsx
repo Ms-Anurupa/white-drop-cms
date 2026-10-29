@@ -5,7 +5,7 @@ import { X, FileSpreadsheet } from "lucide-react";
 import { toast } from "react-toastify";
 import excelStore from "@/zustand/Store/excelStore"; // Adjust this import path to match your project structure
 
-const ExportExcelButton = ({ type, buttonText = "Export To Excel" }) => {
+const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId }) => {
   console.log("type", type)
   const [isOpen, setIsOpen] = useState(false);
   
@@ -82,7 +82,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel" }) => {
 
     try {
       // Call your Zustand store directly
-      await downloadExcel(type, finalFromDate, finalToDate);
+      await downloadExcel(type, finalFromDate, finalToDate, employeeId);
       toast.success("Excel file downloaded successfully!");
       setIsOpen(false);
     } catch (error) {

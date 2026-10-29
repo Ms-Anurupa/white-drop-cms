@@ -1,3 +1,4 @@
+import ExportExcelButton from "@/components/ExportExcelButton";
 import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useState } from "react";
 
@@ -87,6 +88,7 @@ export default function SalaryPaymentLogs() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState(filters.search || "");
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (!employees.length) {
@@ -179,6 +181,22 @@ export default function SalaryPaymentLogs() {
     });
   }
 
+   const notify = (message, tone = "ok") => {
+     setToast({
+       message,
+       tone,
+     });
+   };
+
+  const handleRefresh = async () => {
+    try {
+      await getEmployeeList();
+      notify("Due register refreshed");
+    } catch {
+      notify("Unable to refresh due register", "error");
+    }
+  };
+
   const firstLoad = loading && logs.length === 0;
   const total = pagination?.totalRecords ?? 0;
 
@@ -196,33 +214,68 @@ export default function SalaryPaymentLogs() {
       aria-labelledby="spl-title"
     >
       {/* Compact Header */}
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1
-            id="spl-title"
-            className="text-xl font-bold tracking-tight text-slate-800"
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        {/* Left Section: Title & Amount Summary */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+          <div>
+            <h1
+              id="spl-title"
+              className="text-xl font-bold tracking-tight text-slate-800"
+            >
+              Salary payments
+            </h1>
+            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+              Every payout recorded for your team.
+            </p>
+          </div>
+
+          {/* Amount Summary (Left Aligned) */}
+          <div
+            className="border-slate-200 text-left sm:border-l sm:pl-6"
+            aria-live="polite"
           >
-            Salary payments
-          </h1>
-          <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
-            Every payout recorded for your team.
-          </p>
+            <span className="block text-2xl font-bold leading-tight tracking-tight text-emerald-700 sm:text-3xl">
+              {firstLoad ? (
+                <span className="inline-block h-7 w-36 animate-pulse rounded bg-slate-200" />
+              ) : (
+                inr.format(summary?.totalPaidAmount ?? 0)
+              )}
+            </span>
+
+            <span className="text-xs text-slate-500">
+              {firstLoad
+                ? "Loading totals…"
+                : `Paid across ${summary?.totalRecords ?? 0} ${
+                    (summary?.totalRecords ?? 0) === 1 ? "payment" : "payments"
+                  } ${dateMode ? "on" : "in"} ${periodLabel}`}
+            </span>
+          </div>
         </div>
 
-        <div className="text-left sm:text-right" aria-live="polite">
-          <span className="block text-2xl font-bold leading-tight tracking-tight text-emerald-700 sm:text-3xl">
-            {firstLoad ? (
-              <span className="ml-0 inline-block h-7 w-36 animate-pulse rounded bg-slate-200 sm:ml-auto" />
-            ) : (
-              inr.format(summary?.totalPaidAmount ?? 0)
-            )}
-          </span>
+        {/* Right Section: Action Buttons */}
+        <div className="flex items-center gap-2 sm:ml-auto">
+          <button
+            type="button"
+            onClick={() => handleRefresh()}
+            disabled={loading}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              aria-hidden="true"
+            >
+              <path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7" />
+            </svg>
+            Refresh
+          </button>
 
-          <span className="text-xs text-slate-500">
-            {firstLoad
-              ? "Loading totals…"
-              : `Paid across ${summary?.totalRecords ?? 0} ${(summary?.totalRecords ?? 0) === 1 ? "payment" : "payments"} ${dateMode ? "on" : "in"} ${periodLabel}`}
-          </span>
+          <ExportExcelButton type="paidSalary" />
         </div>
       </header>
 
@@ -240,48 +293,6 @@ export default function SalaryPaymentLogs() {
             onChange={(event) => setSearchText(event.target.value)}
             className="h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
-        </label>
-
-        <label className="flex min-w-0 flex-col gap-1">
-          <span className="text-xs font-semibold text-slate-600">Month</span>
-          <select
-            value={filters.month}
-            disabled={dateMode}
-            onChange={(event) =>
-              applyFilters({
-                month: event.target.value,
-                salaryDate: "",
-              })
-            }
-            className="h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-          >
-            <option value="">Whole year</option>
-            {MONTHS.map((month, index) => (
-              <option key={month} value={index + 1}>
-                {month}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex min-w-0 flex-col gap-1">
-          <span className="text-xs font-semibold text-slate-600">Year</span>
-          <select
-            value={filters.year}
-            disabled={dateMode}
-            onChange={(event) =>
-              applyFilters({
-                year: Number(event.target.value),
-              })
-            }
-            className="h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-          >
-            {YEARS.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
         </label>
 
         <label className="flex min-w-0 flex-col gap-1">
@@ -448,7 +459,9 @@ export default function SalaryPaymentLogs() {
                       </td>
 
                       <td className="px-3 py-2 text-right align-middle text-sm font-semibold tabular-nums whitespace-nowrap text-emerald-700 max-[720px]:block max-[720px]:pt-1 max-[720px]:text-left max-[720px]:text-base">
-                        {inr.format(row.paidAmount ?? 0)}
+                        {inr.format(
+                          (row.paidAmount ?? 0) - (row.deduction ?? 0),
+                        )}
                       </td>
                     </tr>
                   );

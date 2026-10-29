@@ -1,3 +1,4 @@
+import ExportExcelButton from "@/components/ExportExcelButton";
 import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -15,11 +16,14 @@ const inr = new Intl.NumberFormat("en-IN", {
 
 const num = (v) => (v === null || v === undefined || v === "" ? 0 : Number(v));
 
-// Use paidAmount directly from response; fallback to calculated value
-const net = (r) =>
-  r.paidAmount !== undefined
-    ? num(r.paidAmount)
-    : num(r.baseSalary ?? r.salary) + num(r.bonus) + num(r.overtime) - num(r.deduction);
+const basePay = (r) =>  r?.employees?.[0]?.salary?.basePay;
+
+/* Paid Amount = paidAmount - deduction + overtime + bonus */
+const paidAmount = (r) =>
+  num(r.paidAmount) -
+  num(r.deduction) +
+  num(r.overtime) +
+  num(r.bonus);
 
 const dateLabel = (r) =>
   r.period
@@ -34,6 +38,15 @@ const dateLabel = (r) =>
         year: "numeric",
       });
 
+const formatDate = (date) =>
+  date
+    ? new Date(date).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "—";
+
 const initials = (name = "") =>
   name
     .trim()
@@ -43,6 +56,7 @@ const initials = (name = "") =>
     .join("") || "?";
 
 const money = (n) => inr.format(n);
+
 const signed = (n) => `${n > 0 ? "+" : "−"}${money(Math.abs(n))}`;
 
 /* ---------- small pieces ---------- */
@@ -66,15 +80,25 @@ const ICONS = {
   back: "M15 18l-6-6 6-6",
   refresh: "M20 11a8 8 0 10-2.3 5.7M20 4v7h-7",
   empty: "M3 7h18M3 12h18M3 17h10",
-  filter: "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z",
+  filter:
+    "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z",
 };
 
 function Delta({ value }) {
-  if (value === null)
+  if (value === null || value === undefined) {
     return <span className="text-stone-400">First record</span>;
-  if (value === 0) return <span className="text-stone-400">No change</span>;
+  }
+
+  if (value === 0) {
+    return <span className="text-stone-400">No increment</span>;
+  }
+
   return (
-    <span className={value > 0 ? "text-emerald-700" : "text-rose-700"}>
+    <span
+      className={
+        value > 0 ? "font-medium text-emerald-700" : "font-medium text-rose-700"
+      }
+    >
       {signed(value)}
     </span>
   );
@@ -94,12 +118,15 @@ function Skeleton() {
 const EmployeeSalary = () => {
   const params = useParams();
   const location = useLocation();
+
   const targetId = params.employeeId || location.state?.employeeId;
+  console.log(targetId);
+  
 
   const employees = employeeStore((s) => s.employees);
   const salaryRecords = employeeStore((s) => s.salaryRecords);
   const salaryPagination = employeeStore((s) => s.salaryPagination);
-  const salarySummary = employeeStore((s) => s.salarySummary); // Assuming store passes `summary`
+  const salarySummary = employeeStore((s) => s.salarySummary);
   const loading = employeeStore((s) => s.loading);
   const error = employeeStore((s) => s.error);
 
@@ -116,6 +143,7 @@ const EmployeeSalary = () => {
     if (!targetId || !fetchLogs) return;
 
     const filterParams = { ...extraParams };
+
     if (selectedYear) {
       filterParams.year = selectedYear;
     } else {
@@ -126,16 +154,17 @@ const EmployeeSalary = () => {
     try {
       await fetchLogs(targetId, { limit: PAGE_SIZE, ...filterParams }, append);
     } catch {
-      /* Handled in store */
+      // Errors are handled by the store.
     }
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(false);
+
     if (targetId) {
       load().finally(() => setReady(true));
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetId, selectedYear, startDate, endDate]);
 
@@ -150,18 +179,23 @@ const EmployeeSalary = () => {
   const records = ready ? salaryRecords : [];
   const latest = records[0];
   const previous = records[1];
-  const change = latest && previous ? net(latest) - net(previous) : null;
+
+  const latestIncrement = latest && previous ? basePay(latest) - basePay(previous) : null;
+
   const average = records.length
-    ? records.reduce((sum, r) => sum + net(r), 0) / records.length
+    ? records.reduce((sum, r) => sum + paidAmount(r), 0) / records.length
     : 0;
+
   const hasMore = Boolean(salaryPagination?.hasNextPage);
 
-  // Available year selections for filter dropdown
   const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 5 }, (_, i) => String(currentYear - i));
+
+  const yearOptions = Array.from({ length: 5 }, (_, i) =>
+    String(currentYear - i),
+  );
 
   return (
-    <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
+    <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
       <Link
         to={BACK_ROUTE}
         className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
@@ -172,13 +206,12 @@ const EmployeeSalary = () => {
 
       {/* Header */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+        {/* Left: Employee Info */}
         <div className="flex items-center gap-3">
-          {/* Avatar */}
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-700 text-sm font-semibold text-white">
             {initials(employee?.empName)}
           </div>
 
-          {/* Info Container */}
           <div className="flex flex-col justify-center">
             <h1 className="text-xl font-semibold tracking-tight text-stone-900">
               {employee?.empName || "Employee"}
@@ -190,14 +223,7 @@ const EmployeeSalary = () => {
               {employee?.empPhone && employee?.createdAt && <span>·</span>}
 
               {employee?.createdAt && (
-                <span>
-                  Joined{" "}
-                  {new Date(employee.createdAt).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
+                <span>Joined {formatDate(employee.createdAt)}</span>
               )}
 
               {(employee?.empPhone || employee?.createdAt) && <span>·</span>}
@@ -206,28 +232,33 @@ const EmployeeSalary = () => {
             </div>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => load()}
-          disabled={loading}
-          className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-        >
-          <Icon
-            d={ICONS.refresh}
-            className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </button>
+
+        {/* Right: Action Buttons Grouped & Right-Aligned */}
+        <div className="flex items-center gap-2 sm:ml-auto">
+          <button
+            type="button"
+            onClick={() => load()}
+            disabled={loading}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          >
+            <Icon
+              d={ICONS.refresh}
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+
+          <ExportExcelButton type="salaryHistory" employeeId={employee?.id} />
+        </div>
       </div>
 
-      {/* Date & Year Filters */}
+      {/* Filters */}
       <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 sm:px-4">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-500">
           <Icon d={ICONS.filter} className="h-3.5 w-3.5" />
           Filter:
         </div>
 
-        {/* Filter by Year */}
         <select
           value={selectedYear}
           onChange={(e) => {
@@ -237,11 +268,9 @@ const EmployeeSalary = () => {
           }}
           className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
         >
-          <option className="cursor-pointer" value="">
-            All Years
-          </option>
+          <option value="">All Years</option>
           {yearOptions.map((y) => (
-            <option className="cursor-pointer" key={y} value={y}>
+            <option key={y} value={y}>
               Year {y}
             </option>
           ))}
@@ -249,7 +278,6 @@ const EmployeeSalary = () => {
 
         <span className="text-xs text-stone-400">or range</span>
 
-        {/* Date Range Inputs */}
         <input
           type="date"
           value={startDate}
@@ -257,7 +285,9 @@ const EmployeeSalary = () => {
           onChange={(e) => setStartDate(e.target.value)}
           className="rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 disabled:bg-stone-100 disabled:text-stone-400 focus:border-teal-600 focus:outline-none"
         />
+
         <span className="text-xs text-stone-400">to</span>
+
         <input
           type="date"
           value={endDate}
@@ -274,7 +304,7 @@ const EmployeeSalary = () => {
               setStartDate("");
               setEndDate("");
             }}
-            className="cursor-pointer ml-auto text-xs font-medium text-stone-500 hover:text-stone-800 underline"
+            className="ml-auto cursor-pointer text-xs font-medium text-stone-500 underline hover:text-stone-800"
           >
             Clear filters
           </button>
@@ -299,9 +329,11 @@ const EmployeeSalary = () => {
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-500">
             <Icon d={ICONS.empty} className="h-5 w-5" />
           </div>
+
           <p className="text-sm font-medium text-stone-800">
             No salary records found
           </p>
+
           <p className="max-w-sm text-sm text-stone-500">
             No salary records match the selected time frame. Try clearing
             filters or changing dates.
@@ -309,36 +341,37 @@ const EmployeeSalary = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
-          {/* Summary Stats */}
+          {/* Summary */}
           <dl className="grid grid-cols-1 divide-y divide-stone-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {/* Aggregate yearly/filtered total from backend summary */}
             <div className="px-5 py-4 sm:px-6">
               <dt className="text-sm text-stone-500">
                 {selectedYear
                   ? `Total Salary (${selectedYear})`
                   : "Total Filtered Salary"}
               </dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-teal-700">
+
+              <dd className="mt-1 text-2xl font-semibold tracking-tight text-teal-700">
                 {money(
                   salarySummary?.totalYearSalary ??
-                    records.reduce((acc, r) => acc + net(r), 0),
+                    records.reduce((acc, r) => acc + paidAmount(r), 0),
                 )}
               </dd>
+
               <dd className="mt-0.5 text-xs text-stone-500">
                 {salarySummary?.totalRecords ?? records.length} total payments
               </dd>
             </div>
 
             <div className="px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">Change from previous</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">
-                <Delta value={change} />
+              <dt className="text-sm text-stone-500">Latest increment</dt>
+              <dd className="mt-1 text-2xl font-semibold tracking-tight">
+                <Delta value={latestIncrement} />
               </dd>
             </div>
 
             <div className="px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">Average net pay</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900">
+              <dt className="text-sm text-stone-500">Average paid amount</dt>
+              <dd className="mt-1 text-2xl font-semibold tracking-tight text-stone-900">
                 {money(average)}
               </dd>
               <dd className="mt-0.5 text-xs text-stone-500">
@@ -348,30 +381,39 @@ const EmployeeSalary = () => {
             </div>
           </dl>
 
-          {/* Ledger Table */}
+          {/* Salary history table */}
           <div className="overflow-x-auto border-t border-stone-200">
-            <table className="w-full min-w-[720px] text-left text-sm">
+            <table className="w-full min-w-[1100px] text-left text-sm">
               <thead className="bg-stone-50 text-xs text-stone-500">
                 <tr>
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">
                     {records[0]?.period ? "Month" : "Date"}
                   </th>
-                  <th className="px-3 py-3 text-right font-medium">Net Paid</th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Joining Date
+                  </th>
+                  <th className="px-3 py-3 text-right font-medium">Base Pay</th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Increment
+                  </th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Paid Amount
+                  </th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">
                     Deductions
                   </th>
-                  <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
-                    Change
-                  </th>
                 </tr>
               </thead>
+
               <tbody className="tabular-nums">
                 {records.map((r, i) => {
                   const prev = records[i + 1];
-                  const diff = prev ? net(r) - net(prev) : null;
-                  const deductionAmt = num(r.deduction);
+
+                  const increment = prev ? basePay(r) - basePay(prev) : null;
+
+                  const deductionAmt = num(r.deduction ?? r.deductions);
 
                   return (
                     <tr
@@ -384,6 +426,7 @@ const EmployeeSalary = () => {
                         <div className="font-medium text-stone-900">
                           {dateLabel(r)}
                         </div>
+
                         {r.note && (
                           <div
                             className="mt-0.5 max-w-[220px] truncate text-xs text-stone-500"
@@ -393,16 +436,31 @@ const EmployeeSalary = () => {
                           </div>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-right font-semibold text-stone-900">
-                        {money(num(r.paidAmount))}
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        {formatDate(employee?.createdAt)}
                       </td>
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        {money(r?.employees[0]?.salary?.basePay)}
+                      </td>
+
+                      <td className="px-3 py-3 text-right">
+                        <Delta value={increment} />
+                      </td>
+
+                      <td className="px-3 py-3 text-right font-semibold text-stone-900">
+                        {money(paidAmount(r))}
+                      </td>
+
                       <td className="px-3 py-3 text-right text-stone-600">
                         {money(num(r.bonus))}
                       </td>
+
                       <td className="px-3 py-3 text-right text-stone-600">
                         {money(num(r.overtime))}
                       </td>
-                      {/* Fixed: Corrected r.deduction usage */}
+
                       <td className="px-3 py-3 text-right text-stone-600">
                         {deductionAmt > 0 ? (
                           <span className="text-rose-700">
@@ -411,9 +469,6 @@ const EmployeeSalary = () => {
                         ) : (
                           money(0)
                         )}
-                      </td>
-                      <td className="py-3 pl-3 pr-5 text-right text-xs sm:pr-6">
-                        <Delta value={diff} />
                       </td>
                     </tr>
                   );
@@ -429,7 +484,9 @@ const EmployeeSalary = () => {
               {records.length === 1 ? "record" : "records"}
               {hasMore ? "" : " · end of history"}
             </span>
+
             {error && <span className="text-rose-700">{error}</span>}
+
             {hasMore && (
               <button
                 type="button"

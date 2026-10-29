@@ -300,7 +300,6 @@ export default function DueTrackerPro({
     normalizedRows.length > 0 &&
     normalizedRows.every((row) => selected.has(row.id));
 
-  const someOnPage = normalizedRows.some((row) => selected.has(row.id));
 
   // True while the user's typing hasn't been sent to the server yet (debounce) or is loading
   const searching = query.trim() !== (search || "") || (loading && !!search);
