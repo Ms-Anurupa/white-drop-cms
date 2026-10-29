@@ -19,7 +19,6 @@ const MONTHS = [
 
 const PAGE_SIZES = [10, 25, 50, 100];
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
 
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",

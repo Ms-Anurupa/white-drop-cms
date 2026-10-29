@@ -10,11 +10,6 @@ import {
   Plus,
 } from "lucide-react";
 
-const STATUS_OPTIONS = [
-  { value: "", label: "All" },
-  { value: "ACTIVE", label: "Active" },
-  { value: "INACTIVE", label: "Inactive" },
-];
 
 const PAGE_SIZES = [10, 25, 50];
 
@@ -295,28 +290,6 @@ const EmployeeList = () => {
             className="w-full rounded-lg border border-stone-300 bg-white py-2 pl-9 pr-3 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
           />
         </label>
-
-        <div
-          role="group"
-          aria-label="Filter by status"
-          className="inline-flex rounded-lg border border-stone-300 bg-white p-0.5"
-        >
-          {STATUS_OPTIONS.map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => setStatus(o.value)}
-              aria-pressed={status === o.value}
-              className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
-                status === o.value
-                  ? "bg-teal-700 text-white"
-                  : "text-stone-600 hover:bg-stone-100"
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Table */}
