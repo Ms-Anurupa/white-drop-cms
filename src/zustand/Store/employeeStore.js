@@ -1,260 +1,274 @@
 import { create } from "zustand";
 import api from "../axios";
 
+const DEFAULT_FILTERS = () => ({
+  search: "",
+  month: "",
+  year: new Date().getFullYear(),
+  salaryDate: "",
+  employeeId: "",
+});
+
 const employeeStore = create((set, get) => ({
-    employees: [],
-    employeeMeta: null,
-    salaryRecords: [],
-    salaryPagination: null,
+  employees: [],
+  employeeMeta: null,
 
-    // NEW: increment history for the Manage Salary page
-    incrementLogs: [],
-    incrementPagination: null,
-    currentBasePay: null,
+  // Per-employee payment history (employeeSalaryLog)
+  salaryRecords: [],
+  salaryPagination: null,
+  salarySummary: null,
+  salaryEmployee: null,
 
-    salaryLogs: [],
-    salaryLogPagination: null,
-    salaryLogSummary: null,
-    salaryFilters: {
-        search: "",
-        month: "",
-        year: new Date().getFullYear(),
-        salaryDate: "",
-        employeeId: "",
-    },
+  // Per-employee salary package + increment history (employeeSalary)
+  incrementLogs: [],
+  incrementPagination: null,
+  currentPackage: null, // { basePay, pTax, esi, finalPay, lastUpdated }
+  currentBasePay: null,
 
-    loading: false,
-    error: null,
+  // All-employee payment log listing
+  salaryLogs: [],
+  salaryLogPagination: null,
+  salaryLogSummary: null,
+  salaryFilters: DEFAULT_FILTERS(),
 
-    registerEmployee: async (employeeData) => {
-        set({ loading: true, error: null });
+  loading: false,
+  error: null,
 
-        try {
-            const response = await api.post("/admin/registerEmployee", employeeData, {
-                withAuth: true,
-            });
+  registerEmployee: async (employeeData) => {
+    set({ loading: true, error: null });
 
-            set({ loading: false });
+    try {
+      const response = await api.post("/admin/registerEmployee", employeeData, {
+        withAuth: true,
+      });
 
-            return response.data;
-        } catch (error) {
-            set({
-                loading: false,
-                error: error.response?.data?.message || "Failed to register employee",
-            });
-            throw error;
-        }
-    },
+      set({ loading: false });
 
-    // Get paginated employee list
-    getEmployeeList: async (params = {}) => {
-        set({ loading: true, error: null });
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to register employee",
+      });
+      throw error;
+    }
+  },
 
-        try {
-            const response = await api.get("/admin/getEmployeeList", {
-                params,
-                withAuth: true,
-            });
+  // Get paginated employee list
+  getEmployeeList: async (params = {}) => {
+    set({ loading: true, error: null });
 
-            set({
-                employees: response.data.data || [],
-                employeeMeta: response.data.meta || null,
-                loading: false,
-            });
+    try {
+      const response = await api.get("/admin/getEmployeeList", {
+        params,
+        withAuth: true,
+      });
 
-            return response.data;
-        } catch (error) {
-            set({
-                loading: false,
-                error: error.response?.data?.message || "Failed to fetch employees",
-            });
-            throw error;
-        }
-    },
+      set({
+        employees: response.data.data || [],
+        employeeMeta: response.data.meta || null,
+        loading: false,
+      });
 
-    // Record a salary payment (addSalaryPaymentLog)
-    addEmployeeSalary: async (salaryData) => {
-        set({ loading: true, error: null });
-        console.log("enter");
-        try {
-            const response = await api.post(
-                "/admin/addSalaryPaymentLog",
-                salaryData,
-                {
-                    withAuth: true,
-                },
-            );
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to fetch employees",
+      });
+      throw error;
+    }
+  },
 
-            set({ loading: false });
+  // Record a salary payment (addSalaryPaymentLog)
+  addEmployeeSalary: async (salaryData) => {
+    set({ loading: true, error: null });
 
-            return response.data;
-        } catch (error) {
-            set({
-                loading: false,
-                error:
-                    error.response?.data?.message || "Failed to create salary record",
-            });
-            throw error;
-        }
-    },
+    try {
+      const response = await api.post(
+        "/admin/addSalaryPaymentLog",
+        salaryData,
+        { withAuth: true },
+      );
 
-    // Update filters and automatically trigger fetch for page 1
-    setSalaryFilters: (newFilters) => {
-        set((state) => ({
-            salaryFilters: { ...state.salaryFilters, ...newFilters },
-        }));
-        get().fetchSalaryLogs(1);
-    },
+      set({ loading: false });
 
-    // Reset salary filters to default (current year)
-    resetSalaryFilters: () => {
-        set({
-            salaryFilters: {
-                search: "",
-                month: "",
-                year: new Date().getFullYear(),
-                salaryDate: "",
-                employeeId: "",
-            },
-        });
-        get().fetchSalaryLogs(1);
-    },
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error:
+          error.response?.data?.message || "Failed to record salary payment",
+      });
+      throw error;
+    }
+  },
 
-    // Fetch paginated salary logs
-    getSalaryPaymentLogs: async (page = 1, limit = 10) => {
-        set({ loading: true, error: null });
+  // First-time salary package for an employee (addEmployeeSalaryInfo)
+  addEmployeeSalaryInfo: async (salaryInfo) => {
+    set({ loading: true, error: null });
 
-        const { salaryFilters } = get();
+    try {
+      const response = await api.post(
+        "/admin/addEmployeeSalaryInfo",
+        salaryInfo,
+        {
+          withAuth: true,
+        },
+      );
 
-        try {
-            const response = await api.get("/admin/getSalaryPaymentLogs", {
-                params: {
-                    page,
-                    limit,
-                    ...salaryFilters,
-                },
-                withAuth: true,
-            });
+      set({ loading: false });
 
-            const { data, pagination, summary } = response.data;
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to save salary package",
+      });
+      throw error;
+    }
+  },
 
-            set({
-                salaryLogs: data || [],
-                salaryLogPagination: pagination || null,
-                salaryLogSummary: summary || null,
-                loading: false,
-            });
-        } catch (error) {
-            set({
-                loading: false,
-                error: error.response?.data?.message || "Failed to fetch salary logs",
-            });
-        }
-    },
+  // NEW: revise an existing package and log the increment (addSalaryIncrementLog)
+  addSalaryIncrementLog: async (payload) => {
+    set({ loading: true, error: null });
 
-    // NEW: Add a salary increment (addSalaryIncrementLog)
-    // ⚠️ Change the URL to match your router.
-    addSalaryIncrementLog: async (incrementData) => {
-        set({ loading: true, error: null });
+    try {
+      const response = await api.post("/admin/addSalaryIncrementLog", payload, {
+        withAuth: true,
+      });
 
-        try {
-            const response = await api.post(
-                "/admin/addSalaryIncrementLog",
-                incrementData,
-                { withAuth: true },
-            );
+      set({ loading: false });
 
-            set({ loading: false });
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error:
+          error.response?.data?.message || "Failed to save salary increment",
+      });
+      throw error;
+    }
+  },
 
-            return response.data;
-        } catch (error) {
-            set({
-                loading: false,
-                error:
-                    error.response?.data?.message || "Failed to save salary increment",
-            });
-            throw error;
-        }
-    },
+  // Update filters and refetch page 1 (all-employee listing)
+  setSalaryFilters: (newFilters) => {
+    set((state) => ({
+      salaryFilters: { ...state.salaryFilters, ...newFilters },
+    }));
+    get().getSalaryPaymentLogs(1);
+  },
 
-    // Get employee salary payments with cursor pagination
-    getSalaryPaymentLogsById: async (employeeId, params = {}, append = false) => {
-        set({ loading: true, error: null });
+  resetSalaryFilters: () => {
+    set({ salaryFilters: DEFAULT_FILTERS() });
+    get().getSalaryPaymentLogs(1);
+  },
 
-        try {
-            const response = await api.get("/admin/getSalaryPaymentLogsById", {
-                params: { employeeId, ...params },
-                withAuth: true,
-            });
+  // All-employee payment logs (page based)
+  getSalaryPaymentLogs: async (page = 1, limit = 10) => {
+    set({ loading: true, error: null });
 
-            const newRecords = response.data.data || [];
+    const { salaryFilters } = get();
 
-            set((state) => ({
-                salaryRecords: append
-                    ? [...state.salaryRecords, ...newRecords]
-                    : newRecords,
-                salaryPagination:
-                    response.data.pagination || response.data.meta || null,
-                loading: false,
-            }));
+    try {
+      const response = await api.get("/admin/getSalaryPaymentLogs", {
+        params: { page, limit, ...salaryFilters },
+        withAuth: true,
+      });
 
-            return response.data;
-        } catch (error) {
-            set({
-                loading: false,
-                error:
-                    error.response?.data?.message ||
-                    "Failed to fetch employee salary records",
-            });
-            throw error;
-        }
-    },
+      const { data, pagination, summary } = response.data;
 
-    // NEW: Get increment history (cursor = ISO date of last entry)
-    // ⚠️ Change the URL to match your router.
-    getSalaryIncrementLogsById: async (
-        employeeId,
-        params = {},
-        append = false,
-    ) => {
-        // eslint-disable-next-line no-useless-catch
-        try {
-            const response = await api.get("/admin/getSalaryIncrementLogsById", {
-                params: { employeeId, ...params },
-                withAuth: true,
-            });
+      set({
+        salaryLogs: data || [],
+        salaryLogPagination: pagination || null,
+        salaryLogSummary: summary || null,
+        loading: false,
+      });
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Failed to fetch salary logs",
+      });
+    }
+  },
 
-            const payload = response.data.data || {};
-            const newLogs = payload.increments || [];
+  // One employee's payment history. Page based: pass { page, limit, fy, startDate, endDate }.
+  // Uses the same controller as getSalaryPaymentLogs (employeeId switches it to single-employee mode).
+  getSalaryPaymentLogsById: async (employeeId, params = {}, append = false) => {
+    set({ loading: true, error: null });
 
-            set((state) => ({
-                incrementLogs: append ? [...state.incrementLogs, ...newLogs] : newLogs,
-                incrementPagination: response.data.pagination || null,
-                currentBasePay: payload.currentBasePay ?? 0,
-            }));
+    try {
+      const response = await api.get("/admin/getSalaryPaymentLogs", {
+        params: { employeeId, ...params },
+        withAuth: true,
+      });
 
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
+      const newRecords = response.data.data || [];
 
-    // Reset salary records when switching employees
-    clearSalaryRecords: () =>
-        set({
-            salaryRecords: [],
-            salaryPagination: null,
-        }),
+      set((state) => ({
+        salaryRecords: append
+          ? [...state.salaryRecords, ...newRecords]
+          : newRecords,
+        salaryPagination: response.data.pagination || null,
+        salarySummary: response.data.summary || null,
+        salaryEmployee: response.data.employee || state.salaryEmployee,
+        loading: false,
+      }));
 
-    // NEW
-    clearIncrementLogs: () =>
-        set({
-            incrementLogs: [],
-            incrementPagination: null,
-            currentBasePay: null,
-        }),
+      return response.data;
+    } catch (error) {
+      set({
+        loading: false,
+        error:
+          error.response?.data?.message ||
+          "Failed to fetch employee salary records",
+      });
+      throw error;
+    }
+  },
 
-    clearError: () => set({ error: null }),
+  // Salary package + increment history (cursor = ISO date of the last entry)
+  getSalaryIncrementLogsById: async (
+    employeeId,
+    params = {},
+    append = false,
+  ) => {
+    const response = await api.get("/admin/getSalaryIncrementLogsById", {
+      params: { employeeId, ...params },
+      withAuth: true,
+    });
+
+    const payload = response.data.data || {};
+    const newLogs = payload.increments || [];
+
+    set((state) => ({
+      incrementLogs: append ? [...state.incrementLogs, ...newLogs] : newLogs,
+      incrementPagination: response.data.pagination || null,
+      currentPackage: payload.currentPackage || null,
+      currentBasePay: payload.currentBasePay ?? 0,
+    }));
+
+    return response.data;
+  },
+
+  // Reset when switching employees
+  clearSalaryRecords: () =>
+    set({
+      salaryRecords: [],
+      salaryPagination: null,
+      salarySummary: null,
+      salaryEmployee: null,
+    }),
+
+  clearIncrementLogs: () =>
+    set({
+      incrementLogs: [],
+      incrementPagination: null,
+      currentPackage: null,
+      currentBasePay: null,
+    }),
+
+  clearError: () => set({ error: null }),
 }));
 
 export default employeeStore;
