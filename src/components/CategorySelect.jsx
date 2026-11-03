@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Search, Check } from "lucide-react";
 import expenseStore from "../zustand/Store/expenseStore";
+import { useLocation } from "react-router-dom";
 
 const CategorySelect = ({
     value,
@@ -18,6 +19,15 @@ const CategorySelect = ({
     const hasMore = expenseStore((s) => s.categoryHasMore);
     const loading = expenseStore((s) => s.categoryLoading);
 
+    const location = useLocation();
+    const isCreateExpensePage = location.pathname.includes("create-expense");
+    const visibleCategories = categories.filter((category) => {
+      if (isCreateExpensePage && category.name?.toUpperCase() === "SALARY") {
+        return false;
+      }
+      return true;
+    });
+
     const getExpenseCategories = expenseStore(
         (s) => s.getExpenseCategories
     );
@@ -32,6 +42,8 @@ const CategorySelect = ({
 
     const selected =
         categories.find((category) => category.id === value) || null;
+
+    
 
     // Load categories and handle search
     useEffect(() => {
@@ -164,7 +176,7 @@ const CategorySelect = ({
                             </button>
                         )}
 
-                        {categories.map((category) => {
+                        {visibleCategories.map((category) => {
                             const isSelected =
                                 category.id === value;
 
