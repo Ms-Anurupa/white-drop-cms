@@ -174,7 +174,7 @@ const ExpenseCategory = () => {
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-semibold text-gray-800 capitalize">
-                                            {cat.name}
+                                            {cat.name.toUpperCase()}
                                         </h4>
                                     </div>
                                 </div>
