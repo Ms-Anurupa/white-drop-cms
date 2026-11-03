@@ -121,9 +121,9 @@ const App = () => {
                 <Route path="register-employee" element={<RegisterEmployee />} />
                 <Route path="employee-list" element={<EmployeeList />} />
                 <Route path="salary-list" element={<SalaryPaymentLogs />} />
-                <Route path="employee-salary" element={<EmployeeSalary />} />
+                <Route path="employee-salary/:employeeId" element={<EmployeeSalary />} />
                 <Route path="create-salary" element={<ExpenseListing />} />
-                <Route path="manage-salary" element={<ManageSalary />} />
+                <Route path="manage-salary/:employeeId" element={<ManageSalary />} />
                 <Route path="create-expense" element={<CreateExpense />} />
                 <Route path="expense-category" element={<ExpenseCategory />} />
                 <Route

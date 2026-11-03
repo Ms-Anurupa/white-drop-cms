@@ -17,7 +17,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { RefreshCw } from "lucide-react";
 
 const LIST_ROUTE = "/dashboard/employee-list";
-const VIEW_ROUTE = "/dashboard/employee-salary";
+
 const EXPENSE_ROUTE = "/dashboard/expense";
 const PAGE_SIZE = 10;
 const FY_OPTIONS = fyOptions(5);
@@ -616,15 +616,16 @@ const ManageSalary = () => {
         );
     }
 
-    const historyLink = (
+    const getViewRoute = (empId) => `/dashboard/employee-salary/${empId}`;
 
-        <Link
-            to={VIEW_ROUTE}
-            state={{ employeeId: targetId, employee }}
-            className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-        >
-            View payment history
-        </Link>
+    const historyLink = (
+      <Link
+        to={getViewRoute(targetId)}
+        state={{ employeeId: targetId, employee }}
+        className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+      >
+        View payment history
+      </Link>
     );
 
     return (

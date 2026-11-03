@@ -112,12 +112,13 @@ function EmployeeRow({ emp }) {
           <button
             type="button"
             onClick={() =>
-              navigate("/dashboard/manage-salary", {
+              navigate(`/dashboard/manage-salary/${emp.id}`, {
                 state: { employeeId: emp.id, employee: emp },
               })
             }
             className="cursor-pointer rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
+          {console.log(emp.id, emp)}
             Manage Salary
           </button>
         </td>
@@ -126,7 +127,7 @@ function EmployeeRow({ emp }) {
           <button
             type="button"
             onClick={() =>
-              navigate("/dashboard/employee-salary", {
+              navigate(`/dashboard/employee-salary/${emp.id}`, {
                 state: { employeeId: emp.id, employee: emp },
               })
             }
