@@ -1,11 +1,14 @@
 import employeeStore from "@/zustand/Store/employeeStore";
 import {
-    MONTHS,
+    MONTH_OPTIONS,
+    MONTH_MAP,
+    getMonthName,
+    getCurrentMonthNumber,
     apiMessage,
     fmtDate,
     fyOptions,
     getCurrentFY,
-    getCurrentMonth,
+
     initials,
     money,
     moneyOrDash,
@@ -33,7 +36,7 @@ const blankPay = () => ({
     bonus: "",
     overtime: "",
     lop: "",
-    month: getCurrentMonth(),
+    month: getCurrentMonthNumber(),
     fy: getCurrentFY(),
     note: "",
 });
@@ -149,8 +152,11 @@ function SelectField({ label, error, options, className = "", ...props }) {
                 {...props}
             >
                 {options.map((o) => (
-                    <option key={o} value={o}>
-                        {o}
+                    <option
+                        key={typeof o === "object" && o !== null ? o.value : o}
+                        value={typeof o === "object" && o !== null ? o.value : o}
+                    >
+                        {typeof o === "object" && o !== null ? o.label : o}
                     </option>
                 ))}
             </select>
@@ -475,14 +481,14 @@ const ManageSalary = () => {
                 bonus: num(pay.bonus),
                 overtime: num(pay.overtime),
                 lop: num(pay.lop),
-                month: pay.month,
+                month: Number(pay.month),
                 fy: pay.fy,
                 note: pay.note.trim() || undefined,
             });
             resetPay();
             showToast(
                 "success",
-                `${money(payTotal)} salary payment recorded successfully for ${pay.month} ${pay.fy}.`,
+                `${money(payTotal)} salary payment recorded successfully for ${getMonthName(pay.month)} ${pay.fy}.`,
             );
             navigate("/dashboard/salary-list");
         } catch (err) {
@@ -733,7 +739,7 @@ const ManageSalary = () => {
                 {notice?.links && (
                     <div className="mt-1.5 flex gap-4 text-xs font-medium">
                         <Link
-                            to={getViewRoute}
+                            to={getViewRoute(targetId)}
                             state={{ employeeId: targetId, employee }}
                             className="underline underline-offset-2"
                         >
@@ -790,7 +796,7 @@ const ManageSalary = () => {
                         <div className="mt-5 grid gap-4 sm:grid-cols-2">
                             <SelectField
                                 label="Month"
-                                options={MONTHS}
+                                options={MONTH_OPTIONS}
                                 value={pay.month}
                                 onChange={setPayField("month")}
                                 error={payErrors.month}
@@ -920,7 +926,7 @@ const ManageSalary = () => {
                         className="h-fit rounded-xl border border-stone-200 bg-white p-5 lg:sticky lg:top-6"
                     >
                         <h2 className="text-sm font-medium text-stone-800">
-                            Payout for {pay.month} {pay.fy}
+                            Payout for {getMonthName(pay.month)} {pay.fy}
                         </h2>
                         <dl className="mt-2 text-sm">
                             <SummaryRow label="Base amount" value={paidBase} />
@@ -1407,7 +1413,7 @@ const ManageSalary = () => {
                             <div className="flex justify-between py-2 text-sm">
                                 <span className="text-stone-500">Period</span>
                                 <span className="font-medium text-stone-900">
-                                    {pay.month} {pay.fy}
+                                    {getMonthName(pay.month)} {pay.fy}
                                 </span>
                             </div>
 

@@ -1,6 +1,7 @@
 import ExportExcelButton from "@/components/ExportExcelButton";
 import employeeStore from "@/zustand/Store/employeeStore";
 import { useEffect, useState } from "react";
+import { getMonthName } from "../../utils/salaryHelper";
 
 const MONTHS = [
     "January",
@@ -128,7 +129,7 @@ export default function SalaryPaymentLogs() {
     const periodLabel = dateMode
         ? fmtDate(`${filters.salaryDate}T00:00:00`)
         : filters?.month
-            ? `${MONTHS[Number(filters.month) - 1]} ${filters.year}`
+            ? `${getMonthName(filters.month)} ${filters.year}`
             : `${filters?.year || CURRENT_YEAR}`;
 
     const selectedEmployee = employees.find(
@@ -167,7 +168,7 @@ export default function SalaryPaymentLogs() {
     if (filters?.month) {
         chips.push({
             key: "month",
-            label: MONTHS[Number(filters.month) - 1],
+            label: getMonthName(filters.month),
             clear: () => applyFilters({ month: "" }),
         });
     }
@@ -484,7 +485,7 @@ export default function SalaryPaymentLogs() {
                                             {/* Period */}
                                             <td className="flex flex-col px-3 py-3 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1">
                                                 <span className="text-sm font-medium text-slate-700">
-                                                    {row.month}
+                                                    {getMonthName(row.month)}
                                                 </span>
                                                 <span className="text-xs text-slate-500">
                                                     Financial Year {row.fy}
