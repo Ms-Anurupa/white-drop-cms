@@ -242,7 +242,9 @@ export default function SalaryPaymentLogs() {
                         <span className="text-xs text-slate-500">
                             {firstLoad
                                 ? "Loading totals…"
-                                : `Paid across ${summary?.totalRecords ?? 0} ${(summary?.totalRecords ?? 0) === 1 ? "payment" : "payments"
+                                : `Paid across ${summary?.totalRecords ?? 0} ${(summary?.totalRecords ?? 0) === 1
+                                    ? "payment"
+                                    : "payments"
                                 } ${dateMode ? "on" : "in"} ${periodLabel}`}
                         </span>
                     </div>
@@ -310,8 +312,8 @@ export default function SalaryPaymentLogs() {
 
             {dateMode && (
                 <p className="mt-2 text-xs text-slate-500">
-                    Showing a single day, so month and year are paused. Clear the date to
-                    use them again.
+                    Showing a single day, so month and year are paused. Clear the date
+                    to use them again.
                 </p>
             )}
 
@@ -368,7 +370,7 @@ export default function SalaryPaymentLogs() {
                 aria-busy={loading}
             >
                 <div className="overflow-x-auto">
-                    <table className="w-full border-collapse text-left">
+                    <table className="w-full table-fixed border-collapse text-left">
                         <thead className="bg-slate-50 max-[720px]:sr-only">
                             <tr>
                                 <th
@@ -391,7 +393,26 @@ export default function SalaryPaymentLogs() {
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-right text-xs font-semibold text-slate-600"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    Professional Tax
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    ESI
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    LOP
+                                </th>
+
+                                <th
+                                    scope="col"
+                                    className="w-[100px] border-b border-slate-200 px-3 py-2 text-right text-xs font-semibold text-slate-600"
                                 >
                                     Net Payout
                                 </th>
@@ -401,11 +422,14 @@ export default function SalaryPaymentLogs() {
                         <tbody className="divide-y divide-slate-100">
                             {firstLoad &&
                                 Array.from({ length: 6 }).map((_, index) => (
-                                    <tr key={index} className="max-[720px]:block max-[720px]:p-2">
-                                        {[1, 2, 3, 4].map((cell) => (
+                                    <tr
+                                        key={index}
+                                        className="max-[720px]:block max-[720px]:p-2"
+                                    >
+                                        {Array.from({ length: 7 }).map((_, cell) => (
                                             <td
                                                 key={cell}
-                                                className="px-3 py-2 max-[720px]:block max-[720px]:p-1"
+                                                className="px-3 py-3 max-[720px]:block max-[720px]:p-1"
                                             >
                                                 <span className="block h-3 w-3/4 animate-pulse rounded bg-slate-200" />
                                             </td>
@@ -415,25 +439,28 @@ export default function SalaryPaymentLogs() {
 
                             {!firstLoad &&
                                 logs?.map((row) => {
-                                    // ✅ FIX 1: Read 'employees' directly as an Object
                                     const emp = row?.employees;
 
-                                    // ✅ FIX 2 & 3: Calculate Net Payout (Base + Bonus + Overtime - LOP - pTax - esi)
+                                    const paidAmount = Number(row.paidAmount) || 0;
+                                    const bonus = Number(row.bonus) || 0;
+                                    const overtime = Number(row.overtime) || 0;
+                                    const pTax = Number(row.pTax) || 0;
+                                    const esi = Number(row.esi) || 0;
+                                    const lop = Number(row.lop) || 0;
+
                                     const netPayout =
-                                        (row.paidAmount ?? 0) +
-                                        (row.bonus ?? 0) +
-                                        (row.overtime ?? 0) -
-                                        (row.lop ?? 0) -
-                                        (row.pTax ?? 0) -
-                                        (row.esi ?? 0);
+                                        paidAmount + bonus + overtime - pTax - esi - lop;
+
+                                    const amountCell =
+                                        "px-3 py-3 align-middle text-sm tabular-nums whitespace-nowrap max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1";
 
                                     return (
                                         <tr
                                             key={row.id}
                                             className="transition-colors hover:bg-slate-50 max-[720px]:block max-[720px]:p-2"
                                         >
-                                            {/* Employee Info */}
-                                            <td className="px-3 py-2 align-middle max-[720px]:block max-[720px]:p-0">
+                                            {/* Employee */}
+                                            <td className="px-3 py-3 align-middle max-[720px]:block max-[720px]:p-0">
                                                 <div className="flex items-center gap-2.5">
                                                     <span
                                                         className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-50 text-xs font-semibold text-emerald-700"
@@ -446,6 +473,7 @@ export default function SalaryPaymentLogs() {
                                                         <strong className="block text-sm font-semibold text-slate-800">
                                                             {emp?.empName || "Unknown employee"}
                                                         </strong>
+
                                                         <div className="text-xs text-slate-500">
                                                             {emp?.empPhone || "No phone on file"}
                                                         </div>
@@ -453,35 +481,82 @@ export default function SalaryPaymentLogs() {
                                                 </div>
                                             </td>
 
-                                            {/* Month & Financial Year */}
-                                            <td className="px-3 py-2 align-middle max-[720px]:block max-[720px]:p-0">
-                                                <div className="text-sm text-slate-700 font-medium">
+                                            {/* Period */}
+                                            <td className="px-3 py-3 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1">
+                                                <span className="text-sm font-medium text-slate-700">
                                                     {row.month}
-                                                </div>
-                                                <div className="text-xs text-slate-500">
+                                                </span>
+                                                <span className="text-xs text-slate-500">
                                                     FY {row.fy}
+                                                </span>
+                                            </td>
+
+                                            {/* Paid On */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    Paid on
+                                                </span>
+                                                <div className="text-slate-700">
+                                                    <div>{fmtDate(row.createdAt)}</div>
+                                                    <div className="text-xs text-slate-500">
+                                                        {fmtTime(row.createdAt)}
+                                                    </div>
                                                 </div>
                                             </td>
 
-                                            {/* Created At Date/Time */}
-                                            <td className="px-3 py-2 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:p-0 max-[720px]:pt-1">
-                                                <div className="text-sm text-slate-700">
-                                                    {fmtDate(row.createdAt)}
-                                                </div>
-                                                <div className="text-xs text-slate-500">
-                                                    {fmtTime(row.createdAt)}
-                                                </div>
+                                            {/* P.Tax */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    P.Tax
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(pTax)}
+                                                </span>
                                             </td>
 
-                                            {/* Net Payout Amount */}
-                                            <td className="px-3 py-2 text-right align-middle text-sm font-semibold tabular-nums whitespace-nowrap text-emerald-700 max-[720px]:block max-[720px]:pt-1 max-[720px]:text-left max-[720px]:text-base">
-                                                {inr.format(netPayout)}
+                                            {/* ESI */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    ESI
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(esi)}
+                                                </span>
+                                            </td>
+
+                                            {/* LOP */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    LOP
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(lop)}
+                                                </span>
+                                            </td>
+
+                                            {/* Net Payout */}
+                                            <td className="w-[150px] px-3 py-3 text-right align-middle text-sm font-semibold tabular-nums whitespace-nowrap text-emerald-700 max-[720px]:flex max-[720px]:w-full max-[720px]:justify-between max-[720px]:items-center max-[720px]:pt-2 max-[720px]:text-base">
+                                            <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                Net Payout
+                                            </span>
+
+                                            <div className="min-w-0">
+                                                <div>{inr.format(netPayout)}</div>
+
                                                 {row.note && (
-                                                    <div className="text-xs font-normal text-slate-500 truncate max-w-[200px] ml-auto">
-                                                        {row.note}
+                                                    <div className="group relative ml-auto max-w-[110px]">
+                                                        <div className="cursor-pointer truncate text-xs font-normal text-slate-500">
+                                                            {row.note}
+                                                        </div>
+
+                                                        {/* Full note tooltip */}
+                                                        <div className="pointer-events-none invisible absolute bottom-full right-0 z-50 mb-2 w-max max-w-[280px] whitespace-normal rounded-md bg-slate-900 px-3 py-2 text-left text-xs font-normal leading-relaxed text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+                                                            {row.note}
+                                                        </div>
                                                     </div>
                                                 )}
-                                            </td>
+                                            </div>
+</td>
                                         </tr>
                                     );
                                 })}
@@ -555,8 +630,8 @@ export default function SalaryPaymentLogs() {
                                         disabled={loading}
                                         onClick={() => setPage(number)}
                                         className={`inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border px-2 py-1 text-xs tabular-nums transition disabled:cursor-not-allowed disabled:opacity-50 ${number === pagination.currentPage
-                                            ? "border-slate-800 bg-slate-800 text-white"
-                                            : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                                                ? "border-slate-800 bg-slate-800 text-white"
+                                                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                                             }`}
                                     >
                                         {number}

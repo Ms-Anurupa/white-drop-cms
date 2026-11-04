@@ -369,7 +369,7 @@ const EmployeeSalary = () => {
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">LOP</th>
-                  <th className="px-3 py-3 text-right font-medium">pTax</th>
+                  <th className="px-3 py-3 text-right font-medium">P.Tax</th>
                   <th className="px-3 py-3 text-right font-medium">ESI</th>
                   <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
                     Total payout

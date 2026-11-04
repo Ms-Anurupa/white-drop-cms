@@ -329,12 +329,12 @@ const ManageSalary = () => {
     const hasSalary = status === "ready" && pkgBase > 0;
     const loading = status === "loading";
 
-    const lastIncrement = incrementLogs[0];
     const hasMore = Boolean(incrementPagination?.hasNextPage);
 
     /* ----- loading ----- */
 
     const loadHistory = useCallback(
+        // eslint-disable-next-line react-hooks/preserve-manual-memoization
         async (extra = {}, append = false) => {
             if (!targetId) return false;
             setHistoryError(null);
@@ -357,6 +357,7 @@ const ManageSalary = () => {
         if (!targetId) return undefined;
         let cancelled = false;
 
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setStatus("loading");
         clearIncrementLogs();
         setNotice(null);
@@ -385,6 +386,7 @@ const ManageSalary = () => {
     // Fill base / pTax / ESI from the package until the user edits the form
     useEffect(() => {
         if (status === "ready" && !payDirty) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPay((p) => ({ ...p, ...payDefaults(pkgBase, pkgPTax, pkgEsi) }));
         }
     }, [status, pkgBase, pkgPTax, pkgEsi, payDirty]);
@@ -433,7 +435,7 @@ const ManageSalary = () => {
             errs.lop = "LOP can't be more than the total pay.";
         }
         if (!errs.pTax && !errs.esi && payTotal >= 0 && inHand < 0) {
-            errs.pTax = "pTax and ESI add up to more than the payout.";
+            errs.pTax = "P.Tax and ESI add up to more than the payout.";
         }
         return errs;
     };
@@ -482,7 +484,7 @@ const ManageSalary = () => {
                 "success",
                 `${money(payTotal)} salary payment recorded successfully for ${pay.month} ${pay.fy}.`,
             );
-            navigate("/dashboard/expense");
+            navigate("/dashboard/salary-list");
         } catch (err) {
             setConfirming(false);
             showToast(
@@ -511,7 +513,7 @@ const ManageSalary = () => {
         if (num(setup.pTax) < 0) errs.pTax = "Can't be negative.";
         if (num(setup.esi) < 0) errs.esi = "Can't be negative.";
         if (!errs.basePay && !errs.pTax && !errs.esi && setupNet < 0) {
-            errs.pTax = "pTax and ESI add up to more than the base pay.";
+            errs.pTax = "P.Tax and ESI add up to more than the base pay.";
         }
         setSetupErrors(errs);
         if (Object.values(errs).some(Boolean)) return;
@@ -564,7 +566,7 @@ const ManageSalary = () => {
         if (num(rev.pTax) < 0) errs.pTax = "Can't be negative.";
         if (num(rev.esi) < 0) errs.esi = "Can't be negative.";
         if (!errs.pTax && !errs.esi && revNet < 0) {
-            errs.pTax = "pTax and ESI add up to more than the new base pay.";
+            errs.pTax = "P.Tax and ESI add up to more than the new base pay.";
         }
         setRevErrors(errs);
         if (Object.values(errs).some(Boolean)) return;
@@ -731,7 +733,7 @@ const ManageSalary = () => {
                 {notice?.links && (
                     <div className="mt-1.5 flex gap-4 text-xs font-medium">
                         <Link
-                            to={VIEW_ROUTE}
+                            to={getViewRoute}
                             state={{ employeeId: targetId, employee }}
                             className="underline underline-offset-2"
                         >
@@ -856,7 +858,7 @@ const ManageSalary = () => {
                                 hint="Amount deducted for unpaid leave."
                             />
                             <Field
-                                label="Professional tax (pTax)"
+                                label="Professional tax"
                                 optional
                                 prefix="₹"
                                 type="number"
@@ -940,7 +942,7 @@ const ManageSalary = () => {
                         </p>
 
                         <dl className="mt-4 border-t border-stone-200 pt-2 text-sm">
-                            <SummaryRow label="pTax" value={num(pay.pTax)} sign="−" />
+                            <SummaryRow label="P.Tax" value={num(pay.pTax)} sign="−" />
                             <SummaryRow label="ESI" value={num(pay.esi)} sign="−" />
                             <SummaryRow
                                 label="In-Hand"
@@ -996,7 +998,7 @@ const ManageSalary = () => {
                                         disabled={loading}
                                     />
                                     <Field
-                                        label="New pTax"
+                                        label="New P.Tax"
                                         optional
                                         prefix="₹"
                                         type="number"
@@ -1090,7 +1092,7 @@ const ManageSalary = () => {
                                         error={setupErrors.basePay}
                                     />
                                     <Field
-                                        label="Professional tax (pTax)"
+                                        label="Professional tax"
                                         optional
                                         prefix="₹"
                                         type="number"
@@ -1153,7 +1155,7 @@ const ManageSalary = () => {
                                             from={pkgBase}
                                             to={revBase}
                                         />
-                                        <CompareRow label="pTax" from={pkgPTax} to={revPTax} />
+                                        <CompareRow label="P.Tax" from={pkgPTax} to={revPTax} />
                                         <CompareRow label="ESI" from={pkgEsi} to={revEsi} />
                                         <CompareRow
                                             label="Net monthly pay"
@@ -1171,7 +1173,7 @@ const ManageSalary = () => {
                             ) : (
                                 <dl className="mt-2 text-sm">
                                     <SummaryRow label="Base pay" value={num(setup.basePay)} />
-                                    <SummaryRow label="pTax" value={num(setup.pTax)} sign="−" />
+                                    <SummaryRow label="P.Tax" value={num(setup.pTax)} sign="−" />
                                     <SummaryRow label="ESI" value={num(setup.esi)} sign="−" />
                                     <SummaryRow
                                         label="Net monthly pay"

@@ -114,7 +114,7 @@ const CreateExpense = () => {
     if (!form.itemName.trim()) next.itemName = "Item name is required";
     if (form.price === "" || Number.isNaN(Number(form.price)))
       next.price = "Enter a valid price";
-    if (!form.purchaseDate) next.purchaseDate = "Purchase date is required";
+    if (!form.purchaseDate) next.purchaseDate = "Expense date is required";
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -233,7 +233,7 @@ const CreateExpense = () => {
             )}
           </Field>
 
-          <Field label="Purchase date" required>
+          <Field label="Expense date" required>
             <Input
               type="date"
               value={form.purchaseDate}
