@@ -482,12 +482,12 @@ export default function SalaryPaymentLogs() {
                                             </td>
 
                                             {/* Period */}
-                                            <td className="px-3 py-3 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1">
+                                            <td className="flex flex-col px-3 py-3 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1">
                                                 <span className="text-sm font-medium text-slate-700">
                                                     {row.month}
                                                 </span>
                                                 <span className="text-xs text-slate-500">
-                                                    FY {row.fy}
+                                                    Financial Year {row.fy}
                                                 </span>
                                             </td>
 
