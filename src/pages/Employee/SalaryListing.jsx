@@ -536,27 +536,27 @@ export default function SalaryPaymentLogs() {
 
                                             {/* Net Payout */}
                                             <td className="w-[150px] px-3 py-3 text-right align-middle text-sm font-semibold tabular-nums whitespace-nowrap text-emerald-700 max-[720px]:flex max-[720px]:w-full max-[720px]:justify-between max-[720px]:items-center max-[720px]:pt-2 max-[720px]:text-base">
-                                            <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
-                                                Net Payout
-                                            </span>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    Net Payout
+                                                </span>
 
-                                            <div className="min-w-0">
-                                                <div>{inr.format(netPayout)}</div>
+                                                <div className="min-w-0">
+                                                    <div>{inr.format(netPayout)}</div>
 
-                                                {row.note && (
-                                                    <div className="group relative ml-auto max-w-[110px]">
-                                                        <div className="cursor-pointer truncate text-xs font-normal text-slate-500">
-                                                            {row.note}
+                                                    {row.note && (
+                                                        <div className="cursor-pointer group relative ml-auto max-w-[110px]">
+                                                            <div className="cursor-pointer invisible truncate text-xs font-normal text-slate-500">
+                                                                {row.note}
+                                                            </div>
+
+                                                            {/* Full note tooltip */}
+                                                            <div className="cursor-pointer pointer-events-none  absolute bottom-full right-0 z-50 mb-2 w-max max-w-[280px] whitespace-normal rounded-md bg-slate-900 px-3 py-2 text-left text-xs font-normal leading-relaxed text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
+                                                                {row.note}
+                                                            </div>
                                                         </div>
-
-                                                        {/* Full note tooltip */}
-                                                        <div className="pointer-events-none invisible absolute bottom-full right-0 z-50 mb-2 w-max max-w-[280px] whitespace-normal rounded-md bg-slate-900 px-3 py-2 text-left text-xs font-normal leading-relaxed text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100">
-                                                            {row.note}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-</td>
+                                                    )}
+                                                </div>
+                                            </td>
                                         </tr>
                                     );
                                 })}
