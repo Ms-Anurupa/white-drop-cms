@@ -285,6 +285,15 @@ const ManageSalary = () => {
     const [historyError, setHistoryError] = useState(null);
     const [notice, setNotice] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (type, message) => {
+        setToast({ type, message });
+
+        setTimeout(() => {
+            setToast(null);
+        }, 3000);
+    };
 
     const [pay, setPay] = useState(() => ({
         paidAmount: "",
@@ -392,7 +401,7 @@ const ManageSalary = () => {
     // Same formula the backend uses for the mirrored expense
     const payTotal = paidBase + num(pay.bonus) + num(pay.overtime) - num(pay.lop);
     const withheld = num(pay.pTax) + num(pay.esi);
-    const takeHome = payTotal - withheld;
+    const inHand = payTotal - withheld;
 
     const setPayField = (key) => (e) => {
         const value = e.target.value;
@@ -423,7 +432,7 @@ const ManageSalary = () => {
         if (!errs.paidAmount && !errs.lop && payTotal < 0) {
             errs.lop = "LOP can't be more than the total pay.";
         }
-        if (!errs.pTax && !errs.esi && payTotal >= 0 && takeHome < 0) {
+        if (!errs.pTax && !errs.esi && payTotal >= 0 && inHand < 0) {
             errs.pTax = "pTax and ESI add up to more than the payout.";
         }
         return errs;
@@ -468,19 +477,18 @@ const ManageSalary = () => {
                 fy: pay.fy,
                 note: pay.note.trim() || undefined,
             });
-            setNotice({
-                type: "success",
-                text: `${money(payTotal)} recorded for ${pay.month} ${pay.fy} and added to expenses.`,
-                links: true,
-            });
             resetPay();
+            showToast(
+                "success",
+                `${money(payTotal)} salary payment recorded successfully for ${pay.month} ${pay.fy}.`,
+            );
             navigate("/dashboard/expense");
         } catch (err) {
             setConfirming(false);
-            setNotice({
-                type: "error",
-                text: apiMessage(err, "Couldn't record the payment. Try again."),
-            });
+            showToast(
+                "error",
+                apiMessage(err, "Couldn't record the payment. Try again."),
+            );
         } finally {
             setSubmitting(false);
         }
@@ -517,17 +525,17 @@ const ManageSalary = () => {
                 pTax: num(setup.pTax),
                 esi: num(setup.esi),
             });
-            setNotice({
-                type: "success",
-                text: `Salary package saved. Base pay is ${money(setup.basePay)}.`,
-            });
+            showToast(
+                "success",
+                `Salary package saved successfully. Base pay: ${money(setup.basePay)}.`,
+            );
             setSetup(blankSetup());
             await loadHistory();
         } catch (err) {
-            setNotice({
-                type: "error",
-                text: apiMessage(err, "Couldn't save the salary package. Try again."),
-            });
+            showToast(
+                "error",
+                apiMessage(err, "Couldn't save the salary package. Try again.")
+            );
         } finally {
             setSubmitting(false);
         }
@@ -576,17 +584,18 @@ const ManageSalary = () => {
                     ...(rev.note.trim() && { note: rev.note.trim() }),
                 },
             });
-            setNotice({
-                type: "success",
-                text: `Increment saved. New base pay is ${money(revBase)}.`,
-            });
-            setRev(blankRevision());
             await loadHistory();
+            setRev(blankRevision());
+            setTab("payment");
+            showToast(
+                "success",
+                `Salary increment saved successfully. New base pay: ${money(revBase)}.`
+            );
         } catch (err) {
-            setNotice({
-                type: "error",
-                text: apiMessage(err, "Couldn't save the increment. Try again."),
-            });
+            showToast(
+                "error",
+                apiMessage(err, "Couldn't save the increment. Try again.")
+            );
         } finally {
             setSubmitting(false);
         }
@@ -619,13 +628,13 @@ const ManageSalary = () => {
     const getViewRoute = (empId) => `/dashboard/employee-salary/${empId}`;
 
     const historyLink = (
-      <Link
-        to={getViewRoute(targetId)}
-        state={{ employeeId: targetId, employee }}
-        className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
-      >
-        View payment history
-      </Link>
+        <Link
+            to={getViewRoute(targetId)}
+            state={{ employeeId: targetId, employee }}
+            className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+        >
+            View payment history
+        </Link>
     );
 
     return (
@@ -675,7 +684,7 @@ const ManageSalary = () => {
                 </div>
             </div>
 
-            {status === "error" &&
+            {status === "error" && (
                 <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
                     <p className="text-sm text-stone-700">{historyError}</p>
                     <button
@@ -689,7 +698,7 @@ const ManageSalary = () => {
                         Try again
                     </button>
                 </div>
-            }
+            )}
 
             <div
                 role="tablist"
@@ -709,8 +718,8 @@ const ManageSalary = () => {
                             setNotice(null);
                         }}
                         className={`cursor-pointer rounded-md px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${tab === t.id
-                            ? "bg-teal-700 text-white"
-                            : "text-stone-600 hover:bg-stone-100"
+                                ? "bg-teal-700 text-white"
+                                : "text-stone-600 hover:bg-stone-100"
                             }`}
                     >
                         {t.label}
@@ -728,10 +737,7 @@ const ManageSalary = () => {
                         >
                             Payment history
                         </Link>
-                        <Link
-                            to={EXPENSE_ROUTE}
-                            className="underline underline-offset-2"
-                        >
+                        <Link to={EXPENSE_ROUTE} className="underline underline-offset-2">
                             Expenses
                         </Link>
                     </div>
@@ -755,14 +761,14 @@ const ManageSalary = () => {
                             Record a salary payment
                         </h2>
                         <p className="mt-0.5 text-sm text-stone-500">
-                            Saves the payment for the month and adds it to expenses
-                            under Salary.
+                            Saves the payment for the month and adds it to expenses under
+                            Salary.
                         </p>
 
                         {employee?.status === "DEACTIVATED" && (
                             <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                                This employee is deactivated. You can still record a
-                                payment, for example a final settlement.
+                                This employee is deactivated. You can still record a payment,
+                                for example a final settlement.
                             </p>
                         )}
 
@@ -896,53 +902,15 @@ const ManageSalary = () => {
                             </div>
                         </div>
 
-                        {confirming ? (
-                            <div
-                                role="alertdialog"
-                                aria-label="Confirm payment"
-                                className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
-                            >
-                                <p>
-                                    Record{" "}
-                                    <strong className="tabular-nums">
-                                        {money(payTotal)}
-                                    </strong>{" "}
-                                    for {pay.month} {pay.fy}? This also creates an expense
-                                    entry.
-                                </p>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setConfirming(false)}
-                                        disabled={submitting}
-                                        className={ghostBtn}
-                                    >
-                                        Go back
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={confirmPayment}
-                                        disabled={submitting}
-                                        className="cursor-pointer rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-                                    >
-                                        {submitting ? "Recording…" : "Confirm payment"}
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="mt-6 flex items-center justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={resetPay}
-                                    className={ghostBtn}
-                                >
-                                    Reset
-                                </button>
-                                <PrimaryButton busy={loading || submitting}>
-                                    Review payment
-                                </PrimaryButton>
-                            </div>
-                        )}
+                        <div className="mt-6 flex items-center justify-end gap-3">
+                            <button type="button" onClick={resetPay} className={ghostBtn}>
+                                Reset
+                            </button>
+                            <PrimaryButton busy={loading || submitting}>
+                                Save payment
+                            </PrimaryButton>
+                        </div>
+                        
                     </form>
 
                     <aside
@@ -975,8 +943,8 @@ const ManageSalary = () => {
                             <SummaryRow label="pTax" value={num(pay.pTax)} sign="−" />
                             <SummaryRow label="ESI" value={num(pay.esi)} sign="−" />
                             <SummaryRow
-                                label="Take-home"
-                                value={Math.max(takeHome, 0)}
+                                label="In-Hand"
+                                value={Math.max(inHand, 0)}
                                 strong
                             />
                         </dl>
@@ -1003,8 +971,7 @@ const ManageSalary = () => {
                                     Add a salary increment
                                 </h2>
                                 <p className="mt-0.5 text-sm text-stone-500">
-                                    Raises the base pay and keeps a dated record of the
-                                    change.
+                                    Raises the base pay and keeps a dated record of the change.
                                 </p>
 
                                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -1178,9 +1145,7 @@ const ManageSalary = () => {
                                     <div className="mt-2 grid grid-cols-[1fr_auto_auto] gap-x-4 text-xs text-stone-400">
                                         <span />
                                         <span className="text-right">Now</span>
-                                        <span className="min-w-[5.5rem] text-right">
-                                            After
-                                        </span>
+                                        <span className="min-w-[5.5rem] text-right">After</span>
                                     </div>
                                     <dl className="text-sm">
                                         <CompareRow
@@ -1188,11 +1153,7 @@ const ManageSalary = () => {
                                             from={pkgBase}
                                             to={revBase}
                                         />
-                                        <CompareRow
-                                            label="pTax"
-                                            from={pkgPTax}
-                                            to={revPTax}
-                                        />
+                                        <CompareRow label="pTax" from={pkgPTax} to={revPTax} />
                                         <CompareRow label="ESI" from={pkgEsi} to={revEsi} />
                                         <CompareRow
                                             label="Net monthly pay"
@@ -1209,20 +1170,9 @@ const ManageSalary = () => {
                                 </>
                             ) : (
                                 <dl className="mt-2 text-sm">
-                                    <SummaryRow
-                                        label="Base pay"
-                                        value={num(setup.basePay)}
-                                    />
-                                    <SummaryRow
-                                        label="pTax"
-                                        value={num(setup.pTax)}
-                                        sign="−"
-                                    />
-                                    <SummaryRow
-                                        label="ESI"
-                                        value={num(setup.esi)}
-                                        sign="−"
-                                    />
+                                    <SummaryRow label="Base pay" value={num(setup.basePay)} />
+                                    <SummaryRow label="pTax" value={num(setup.pTax)} sign="−" />
+                                    <SummaryRow label="ESI" value={num(setup.esi)} sign="−" />
                                     <SummaryRow
                                         label="Net monthly pay"
                                         value={Math.max(setupNet, 0)}
@@ -1243,9 +1193,7 @@ const ManageSalary = () => {
                                 id="showIncrementHistory"
                                 type="checkbox"
                                 checked={showIncrementHistory}
-                                onChange={(e) =>
-                                    setShowIncrementHistory(e.target.checked)
-                                }
+                                onChange={(e) => setShowIncrementHistory(e.target.checked)}
                                 className="h-4 w-4 cursor-pointer rounded border-stone-300 text-teal-700 focus:ring-teal-600"
                             />
 
@@ -1274,8 +1222,7 @@ const ManageSalary = () => {
                                 </h2>
                                 {!loading && incrementLogs.length > 0 && (
                                     <span className="text-xs text-stone-500">
-                                        {incrementPagination?.totalCount ??
-                                            incrementLogs.length}{" "}
+                                        {incrementPagination?.totalCount ?? incrementLogs.length}{" "}
                                         {(incrementPagination?.totalCount ??
                                             incrementLogs.length) === 1
                                             ? "entry"
@@ -1294,8 +1241,7 @@ const ManageSalary = () => {
                                 </div>
                             ) : incrementLogs.length === 0 ? (
                                 <p className="border-t border-stone-200 px-6 py-10 text-center text-sm text-stone-500">
-                                    No increments yet. Each raise you save will be listed
-                                    here.
+                                    No increments yet. Each raise you save will be listed here.
                                 </p>
                             ) : (
                                 <div className="overflow-x-auto border-t border-stone-200">
@@ -1321,15 +1267,11 @@ const ManageSalary = () => {
                                                 const amt = num(r.amount);
                                                 const before = num(r.previousBasePay);
                                                 const pct =
-                                                    amt > 0 && before > 0
-                                                        ? (amt / before) * 100
-                                                        : null;
+                                                    amt > 0 && before > 0 ? (amt / before) * 100 : null;
                                                 return (
                                                     <tr
                                                         key={`${r.date}-${i}`}
-                                                        className={`border-t border-stone-200 ${i === 0
-                                                            ? "bg-teal-50/40"
-                                                            : "hover:bg-stone-50"
+                                                        className={`border-t border-stone-200 ${i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
                                                             }`}
                                                     >
                                                         <td className="py-3 pl-5 pr-3 sm:pl-6">
@@ -1402,8 +1344,108 @@ const ManageSalary = () => {
                     )}
                 </div>
             )}
+            {/* Toast notification */}
+            {toast && (
+                <div
+                    role={toast.type === "success" ? "status" : "alert"}
+                    className={`fixed right-5 top-5 z-[60] flex max-w-sm items-center gap-3 rounded-lg border px-4 py-3 shadow-lg ${
+                        toast.type === "success"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                            : "border-rose-200 bg-rose-50 text-rose-800"
+                    }`}
+                >
+                    <span className="text-sm font-medium">
+                        {toast.message}
+                    </span>
 
+                    <button
+                        type="button"
+                        onClick={() => setToast(null)}
+                        className="ml-2 text-sm font-semibold"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
+            {/* Payment confirmation modal */}
+            {confirming && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget && !submitting) {
+                            setConfirming(false);
+                        }
+                    }}
+                >
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="payment-modal-title"
+                        className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+                    >
+                        <h2
+                            id="payment-modal-title"
+                            className="text-lg font-semibold text-stone-900"
+                        >
+                            Confirm Salary Payment
+                        </h2>
 
+                        <p className="mt-2 text-sm text-stone-500">
+                            Are you sure you want to save this salary payment?
+                        </p>
+
+                        <div className="mt-5 rounded-lg bg-stone-50 p-4">
+                            <div className="flex justify-between py-2 text-sm">
+                                <span className="text-stone-500">Employee</span>
+                                <span className="font-medium text-stone-900">
+                                    {employee?.empName}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between py-2 text-sm">
+                                <span className="text-stone-500">Period</span>
+                                <span className="font-medium text-stone-900">
+                                    {pay.month} {pay.fy}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between py-2 text-sm">
+                                <span className="text-stone-500">Total payout</span>
+                                <span className="font-semibold text-stone-900">
+                                    {money(payTotal)}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between border-t border-stone-200 pt-3 text-sm">
+                                <span className="font-medium text-stone-700">In-hand</span>
+                                <span className="font-bold text-teal-700">
+                                    {money(inHand)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                disabled={submitting}
+                                onClick={() => setConfirming(false)}
+                                className={ghostBtn}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                disabled={submitting}
+                                onClick={confirmPayment}
+                                className="cursor-pointer rounded-lg bg-teal-700 px-5 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {submitting ? "Saving..." : "Confirm & Save"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

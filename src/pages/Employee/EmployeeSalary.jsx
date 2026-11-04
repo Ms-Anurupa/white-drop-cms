@@ -7,8 +7,7 @@ import {
   money,
   num,
   payoutOf,
-  signedMoney,
-  takeHomeOf,
+  inHandOf,
 } from "../../utils/salaryHelper";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -59,20 +58,6 @@ function StatusBadge({ status }) {
 }
 
 /* Change in base pay compared with the previous payment */
-function Delta({ value, first }) {
-  if (first) return <span className="text-stone-400">First record</span>;
-  if (value === null) return <span className="text-stone-300">—</span>;
-  if (value === 0) return <span className="text-stone-400">No change</span>;
-  return (
-    <span
-      className={
-        value > 0 ? "font-medium text-emerald-700" : "font-medium text-rose-700"
-      }
-    >
-      {signedMoney(value)}
-    </span>
-  );
-}
 
 // Zero amounts become a quiet dash so non-zero values stand out
 const Amount = ({ value, negative }) => {
@@ -132,6 +117,7 @@ const EmployeeSalary = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(false);
     clearSalaryRecords();
 
@@ -164,9 +150,6 @@ const EmployeeSalary = () => {
     backendTotal ?? records.reduce((sum, r) => sum + payoutOf(r), 0);
   const totalIsPartial = backendTotal == null && hasMore;
 
-  const average = records.length
-    ? records.reduce((sum, r) => sum + payoutOf(r), 0) / records.length
-    : 0;
 
   const salary = employee?.salary;
   const hasFilters = Boolean(fy || startDate || endDate);
@@ -383,7 +366,6 @@ const EmployeeSalary = () => {
                 <tr>
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">Period</th>
                   <th className="px-3 py-3 text-right font-medium">Base pay</th>
-                  <th className="px-3 py-3 text-right font-medium">Change</th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">LOP</th>
@@ -398,11 +380,6 @@ const EmployeeSalary = () => {
               <tbody className="tabular-nums">
                 {records.map((r, i) => {
                   // Records are newest first, so the next row is the previous payment
-                  const older = records[i + 1];
-                  const change = older
-                    ? num(r.basePay) - num(older.basePay)
-                    : null;
-                  const isOldest = !older && !hasMore;
 
                   return (
                     <tr
@@ -431,10 +408,6 @@ const EmployeeSalary = () => {
                         {money(r.basePay)}
                       </td>
 
-                      <td className="px-3 py-3 text-right">
-                        <Delta value={change} first={isOldest} />
-                      </td>
-
                       <td className="px-3 py-3 text-right text-stone-600">
                         <Amount value={r.bonus} />
                       </td>
@@ -460,7 +433,7 @@ const EmployeeSalary = () => {
                           {money(payoutOf(r))}
                         </div>
                         <div className="mt-0.5 text-xs text-stone-500">
-                          Take-home {money(takeHomeOf(r))}
+                          In-Hand {money(inHandOf(r))}
                         </div>
                       </td>
                     </tr>

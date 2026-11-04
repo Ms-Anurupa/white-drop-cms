@@ -88,5 +88,5 @@ export const payoutOf = (log) =>
     num(log?.paidAmount) + num(log?.bonus) + num(log?.overtime) - num(log?.lop);
 
 /* What the employee actually receives after pTax and ESI are withheld */
-export const takeHomeOf = (log) =>
+export const inHandOf = (log) =>
     payoutOf(log) - num(log?.pTax) - num(log?.esi);
