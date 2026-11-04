@@ -384,8 +384,9 @@ const EmployeeSalary = () => {
                   return (
                     <tr
                       key={r.id || i}
-                      className={`border-t border-stone-200 ${i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
-                        }`}
+                      className={`border-t border-stone-200 ${
+                        i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
+                      }`}
                     >
                       <td className="py-3 pl-5 pr-3 sm:pl-6">
                         <div className="font-medium text-stone-900">
@@ -430,10 +431,7 @@ const EmployeeSalary = () => {
 
                       <td className="py-3 pl-3 pr-5 text-right sm:pr-6">
                         <div className="font-semibold text-stone-900">
-                          {money(payoutOf(r))}
-                        </div>
-                        <div className="mt-0.5 text-xs text-stone-500">
-                          In-Hand {money(inHandOf(r))}
+                          {money(inHandOf(r))}
                         </div>
                       </td>
                     </tr>
