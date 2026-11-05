@@ -410,6 +410,18 @@ export default function SalaryPaymentLogs() {
                                 >
                                     LOP
                                 </th>
+                                <th
+                                    scope="col"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    Bonus
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    Overtime
+                                </th>
 
                                 <th
                                     scope="col"
@@ -532,6 +544,24 @@ export default function SalaryPaymentLogs() {
                                                 </span>
                                                 <span className="text-slate-700">
                                                     {inr.format(lop)}
+                                                </span>
+                                            </td>
+                                            {/* Bonus */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    Bonus
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(bonus)}
+                                                </span>
+                                            </td>
+                                            {/* Overtime */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    Overtime
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(overtime)}
                                                 </span>
                                             </td>
 
