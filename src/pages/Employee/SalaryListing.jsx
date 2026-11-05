@@ -392,6 +392,13 @@ export default function SalaryPaymentLogs() {
                                 >
                                     Paid on
                                 </th>
+
+                                <th
+                                    scope="col"
+                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                >
+                                    Base Pay
+                                </th>
                                 <th
                                     scope="col"
                                     className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
@@ -454,6 +461,7 @@ export default function SalaryPaymentLogs() {
                                 logs?.map((row) => {
                                     const emp = row?.employees;
 
+                                    const basePay = Number(row.basePay) || 0;
                                     const paidAmount = Number(row.paidAmount) || 0;
                                     const bonus = Number(row.bonus) || 0;
                                     const overtime = Number(row.overtime) || 0;
@@ -515,6 +523,16 @@ export default function SalaryPaymentLogs() {
                                                         {fmtTime(row.createdAt)}
                                                     </div>
                                                 </div>
+                                            </td>
+
+                                            {/* P.Tax */}
+                                            <td className={amountCell}>
+                                                <span className="text-xs font-medium text-slate-500 min-[721px]:hidden">
+                                                    Base Pay
+                                                </span>
+                                                <span className="text-slate-700">
+                                                    {inr.format(basePay)}
+                                                </span>
                                             </td>
 
                                             {/* P.Tax */}
