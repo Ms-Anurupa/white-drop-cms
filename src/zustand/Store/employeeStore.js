@@ -31,6 +31,11 @@ const employeeStore = create((set, get) => ({
   salaryLogSummary: null,
   salaryFilters: DEFAULT_FILTERS(),
 
+  hasSalary: false,
+  hasAnyIncrement: false,
+  hasAnySalaryPaid: false,
+  canEditPackage: false,
+
   loading: false,
   error: null,
 
@@ -83,7 +88,7 @@ const employeeStore = create((set, get) => ({
   // Record a salary payment (addSalaryPaymentLog)
   addEmployeeSalary: async (salaryData) => {
     set({ loading: true, error: null });
-
+    console.log("herere");
     try {
       const response = await api.post(
         "/admin/addSalaryPaymentLog",
@@ -104,13 +109,13 @@ const employeeStore = create((set, get) => ({
     }
   },
 
-  // First-time salary package for an employee (addEmployeeSalaryInfo)
-  addEmployeeSalaryInfo: async (salaryInfo) => {
+  // First-time salary package for an employee (addOrUpdateEmployeeSalaryInfo)
+  addOrUpdateEmployeeSalaryInfo: async (salaryInfo) => {
     set({ loading: true, error: null });
 
     try {
       const response = await api.post(
-        "/admin/addEmployeeSalaryInfo",
+        "/admin/addOrUpdateEmployeeSalaryInfo",
         salaryInfo,
         {
           withAuth: true,
@@ -246,6 +251,12 @@ const employeeStore = create((set, get) => ({
       incrementPagination: response.data.pagination || null,
       currentPackage: payload.currentPackage || null,
       currentBasePay: payload.currentBasePay ?? 0,
+      salaryEditEligibility: {
+        hasSalary: payload.hasSalary ?? false,
+        hasAnyIncrement: payload.hasAnyIncrement ?? false,
+        hasAnySalaryPaid: payload.hasAnySalaryPaid ?? false,
+        canEditPackage: payload.canEditPackage ?? false,
+      },
     }));
 
     return response.data;

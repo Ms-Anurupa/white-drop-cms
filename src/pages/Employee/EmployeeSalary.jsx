@@ -8,6 +8,7 @@ import {
   num,
   payoutOf,
   inHandOf,
+  getMonthName,
 } from "../../utils/salaryHelper";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -342,7 +343,7 @@ const EmployeeSalary = () => {
                 {money(payoutOf(latest))}
               </dd>
               <dd className="mt-0.5 text-xs text-stone-500">
-                {latest.month} {latest.fy}
+                {getMonthName(latest.month)} {latest.fy}
               </dd>
             </div>
 
@@ -390,7 +391,7 @@ const EmployeeSalary = () => {
                     >
                       <td className="py-3 pl-5 pr-3 sm:pl-6">
                         <div className="font-medium text-stone-900">
-                          {r.month} {r.fy}
+                          {getMonthName(r.month)} {r.fy}
                         </div>
                         <div className="mt-0.5 text-xs text-stone-500">
                           Saved {fmtDate(r.createdAt)}

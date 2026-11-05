@@ -5,15 +5,18 @@ import api from "../axios";
 const excelStore = create((set) => ({
   isDownloading: false,
 
-  downloadExcel: async (type, dateFrom, dateTo, employeeId) => {
+  downloadExcel: async (type, dateFrom, dateTo, employeeId, options = {}) => {
     set({ isDownloading: true });
     try {
+      const byPaidDate = typeof options === "object" ? options?.byPaidDate : options;
+
       const response = await api.get(`admin/exportToExcel`, {
         params: {
           type,
           dateFrom,
           dateTo,
           ...(type === "salaryHistory" && employeeId ? { employeeId } : {}),
+          ...(type === "paidSalary" && byPaidDate !== undefined ? { byPaidDate } : {}),
         },
         withAuth: true,
         responseType: "blob",

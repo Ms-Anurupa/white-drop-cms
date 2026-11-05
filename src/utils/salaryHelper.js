@@ -39,23 +39,33 @@ export const fmtDate = (d) =>
 
 export const todayISO = () => new Date().toLocaleDateString("en-CA"); // yyyy-mm-dd
 
-export const MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
+export const MONTH_MAP = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+};
 
-export const getCurrentMonth = () =>
-    new Date().toLocaleString("en-US", { month: "long" });
+export const MONTH_OPTIONS = Object.entries(MONTH_MAP).map(([val, label]) => ({
+    value: Number(val),
+    label,
+}));
+
+export const getMonthName = (m) => MONTH_MAP[Number(m)] || m || "";
+
+export const getCurrentMonthNumber = () => new Date().getMonth() + 1;
+
+export const MONTHS = Object.values(MONTH_MAP);
+
+export const getCurrentMonth = () => MONTH_MAP[getCurrentMonthNumber()];
 
 /* Indian financial year: April to March, e.g. "2026-27" */
 const fyStartYear = () => {

@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { X, FileSpreadsheet } from "lucide-react";
 import { toast } from "react-toastify";
-import excelStore from "@/zustand/Store/excelStore"; // Adjust this import path to match your project structure
+import excelStore from "@/zustand/Store/excelStore"; 
 
 const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId }) => {
-  console.log("type", type)
+  console.log("type", type === "paidSalary")
   const [isOpen, setIsOpen] = useState(false);
   
   // Connect directly to your Zustand store
@@ -17,6 +17,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
   const [presetSelection, setPresetSelection] = useState("this_month");
   const [customFromDate, setCustomFromDate] = useState("");
   const [customToDate, setCustomToDate] = useState("");
+  const [byPaidDate, setByPaidDate] = useState(false);
 
   // Reset modal state every time it opens
   useEffect(() => {
@@ -25,6 +26,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
       setPresetSelection("this_month");
       setCustomFromDate("");
       setCustomToDate("");
+      setByPaidDate(false);
     }
   }, [isOpen]);
 
@@ -82,7 +84,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
 
     try {
       // Call your Zustand store directly
-      await downloadExcel(type, finalFromDate, finalToDate, employeeId);
+      await downloadExcel(type, finalFromDate, finalToDate, employeeId, { byPaidDate });
       toast.success("Excel file downloaded successfully!");
       setIsOpen(false);
     } catch (error) {
@@ -149,6 +151,22 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                   </label>
                 </div>
 
+                {/* By Paid Date option for paidSalary */}
+                {type === "paidSalary" && (
+                  <div className="border-t border-gray-100 pt-4">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
+                      <input
+                        type="checkbox"
+                        checked={byPaidDate}
+                        onChange={(e) => setByPaidDate(e.target.checked)}
+                        disabled={isDownloading}
+                        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition focus:ring-blue-500"
+                      />
+                      <span>By paid Date</span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Dynamic Inputs */}
                 <div className="min-h-[70px]">
                   {dateType === "preset" ? (
@@ -198,6 +216,8 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                     </div>
                   )}
                 </div>
+
+                
               </div>
 
               {/* Footer */}
