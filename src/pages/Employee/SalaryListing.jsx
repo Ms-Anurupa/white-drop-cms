@@ -370,69 +370,76 @@ export default function SalaryPaymentLogs() {
                     }`}
                 aria-busy={loading}
             >
-                <div className="overflow-x-auto">
-                    <table className="w-full table-fixed border-collapse text-left">
-                        <thead className="bg-slate-50 max-[720px]:sr-only">
+                {/* vertical + horizontal scroll container */}
+                <div
+                    className="max-h-[70vh] overflow-auto min-[721px]:overscroll-contain
+                        [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5
+                        [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-200
+                        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-blue-500
+                        hover:[&::-webkit-scrollbar-thumb]:bg-blue-600"
+                >
+                    <table className="w-full min-w-[1100px] border-collapse text-left max-[720px]:min-w-0">
+                        <thead className="bg-slate-50 max-[720px]:sr-only min-[721px]:sticky min-[721px]:top-0 min-[721px]:z-10">
                             <tr>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Employee
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Period
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Paid on
                                 </th>
 
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Base Pay
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Professional Tax
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     ESI
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     LOP
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Bonus
                                 </th>
                                 <th
                                     scope="col"
-                                    className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600"
                                 >
                                     Overtime
                                 </th>
 
                                 <th
                                     scope="col"
-                                    className="w-[100px] border-b border-slate-200 px-3 py-2 text-right text-xs font-semibold text-slate-600"
+                                    className="whitespace-nowrap border-b border-slate-200 px-3 py-2 text-right text-xs font-semibold text-slate-600"
                                 >
                                     Net Payout
                                 </th>
@@ -481,7 +488,7 @@ export default function SalaryPaymentLogs() {
                                             className="transition-colors hover:bg-slate-50 max-[720px]:block max-[720px]:p-2"
                                         >
                                             {/* Employee */}
-                                            <td className="px-3 py-3 align-middle max-[720px]:block max-[720px]:p-0">
+                                            <td className="min-w-[200px] px-3 py-3 align-middle max-[720px]:block max-[720px]:p-0">
                                                 <div className="flex items-center gap-2.5">
                                                     <span
                                                         className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-50 text-xs font-semibold text-emerald-700"
@@ -489,27 +496,29 @@ export default function SalaryPaymentLogs() {
                                                     >
                                                         {initials(emp?.empName)}
                                                     </span>
-
                                                     <div className="min-w-0">
-                                                        <strong className="block text-sm font-semibold text-slate-800">
-                                                            {emp?.empName || "Unknown employee"}
+                                                        <strong className="block whitespace-nowrap text-sm font-semibold text-slate-800">
+                                                            {emp?.empName ||
+                                                                "Unknown employee"}
                                                         </strong>
-
-                                                        <div className="text-xs text-slate-500">
-                                                            {emp?.empPhone || "No phone on file"}
+                                                        <div className="whitespace-nowrap text-xs text-slate-500">
+                                                            {emp?.empPhone ||
+                                                                "No phone on file"}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
 
                                             {/* Period */}
-                                            <td className="flex flex-col px-3 py-3 align-middle max-[720px]:flex max-[720px]:justify-between max-[720px]:items-center max-[720px]:py-1">
-                                                <span className="text-sm font-medium text-slate-700">
-                                                    {getMonthName(row.month)}
-                                                </span>
-                                                <span className="text-xs text-slate-500">
-                                                    Financial Year {row.fy}
-                                                </span>
+                                            <td className="whitespace-nowrap px-3 py-3 align-middle max-[720px]:block max-[720px]:py-1">
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium text-slate-700">
+                                                        {getMonthName(row.month)}
+                                                    </span>
+                                                    <span className="text-xs text-slate-500">
+                                                        Financial Year {row.fy}
+                                                    </span>
+                                                </div>
                                             </td>
 
                                             {/* Paid On */}
@@ -679,8 +688,8 @@ export default function SalaryPaymentLogs() {
                                         disabled={loading}
                                         onClick={() => setPage(number)}
                                         className={`inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border px-2 py-1 text-xs tabular-nums transition disabled:cursor-not-allowed disabled:opacity-50 ${number === pagination.currentPage
-                                                ? "border-slate-800 bg-slate-800 text-white"
-                                                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                                            ? "border-slate-800 bg-slate-800 text-white"
+                                            : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                                             }`}
                                     >
                                         {number}
