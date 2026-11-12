@@ -42,21 +42,22 @@ const blankPay = () => ({
 });
 
 // Base amount, pTax and ESI start from the employee's saved package
-const payDefaults = (base, pTax, employeeEsi, employeerEsi) =>
+const payDefaults = (base, pTax, esiNo, employeeEsi, employeerEsi) =>
   base > 0
-    ? { paidAmount: String(base), pTax: String(pTax), employeeEsi: String(employeeEsi), employeerEsi: String(employeerEsi) }
-    : { paidAmount: "", pTax: "", employeeEsi: "", employeerEsi: "" };
+    ? { paidAmount: String(base), pTax: String(pTax), esiNo: String(esiNo), employeeEsi: String(employeeEsi), employeerEsi: String(employeerEsi) }
+    : { paidAmount: "", pTax: "", esiNo:"", employeeEsi: "", employeerEsi: "" };
 
 const blankRevision = () => ({
     amount: "",
     date: todayISO(),
     pTax: "",
+    esiNo: "",
     employeeEsi: "",
     employeerEsi: "",
     note: "",
 });
 
-const blankSetup = () => ({ basePay: "", pTax: "", employeeEsi: "", employeerEsi: ""});
+const blankSetup = () => ({ basePay: "", pTax: "", esiNo:"", employeeEsi: "", employeerEsi: ""});
 
 /* ---------- UI pieces ---------- */
 
@@ -301,6 +302,7 @@ const ManageSalary = () => {
     const [packageEdit, setPackageEdit] = useState({
       basePay: "",
       pTax: "",
+      esiNo: "",
       employeeEsi: "",
       employeerEsi: ""
     });
@@ -318,6 +320,7 @@ const ManageSalary = () => {
     const [pay, setPay] = useState(() => ({
         paidAmount: "",
         pTax: "",
+        esiNo:"",
         employeeEsi: "",
         employeerEsi: "",
         ...blankPay(),
@@ -345,6 +348,7 @@ const ManageSalary = () => {
 
     const pkgBase = num(currentPackage?.basePay ?? currentBasePay);
     const pkgPTax = num(currentPackage?.pTax);
+    const pkgEsiNo = num(currentPackage?.pkgEsiNo);
     const pkgEmployeeEsi = num(currentPackage?.employeeEsi);
     const pkgEmployeerEsi = num(currentPackage?.employeerEsi);
     const pkgNet = num(currentPackage?.finalPay ?? pkgBase - pkgPTax - pkgEmployeeEsi - pkgEmployeerEsi);
@@ -383,7 +387,7 @@ const ManageSalary = () => {
         setStatus("loading");
         clearIncrementLogs();
         setNotice(null);
-        setPay({ paidAmount: "", pTax: "", employeeEsi: "", employeerEsi: "", ...blankPay() });
+        setPay({ paidAmount: "", pTax: "", esiNo: "", employeeEsi: "", employeerEsi: "", ...blankPay() });
         setPayDirty(false);
         setConfirming(false);
         setRev(blankRevision());
@@ -409,9 +413,9 @@ const ManageSalary = () => {
     useEffect(() => {
         if (status === "ready" && !payDirty) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setPay((p) => ({ ...p, ...payDefaults(pkgBase, pkgPTax, pkgEmployeeEsi, pkgEmployeerEsi) }));
+            setPay((p) => ({ ...p, ...payDefaults(pkgBase, pkgPTax, pkgEsiNo, pkgEmployeeEsi, pkgEmployeerEsi) }));
         }
-    }, [status, pkgBase, pkgPTax, pkgEmployeeEsi, pkgEmployeerEsi, payDirty]);
+    }, [status, pkgBase, pkgPTax, pkgEsiNo, pkgEmployeeEsi, pkgEmployeerEsi, payDirty]);
 
     const loadMore = async () => {
         setLoadingMore(true);
@@ -437,7 +441,7 @@ const ManageSalary = () => {
 
     const resetPay = () => {
         setPay({
-            ...payDefaults(pkgBase, pkgPTax, pkgEmployeeEsi, pkgEmployeerEsi),
+            ...payDefaults(pkgBase, pkgPTax, pkgEsiNo, pkgEmployeeEsi, pkgEmployeerEsi),
             ...blankPay(),
         });
         setPayDirty(false);
@@ -493,6 +497,7 @@ const ManageSalary = () => {
                 employeeId: targetId,
                 paidAmount: paidBase,
                 pTax: pay.pTax === "" ? undefined : num(pay.pTax),
+                esiNo: pay.esiNo === "" ? undefined : num(pay.esiNo),
                 employeeEsi: pay.employeeEsi === "" ? undefined : num(pay.employeeEsi),
                 employeerEsi: pay.employeerEsi === "" ? undefined : num(pay.employeerEsi),
                 bonus: num(pay.bonus),
@@ -549,6 +554,7 @@ const ManageSalary = () => {
                 employeeId: targetId,
                 basePay: num(setup.basePay),
                 pTax: num(setup.pTax),
+                esiNo: num(setup.esiNo),
                 employeeEsi: num(setup.employeeEsi),
                 employeerEsi: num(setup.employeerEsi),
             });
@@ -572,6 +578,7 @@ const ManageSalary = () => {
     setPackageEdit({
         basePay: String(pkgBase),
         pTax: String(pkgPTax),
+        esiNo: String(pkgEsiNo),
         employeeEsi: String(pkgEmployeeEsi),
         employeerEsi: String(pkgEmployeerEsi),
     });
@@ -601,6 +608,7 @@ const setPackageEditField = (key) => (e) => {
 
         const basePay = num(packageEdit.basePay);
         const pTax = num(packageEdit.pTax);
+        const esiNo = num(packageEdit.esiNo);
         const employeeEsi = num(packageEdit.employeeEsi);
         const employeerEsi = num(packageEdit.employeerEsi);
 
@@ -639,6 +647,7 @@ const setPackageEditField = (key) => (e) => {
                 employeeId: targetId,
                 basePay,
                 pTax,
+                esiNo,
                 employeeEsi,
                 employeerEsi,
             });
@@ -699,6 +708,7 @@ const setPackageEditField = (key) => (e) => {
                 employeeId: targetId,
                 basePay: revBase,
                 ...(rev.pTax !== "" && { pTax: num(rev.pTax) }),
+                ...(rev.esiNo !== "" && { esiNo: num(rev.esiNo) }),
                 ...(rev.employeeEsi !== "" && { employeeEsi: num(rev.employeeEsi) }),
                 ...(rev.employeerEsi !== "" && { employeerEsi: num(rev.employeerEsi) }),
                 increments: {
@@ -942,21 +952,8 @@ const setPackageEditField = (key) => (e) => {
                       : "Base salary for this payment."
                   }
                 />
-
                 <Field
-                  label="Employee ESI"
-                  prefix="₹"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={pay.employeeEsi}
-                  onChange={setPayField("employeeEsi")}
-                  error={payErrors.employeeEsi}
-                  hint="Pre-filled from the package. Change it for this month only."
-                />
-                <Field
-                  label="Employeer ESI"
+                  label="Employeer Contribution(ESI)"
                   prefix="₹"
                   type="number"
                   inputMode="decimal"
@@ -966,6 +963,19 @@ const setPackageEditField = (key) => (e) => {
                   onChange={setPayField("employeerEsi")}
                   error={payErrors.employeerEsi}
                   hint="Pre-filled from the package."
+                />
+
+                <Field
+                  label="Employee Contribution(ESI)"
+                  prefix="₹"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={pay.employeeEsi}
+                  onChange={setPayField("employeeEsi")}
+                  error={payErrors.employeeEsi}
+                  hint="Pre-filled from the package. Change it for this month only."
                 />
                 <Field
                   label="Professional tax"
@@ -1289,21 +1299,18 @@ const setPackageEditField = (key) => (e) => {
                     />
 
                     <Field
-                      label="New Employee ESI"
-                      prefix="₹"
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      step="0.01"
-                      placeholder={String(pkgEmployeeEsi)}
-                      value={rev.employeeEsi}
-                      onChange={setRevField("employeeEsi")}
-                      error={revErrors.employeeEsi}
-                      hint="Leave blank to keep the current amount."
+                      className="sm:col-span-2"
+                      label="ESI NO"
+                      type="text"
+                      placeholder={String(pkgEsiNo ?? "")}
+                      value={rev.esiNo ?? ""}
+                      onChange={setRevField("esiNo")}
+                      error={revErrors.esiNo}
                       disabled={loading}
                     />
+
                     <Field
-                      label="New Employeer ESI"
+                      label="New Employeer Contribution(ESI)"
                       prefix="₹"
                       type="number"
                       inputMode="decimal"
@@ -1313,6 +1320,20 @@ const setPackageEditField = (key) => (e) => {
                       value={rev.employeerEsi}
                       onChange={setRevField("employeerEsi")}
                       error={revErrors.employeerEsi}
+                      hint="Leave blank to keep the current amount."
+                      disabled={loading}
+                    />
+                    <Field
+                      label="New Employee Contribution(ESI)"
+                      prefix="₹"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      placeholder={String(pkgEmployeeEsi)}
+                      value={rev.employeeEsi}
+                      onChange={setRevField("employeeEsi")}
+                      error={revErrors.employeeEsi}
                       hint="Leave blank to keep the current amount."
                       disabled={loading}
                     />
@@ -1381,7 +1402,6 @@ const setPackageEditField = (key) => (e) => {
 
                   <div className="mt-5 grid gap-4 sm:grid-cols-2">
                     <Field
-                      className="sm:col-span-2"
                       label="Base pay"
                       prefix="₹"
                       type="number"
@@ -1394,19 +1414,15 @@ const setPackageEditField = (key) => (e) => {
                     />
 
                     <Field
-                      label="Employee ESI"
-                      // optional
-                      prefix="₹"
-                      type="number"
+                      label="ESI NO"
+                      type="text"
                       inputMode="decimal"
-                      min="0"
-                      step="0.01"
-                      value={setup.employeeEsi}
-                      onChange={setSetupField("employeeEsi")}
-                      error={setupErrors.employeeEsi}
+                      value={setup.esiNo}
+                      onChange={setSetupField("esiNo")}
+                      error={setupErrors.esiNo}
                     />
                     <Field
-                      label="Employeer ESI"
+                      label="Employeer Contribution(ESI)"
                       // optional
                       prefix="₹"
                       type="number"
@@ -1416,6 +1432,19 @@ const setPackageEditField = (key) => (e) => {
                       value={setup.employeerEsi}
                       onChange={setSetupField("employeerEsi")}
                       error={setupErrors.employeerEsi}
+                    />
+
+                    <Field
+                      label="Employee Contribution(ESI)"
+                      // optional
+                      prefix="₹"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      value={setup.employeeEsi}
+                      onChange={setSetupField("employeeEsi")}
+                      error={setupErrors.employeeEsi}
                     />
                     <Field
                       label="Professional tax"
