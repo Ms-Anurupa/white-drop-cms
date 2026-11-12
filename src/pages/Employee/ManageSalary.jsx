@@ -942,47 +942,9 @@ const setPackageEditField = (key) => (e) => {
                       : "Base salary for this payment."
                   }
                 />
+
                 <Field
-                  label="Bonus"
-                  optional
-                  prefix="₹"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={pay.bonus}
-                  onChange={setPayField("bonus")}
-                  error={payErrors.bonus}
-                />
-                <Field
-                  label="Overtime"
-                  optional
-                  prefix="₹"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={pay.overtime}
-                  onChange={setPayField("overtime")}
-                  error={payErrors.overtime}
-                />
-                <Field
-                  className="sm:col-span-2"
-                  label="Loss of pay (LOP)"
-                  optional
-                  prefix="₹"
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={pay.lop}
-                  onChange={setPayField("lop")}
-                  error={payErrors.lop}
-                  hint="Amount deducted for unpaid leave."
-                />
-                <Field
-                  label="Professional tax"
-                  optional
+                  label="Employee ESI"
                   prefix="₹"
                   type="number"
                   inputMode="decimal"
@@ -994,8 +956,7 @@ const setPackageEditField = (key) => (e) => {
                   hint="Pre-filled from the package. Change it for this month only."
                 />
                 <Field
-                  label="ESI"
-                  optional
+                  label="Employeer ESI"
                   prefix="₹"
                   type="number"
                   inputMode="decimal"
@@ -1006,15 +967,59 @@ const setPackageEditField = (key) => (e) => {
                   error={payErrors.employeeEsi}
                   hint="Pre-filled from the package."
                 />
+                <Field
+                  label="Professional tax"
+                  prefix="₹"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={pay.pTax}
+                  onChange={setPayField("pTax")}
+                  error={payErrors.pTax}
+                  hint="Pre-filled from the package. Change it for this month only."
+                />
+                <Field
+                  label="Bonus"
+                  prefix="₹"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={pay.bonus}
+                  onChange={setPayField("bonus")}
+                  error={payErrors.bonus}
+                />
+                <Field
+                  label="Overtime"
+                  prefix="₹"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={pay.overtime}
+                  onChange={setPayField("overtime")}
+                  error={payErrors.overtime}
+                />
+                <Field
+                  label="Loss of pay (LOP)"
+                  prefix="₹"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  value={pay.lop}
+                  onChange={setPayField("lop")}
+                  error={payErrors.lop}
+                  hint="Amount deducted for unpaid leave."
+                />
+
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="pay-note"
                     className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
                   >
                     Note
-                    <span className="text-xs font-normal text-stone-400">
-                      Optional
-                    </span>
                   </label>
                   <textarea
                     id="pay-note"
@@ -1064,10 +1069,18 @@ const setPackageEditField = (key) => (e) => {
               </p>
 
               <dl className="mt-4 border-t border-stone-200 pt-2 text-sm">
-                <SummaryRow label="P.Tax" value={num(pay.pTax)} sign="−" />
-                <SummaryRow label="ESI" value={num(pay.employeeEsi)} sign="−" />
                 <SummaryRow
-                  label="ESI"
+                  label="Professional tax"
+                  value={num(pay.pTax)}
+                  sign="−"
+                />
+                <SummaryRow
+                  label="Employee ESI"
+                  value={num(pay.employeeEsi)}
+                  sign="−"
+                />
+                <SummaryRow
+                  label="Employeer ESI"
                   value={num(pay.employeerEsi)}
                   sign="−"
                 />
@@ -1131,14 +1144,14 @@ const setPackageEditField = (key) => (e) => {
                     </div>
 
                     <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">ESI</p>
+                      <p className="text-xs text-stone-500">Employee ESI</p>
                       <p className="mt-1 text-lg font-semibold text-stone-900">
                         {money(pkgEmployeeEsi)}
                       </p>
                     </div>
 
                     <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">ESI</p>
+                      <p className="text-xs text-stone-500">Employeer ESI</p>
                       <p className="mt-1 text-lg font-semibold text-stone-900">
                         {money(pkgEmployeerEsi)}
                       </p>
@@ -1164,17 +1177,6 @@ const setPackageEditField = (key) => (e) => {
                       />
 
                       <Field
-                        label="Professional Tax"
-                        prefix="₹"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={packageEdit.pTax}
-                        onChange={setPackageEditField("pTax")}
-                        error={packageEditErrors.pTax}
-                      />
-
-                      <Field
                         label="Employee ESI"
                         prefix="₹"
                         type="number"
@@ -1194,6 +1196,17 @@ const setPackageEditField = (key) => (e) => {
                         value={packageEdit.employeerEsi}
                         onChange={setPackageEditField("employeerEsi")}
                         error={packageEditErrors.employeerEsi}
+                      />
+
+                      <Field
+                        label="Professional Tax"
+                        prefix="₹"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={packageEdit.pTax}
+                        onChange={setPackageEditField("pTax")}
+                        error={packageEditErrors.pTax}
                       />
                     </div>
 
@@ -1274,24 +1287,9 @@ const setPackageEditField = (key) => (e) => {
                       error={revErrors.date}
                       disabled={loading}
                     />
-                    <Field
-                      label="New P.Tax"
-                      optional
-                      prefix="₹"
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      step="0.01"
-                      placeholder={String(pkgPTax)}
-                      value={rev.pTax}
-                      onChange={setRevField("pTax")}
-                      error={revErrors.pTax}
-                      hint="Leave blank to keep the current amount."
-                      disabled={loading}
-                    />
+
                     <Field
                       label="New Employee ESI"
-                      optional
                       prefix="₹"
                       type="number"
                       inputMode="decimal"
@@ -1306,7 +1304,6 @@ const setPackageEditField = (key) => (e) => {
                     />
                     <Field
                       label="New Employeer ESI"
-                      optional
                       prefix="₹"
                       type="number"
                       inputMode="decimal"
@@ -1319,15 +1316,27 @@ const setPackageEditField = (key) => (e) => {
                       hint="Leave blank to keep the current amount."
                       disabled={loading}
                     />
+                    <Field
+                      label="New Professional tax"
+                      prefix="₹"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      placeholder={String(pkgPTax)}
+                      value={rev.pTax}
+                      onChange={setRevField("pTax")}
+                      error={revErrors.pTax}
+                      hint="Leave blank to keep the current amount."
+                      disabled={loading}
+                    />
+
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="rev-note"
                         className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
                       >
                         Note
-                        <span className="text-xs font-normal text-stone-400">
-                          Optional
-                        </span>
                       </label>
                       <textarea
                         id="rev-note"
@@ -1460,9 +1469,21 @@ const setPackageEditField = (key) => (e) => {
                         from={pkgBase}
                         to={revBase}
                       />
-                      <CompareRow label="P.Tax" from={pkgPTax} to={revPTax} />
-                      <CompareRow label="ESI" from={pkgEmployeeEsi} to={revEmployeeEsi} />
-                      <CompareRow label="ESI" from={pkgEmployeerEsi} to={revEmployeerEsi} />
+                      <CompareRow
+                        label="Professional tax"
+                        from={pkgPTax}
+                        to={revPTax}
+                      />
+                      <CompareRow
+                        label="Employee ESI"
+                        from={pkgEmployeeEsi}
+                        to={revEmployeeEsi}
+                      />
+                      <CompareRow
+                        label="Employeer ESI"
+                        from={pkgEmployeerEsi}
+                        to={revEmployeerEsi}
+                      />
                       <CompareRow
                         label="Net monthly pay"
                         from={pkgNet}
@@ -1484,8 +1505,16 @@ const setPackageEditField = (key) => (e) => {
                       value={num(setup.pTax)}
                       sign="−"
                     />
-                    <SummaryRow label="Employee ESI" value={num(setup.employeeEsi)} sign="−" />
-                    <SummaryRow label="Employeer ESI" value={num(setup.employeerEsi)} sign="−" />
+                    <SummaryRow
+                      label="Employee ESI"
+                      value={num(setup.employeeEsi)}
+                      sign="−"
+                    />
+                    <SummaryRow
+                      label="Employeer ESI"
+                      value={num(setup.employeerEsi)}
+                      sign="−"
+                    />
                     <SummaryRow
                       label="Net monthly pay"
                       value={Math.max(setupNet, 0)}
