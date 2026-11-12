@@ -950,9 +950,9 @@ const setPackageEditField = (key) => (e) => {
                   inputMode="decimal"
                   min="0"
                   step="0.01"
-                  value={pay.pTax}
-                  onChange={setPayField("pTax")}
-                  error={payErrors.pTax}
+                  value={pay.employeeEsi}
+                  onChange={setPayField("employeeEsi")}
+                  error={payErrors.employeeEsi}
                   hint="Pre-filled from the package. Change it for this month only."
                 />
                 <Field
@@ -962,9 +962,9 @@ const setPackageEditField = (key) => (e) => {
                   inputMode="decimal"
                   min="0"
                   step="0.01"
-                  value={pay.employeeEsi}
-                  onChange={setPayField("employeeEsi")}
-                  error={payErrors.employeeEsi}
+                  value={pay.employeerEsi}
+                  onChange={setPayField("employeerEsi")}
+                  error={payErrors.employeerEsi}
                   hint="Pre-filled from the package."
                 />
                 <Field

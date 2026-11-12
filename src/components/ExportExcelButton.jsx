@@ -153,7 +153,23 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
 
                 {/* By Paid Date option for paidSalary */}
                 {type === "paidSalary" && (
-                  <div className="border-t border-gray-100 pt-4">
+                  <div className="border-gray-100 pt-2">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
+                      <input
+                        type="checkbox"
+                        checked={byPaidDate}
+                        onChange={(e) => setByPaidDate(e.target.checked)}
+                        disabled={isDownloading}
+                        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition focus:ring-blue-500"
+                      />
+                      <span>By paid Date</span>
+                    </label>
+                  </div>
+                )}
+
+                {/* By Paid Date option for esiReport */}
+                {type === "esiReport" && (
+                  <div className="border-gray-100 pt-2">
                     <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
                       <input
                         type="checkbox"

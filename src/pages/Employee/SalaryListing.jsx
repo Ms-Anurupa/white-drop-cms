@@ -269,6 +269,7 @@ export default function SalaryPaymentLogs() {
               </svg>
               Refresh
             </button>
+            <ExportExcelButton type="esiReport" buttonText="ESI Report" />
             <ExportExcelButton type="paidSalary" />
           </div>
         </header>
@@ -381,10 +382,13 @@ export default function SalaryPaymentLogs() {
                     Base pay
                   </th>
                   <th scope="col" className={`${th} text-right`}>
-                    P. Tax
+                    Prof. Tax
                   </th>
                   <th scope="col" className={`${th} text-right`}>
-                    ESI
+                    Employee ESI
+                  </th>
+                  <th scope="col" className={`${th} text-right`}>
+                    Employeer ESI
                   </th>
                   <th scope="col" className={`${th} text-right`}>
                     LOP
@@ -428,11 +432,12 @@ export default function SalaryPaymentLogs() {
                     const bonus = Number(row.bonus) || 0;
                     const overtime = Number(row.overtime) || 0;
                     const pTax = Number(row.pTax) || 0;
-                    const esi = Number(row.esi) || 0;
+                    const employeeEsi = Number(row.employeeEsi) || 0;
+                    const employeerEsi = Number(row.employeerEsi) || 0;
                     const lop = Number(row.lop) || 0;
 
                     const netPayout =
-                      paidAmount + bonus + overtime - pTax - esi - lop;
+                      paidAmount + bonus + overtime - pTax - employeeEsi - employeerEsi - lop;
 
                     return (
                       <tr
@@ -494,11 +499,14 @@ export default function SalaryPaymentLogs() {
                         <td data-label="Base pay" className={numCell}>
                           <Money value={basePay} />
                         </td>
-                        <td data-label="P. Tax" className={numCell}>
+                        <td data-label="Prof. Tax" className={numCell}>
                           <Money value={pTax} tone="text-rose-600" />
                         </td>
-                        <td data-label="ESI" className={numCell}>
-                          <Money value={esi} tone="text-rose-600" />
+                        <td data-label="Employee ESI" className={numCell}>
+                          <Money value={employeeEsi} tone="text-rose-600" />
+                        </td>
+                        <td data-label="Employeer ESI" className={numCell}>
+                          <Money value={employeerEsi} tone="text-rose-600" />
                         </td>
                         <td data-label="LOP" className={numCell}>
                           <Money value={lop} tone="text-rose-600" />
@@ -566,7 +574,7 @@ export default function SalaryPaymentLogs() {
                 type="button"
                 disabled={!pagination.hasPrevPage || loading}
                 onClick={() => setPage((c) => c - 1)}
-                className="inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
@@ -590,7 +598,7 @@ export default function SalaryPaymentLogs() {
                       }
                       disabled={loading}
                       onClick={() => setPage(number)}
-                      className={`inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border px-2 py-1 text-xs tabular-nums transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`cursor-pointer inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border px-2 py-1 text-xs tabular-nums transition disabled:cursor-not-allowed disabled:opacity-50 ${
                         number === pagination.currentPage
                           ? "border-slate-800 bg-slate-800 text-white"
                           : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
@@ -605,7 +613,7 @@ export default function SalaryPaymentLogs() {
                 type="button"
                 disabled={!pagination.hasNextPage || loading}
                 onClick={() => setPage((c) => c + 1)}
-                className="inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>
