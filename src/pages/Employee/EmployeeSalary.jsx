@@ -371,8 +371,9 @@ const EmployeeSalary = () => {
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">LOP</th>
                   <th className="px-3 py-3 text-right font-medium">Prof. Tax</th>
-                  <th className="px-3 py-3 text-right font-medium">Employee ESI</th>
-                  <th className="px-3 py-3 text-right font-medium">Employeer ESI</th>
+                  <th className="px-3 py-3 text-right font-medium">ESI NO</th>
+                  <th className="px-3 py-3 text-right font-medium">Employeer Cont.(ESI)</th>
+                  <th className="px-3 py-3 text-right font-medium">Employee Cont.(ESI)</th>
                   <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
                     Total payout
                   </th>
@@ -382,7 +383,7 @@ const EmployeeSalary = () => {
               <tbody className="tabular-nums">
                 {records.map((r, i) => {
                   // Records are newest first, so the next row is the previous payment
-
+                  console.log(r)
                   return (
                     <tr
                       key={r.id || i}
@@ -428,11 +429,15 @@ const EmployeeSalary = () => {
                       </td>
 
                       <td className="px-3 py-3 text-right text-stone-600">
-                        <Amount value={r.employeeEsi} />
+                        {r?.employees?.salary?.esiNo}
                       </td>
 
                       <td className="px-3 py-3 text-right text-stone-600">
                         <Amount value={r.employeerEsi} />
+                      </td>
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        <Amount value={r.employeeEsi} />
                       </td>
 
                       <td className="py-3 pl-3 pr-5 text-right sm:pr-6">

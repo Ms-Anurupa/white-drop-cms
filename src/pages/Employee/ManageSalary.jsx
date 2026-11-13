@@ -1087,13 +1087,13 @@ const setPackageEditField = (key) => (e) => {
                 />
 
                 <SummaryRow
-                  label="Employeer ESI"
+                  label="Employeer Cont.(ESI)"
                   value={num(pay.employeerEsi)}
                   sign="−"
                 />
 
                 <SummaryRow
-                  label="Employee ESI"
+                  label="Employee Cont. (ES)I"
                   value={num(pay.employeeEsi)}
                   sign="−"
                 />
@@ -1536,14 +1536,14 @@ const setPackageEditField = (key) => (e) => {
                         to={revPTax}
                       />
                       <CompareRow
-                        label="Employee ESI"
-                        from={pkgEmployeeEsi}
-                        to={revEmployeeEsi}
-                      />
-                      <CompareRow
-                        label="Employeer ESI"
+                        label="Employeer Cont.(ESI)"
                         from={pkgEmployeerEsi}
                         to={revEmployeerEsi}
+                      />
+                      <CompareRow
+                        label="Employee Cont.(ESI)"
+                        from={pkgEmployeeEsi}
+                        to={revEmployeeEsi}
                       />
                       <CompareRow
                         label="Net monthly pay"

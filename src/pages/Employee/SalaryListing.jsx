@@ -269,6 +269,7 @@ export default function SalaryPaymentLogs() {
               </svg>
               Refresh
             </button>
+            <ExportExcelButton type="pTaxReport" buttonText="Prof. Tax Report" />
             <ExportExcelButton type="esiReport" buttonText="ESI Report" />
             <ExportExcelButton type="paidSalary" />
           </div>
