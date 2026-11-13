@@ -348,7 +348,7 @@ const ManageSalary = () => {
 
     const pkgBase = num(currentPackage?.basePay ?? currentBasePay);
     const pkgPTax = num(currentPackage?.pTax);
-    const pkgEsiNo = num(currentPackage?.pkgEsiNo);
+    const pkgEsiNo = currentPackage?.esiNo ?? "";
     const pkgEmployeeEsi = num(currentPackage?.employeeEsi);
     const pkgEmployeerEsi = num(currentPackage?.employeerEsi);
     const pkgNet = num(currentPackage?.finalPay ?? pkgBase - pkgPTax - pkgEmployeeEsi - pkgEmployeerEsi);
@@ -497,7 +497,7 @@ const ManageSalary = () => {
                 employeeId: targetId,
                 paidAmount: paidBase,
                 pTax: pay.pTax === "" ? undefined : num(pay.pTax),
-                esiNo: pay.esiNo === "" ? undefined : num(pay.esiNo),
+                esiNo: pay.esiNo ?? null,
                 employeeEsi: pay.employeeEsi === "" ? undefined : num(pay.employeeEsi),
                 employeerEsi: pay.employeerEsi === "" ? undefined : num(pay.employeerEsi),
                 bonus: num(pay.bonus),
@@ -708,7 +708,7 @@ const setPackageEditField = (key) => (e) => {
                 employeeId: targetId,
                 basePay: revBase,
                 ...(rev.pTax !== "" && { pTax: num(rev.pTax) }),
-                ...(rev.esiNo !== "" && { esiNo: num(rev.esiNo) }),
+                ...(rev.esiNo !== "" && { esiNo: rev.esiNo }),
                 ...(rev.employeeEsi !== "" && { employeeEsi: num(rev.employeeEsi) }),
                 ...(rev.employeerEsi !== "" && { employeerEsi: num(rev.employeerEsi) }),
                 increments: {
@@ -952,6 +952,7 @@ const setPackageEditField = (key) => (e) => {
                       : "Base salary for this payment."
                   }
                 />
+
                 <Field
                   label="Employeer Contribution(ESI)"
                   prefix="₹"
@@ -1084,14 +1085,16 @@ const setPackageEditField = (key) => (e) => {
                   value={num(pay.pTax)}
                   sign="−"
                 />
-                <SummaryRow
-                  label="Employee ESI"
-                  value={num(pay.employeeEsi)}
-                  sign="−"
-                />
+
                 <SummaryRow
                   label="Employeer ESI"
                   value={num(pay.employeerEsi)}
+                  sign="−"
+                />
+
+                <SummaryRow
+                  label="Employee ESI"
+                  value={num(pay.employeeEsi)}
                   sign="−"
                 />
                 <SummaryRow
@@ -1154,16 +1157,26 @@ const setPackageEditField = (key) => (e) => {
                     </div>
 
                     <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">Employee ESI</p>
+                      <p className="text-xs text-stone-500">ESI NO</p>
                       <p className="mt-1 text-lg font-semibold text-stone-900">
-                        {money(pkgEmployeeEsi)}
+                        {pkgEsiNo || "—"}
                       </p>
                     </div>
 
                     <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">Employeer ESI</p>
+                      <p className="text-xs text-stone-500">
+                        Employeer Cont. (ESI)
+                      </p>
                       <p className="mt-1 text-lg font-semibold text-stone-900">
                         {money(pkgEmployeerEsi)}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-stone-50 p-4">
+                      <p className="text-xs text-stone-500">
+                        Employee Cont. (ESI)
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                        {money(pkgEmployeeEsi)}
                       </p>
                     </div>
                   </div>
@@ -1185,20 +1198,28 @@ const setPackageEditField = (key) => (e) => {
                         onChange={setPackageEditField("basePay")}
                         error={packageEditErrors.basePay}
                       />
-
                       <Field
-                        label="Employee ESI"
-                        prefix="₹"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={packageEdit.employeeEsi}
-                        onChange={setPackageEditField("employeeEsi")}
-                        error={packageEditErrors.employeeEsi}
+                        label="ESI NO"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={10}
+                        placeholder="Enter 10-digit ESI number"
+                        value={packageEdit.esiNo ?? ""}
+                        onChange={(e) =>
+                          setPackageEditField("esiNo")({
+                            target: {
+                              value: e.target.value
+                                .replace(/\D/g, "")
+                                .slice(0, 10),
+                            },
+                          })
+                        }
+                        error={packageEditErrors.esiNo}
+                        hint="Enter the employee's 10-digit ESIC insurance number."
                       />
 
                       <Field
-                        label="Employeer ESI"
+                        label="Employeer Cont.(ESI)"
                         prefix="₹"
                         type="number"
                         min="0"
@@ -1206,6 +1227,17 @@ const setPackageEditField = (key) => (e) => {
                         value={packageEdit.employeerEsi}
                         onChange={setPackageEditField("employeerEsi")}
                         error={packageEditErrors.employeerEsi}
+                      />
+
+                      <Field
+                        label="Employee Cont.(ESI)"
+                        prefix="₹"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={packageEdit.employeeEsi}
+                        onChange={setPackageEditField("employeeEsi")}
+                        error={packageEditErrors.employeeEsi}
                       />
 
                       <Field

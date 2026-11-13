@@ -385,10 +385,10 @@ export default function SalaryPaymentLogs() {
                     Prof. Tax
                   </th>
                   <th scope="col" className={`${th} text-right`}>
-                    Employee ESI
+                    Employeer Cont. (ESI)
                   </th>
                   <th scope="col" className={`${th} text-right`}>
-                    Employeer ESI
+                    Employee Cont. (ESI)
                   </th>
                   <th scope="col" className={`${th} text-right`}>
                     LOP
@@ -502,11 +502,11 @@ export default function SalaryPaymentLogs() {
                         <td data-label="Prof. Tax" className={numCell}>
                           <Money value={pTax} tone="text-rose-600" />
                         </td>
-                        <td data-label="Employee ESI" className={numCell}>
-                          <Money value={employeeEsi} tone="text-rose-600" />
-                        </td>
-                        <td data-label="Employeer ESI" className={numCell}>
+                        <td data-label="Employeer Cont. (ESI)" className={numCell}>
                           <Money value={employeerEsi} tone="text-rose-600" />
+                        </td>
+                        <td data-label="Employee Cont. (ESI)" className={numCell}>
+                          <Money value={employeeEsi} tone="text-rose-600" />
                         </td>
                         <td data-label="LOP" className={numCell}>
                           <Money value={lop} tone="text-rose-600" />
