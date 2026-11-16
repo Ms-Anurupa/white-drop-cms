@@ -366,14 +366,14 @@ const EmployeeSalary = () => {
               <thead className="bg-stone-50 text-xs text-stone-500">
                 <tr>
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">Period</th>
+                  <th className="px-3 py-3 text-right font-medium">ESI NO</th>
                   <th className="px-3 py-3 text-right font-medium">Base pay</th>
+                  <th className="px-3 py-3 text-right font-medium">Prof. Tax</th>
+                  <th className="px-3 py-3 text-right font-medium">Employeer Cont.(ESI)</th>
+                  <th className="px-3 py-3 text-right font-medium">Employee Cont.(ESI)</th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">LOP</th>
-                  <th className="px-3 py-3 text-right font-medium">Prof. Tax</th>
-                  <th className="px-3 py-3 text-right font-medium">ESI NO</th>
-                  <th className="px-3 py-3 text-right font-medium">Employeer Cont.(ESI)</th>
-                  <th className="px-3 py-3 text-right font-medium">Employee Cont.(ESI)</th>
                   <th className="py-3 pl-3 pr-5 text-right font-medium sm:pr-6">
                     Total payout
                   </th>
@@ -407,9 +407,25 @@ const EmployeeSalary = () => {
                           </div>
                         )}
                       </td>
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        {r?.employees?.salary?.esiNo}
+                      </td>
 
                       <td className="px-3 py-3 text-right text-stone-700">
                         {money(r.basePay)}
+                      </td>
+
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        <Amount value={r.pTax} />
+                      </td>
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        <Amount value={r.employeerEsi} />
+                      </td>
+
+                      <td className="px-3 py-3 text-right text-stone-600">
+                        <Amount value={r.employeeEsi} />
                       </td>
 
                       <td className="px-3 py-3 text-right text-stone-600">
@@ -422,22 +438,6 @@ const EmployeeSalary = () => {
 
                       <td className="px-3 py-3 text-right">
                         <Amount value={r.lop} negative />
-                      </td>
-
-                      <td className="px-3 py-3 text-right text-stone-600">
-                        <Amount value={r.pTax} />
-                      </td>
-
-                      <td className="px-3 py-3 text-right text-stone-600">
-                        {r?.employees?.salary?.esiNo}
-                      </td>
-
-                      <td className="px-3 py-3 text-right text-stone-600">
-                        <Amount value={r.employeerEsi} />
-                      </td>
-
-                      <td className="px-3 py-3 text-right text-stone-600">
-                        <Amount value={r.employeeEsi} />
                       </td>
 
                       <td className="py-3 pl-3 pr-5 text-right sm:pr-6">

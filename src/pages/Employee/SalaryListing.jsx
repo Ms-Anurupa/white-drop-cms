@@ -225,7 +225,7 @@ export default function SalaryPaymentLogs() {
               </p>
             </div>
 
-            <div
+            {/* <div
               className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5"
               aria-live="polite"
             >
@@ -245,7 +245,7 @@ export default function SalaryPaymentLogs() {
                         : "payments"
                     } ${dateMode ? "on" : "in"} ${periodLabel}`}
               </span>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center gap-2 sm:ml-auto">
@@ -253,7 +253,7 @@ export default function SalaryPaymentLogs() {
               type="button"
               onClick={handleRefresh}
               disabled={loading}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer flex inline-flexcursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-[15px] font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -320,7 +320,7 @@ export default function SalaryPaymentLogs() {
                 key={chip.key}
                 type="button"
                 onClick={chip.clear}
-                className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs text-teal-900 transition hover:bg-teal-200"
+                className="cursor-pointer inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs text-teal-900 transition hover:bg-teal-200"
               >
                 {chip.label}
                 <span aria-hidden="true">×</span>
@@ -330,7 +330,7 @@ export default function SalaryPaymentLogs() {
             <button
               type="button"
               onClick={handleReset}
-              className="p-1 text-xs text-teal-700 underline hover:text-teal-900"
+              className="cursor-pointer p-1 text-xs text-teal-700 underline hover:text-teal-900"
             >
               Reset all
             </button>
@@ -386,6 +386,9 @@ export default function SalaryPaymentLogs() {
                     Prof. Tax
                   </th>
                   <th scope="col" className={`${th} text-right`}>
+                    ESI NO
+                  </th>
+                  <th scope="col" className={`${th} text-right`}>
                     Employeer Cont. (ESI)
                   </th>
                   <th scope="col" className={`${th} text-right`}>
@@ -433,6 +436,7 @@ export default function SalaryPaymentLogs() {
                     const bonus = Number(row.bonus) || 0;
                     const overtime = Number(row.overtime) || 0;
                     const pTax = Number(row.pTax) || 0;
+                    const esiNo = String(row?.employees?.salary?.esiNo ?? "NA");
                     const employeeEsi = Number(row.employeeEsi) || 0;
                     const employeerEsi = Number(row.employeerEsi) || 0;
                     const lop = Number(row.lop) || 0;
@@ -502,6 +506,9 @@ export default function SalaryPaymentLogs() {
                         </td>
                         <td data-label="Prof. Tax" className={numCell}>
                           <Money value={pTax} tone="text-rose-600" />
+                        </td>
+                        <td data-label="ESI NO" className={numCell}>
+                          <span tone="text-slate-300" >{esiNo}</span>
                         </td>
                         <td data-label="Employeer Cont. (ESI)" className={numCell}>
                           <Money value={employeerEsi} tone="text-rose-600" />

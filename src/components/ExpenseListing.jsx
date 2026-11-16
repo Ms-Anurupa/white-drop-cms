@@ -10,6 +10,7 @@ import {
   Inbox,
   FileText,
   FileSpreadsheet,
+  RefreshCw,
 } from "lucide-react";
 import expenseStore, { PAGE_LIMIT } from "../zustand/Store/expenseStore";
 import CategorySelect from "../components/CategorySelect";
@@ -102,6 +103,10 @@ const ExpenseListing = () => {
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const hasStartedLoading = useRef(false);
 
+  const handleRefresh = () => {
+    getExpenseListing()
+  }
+
   useEffect(() => {
     if (loading) {
       hasStartedLoading.current = true;
@@ -160,14 +165,20 @@ const ExpenseListing = () => {
           </p>
         </div>
 
-        
         {/* Button Group Container */}
-        <div className="flex items-center gap-3">
-          {(!selectedCategory || exportType === 'salary') && <ExportExcelButton
-            type={
-              exportType
-            }
-          />}
+        <div className="flex items-center  gap-3">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={loading}
+            className="p-5 flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border text-sm font-mediu border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+          {(!selectedCategory || exportType === "salary") && (
+            <ExportExcelButton type={exportType} />
+          )}
 
           <button
             type="button"

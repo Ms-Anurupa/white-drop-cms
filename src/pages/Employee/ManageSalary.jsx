@@ -608,7 +608,7 @@ const setPackageEditField = (key) => (e) => {
 
         const basePay = num(packageEdit.basePay);
         const pTax = num(packageEdit.pTax);
-        const esiNo = num(packageEdit.esiNo);
+        const esiNo = packageEdit.esiNo;
         const employeeEsi = num(packageEdit.employeeEsi);
         const employeerEsi = num(packageEdit.employeerEsi);
 
@@ -1562,18 +1562,18 @@ const setPackageEditField = (key) => (e) => {
                   <dl className="mt-2 text-sm">
                     <SummaryRow label="Base pay" value={num(setup.basePay)} />
                     <SummaryRow
-                      label="P.Tax"
+                      label="Prof. Tax"
                       value={num(setup.pTax)}
                       sign="−"
                     />
                     <SummaryRow
-                      label="Employee ESI"
-                      value={num(setup.employeeEsi)}
+                      label="Employeer Cont.(ESI)"
+                      value={num(setup.employeerEsi)}
                       sign="−"
                     />
                     <SummaryRow
-                      label="Employeer ESI"
-                      value={num(setup.employeerEsi)}
+                      label="Employee Cont.(ESI)"
+                      value={num(setup.employeeEsi)}
                       sign="−"
                     />
                     <SummaryRow
