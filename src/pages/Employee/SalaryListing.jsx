@@ -389,7 +389,7 @@ export default function SalaryPaymentLogs() {
                     ESI NO
                   </th>
                   <th scope="col" className={`${th} text-right`}>
-                    Employeer Cont. (ESI)
+                    Employer Cont. (ESI)
                   </th>
                   <th scope="col" className={`${th} text-right`}>
                     Employee Cont. (ESI)
@@ -438,11 +438,11 @@ export default function SalaryPaymentLogs() {
                     const pTax = Number(row.pTax) || 0;
                     const esiNo = String(row?.employees?.salary?.esiNo ?? "NA");
                     const employeeEsi = Number(row.employeeEsi) || 0;
-                    const employeerEsi = Number(row.employeerEsi) || 0;
+                    const employerEsi = Number(row.employerEsi) || 0;
                     const lop = Number(row.lop) || 0;
 
                     const netPayout =
-                      paidAmount + bonus + overtime - pTax - employeeEsi - employeerEsi - lop;
+                      paidAmount + bonus + overtime - pTax - employeeEsi - employerEsi - lop;
 
                     return (
                       <tr
@@ -510,8 +510,8 @@ export default function SalaryPaymentLogs() {
                         <td data-label="ESI NO" className={numCell}>
                           <span tone="text-slate-300" >{esiNo}</span>
                         </td>
-                        <td data-label="Employeer Cont. (ESI)" className={numCell}>
-                          <Money value={employeerEsi} tone="text-rose-600" />
+                        <td data-label="Employer Cont. (ESI)" className={numCell}>
+                          <Money value={employerEsi} tone="text-rose-600" />
                         </td>
                         <td data-label="Employee Cont. (ESI)" className={numCell}>
                           <Money value={employeeEsi} tone="text-rose-600" />

@@ -369,7 +369,7 @@ const EmployeeSalary = () => {
                   <th className="px-3 py-3 text-right font-medium">ESI NO</th>
                   <th className="px-3 py-3 text-right font-medium">Base pay</th>
                   <th className="px-3 py-3 text-right font-medium">Prof. Tax</th>
-                  <th className="px-3 py-3 text-right font-medium">Employeer Cont.(ESI)</th>
+                  <th className="px-3 py-3 text-right font-medium">Employer Cont.(ESI)</th>
                   <th className="px-3 py-3 text-right font-medium">Employee Cont.(ESI)</th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
@@ -421,7 +421,7 @@ const EmployeeSalary = () => {
                       </td>
 
                       <td className="px-3 py-3 text-right text-stone-600">
-                        <Amount value={r.employeerEsi} />
+                        <Amount value={r.employerEsi} />
                       </td>
 
                       <td className="px-3 py-3 text-right text-stone-600">

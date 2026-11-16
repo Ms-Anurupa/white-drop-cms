@@ -1,26 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import expenseStore from "../zustand/Store/expenseStore"; // adjust path
 import CategorySelect from "../components/CategorySelect"; // adjust path
 
-const INVOICE_TYPE_OPTIONS = [
-  { value: "TAX_INVOICE", label: "Tax invoice" },
-  { value: "BILL_OF_SUPPLY", label: "Bill of supply" },
-  { value: "CREDIT_NOTE", label: "Credit note" },
-  { value: "DEBIT_NOTE", label: "Debit note" },
-];
 
 const REVERSE_TAX_OPTIONS = [
   { value: "YES", label: "Yes" },
   { value: "NO", label: "No" },
 ];
 
-const FILING_STATUS_OPTIONS = [
-  { value: "FILED", label: "Filed" },
-  { value: "PENDING", label: "Pending" },
-  { value: "NOT_APPLICABLE", label: "Not applicable" },
-];
 
 const YES_NO_OPTIONS = [
   { value: "YES", label: "Yes" },
@@ -101,6 +90,19 @@ const CreateExpense = () => {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
+
+  const price = parseFloat(form.price);
+  const qty = parseFloat(form.quantity);
+  const hasPrice = !isNaN(price) && price >= 0;
+  const hasQty = !isNaN(qty) && qty > 0;
+  const totalPrice = hasPrice ? price * (hasQty ? qty : 1) : 0;
+
+  const fmt = (n) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+    }).format(n);
 
   const setField = (key) => (e) => {
     const value = e?.target ? e.target.value : e;
@@ -220,7 +222,7 @@ const CreateExpense = () => {
             />
           </Field>
 
-          <Field label="Price" required>
+          <Field label="Price per unit" required>
             <Input
               type="number"
               step="0.01"
@@ -243,6 +245,31 @@ const CreateExpense = () => {
               <p className="mt-1 text-xs text-red-500">{errors.purchaseDate}</p>
             )}
           </Field>
+
+          <div className="flex items-end sm:col-span-1 lg:col-span-2">
+            <div className="w-[50%] rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2">
+              <p className="text-xs text-gray-500">Total price</p>
+              {hasPrice ? (
+                <p className="text-sm text-gray-900">
+                  <span className="text-gray-500">
+                    {fmt(price)}
+                    {form.unit ? ` / ${form.unit}` : ""}
+                    {hasQty
+                      ? ` × ${qty}${form.unit ? ` ${form.unit}` : ""}`
+                      : ""}
+                    {" = "}
+                  </span>
+                  <span className="text-base font-semibold">
+                    {fmt(totalPrice)}
+                  </span>
+                </p>
+              ) : (
+                <p className="text-sm text-gray-400">
+                  Enter price and quantity
+                </p>
+              )}
+            </div>
+          </div>
 
           <Field label="Notes" className="sm:col-span-2 lg:col-span-3">
             <textarea
