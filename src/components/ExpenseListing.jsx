@@ -374,7 +374,7 @@ const ExpenseListing = () => {
                         : "—"}
                     </td>
                     <td className="px-4 py-3 font-bold text-slate-900">
-                      {inr(expense.price)}
+                      {inr(expense.category?.name === "SALARY" ? expense.price : (expense.price * expense.quantity))}
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200 text-slate-500">
                       {formatDate(expense.purchaseDate)}

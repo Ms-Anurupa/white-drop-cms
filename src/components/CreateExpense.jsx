@@ -92,10 +92,10 @@ const CreateExpense = () => {
   const [formError, setFormError] = useState("");
 
   const price = parseFloat(form.price);
-  const qty = parseFloat(form.quantity);
+  const parsedQty = parseFloat(form.quantity);
+  const qty = !isNaN(parsedQty) && parsedQty > 0 ? parsedQty : 1; 
   const hasPrice = !isNaN(price) && price >= 0;
-  const hasQty = !isNaN(qty) && qty > 0;
-  const totalPrice = hasPrice ? price * (hasQty ? qty : 1) : 0;
+  const totalPrice = hasPrice ? Math.round(price * qty * 100) / 100 : 0;
 
   const fmt = (n) =>
     new Intl.NumberFormat("en-IN", {
@@ -103,7 +103,6 @@ const CreateExpense = () => {
       currency: "INR",
       minimumFractionDigits: 2,
     }).format(n);
-
   const setField = (key) => (e) => {
     const value = e?.target ? e.target.value : e;
     setForm((f) => ({ ...f, [key]: value }));
@@ -127,8 +126,9 @@ const CreateExpense = () => {
 
     const payload = {
       ...form,
-      quantity: form.quantity === "" ? undefined : form.quantity,
-      price: form.price,
+      quantity: qty,
+      price: form.price, // per unit
+      totalPrice,
     };
 
     const res = await createExpense(payload);
@@ -210,7 +210,7 @@ const CreateExpense = () => {
               step="any"
               value={form.quantity}
               onChange={setField("quantity")}
-              placeholder="0"
+              placeholder="1"
             />
           </Field>
 
@@ -247,26 +247,21 @@ const CreateExpense = () => {
           </Field>
 
           <div className="flex items-end sm:col-span-1 lg:col-span-2">
-            <div className="w-[50%] rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2">
+            <div className="w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2">
               <p className="text-xs text-gray-500">Total price</p>
               {hasPrice ? (
                 <p className="text-sm text-gray-900">
                   <span className="text-gray-500">
                     {fmt(price)}
                     {form.unit ? ` / ${form.unit}` : ""}
-                    {hasQty
-                      ? ` × ${qty}${form.unit ? ` ${form.unit}` : ""}`
-                      : ""}
-                    {" = "}
+                    {` × ${qty}${form.unit ? ` ${form.unit}` : ""} = `}
                   </span>
                   <span className="text-base font-semibold">
                     {fmt(totalPrice)}
                   </span>
                 </p>
               ) : (
-                <p className="text-sm text-gray-400">
-                  Enter price and quantity
-                </p>
+                <p className="text-sm text-gray-400">Enter price</p>
               )}
             </div>
           </div>
