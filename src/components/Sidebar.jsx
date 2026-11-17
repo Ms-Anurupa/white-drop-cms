@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -15,6 +15,7 @@ import {
   HandCoins,
   UserCog2Icon,
   ChartNoAxesGantt,
+  Search,
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
@@ -39,9 +40,9 @@ const sections = [
         key: "salaryLogs",
         icon: UserCog2Icon,
         children: [
-          { name: "Employee List", path: "employee-list"},
-          { name: "Salary List", path: "salary-list"}
-        ]
+          { name: "Employee List", path: "employee-list" },
+          { name: "Salary List", path: "salary-list" },
+        ],
       },
       {
         name: "Expenses",
@@ -141,14 +142,11 @@ const matchesPath = (pathname, path) => {
     .filter(Boolean)
     .map((s) => s.toLowerCase());
 
-  // 1. Exact segment match (e.g., segment "expense" === path "expense")
   if (segments.includes(cleanPath)) {
     return true;
   }
 
-  // 2. Sub-route match for multi-word paths (e.g. /dashboard/expense/create or /dashboard/createExpense)
   return segments.some((segment) => {
-    // Prevent "expense-category" from matching "expense"
     if (segment.includes("-") && !cleanPath.includes("-")) {
       return false;
     }
@@ -164,7 +162,6 @@ const NavItem = ({ item, onClick, collapsed }) => {
   const Icon = item.icon;
   const { pathname } = useLocation();
 
-  // Custom active state logic to cover sub-routes (e.g. createExpense)
   const isItemActive = (navLinkIsActive) => {
     if (navLinkIsActive) return true;
     if (item.end) return false;
@@ -214,7 +211,7 @@ const NavItem = ({ item, onClick, collapsed }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Child link inside a dropdown                                       */
+/* Child link inside a dropdown                                        */
 /* ------------------------------------------------------------------ */
 
 const SubNavItem = ({ item, onClick }) => {
@@ -258,7 +255,7 @@ const SubNavItem = ({ item, onClick }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Group with dropdown                                                */
+/* Group with dropdown                                                 */
 /* ------------------------------------------------------------------ */
 
 const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
@@ -321,7 +318,7 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
           ].join(" ")}
         >
           <div className="overflow-hidden">
-            <div className="ml-[20px] mt-1 space-y-0.5 border-l border-slate-200 ">
+            <div className="ml-[20px] mt-1 space-y-0.5 border-l border-slate-200">
               {item.children.map((child) => (
                 <SubNavItem
                   key={child.path}
@@ -338,27 +335,73 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Sidebar body (shared by drawer + desktop)                          */
+/* Sidebar body (shared by drawer + desktop)                           */
 /* ------------------------------------------------------------------ */
 
 const SidebarBody = ({
   user,
   collapsed,
   onToggleCollapse,
+  onExpandAndSearch,
   openGroups,
   onToggleGroup,
   onNavClick,
   onLogOut,
+  searchQuery,
+  setSearchQuery,
+  searchInputRef,
   isMobile = false,
 }) => {
   const isCollapsed = collapsed && !isMobile;
+
+  // Filter sections and items based on search query
+  const filteredSections = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return sections;
+
+    return sections
+      .map((section) => {
+        const sectionMatches = section.label.toLowerCase().includes(query);
+
+        const filteredItems = section.items
+          .map((item) => {
+            const itemMatches = item.name.toLowerCase().includes(query);
+
+            if (item.children) {
+              const matchingChildren = item.children.filter((child) =>
+                child.name.toLowerCase().includes(query),
+              );
+
+              // Show parent with all children if section/parent matches, otherwise only matching children
+              if (sectionMatches || itemMatches) {
+                return item;
+              }
+              if (matchingChildren.length > 0) {
+                return { ...item, children: matchingChildren };
+              }
+              return null;
+            }
+
+            return sectionMatches || itemMatches ? item : null;
+          })
+          .filter(Boolean);
+
+        return filteredItems.length > 0
+          ? { ...section, items: filteredItems }
+          : null;
+      })
+      .filter(Boolean);
+  }, [searchQuery]);
+
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Logo */}
       <div
-        className={`h-14 flex items-center ${isCollapsed ? "justify-center" : "justify-between"
-          } px-4 border-b border-slate-100 shrink-0`}
+        className={`h-14 flex items-center ${
+          isCollapsed ? "justify-center" : "justify-between"
+        } px-4 border-b border-slate-100 shrink-0`}
       >
         {!isCollapsed && (
           <div className="flex items-center gap-2.5 min-w-0">
@@ -389,39 +432,86 @@ const SidebarBody = ({
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {sections.map((section, index) => (
-          <div key={section.label} className={index > 0 ? "pt-5" : ""}>
-            {!isCollapsed && (
-              <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                {section.label}
-              </p>
+      {/* Search Bar */}
+      <div className="px-3 pt-3 pb-1 shrink-0">
+        {isCollapsed ? (
+          <button
+            type="button"
+            onClick={onExpandAndSearch}
+            title="Search menu"
+            className="w-full h-10 flex items-center justify-center rounded-lg bg-slate-100 text-gray-500 hover:bg-slate-200 hover:text-gray-900 transition cursor-pointer"
+            aria-label="Search menu"
+          >
+            <Search size={17} />
+          </button>
+        ) : (
+          <div className="relative flex items-center">
+            <Search
+              size={15}
+              className="absolute left-3 text-gray-400 pointer-events-none"
+            />
+            <input
+              ref={!isMobile ? searchInputRef : undefined}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search menu..."
+              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 p-0.5 rounded text-gray-400 hover:text-gray-600 cursor-pointer"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
             )}
-
-            <div className="space-y-0.5">
-              {section.items.map((item) =>
-                item.children ? (
-                  <NavGroup
-                    key={item.key}
-                    item={item}
-                    collapsed={isCollapsed}
-                    open={!!openGroups[item.key]}
-                    onToggle={() => onToggleGroup(item.key)}
-                    onNavClick={onNavClick}
-                  />
-                ) : (
-                  <NavItem
-                    key={item.path}
-                    item={item}
-                    onClick={onNavClick}
-                    collapsed={isCollapsed}
-                  />
-                ),
-              )}
-            </div>
           </div>
-        ))}
+        )}
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+        {filteredSections.length > 0
+          ? filteredSections.map((section, index) => (
+              <div key={section.label} className={index > 0 ? "pt-5" : ""}>
+                {!isCollapsed && (
+                  <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                    {section.label}
+                  </p>
+                )}
+
+                <div className="space-y-0.5">
+                  {section.items.map((item) =>
+                    item.children ? (
+                      <NavGroup
+                        key={item.key}
+                        item={item}
+                        collapsed={isCollapsed}
+                        // Force group open while searching so matching sub-items are immediately visible
+                        open={isSearching ? true : !!openGroups[item.key]}
+                        onToggle={() => onToggleGroup(item.key)}
+                        onNavClick={onNavClick}
+                      />
+                    ) : (
+                      <NavItem
+                        key={item.path}
+                        item={item}
+                        onClick={onNavClick}
+                        collapsed={isCollapsed}
+                      />
+                    ),
+                  )}
+                </div>
+              </div>
+            ))
+          : !isCollapsed && (
+              <div className="px-3 py-8 text-center">
+                <p className="text-xs text-gray-400">No menu items found</p>
+              </div>
+            )}
       </nav>
 
       {/* Mobile Logout */}
@@ -440,8 +530,9 @@ const SidebarBody = ({
       {/* Footer */}
       <div className="shrink-0 px-4 py-3 border-t border-slate-100">
         <div
-          className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"
-            }`}
+          className={`flex items-center ${
+            isCollapsed ? "justify-center" : "gap-3"
+          }`}
         >
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
             {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
@@ -464,17 +555,30 @@ const SidebarBody = ({
 };
 
 /* ------------------------------------------------------------------ */
-/* Sidebar                                                            */
+/* Sidebar                                                             */
 /* ------------------------------------------------------------------ */
 
 const Sidebar = ({ onLogOut }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+
   const user = authStore((state) => state.user);
   const { pathname } = useLocation();
 
-  const close = () => setMobileOpen(false);
+  const close = () => {
+    setMobileOpen(false);
+  };
+
+  /* Expand collapsed sidebar and focus search input */
+  const handleExpandAndSearch = () => {
+    setCollapsed(false);
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 50);
+  };
 
   /* Open the group that owns the current route */
   useEffect(() => {
@@ -509,9 +613,13 @@ const Sidebar = ({ onLogOut }) => {
     user,
     collapsed,
     onToggleCollapse: () => setCollapsed((prev) => !prev),
+    onExpandAndSearch: handleExpandAndSearch,
     openGroups,
     onToggleGroup: toggleGroup,
     onLogOut,
+    searchQuery,
+    setSearchQuery,
+    searchInputRef,
   };
 
   return (
@@ -569,8 +677,9 @@ const Sidebar = ({ onLogOut }) => {
 
       {/* Desktop Sidebar — fixed */}
       <aside
-        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white border-r border-slate-100 transition-all duration-300 ${collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
-          }`}
+        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white border-r border-slate-100 transition-all duration-300 ${
+          collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
+        }`}
       >
         <SidebarBody {...bodyProps} />
       </aside>
@@ -578,8 +687,9 @@ const Sidebar = ({ onLogOut }) => {
       {/* Spacer keeps page content beside the fixed sidebar */}
       <div
         aria-hidden="true"
-        className={`hidden lg:block shrink-0 transition-all duration-300 ${collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
-          }`}
+        className={`hidden lg:block shrink-0 transition-all duration-300 ${
+          collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
+        }`}
       />
     </>
   );
