@@ -248,7 +248,14 @@ const EmployeeSalary = () => {
           value={startDate}
           max={endDate || undefined}
           onChange={(e) => setStartDate(e.target.value)}
-          className="rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+          onClick={(e) => {
+            try {
+              e.currentTarget?.showPicker();
+            } catch {
+              e.currentTarget?.focus();
+            }
+          }}
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
         />
 
         <span className="text-xs text-stone-400">and</span>
@@ -259,7 +266,14 @@ const EmployeeSalary = () => {
           value={endDate}
           min={startDate || undefined}
           onChange={(e) => setEndDate(e.target.value)}
-          className="rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+          onClick={(e) => {
+            try {
+              e.currentTarget?.showPicker();
+            } catch {
+              e.currentTarget?.focus();
+            }
+          }}
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
         />
 
         {hasFilters && (
@@ -368,9 +382,15 @@ const EmployeeSalary = () => {
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">Period</th>
                   <th className="px-3 py-3 text-right font-medium">ESI NO</th>
                   <th className="px-3 py-3 text-right font-medium">Base pay</th>
-                  <th className="px-3 py-3 text-right font-medium">Prof. Tax</th>
-                  <th className="px-3 py-3 text-right font-medium">Employer Cont.(ESI)</th>
-                  <th className="px-3 py-3 text-right font-medium">Employee Cont.(ESI)</th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Prof. Tax
+                  </th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Employer Cont.(ESI)
+                  </th>
+                  <th className="px-3 py-3 text-right font-medium">
+                    Employee Cont.(ESI)
+                  </th>
                   <th className="px-3 py-3 text-right font-medium">Bonus</th>
                   <th className="px-3 py-3 text-right font-medium">Overtime</th>
                   <th className="px-3 py-3 text-right font-medium">LOP</th>
@@ -383,7 +403,7 @@ const EmployeeSalary = () => {
               <tbody className="tabular-nums">
                 {records.map((r, i) => {
                   // Records are newest first, so the next row is the previous payment
-                  console.log(r)
+                  console.log(r);
                   return (
                     <tr
                       key={r.id || i}
@@ -414,7 +434,6 @@ const EmployeeSalary = () => {
                       <td className="px-3 py-3 text-right text-stone-700">
                         {money(r.basePay)}
                       </td>
-
 
                       <td className="px-3 py-3 text-right text-stone-600">
                         <Amount value={r.pTax} />
