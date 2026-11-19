@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft, ImagePlus, X, Trash2 } from "lucide-react";
+
+const labelCls = "text-xs font-medium text-gray-600";
+const inputCls =
+  "h-8 w-full px-2.5 text-xs rounded-md border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition";
+const textareaCls =
+  "w-full px-2.5 py-2 text-xs rounded-md border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition resize-none";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -33,7 +39,6 @@ const AddProduct = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
     setProductList((prev) => ({
       ...prev,
       images: files,
@@ -42,7 +47,6 @@ const AddProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setProductList((prev) => ({
       ...prev,
       [name]: value,
@@ -60,7 +64,9 @@ const AddProduct = () => {
               ...variant,
               [name]:
                 name === "price" || name === "stock_quantity"
-                  ? Number(value)
+                  ? value === ""
+                    ? ""
+                    : Number(value)
                   : name === "availability"
                     ? value === "true"
                     : value,
@@ -102,55 +108,12 @@ const AddProduct = () => {
     });
   }, []);
 
-  const validateProduct = () => {
-    if (!productList.product_name.trim()) {
-      return "Product Name is required";
-    }
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
 
-    if (!productList.product_description.trim()) {
-      return "Product Description is required";
-    }
-
-    if (!productList.catch_phrase.trim()) {
-      return "Product catch phrase is required";
-    }
-
-    if (productList.images.length === 0) {
-      return "At least one image is required";
-    }
-
-    for (let i = 0; i < productList.variants.length; i++) {
-      const v = productList.variants[i];
-
-      // if (!v.variant_name.trim()) {
-      //   return `Variant ${i + 1}: Name is required`;
-      // }
-
-      if (v.price === "") {
-        return `Variant ${i + 1}: Price is required`;
-      }
-
-      if (v.stock_quantity === "") {
-        return `Variant ${i + 1}: Stock quantity is required`;
-      }
-
-      if (!v.sku.trim()) {
-        return `Variant ${i + 1}: SKU is required`;
-      }
-    }
-
-    return null;
-  };
-
-  const handleCreateProduct = async () => {
     try {
-      //validations
-      const error = validateProduct();
-
-      if (error) {
-        toast.error(error);
-        console.log("errr", error);
-
+      if (productList.images.length === 0) {
+        toast.error("At least one image is required");
         return;
       }
 
@@ -169,242 +132,277 @@ const AddProduct = () => {
           formData.append("productImages", file);
         });
       }
-      console.log("productData", productList);
 
-      console.log(Object.fromEntries(formData));
-      const res = await createProduct(formData);
-      console.log("product res", res.data);
+      await createProduct(formData);
 
-      toast.success("Poduct Added Successfully");
-      console.log("Product Added:", productList);
+      toast.success("Product Added Successfully");
       navigate("/dashboard/product");
-    } catch {
-      toast.error("Product Creation Failed");
+    } catch (err) {
+      const serverMessage = err?.response?.data?.message;
+      toast.error(serverMessage || "Product Creation Failed");
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full bg-gradient-to-br p-6">
-      <div className="max-w-9xl mx-auto">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-gray-50 px-3 py-4 sm:px-5 lg:px-6 text-[13px]">
+      <form
+        onSubmit={handleCreateProduct}
+        className="max-w-6xl mx-auto space-y-4"
+      >
         {/* HEADER */}
-        <div className="mb-8 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-            <span className="text-white text-xl">＋</span>
-          </div>
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/product")}
+            className="inline-flex items-center gap-1.5 -ml-1 px-1.5 py-1 rounded-md cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+          >
+            <ArrowLeft size={14} />
+            Back to products
+          </button>
+
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              Add New Product
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight leading-tight">
+              Add new product
             </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               Fill in the details below to create a new product listing
             </p>
           </div>
         </div>
 
-        {/* MAIN CARD */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/60 border border-white p-8 space-y-10">
-          {/* SECTION: Media & Identity */}
-          <div>
-            <p className="text-xs font-semibold text-blue-500 uppercase tracking-widest mb-5">
-              Product Identity
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* IMAGE UPLOAD */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-semibold text-slate-600 block mb-2">
-                  Product Images
-                </label>
-                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-blue-200 rounded-2xl cursor-pointer bg-blue-50/40 hover:bg-blue-50 transition-colors group">
-                  <div className="text-center">
-                    <span className="text-2xl">🖼️</span>
-                    <p className="text-sm text-slate-500 mt-1 group-hover:text-blue-600 transition-colors">
-                      Click to upload images
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      PNG, JPG, WEBP supported
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </label>
+        {/* SECTION: Product identity */}
+        <section className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="px-4 py-2.5 border-b border-gray-100">
+            <h2 className="text-[13px] font-semibold text-gray-900">
+              Product details
+            </h2>
+          </div>
 
-                {productList.images.length > 0 && (
-                  <div className="grid grid-cols-4 md:grid-cols-8 gap-3 mt-4">
-                    {productList.images.map((img, index) => (
-                      <div
-                        key={index}
-                        className="relative h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm group"
+          <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* IMAGE UPLOAD */}
+            <div className="lg:col-span-1">
+              <label className={`${labelCls} block mb-1`}>
+                Product images<span className="text-red-500 ml-0.5">*</span>
+              </label>
+              <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-gray-300 rounded-md cursor-pointer bg-gray-50 hover:bg-blue-50/50 hover:border-blue-400 transition-colors group">
+                <ImagePlus
+                  size={20}
+                  className="text-gray-400 group-hover:text-blue-500 transition-colors"
+                />
+                <p className="text-xs text-gray-600 mt-1 group-hover:text-blue-600 transition-colors">
+                  Click to upload images
+                </p>
+                <p className="text-[11px] text-gray-400">
+                  PNG, JPG, WEBP supported
+                </p>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+
+              {productList.images.length > 0 && (
+                <div className="grid grid-cols-5 lg:grid-cols-4 gap-2 mt-2.5">
+                  {productList.images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative aspect-square rounded-md overflow-hidden border border-gray-200 group"
+                    >
+                      <img
+                        src={URL.createObjectURL(img)}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setProductList((prev) => ({
+                            ...prev,
+                            images: prev.images.filter((_, i) => i !== index),
+                          }))
+                        }
+                        aria-label="Remove image"
+                        className="absolute cursor-pointer inset-0 bg-black/50 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity flex items-center justify-center text-white"
                       >
-                        <img
-                          src={URL.createObjectURL(img)}
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          onClick={() =>
-                            setProductList((prev) => ({
-                              ...prev,
-                              images: prev.images.filter((_, i) => i !== index),
-                            }))
-                          }
-                          className="absolute cursor-pointer inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              {/* Product Name */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Product Name
+            {/* TEXT FIELDS */}
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
+              <div className="flex flex-col gap-1">
+                <label className={labelCls}>
+                  Product name<span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <input
+                  required
                   name="product_name"
                   value={productList.product_name}
                   onChange={handleChange}
                   placeholder="e.g. Cow Milk"
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                  className={inputCls}
                 />
               </div>
 
-              {/* Catch Phrase */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Catch Phrase
+              <div className="flex flex-col gap-1">
+                <label className={labelCls}>
+                  Catch phrase<span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <input
+                  required
                   name="catch_phrase"
                   value={productList.catch_phrase}
                   onChange={handleChange}
                   placeholder="e.g. Pure Fresh Milk Every Day"
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                  className={inputCls}
                 />
               </div>
 
-              {/* Description */}
-              <div className="md:col-span-2 flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Product Description
+              <div className="sm:col-span-2 flex flex-col gap-1">
+                <label className={labelCls}>
+                  Product description
                 </label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   name="product_description"
                   value={productList.product_description}
                   onChange={handleChange}
                   placeholder="Fresh and pure milk collected from local farms..."
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all resize-none text-slate-800 placeholder:text-slate-300"
+                  className={textareaCls}
                 />
               </div>
             </div>
           </div>
+        </section>
 
-          {/* DIVIDER */}
-          <div className="border-t border-dashed border-slate-200" />
+        {/* SECTION: Variant Details */}
+        <section className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold text-gray-900">
+              Variants
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({productList.variants.length})
+              </span>
+            </h2>
+            <button
+              type="button"
+              onClick={addVariant}
+              className="inline-flex items-center cursor-pointer gap-1 h-7 px-2.5 rounded-md bg-white hover:bg-blue-50 text-blue-600 font-medium text-xs transition border border-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+            >
+              <Plus size={13} />
+              Add variant
+            </button>
+          </div>
 
-          {/* SECTION: Variant Details */}
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-xs font-semibold text-blue-500 uppercase tracking-widest">
-                Variant Details
-              </p>
-              <button
-                type="button"
-                onClick={addVariant}
-                className="flex items-center cursor-pointer gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-sm transition-all border border-blue-100"
+          <div className="p-4 space-y-3">
+            {productList.variants.map((variant, index) => (
+              <div
+                key={index}
+                className="rounded-md border border-gray-200 bg-gray-50/60 p-3"
               >
-                <span className="text-lg leading-none">＋</span> Add Variant
-              </button>
-            </div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-xs font-semibold text-gray-700">
+                    Variant {index + 1}
+                  </span>
+                  {productList.variants.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeVariant(index)}
+                      className="inline-flex cursor-pointer items-center gap-1 h-6 px-2 rounded-md bg-white hover:bg-red-50 text-red-600 font-medium text-[11px] transition border border-red-100"
+                    >
+                      <Trash2 size={11} />
+                      Remove
+                    </button>
+                  )}
+                </div>
 
-            <div className="space-y-6">
-              {productList.variants.map((variant, index) => (
-                <div
-                  key={index}
-                  className="relative rounded-2xl border border-slate-200 bg-slate-50/50 p-5"
-                >
-                  {/* Variant Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Variant {index + 1}
-                    </span>
-                    {productList.variants.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeVariant(index)}
-                        className="flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 font-semibold text-xs transition-all border border-red-100"
-                      >
-                        <span>✕</span> Remove
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {[
-                      {
-                        label: "Quantity",
-                        name: "quantity",
-                        placeholder: "e.g. 500",
-                        type: "text",
-                      },
-                      {
-                        label: "Unit",
-                        name: "unit",
-                        placeholder: "e.g. ML",
-                        type: "text",
-                      },
-                      {
-                        label: "Variant Name",
-                        name: "variant_name",
-                        placeholder: "Optional",
-                        type: "text",
-                      },
-                      {
-                        label: "Package",
-                        name: "package",
-                        placeholder: "e.g. Bottle",
-                        type: "text",
-                      },
-                      {
-                        label: "Price (₹)",
-                        name: "price",
-                        placeholder: "e.g. 25",
-                        type: "number",
-                      },
-                      {
-                        label: "Stock Quantity",
-                        name: "stock_quantity",
-                        placeholder: "e.g. 100",
-                        type: "number",
-                      },
-                      {
-                        label: "SKU",
-                        name: "sku",
-                        placeholder: "e.g. CM-500",
-                        type: "text",
-                      },
-                    ].map(({ label, name, placeholder, type }) => (
-                      <div key={name} className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-slate-600">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-2.5">
+                  {[
+                    {
+                      label: "Quantity",
+                      name: "quantity",
+                      placeholder: "e.g. 500",
+                      type: "number",
+                      step: "any",
+                      min: "0.01",
+                      required: true,
+                    },
+                    {
+                      label: "Unit",
+                      name: "unit",
+                      required: true,
+                    },
+                    {
+                      label: "Price (₹)",
+                      name: "price",
+                      placeholder: "e.g. 25",
+                      type: "number",
+                      step: "any",
+                      min: "0",
+                      required: true,
+                    },
+                    {
+                      label: "Variant Name",
+                      name: "variant_name",
+                      placeholder: "Optional",
+                      type: "text",
+                      required: false,
+                    },
+                    {
+                      label: "Package",
+                      name: "package",
+                      placeholder: "e.g. Bottle",
+                      type: "text",
+                      required: false,
+                    },
+                    {
+                      label: "Stock Quantity",
+                      name: "stock_quantity",
+                      placeholder: "e.g. 100",
+                      type: "number",
+                      min: "0",
+                      required: true,
+                    },
+                    {
+                      label: "SKU",
+                      name: "sku",
+                      placeholder: "e.g. CM-500",
+                      type: "text",
+                      required: true,
+                    },
+                  ].map(
+                    ({
+                      label,
+                      name,
+                      placeholder,
+                      type,
+                      step,
+                      min,
+                      required,
+                    }) => (
+                      <div key={name} className="flex flex-col gap-1">
+                        <label className={labelCls}>
                           {label}
+                          {required && (
+                            <span className="text-red-500 ml-0.5">*</span>
+                          )}
                         </label>
 
                         {name === "unit" ? (
                           <select
                             name="unit"
+                            required={required}
                             value={variant.unit}
                             onChange={(e) => handleVariantChange(index, e)}
-                            className="px-4 py-3 cursor-pointer rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
+                            className={`${inputCls} cursor-pointer`}
                           >
                             <option value="">Select Unit</option>
-
                             {ProductUnit?.map((unit) => (
                               <option key={unit} value={unit}>
                                 {unit}
@@ -415,58 +413,56 @@ const AddProduct = () => {
                           <input
                             type={type}
                             name={name}
+                            step={step}
+                            min={min}
+                            required={required}
                             value={variant[name]}
                             onChange={(e) => handleVariantChange(index, e)}
                             placeholder={placeholder}
-                            className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                            className={inputCls}
                           />
                         )}
                       </div>
-                    ))}
+                    ),
+                  )}
 
-                    {/* Availability */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-slate-600">
-                        Availability
-                      </label>
-                      <select
-                        name="availability"
-                        value={variant.availability}
-                        onChange={(e) => handleVariantChange(index, e)}
-                        className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
-                      >
-                        <option value={true}>In Stock</option>
-                        <option value={false}>Out of Stock</option>
-                      </select>
-                    </div>
+                  {/* Availability */}
+                  <div className="flex flex-col gap-1">
+                    <label className={labelCls}>Availability</label>
+                    <select
+                      name="availability"
+                      value={variant.availability}
+                      onChange={(e) => handleVariantChange(index, e)}
+                      className={`${inputCls} cursor-pointer`}
+                    >
+                      <option value={true}>In Stock</option>
+                      <option value={false}>Out of Stock</option>
+                    </select>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* DIVIDER */}
-          <div className="border-t border-dashed border-slate-100" />
-
-          {/* FOOTER BUTTONS */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard/product")}
-              className="px-6 py-3 cursor-pointer rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold transition-all text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleCreateProduct}
-              className="px-8 py-3 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold shadow-lg shadow-blue-200 transition-all text-sm flex items-center gap-2"
-            >
-              <Plus size={18} />
-              Add Product
-            </button>
-          </div>
+        {/* FOOTER BUTTONS */}
+        <div className="sticky bottom-0 z-10 -mx-3 sm:-mx-5 lg:-mx-6 px-3 sm:px-5 lg:px-6 py-2.5 bg-white/95 backdrop-blur border-t border-gray-200 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/product")}
+            className="h-8 px-4 cursor-pointer rounded-md bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium transition text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="h-8 px-4 cursor-pointer rounded-md bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-medium shadow-sm transition text-xs inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+          >
+            <Plus size={14} />
+            Add product
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

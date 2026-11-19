@@ -4,6 +4,38 @@ import productDataStore from "../zustand/Store/productDataStore";
 import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
+import { ArrowLeft, ImagePlus, Plus, Trash2, X } from "lucide-react";
+
+/* ---------- UI-only helpers (no business logic) ---------- */
+
+const inputClass =
+  "w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition hover:border-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-600/15";
+
+const labelClass = "mb-1.5 block text-sm font-medium text-slate-700";
+
+const Card = ({ title, subtitle, action, children }) => (
+  <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
+      <div>
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        {subtitle && (
+          <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
+        )}
+      </div>
+      {action}
+    </div>
+    <div className="p-6">{children}</div>
+  </section>
+);
+
+const Field = ({ id, label, children }) => (
+  <div>
+    <label htmlFor={id} className={labelClass}>
+      {label}
+    </label>
+    {children}
+  </div>
+);
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -102,7 +134,7 @@ const EditProduct = () => {
       variants: [
         ...prev.variants,
         {
-          quantity:"",
+          quantity: "",
           unit: "",
           variant_name: "",
           package: "",
@@ -116,35 +148,36 @@ const EditProduct = () => {
   };
 
   const removeVariant = async (index) => {
-  const variant = productList.variants[index];
+    const variant = productList.variants[index];
 
-  try {
-    // Existing variant 
-    if (variant?.product_item_id) {
-      const confirmMessage = await confirm({
-        title: "Delete Product Variant",
-        message: "This will permanently delete the product variant. Continue?",
-      });
+    try {
+      // Existing variant
+      if (variant?.product_item_id) {
+        const confirmMessage = await confirm({
+          title: "Delete Product Variant",
+          message:
+            "This will permanently delete the product variant. Continue?",
+        });
 
-      if (!confirmMessage) return;
+        if (!confirmMessage) return;
 
-      await deleteProductVariantById({
-        variantId: variant.product_item_id,
-      });
+        await deleteProductVariantById({
+          variantId: variant.product_item_id,
+        });
 
-      toast.success("Variant deleted successfully");
+        toast.success("Variant deleted successfully");
+      }
+
+      // Remove from local state
+      setProductList((prev) => ({
+        ...prev,
+        variants: prev.variants.filter((_, i) => i !== index),
+      }));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete variant");
     }
-
-    // Remove from local state
-    setProductList((prev) => ({
-      ...prev,
-      variants: prev.variants.filter((_, i) => i !== index),
-    }));
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to delete variant");
-  }
-};
+  };
 
   const handleUpdateProduct = async () => {
     try {
@@ -189,299 +222,399 @@ const EditProduct = () => {
     }
   };
 
+  /* ---------- Render ---------- */
+
+  const addImageTile = (large) => (
+    <label
+      className={`group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 transition hover:border-indigo-500 hover:bg-indigo-50/60 hover:text-indigo-700 focus-within:ring-4 focus-within:ring-indigo-600/15 ${
+        large ? "col-span-full h-44" : "aspect-square"
+      }`}
+    >
+      <ImagePlus size={large ? 28 : 22} strokeWidth={1.5} />
+      <span className="text-sm font-medium">
+        {large ? "Upload product images" : "Add"}
+      </span>
+      {large && (
+        <span className="text-xs text-slate-400 group-hover:text-indigo-500">
+          PNG, JPG or WEBP · select multiple at once
+        </span>
+      )}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={handleImageChange}
+        className="sr-only"
+      />
+    </label>
+  );
+
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full bg-gradient-to-br p-6">
-      <div className="max-w-9xl mx-auto">
-        {/* HEADER */}
-        <div className="mb-8 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-            <span className="text-white text-xl">✏️</span>
+    <div className="min-h-[calc(100vh-64px)] w-full bg-slate-50">
+      {/* PAGE HEADER */}
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard/product")}
+              aria-label="Back to products"
+              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <div className="min-w-0">
+              <p className="text-xs text-slate-500">Products / Edit</p>
+              <h1 className="truncate text-lg font-semibold leading-tight text-slate-900">
+                {productList.product_name || "Edit product"}
+              </h1>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              Edit Product
-            </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
-              Update the details below to edit this product listing
-            </p>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard/product")}
+              className="h-9 cursor-pointer rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleUpdateProduct}
+              className="h-9 cursor-pointer rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/30"
+            >
+              Save changes
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* MAIN CARD */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/60 border border-white p-8 space-y-10">
-          {/* SECTION: Product Identity */}
-          <div>
-            <p className="text-xs font-semibold text-blue-500 uppercase tracking-widest mb-5">
-              Product Identity
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* IMAGE UPLOAD */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-semibold text-slate-600 block mb-2">
-                  Product Images{" "}
-                  <span className="text-xs font-normal text-slate-400">
-                    (Upload new images to replace or add)
-                  </span>
-                </label>
-                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-blue-200 rounded-2xl cursor-pointer bg-blue-50/40 hover:bg-blue-50 transition-colors group">
-                  <div className="text-center">
-                    <span className="text-2xl">🖼️</span>
-                    <p className="text-sm text-slate-500 mt-1 group-hover:text-blue-600 transition-colors">
-                      Click to upload images
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      PNG, JPG, WEBP supported
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
+      <main className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
+        {/* 1. IMAGES (top) */}
+        <Card
+          title="Product images"
+          subtitle={
+            productList.images.length > 0
+              ? `${productList.images.length} ${
+                  productList.images.length === 1 ? "image" : "images"
+                } · the first image is the main one`
+              : "Add photos so customers can see the product"
+          }
+        >
+          {productList.images.length === 0 ? (
+            <div className="grid grid-cols-1">{addImageTile(true)}</div>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3">
+              {productList.images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="group relative aspect-square w-full min-w-[100px] max-w-[160px] overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                >
+                  <img
+                    src={
+                      typeof img === "string"
+                        ? resolveFirebaseUrl({
+                            folderName: "productImages",
+                            fileName: img,
+                          })
+                        : URL.createObjectURL(img)
+                    }
+                    className="h-full w-full object-contain p-2"
+                    alt={`product-${idx}`}
                   />
-                </label>
 
-                {productList.images.length > 0 && (
-                  <div className="grid grid-cols-4 md:grid-cols-8 gap-3 mt-4">
-                    {productList.images.map((img, index) => (
-                      <div
-                        key={index}
-                        className="relative h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm group"
-                      >
-                        <img
-                          src={
-                            typeof img === "string"
-                              ? resolveFirebaseUrl({
-                                folderName: "productImages",
-                                fileName: img
-                              })
-                              : URL.createObjectURL(img)
-                          }
-                          className="w-full h-full object-cover"
-                          alt={`product-${index}`}
-                        />
-                        <button
-                          onClick={() =>
-                            setProductList((prev) => ({
-                              ...prev,
-                              images: prev.images.filter((_, i) => i !== index),
-                            }))
-                          }
-                          className="absolute cursor-pointer inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  {idx === 0 && (
+                    <span className="absolute left-2 top-2 rounded-md bg-slate-900/80 px-2 py-0.5 text-xs font-medium text-white">
+                      Main
+                    </span>
+                  )}
 
-              {/* Product Name */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Product Name
-                </label>
+                  {typeof img !== "string" && (
+                    <span className="absolute bottom-2 left-2 rounded-md bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">
+                      New
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    aria-label={`Remove image ${idx + 1}`}
+                    onClick={() =>
+                      setProductList((prev) => ({
+                        ...prev,
+                        images: prev.images.filter((_, i) => i !== idx),
+                      }))
+                    }
+                    className="absolute right-2 top-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white text-slate-700 opacity-100 shadow ring-1 ring-slate-200 transition hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+              ))}
+
+              {/* Add Image Tile */}
+              <label className="flex aspect-square w-full min-w-[100px] max-w-[160px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 transition hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600">
+                <ImagePlus size={22} />
+                <span className="mt-1 text-xs font-medium">Add Image</span>
+
                 <input
-                  name="product_name"
-                  value={productList.product_name}
-                  onChange={handleChange}
-                  placeholder="e.g. Cow Milk"
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
                 />
-              </div>
+              </label>
+            </div>
+          )}
+        </Card>
 
-              {/* Catch Phrase */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Catch Phrase
-                </label>
-                <input
-                  name="catch_phrase"
-                  value={productList.catch_phrase}
-                  onChange={handleChange}
-                  placeholder="e.g. Pure Fresh Milk Every Day"
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
-                />
-              </div>
+        {/* 2. BASIC INFORMATION */}
+        <Card
+          title="Basic information"
+          subtitle="This is what customers see on the product page"
+        >
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <Field id="product_name" label="Product name">
+              <input
+                id="product_name"
+                name="product_name"
+                value={productList.product_name}
+                onChange={handleChange}
+                placeholder="e.g. Cow Milk"
+                className={inputClass}
+              />
+            </Field>
 
-              {/* Description */}
-              <div className="md:col-span-2 flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-600">
-                  Product Description
-                </label>
+            <Field id="catch_phrase" label="Catch phrase">
+              <input
+                id="catch_phrase"
+                name="catch_phrase"
+                value={productList.catch_phrase}
+                onChange={handleChange}
+                placeholder="e.g. Pure Fresh Milk Every Day"
+                className={inputClass}
+              />
+            </Field>
+
+            <div className="md:col-span-2">
+              <Field id="product_description" label="Description">
                 <textarea
+                  id="product_description"
                   rows={4}
                   name="product_description"
                   value={productList.product_description}
                   onChange={handleChange}
                   placeholder="Fresh and pure milk collected from local farms..."
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all resize-none text-slate-800 placeholder:text-slate-300"
+                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition hover:border-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-600/15"
                 />
-              </div>
+              </Field>
             </div>
           </div>
+        </Card>
 
-          {/* DIVIDER */}
-          <div className="border-t border-dashed border-slate-200" />
-
-          {/* SECTION: Variant Details */}
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-xs font-semibold text-blue-500 uppercase tracking-widest">
-                Variant Details
+        {/* 3. VARIANTS */}
+        <Card
+          title="Variants"
+          subtitle="Sizes or packs, each with its own price, SKU and stock"
+          action={
+            <button
+              type="button"
+              onClick={addVariant}
+              className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+            >
+              <Plus size={16} />
+              Add variant
+            </button>
+          }
+        >
+          {productList.variants.length === 0 ? (
+            <div className="rounded-xl border-2 border-dashed border-slate-200 px-4 py-10 text-center">
+              <p className="text-sm font-medium text-slate-700">
+                No variants yet
               </p>
-              <button
-                type="button"
-                onClick={addVariant}
-                className="flex items-center cursor-pointer gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-sm transition-all border border-blue-100"
-              >
-                <span className="text-lg leading-none">＋</span> Add Variant
-              </button>
+              <p className="mt-1 text-sm text-slate-500">
+                Add a variant to set a price and stock for this product.
+              </p>
             </div>
-
-            <div className="space-y-6">
+          ) : (
+            <div className="space-y-4">
               {productList.variants.map((variant, index) => (
-                <div
+                <fieldset
                   key={index}
-                  className="relative rounded-2xl border border-slate-200 bg-slate-50/50 p-5"
+                  className="overflow-hidden rounded-xl border border-slate-200"
                 >
-                  {/* Variant Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Variant {index + 1}
-                    </span>
+                  {/* Variant header */}
+                  <div className="flex items-center justify-between gap-3 bg-slate-50 px-4 py-3">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
+                        {index + 1}
+                      </span>
+                      <span className="truncate text-sm font-semibold text-slate-900">
+                        {variant.variant_name || "Untitled variant"}
+                      </span>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                          variant.availability
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
+                        }`}
+                      >
+                        {variant.availability ? "In stock" : "Out of stock"}
+                      </span>
+                    </div>
+
                     {productList.variants.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeVariant(index)}
-                        className="flex cursor-pointer items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 font-semibold text-xs transition-all border border-red-100"
+                        className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
                       >
-                        <span>✕</span> Remove
+                        <Trash2 size={15} />
+                        Remove
                       </button>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {[
-                      {
-                        label: "Quantity",
-                        name: "quantity",
-                        placeholder: "e.g. 500",
-                        type: "text",
-                      },
-                      {
-                        label: "Unit",
-                        name: "unit",
-                        placeholder: "e.g. ML",
-                        type: "text",
-                      },
-                      {
-                        label: "Variant Name",
-                        name: "variant_name",
-                        placeholder: "e.g. 500 ML",
-                        type: "text",
-                      },
-                      {
-                        label: "Package",
-                        name: "package",
-                        placeholder: "e.g. Bottle",
-                        type: "text",
-                      },
-                      {
-                        label: "Price (₹)",
-                        name: "price",
-                        placeholder: "e.g. 25",
-                        type: "number",
-                      },
-                      {
-                        label: "Stock Quantity",
-                        name: "stock_quantity",
-                        placeholder: "e.g. 100",
-                        type: "number",
-                      },
-                      {
-                        label: "SKU",
-                        name: "sku",
-                        placeholder: "e.g. CM-500",
-                        type: "text",
-                      },
-                    ].map(({ label, name, placeholder, type }) => (
-                      <div key={name} className="flex flex-col gap-1.5">
-                        <label className="text-sm font-semibold text-slate-600">
-                          {label}
-                        </label>
+                  {/* Variant body */}
+                  <div className="space-y-5 p-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      <Field id={`v${index}-variant_name`} label="Variant name">
+                        <input
+                          id={`v${index}-variant_name`}
+                          type="text"
+                          name="variant_name"
+                          value={variant.variant_name}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          placeholder="e.g. 500 ML"
+                          className={inputClass}
+                        />
+                      </Field>
 
-                        {name === "unit" ? (
-                          <select
-                            name="unit"
-                            value={variant.unit}
-                            onChange={(e) => handleVariantChange(index, e)}
-                            className="px-4 py-3 cursor-pointer rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
-                          >
-                            <option value="">Select Unit</option>
-                            {ProductUnit?.map((unit) => (
-                              <option key={unit} value={unit}>
-                                {unit}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
+                      <Field id={`v${index}-quantity`} label="Quantity">
+                        <input
+                          id={`v${index}-quantity`}
+                          type="text"
+                          name="quantity"
+                          value={variant.quantity}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          placeholder="e.g. 500"
+                          className={inputClass}
+                        />
+                      </Field>
+
+                      <Field id={`v${index}-unit`} label="Unit">
+                        <select
+                          id={`v${index}-unit`}
+                          name="unit"
+                          value={variant.unit}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          className={`${inputClass} cursor-pointer`}
+                        >
+                          <option value="">Select unit</option>
+                          {ProductUnit?.map((unit) => (
+                            <option key={unit} value={unit}>
+                              {unit}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+
+                      <Field id={`v${index}-package`} label="Package">
+                        <input
+                          id={`v${index}-package`}
+                          type="text"
+                          name="package"
+                          value={variant.package}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          placeholder="e.g. Bottle"
+                          className={inputClass}
+                        />
+                      </Field>
+                    </div>
+
+                    <div className="border-t border-dashed border-slate-200" />
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      <Field id={`v${index}-sku`} label="SKU">
+                        <input
+                          id={`v${index}-sku`}
+                          type="text"
+                          name="sku"
+                          value={variant.sku}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          placeholder="e.g. CM-500"
+                          className={inputClass}
+                        />
+                      </Field>
+
+                      <Field id={`v${index}-price`} label="Price">
+                        <div className="relative">
+                          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500">
+                            ₹
+                          </span>
                           <input
-                            type={type}
-                            name={name}
-                            value={variant[name]}
+                            id={`v${index}-price`}
+                            type="number"
+                            name="price"
+                            value={variant.price}
                             onChange={(e) => handleVariantChange(index, e)}
-                            placeholder={placeholder}
-                            className="px-4 py-3 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800 placeholder:text-slate-300"
+                            placeholder="25"
+                            className={`${inputClass} pl-7`}
                           />
-                        )}
-                      </div>
-                    ))}
+                        </div>
+                      </Field>
 
-                    {/* Availability */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-slate-600">
-                        Availability
-                      </label>
-                      <select
-                        name="availability"
-                        value={variant.availability}
-                        onChange={(e) => handleVariantChange(index, e)}
-                        className="px-4 py-3 cursor-pointer rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-800"
-                      >
-                        <option value={true}>In Stock</option>
-                        <option value={false}>Out of Stock</option>
-                      </select>
+                      <Field id={`v${index}-stock`} label="Stock quantity">
+                        <input
+                          id={`v${index}-stock`}
+                          type="number"
+                          name="stock_quantity"
+                          value={variant.stock_quantity}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          placeholder="100"
+                          className={inputClass}
+                        />
+                      </Field>
+
+                      <Field id={`v${index}-availability`} label="Availability">
+                        <select
+                          id={`v${index}-availability`}
+                          name="availability"
+                          value={variant.availability}
+                          onChange={(e) => handleVariantChange(index, e)}
+                          className={`${inputClass} cursor-pointer`}
+                        >
+                          <option value={true}>In stock</option>
+                          <option value={false}>Out of stock</option>
+                        </select>
+                      </Field>
                     </div>
                   </div>
-                </div>
+                </fieldset>
               ))}
             </div>
-          </div>
+          )}
+        </Card>
 
-          {/* DIVIDER */}
-          <div className="border-t border-dashed border-slate-100" />
-
-          {/* FOOTER BUTTONS */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard/product")}
-              className="px-6 py-3 cursor-pointer rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold transition-all text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleUpdateProduct}
-              className="px-8 py-3 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold shadow-lg shadow-blue-200 transition-all text-sm"
-            >
-              Save Changes →
-            </button>
-          </div>
+        {/* FOOTER ACTIONS */}
+        <div className="flex justify-end gap-2 pb-6">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/product")}
+            className="h-10 cursor-pointer rounded-lg border border-slate-300 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleUpdateProduct}
+            className="h-10 cursor-pointer rounded-lg bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/30"
+          >
+            Save changes
+          </button>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

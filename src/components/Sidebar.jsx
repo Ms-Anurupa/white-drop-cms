@@ -64,7 +64,7 @@ const sections = [
         children: [
           { name: "Mini Orders", path: "orders" },
           { name: "Subscription Orders", path: "subscription-orders" },
-          { name: "Corporate Orders", path: "corporate-orders" },
+          { name: "Corporate/Bulk Orders", path: "corporate-orders" },
           { name: "Adhoc Orders", path: "adhoc-orders" },
           { name: "Special Orders", path: "special-orders" },
         ],
