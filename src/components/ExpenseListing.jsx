@@ -260,20 +260,47 @@ const ExpenseListing = () => {
 
           {filters.dateFilter === "custom" && (
             <>
-              <input
-                type="date"
-                value={filters.dateFrom}
-                max={filters.dateTo || undefined}
-                onChange={(e) => setFilter("dateFrom", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
-              />
-              <input
-                type="date"
-                value={filters.dateTo}
-                min={filters.dateFrom || undefined}
-                onChange={(e) => setFilter("dateTo", e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
-              />
+              <div
+                className="w-full cursor-pointer"
+                onClick={(e) => {
+                  const input =
+                    e.currentTarget.querySelector('input[type="date"]');
+                  try {
+                    input?.showPicker?.();
+                  } catch {
+                    input?.focus();
+                  }
+                }}
+              >
+                <input
+                  type="date"
+                  value={filters.dateFrom}
+                  max={filters.dateTo || undefined}
+                  onChange={(e) => setFilter("dateFrom", e.target.value)}
+                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div
+                className="w-full cursor-pointer"
+                onClick={(e) => {
+                  const input =
+                    e.currentTarget.querySelector('input[type="date"]');
+                  try {
+                    input?.showPicker?.();
+                  } catch {
+                    input?.focus();
+                  }
+                }}
+              >
+                <input
+                  type="date"
+                  value={filters.dateTo}
+                  min={filters.dateFrom || undefined}
+                  onChange={(e) => setFilter("dateTo", e.target.value)}
+                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
             </>
           )}
         </div>
@@ -374,7 +401,11 @@ const ExpenseListing = () => {
                         : "—"}
                     </td>
                     <td className="px-4 py-3 font-bold text-slate-900">
-                      {inr(expense.category?.name === "SALARY" ? expense.price : (expense.price * expense.quantity))}
+                      {inr(
+                        expense.category?.name === "SALARY"
+                          ? expense.price
+                          : expense.price * expense.quantity,
+                      )}
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200 text-slate-500">
                       {formatDate(expense.purchaseDate)}

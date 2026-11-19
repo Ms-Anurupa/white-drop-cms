@@ -12,7 +12,7 @@ import {
   Loader2,
   Clock3,
   RefreshCw,
-  SquarePen
+  SquarePen,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import orderDataStore from "../../zustand/Store/orderDataStore";
@@ -67,6 +67,17 @@ const PAYMENT_STATUS_STYLES = {
     badge: "bg-orange-50 text-orange-700 border-orange-200",
   },
 };
+
+/* UI-only class strings */
+const TH_CLASS =
+  "px-2.5 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap";
+
+// Forces the (external) export button to match the 40px toolbar height,
+// whether ExportExcelButton's root element is a <button> or a wrapper.
+const EXPORT_WRAPPER_CLASS =
+  "h-10 shrink-0 " +
+  "[&>*]:!h-10 [&>*]:!min-h-0 [&>*]:!py-0 [&>*]:!w-auto [&>*]:!whitespace-nowrap " +
+  "[&_button]:!h-10 [&_button]:!min-h-0 [&_button]:!py-0 [&_button]:!w-auto [&_button]:!whitespace-nowrap";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -279,6 +290,10 @@ const PageStyles = () => (
     .order-row {
       transition: background-color 0.15s ease;
     }
+
+    .date-click-area input[type="date"] {
+      cursor: pointer;
+    }
   `}</style>
 );
 
@@ -297,7 +312,7 @@ const Order = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(15);
   const [dateFilter, setDateFilter] = useState("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -331,26 +346,35 @@ const Order = () => {
     setPopoverPos(null);
   };
 
-const handleExport = async () => {
-  try {
-    await downloadExcel(
-      "order",
-      appliedFromDate || "",
-      appliedToDate || "",
-    );
+  const handleExport = async () => {
+    try {
+      await downloadExcel("order", appliedFromDate || "", appliedToDate || "");
 
-    toast.success("Order data exported successfully");
-  } catch (error) {
-    console.error("Failed to export orders:", error);
+      toast.success("Order data exported successfully");
+    } catch (error) {
+      console.error("Failed to export orders:", error);
 
-    toast.error(
-      error?.response?.data?.message ||
-        error?.message ||
-        "Failed to export order details",
-    );
-  }
-};
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to export order details",
+      );
+    }
+  };
 
+  // Opens the native calendar when the user clicks anywhere on a date input
+  // (not just the small calendar icon). Falls back silently where unsupported.
+  const openDatePicker = (e) => {
+    const el = e.target;
+
+    if (el instanceof HTMLInputElement && el.type === "date") {
+      try {
+        el.showPicker?.();
+      } catch {
+        // showPicker can throw if the picker is already open — safe to ignore
+      }
+    }
+  };
 
   const showPopover = (e, order, type) => {
     const anchor = e.currentTarget.getBoundingClientRect();
@@ -445,7 +469,7 @@ const handleExport = async () => {
     pageSize,
     appliedFromDate,
     appliedToDate,
-    dateFilterType
+    dateFilterType,
   ]);
 
   const handlePillFilterChange = (key) => {
@@ -610,33 +634,6 @@ const handleExport = async () => {
     }
   };
 
-  // const handleExport = async () => {
-  //   try {
-  //     const file = await exportOrderDetails();
-
-  //     const url = window.URL.createObjectURL(file);
-
-  //     const link = document.createElement("a");
-
-  //     link.href = url;
-  //     link.download = "orders.xlsx";
-
-  //     document.body.appendChild(link);
-
-  //     link.click();
-
-  //     document.body.removeChild(link);
-
-  //     window.URL.revokeObjectURL(url);
-
-  //     toast.success("Order data exported successfully");
-  //   } catch (error) {
-  //     console.error("Failed to export orders:", error);
-
-  //     toast.error("Failed to export order details");
-  //   }
-  // };
-
   const handleStatusChange = async (order, newStatus) => {
     if (!newStatus || newStatus === order.orderStatus) {
       return;
@@ -733,33 +730,30 @@ const handleExport = async () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap sm:justify-between gap-3 items-stretch sm:items-end">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
-            <div className="w-full sm:w-64 lg:w-72">
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+        {/* TOOLBAR — every control is exactly h-10 and vertically centred */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative w-full sm:w-64 lg:w-72">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
 
-                <input
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                  placeholder="Search orders..."
-                  className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                />
-              </div>
-            </div>
+            <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search orders..."
+              className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+            />
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-blue-600 text-white text-sm hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 whitespace-nowrap bg-blue-600 text-white text-sm font-medium border border-blue-600 hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <RefreshCw
                 size={16}
@@ -767,126 +761,142 @@ const handleExport = async () => {
               />
               Refresh
             </button>
+
             <button
               onClick={() => navigate("/dashboard/orders/add-offline-orders")}
               disabled={refreshing}
-              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 whitespace-nowrap bg-white text-gray-800 text-sm font-medium border border-gray-200 hover:bg-gray-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <SquarePen size={16} />
               Add Offline Order
             </button>
 
-            <ExportExcelButton type="orders" />
+            <div className={EXPORT_WRAPPER_CLASS}>
+              <ExportExcelButton type="orders" />
+            </div>
           </div>
         </div>
       </div>
 
       {/* DATE FILTER + STATUS */}
       <div className="relative z-40 bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
-        <div className="flex items-center gap-3 futuristic-scroll">
-          <DateFilter
-            filters={DATE_FILTERS.map((f) => ({
-              ...f,
-              count: dateCounts[f.key],
-            }))}
-            activeFilter={dateFilter}
-            onFilterChange={handlePillFilterChange}
-            fromDate={fromDate}
-            toDate={toDate}
-            onFromDateChange={handleFromDateChange}
-            onToDateChange={handleToDateChange}
-            onClear={fromDate || toDate ? clearDates : undefined}
-            dateFilterType={dateFilterType}
-            onDateTypeChange={(value) => {
-              setDateFilterType(value);
-              setPage(1);
-            }}
-            dateTypeOptions={[
-              { value: "createdAt", label: "Created Date" },
-              { value: "deliveryDate", label: "Delivery Date" },
-            ]}
-            bare
-          />
+        {/* items-end → status dropdown sits on the same line as From / To inputs */}
+        <div className="flex items-end gap-3 futuristic-scroll">
+          {/* display:contents keeps layout identical; the wrapper only listens
+              for clicks so the whole From / To field opens the calendar */}
+          <div className="contents date-click-area" onClick={openDatePicker}>
+            <DateFilter
+              filters={DATE_FILTERS.map((f) => ({
+                ...f,
+                count: dateCounts[f.key],
+              }))}
+              activeFilter={dateFilter}
+              onFilterChange={handlePillFilterChange}
+              fromDate={fromDate}
+              toDate={toDate}
+              onFromDateChange={handleFromDateChange}
+              onToDateChange={handleToDateChange}
+              onClear={fromDate || toDate ? clearDates : undefined}
+              dateFilterType={dateFilterType}
+              onDateTypeChange={(value) => {
+                setDateFilterType(value);
+                setPage(1);
+              }}
+              dateTypeOptions={[
+                { value: "createdAt", label: "Created Date" },
+                { value: "deliveryDate", label: "Delivery Date" },
+              ]}
+              bare
+            />
+          </div>
 
-          <div className="w-px h-8 shrink-0 bg-gray-100" />
+          <div className="ml-auto flex shrink-0 items-end gap-3">
+            <div className="w-px h-10 shrink-0 bg-gray-100" />
 
-          {/* STATUS FILTER */}
-          <div className="relative z-100 shrink-0" style={{ top: "8px" }}>
-            <SplitButton
-              variant="outline"
-              className="w-40"
-              onClick={() => {}}
-              menuContent={
-                <>
-                  <SplitButtonItem
-                    onClick={() => {
-                      setStatus("");
-                      setPage(1);
-                    }}
-                  >
-                    <div className="flex w-full h-full items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+            {/* STATUS FILTER */}
+            <div className="relative z-100 shrink-0">
+              <p className="mb-1 text-[11px] leading-4 text-gray-500">
+                Order status
+              </p>
 
-                        <span>All Statuses</span>
-                      </div>
-
-                      {status === "" && (
-                        <span className="text-blue-600">✓</span>
-                      )}
-                    </div>
-                  </SplitButtonItem>
-
-                  {ORDER_STATUSES.map((item) => (
+              <SplitButton
+                variant="outline"
+                className="w-40"
+                onClick={() => {}}
+                menuContent={
+                  <>
                     <SplitButtonItem
-                      key={item}
                       onClick={() => {
-                        setStatus(item);
+                        setStatus("");
                         setPage(1);
                       }}
                     >
                       <div className="flex w-full h-full items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              STATUS_DOT[item] || "bg-gray-400"
-                            }`}
-                          />
+                          <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
 
-                          <span>
-                            {item
-                              .replaceAll("_", " ")
-                              .toLowerCase()
-                              .replace(/\b\w/g, (c) => c.toUpperCase())}
-                          </span>
+                          <span>All Statuses</span>
                         </div>
 
-                        {status === item && (
+                        {status === "" && (
                           <span className="text-blue-600">✓</span>
                         )}
                       </div>
                     </SplitButtonItem>
-                  ))}
-                </>
-              }
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    status ? STATUS_DOT[status] || "bg-gray-400" : "bg-gray-400"
-                  }`}
-                />
 
-                <span>
-                  {status
-                    ? status
-                        .replaceAll("_", " ")
-                        .toLowerCase()
-                        .replace(/\b\w/g, (c) => c.toUpperCase())
-                    : "All Statuses"}
-                </span>
-              </div>
-            </SplitButton>
+                    {ORDER_STATUSES.map((item) => (
+                      <SplitButtonItem
+                        key={item}
+                        onClick={() => {
+                          setStatus(item);
+                          setPage(1);
+                        }}
+                      >
+                        <div className="flex w-full h-full items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                STATUS_DOT[item] || "bg-gray-400"
+                              }`}
+                            />
+
+                            <span>
+                              {item
+                                .replaceAll("_", " ")
+                                .toLowerCase()
+                                .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            </span>
+                          </div>
+
+                          {status === item && (
+                            <span className="text-blue-600">✓</span>
+                          )}
+                        </div>
+                      </SplitButtonItem>
+                    ))}
+                  </>
+                }
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      status
+                        ? STATUS_DOT[status] || "bg-gray-400"
+                        : "bg-gray-400"
+                    }`}
+                  />
+
+                  <span>
+                    {status
+                      ? status
+                          .replaceAll("_", " ")
+                          .toLowerCase()
+                          .replace(/\b\w/g, (c) => c.toUpperCase())
+                      : "All Statuses"}
+                  </span>
+                </div>
+              </SplitButton>
+            </div>
           </div>
         </div>
       </div>
@@ -965,86 +975,51 @@ const handleExport = async () => {
           )}
         </div>
 
-        {/* DESKTOP TABLE */}
+        {/* DESKTOP TABLE — compact rows, light font weights */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
-          <table className="w-full table-fixed text-sm">
+          <table className="w-full table-fixed text-[13px] text-gray-700">
             <thead
-              className="order-table-head sticky top-0  relative"
+              className="order-table-head sticky top-0"
               style={{ zIndex: "1000" }}
             >
               <tr className="border-b border-transparent">
-                <th className="w-10 px-2.5 py-2.5 whitespace-nowrap text-left text-xs font-semibold text-gray-500">
-                  Sl No.
-                </th>
-
-                <th className="w-32 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Order ID
-                </th>
-
-                <th className="w-14 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Image
-                </th>
-
-                <th className="w-16 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Total
-                </th>
-
-                <th className="w-44 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Customer
-                </th>
-
-                <th className="w-34 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Order Status
-                </th>
-
-                <th className="w-32 px-2.5 py-2.5 pl-6 text-right text-xs font-semibold text-gray-500">
-                  Payment Status
-                </th>
-
-                <th className="w-32 px-2.5 py-2.5 text-right text-xs font-semibold text-gray-500">
-                  Payment Mode
-                </th>
-
-                <th className="w-28 pl-5 pr-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Delivery Slot
-                </th>
-
-                <th className="w-24 px-2.5 py-2.5 text-left text-xs font-semibold text-gray-500">
-                  Delivery Date
-                </th>
-
-                <th className="w-16 px-2.5 py-2.5 mr-6 text-left text-xs font-semibold text-gray-500">
-                  Action
-                </th>
+                <th className={`w-12 ${TH_CLASS}`}>Sl No.</th>
+                <th className={`w-32 ${TH_CLASS}`}>Order ID</th>
+                <th className={`w-14 ${TH_CLASS}`}>Image</th>
+                <th className={`w-[72px] ${TH_CLASS}`}>Total</th>
+                <th className={`w-48 ${TH_CLASS}`}>Customer</th>
+                <th className={`w-[168px] ${TH_CLASS}`}>Order Status</th>
+                <th className={`w-32 ${TH_CLASS}`}>Payment Status</th>
+                <th className={`w-24 ${TH_CLASS}`}>Payment Mode</th>
+                <th className={`w-32 ${TH_CLASS}`}>Delivery Slot</th>
+                <th className={`w-[104px] ${TH_CLASS}`}>Delivery Date</th>
+                <th className={`w-20 ${TH_CLASS}`}>Action</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50 px-4">
+            <tbody className="divide-y divide-gray-50">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={9}>
+                  <td colSpan={11}>
                     <EmptyState />
                   </td>
                 </tr>
               ) : (
                 paginated.map((o, idx) => (
-                  <tr
-                    key={o.orderId}
-                    className="order-row hover:bg-slate-50 px-4"
-                  >
-                    <td className="px-2.5 py-2.5 text-gray-400">
+                  <tr key={o.orderId} className="order-row hover:bg-slate-50">
+                    <td className="px-2.5 py-1.5 text-gray-400">
                       {start + idx + 1}
                     </td>
 
                     <td
-                      className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis cursor-default"
+                      className="px-2.5 py-1.5 text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis cursor-default"
                       onMouseEnter={(e) => showPopover(e, o, "orderId")}
                       onMouseLeave={hidePopover}
                     >
                       <span className="block truncate">{o.orderId}</span>
                     </td>
 
-                    <td className="px-2.5 py-2.5">
+                    <td className="px-2.5 py-1.5">
                       <img
                         src={resolveFirebaseUrl({
                           folderName: "productImages",
@@ -1052,38 +1027,39 @@ const handleExport = async () => {
                             o?.orderItems?.[0]?.product?.product_images?.[0],
                         })}
                         alt="Product"
-                        className="w-9 h-9 rounded-lg object-cover border border-gray-100"
+                        className="w-8 h-8 rounded-md object-cover border border-gray-100"
                       />
                     </td>
 
-                    <td className="px-2.5 py-2.5 font-medium text-gray-900 whitespace-nowrap">
+                    <td className="px-2.5 py-1.5 text-gray-900 whitespace-nowrap tabular-nums">
                       ₹{o.orderTotal}
                     </td>
 
                     <td
-                      className="px-2.5 py-2.5 text-gray-600 cursor-default"
+                      className="px-2.5 py-1.5 cursor-default"
                       onMouseEnter={(e) => showAddressPopover(e, o, "customer")}
                       onMouseLeave={hidePopover}
                     >
-                      <p className="font-medium text-gray-800 truncate">
+                      <p className="truncate text-[13px] leading-4 text-gray-900">
                         {o.user?.customer_name}
                       </p>
 
-                      <p className="text-xs text-gray-500 truncate">
-                        {o.user?.phone_num}
-                      </p>
-
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="mt-0.5 truncate text-xs leading-4 text-gray-500">
                         {[
-                          o.shippingAddress?.apartment,
-                          o.shippingAddress?.locality,
+                          o.user?.phone_num,
+                          [
+                            o.shippingAddress?.apartment,
+                            o.shippingAddress?.locality,
+                          ]
+                            .filter(Boolean)
+                            .join(", "),
                         ]
                           .filter(Boolean)
-                          .join(", ")}
+                          .join(" · ")}
                       </p>
                     </td>
 
-                    <td className="px-2.5 py-2.5 align-middle">
+                    <td className="px-2.5 py-1.5 align-middle">
                       <StatusSelect
                         order={o}
                         onChange={handleStatusChange}
@@ -1092,13 +1068,13 @@ const handleExport = async () => {
                       />
                     </td>
 
-                    <td className="px-2.5 py-2.5 pl-12 pr-12 whitespace-nowrap">
+                    <td className="px-2.5 py-1.5 whitespace-nowrap">
                       <PaymentStatusBadge status={o.paymentStatus} />
                     </td>
 
-                    <td className="px-2.5 py-2.5 pl-12 pr-12 whitespace-nowrap">
+                    <td className="px-2.5 py-1.5 whitespace-nowrap">
                       <span
-                        className={`font-bold ${
+                        className={`font-medium ${
                           o.paymentMode === "PG"
                             ? "text-emerald-600"
                             : o.paymentMode === "COD"
@@ -1115,7 +1091,7 @@ const handleExport = async () => {
                     </td>
 
                     <td
-                      className="pl-5 pr-2.5 py-2.5 cursor-default"
+                      className="px-2.5 py-1.5 cursor-default"
                       onMouseEnter={(e) => showPopover(e, o, "deliverySlot")}
                       onMouseLeave={hidePopover}
                     >
@@ -1137,17 +1113,13 @@ const handleExport = async () => {
                           </span>
 
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-gray-800 truncate">
+                            <p className="text-xs leading-4 text-gray-800 truncate">
                               {o.deliverySlot.name}
                             </p>
 
-                            <p className="text-xs font-medium text-gray-800 truncate">
-                              {o.deliveryDate}
-                            </p>
-
                             {o.deliverySlot?.from && o.deliverySlot?.to && (
-                              <p className="text-[10px] text-gray-400 truncate">
-                                {o.deliverySlot.from}-{o.deliverySlot.to}
+                              <p className="text-[11px] leading-4 text-gray-400 truncate">
+                                {o.deliverySlot.from}–{o.deliverySlot.to}
                               </p>
                             )}
                           </div>
@@ -1157,22 +1129,22 @@ const handleExport = async () => {
                       )}
                     </td>
 
-                    <td className="px-2.5 py-2.5 whitespace-nowrap">
-                      <p className="text-xs text-gray-700">
+                    <td className="px-2.5 py-1.5 whitespace-nowrap">
+                      <p className="text-xs leading-4 text-gray-700">
                         {formatDateOnly(o.deliveryDate)}
                       </p>
 
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[11px] leading-4 text-gray-400">
                         {formatTimeOnly(o.deliveryDate)}
                       </p>
                     </td>
 
-                    <td className="px-2.5 py-2.5 pr-6 m-6">
+                    <td className="px-2.5 py-1.5">
                       <button
                         onClick={() =>
                           navigate(`/dashboard/orders/orderDetails/${o.id}`)
                         }
-                        className="inline-flex items-center gap-1 px-2 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1 cursor-pointer text-xs font-normal rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
                       >
                         <Eye size={12} />
                         View
@@ -1497,7 +1469,7 @@ const PaymentStatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold whitespace-nowrap ${config.badge}`}
+      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[11px] font-medium whitespace-nowrap ${config.badge}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
       {label}
