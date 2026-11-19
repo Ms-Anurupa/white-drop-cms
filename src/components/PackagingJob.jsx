@@ -120,7 +120,15 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
               const startDate = e.target.value;
               onChange({ startDate });
             }}
-            className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            onClick={(e) => {
+              const input = e.currentTarget;
+              try {
+                input?.showPicker();
+              } catch {
+                input?.focus();
+              }
+            }}
+            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
       </div>
@@ -138,7 +146,15 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
                 endDate,
               });
             }}
-            className="rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            onClick={(e) => {
+              const input = e.currentTarget;
+              try {
+                input?.showPicker();
+              } catch {
+                input?.focus();
+              }
+            }}
+            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
       </div>

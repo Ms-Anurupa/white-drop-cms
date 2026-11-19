@@ -231,45 +231,72 @@ const SpecialOrderListing = () => {
               <option value="month">This Month</option>
             </select>
 
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value);
-                setPage(1);
+            <div
+              onClick={(e) => {
+                const input =
+                  e.currentTarget.querySelector('input[type="date"]');
+                try {
+                  input?.showPicker?.();
+                } catch {
+                  input?.focus();
+                }
               }}
-              className="
-                h-10
-                rounded-lg
-                border
-                border-gray-200
-                bg-white
-                px-3
-                text-sm
-                text-gray-600
-                outline-none
-              "
-            />
+            >
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setPage(1);
+                }}
+                className="
+                  cursor-pointer
+                  h-10
+                  rounded-lg
+                  border
+                  border-gray-200
+                  bg-white
+                  px-3
+                  text-sm
+                  text-gray-600
+                  outline-none
+                "
+              />
+            </div>
 
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                setEndDate(e.target.value);
-                setPage(1);
+            <div
+              onClick={(e) => {
+                const input =
+                  e.currentTarget.querySelector('input[type="date"]');
+                try {
+                  input?.showPicker?.();
+                } catch {
+                  input?.focus();
+                }
               }}
-              className="
-                h-10
-                rounded-lg
-                border
-                border-gray-200
-                bg-white
-                px-3
-                text-sm
-                text-gray-600
-                outline-none
-              "
-            />
+            >
+
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setPage(1);
+                }}
+                className="
+                  cursor-pointer
+                  h-10
+                  rounded-lg
+                  border
+                  border-gray-200
+                  bg-white
+                  px-3
+                  text-sm
+                  text-gray-600
+                  outline-none
+                "
+              />
+            </div>
           </div>
         </div>
       </div>

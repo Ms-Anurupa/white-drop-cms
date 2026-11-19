@@ -469,7 +469,15 @@ export default function Inventory() {
               type="date"
               value={startDate}
               onChange={(e) => handleStartDate(e.target.value)}
-              className="bg-white border rounded-md px-2.5 py-1.5 text-sm outline-none focus:ring-2 w-36"
+              onClick={(e) => {
+                const input = e.currentTarget;
+                try {
+                  input.showPicker?.();
+                } catch {
+                  input.focus();
+                }
+              }}
+              className="cursor-pointer bg-white border rounded-md px-2.5 py-1.5 text-sm outline-none focus:ring-2 w-36"
               style={{ borderColor: LINE, "--tw-ring-color": TEAL_SOFT }}
             />
           </div>
@@ -485,9 +493,17 @@ export default function Inventory() {
               id="endDate"
               type="date"
               value={endDate}
+              onClick={(e) => {
+                const input = e.currentTarget;
+                try {
+                  input.showPicker?.();
+                } catch {
+                  input.focus();
+                }
+              }}
               min={startDate || undefined}
               onChange={(e) => handleEndDate(e.target.value)}
-              className="bg-white border rounded-md px-2.5 py-1.5 text-sm outline-none focus:ring-2 w-36"
+              className="cursor-pointer bg-white border rounded-md px-2.5 py-1.5 text-sm outline-none focus:ring-2 w-36"
               style={{ borderColor: LINE, "--tw-ring-color": TEAL_SOFT }}
             />
           </div>

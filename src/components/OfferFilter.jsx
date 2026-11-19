@@ -80,10 +80,11 @@ const OfferFilters = ({
                   key={tab.key}
                   type="button"
                   onClick={() => handleStatusChange(tab.key)}
-                  className={`flex h-7 shrink-0 items-center gap-1.5 rounded-md px-3 text-[10px] font-semibold transition-all ${isActive
+                  className={`flex h-7 shrink-0 items-center gap-1.5 rounded-md px-3 text-[10px] font-semibold transition-all ${
+                    isActive
                       ? "bg-white text-[#6655DF] shadow-sm ring-1 ring-[#E5E7F0]"
                       : "text-[#5C6480] hover:bg-white/70 hover:text-[#12151F]"
-                    }`}
+                  }`}
                 >
                   {getStatusIcon(tab.key)}
                   {tab.label}
@@ -153,8 +154,16 @@ const OfferFilters = ({
               type="date"
               value={fromDate}
               onChange={handleFromDateChange}
+              onClick={(e) => {
+                const input = e.currentTarget;
+                try {
+                  input?.showPicker();
+                } catch {
+                  input?.focus();
+                }
+              }}
               max={toDate || undefined}
-              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
             />
           </div>
 
@@ -169,8 +178,16 @@ const OfferFilters = ({
               type="date"
               value={toDate}
               onChange={handleToDateChange}
+              onClick={(e) => {
+                const input = e.currentTarget;
+                try {
+                  input?.showPicker();
+                } catch {
+                  input?.focus();
+                }
+              }}
               min={fromDate || undefined}
-              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
             />
           </div>
 

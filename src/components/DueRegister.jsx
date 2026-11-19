@@ -675,7 +675,13 @@ export default function DueTrackerPro({
         <div className="dt-actions flex flex-wrap items-center gap-3">
           <label className="dt-field">
             <span className="dt-sr">Month</span>
-            <input type="month" value={month} onChange={handleMonthChange} />
+            <input type="month" value={month} onChange={handleMonthChange} onClick={(e) => {
+              try{
+                e.currentTarget?.showPicker?.();
+              }catch{
+                e.currentTarget?.focus?.()
+              }
+            }} />
           </label>
 
           <ExportExcelButton type="due" />

@@ -394,7 +394,6 @@ const Sales = () => {
           </button>
 
           <ExportExcelButton type="sales" />
-          
         </div>
       </div>
 
@@ -537,17 +536,29 @@ const Sales = () => {
                   className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
 
-                <input
-                  type="date"
-                  value={customFrom}
-                  max={customTo || undefined}
-                  onChange={(e) => {
-                    setCustomFrom(e.target.value);
-                    setDateFilter("ALL");
-                    setPage(1);
+                <div
+                  onClick={(e) => {
+                    const input =
+                      e.currentTarget.querySelector('input[type="date"]');
+                    try {
+                      input?.showPicker?.();
+                    } catch {
+                      input?.focus();
+                    }
                   }}
-                  className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
-                />
+                >
+                  <input
+                    type="date"
+                    value={customFrom}
+                    max={customTo || undefined}
+                    onChange={(e) => {
+                      setCustomFrom(e.target.value);
+                      setDateFilter("ALL");
+                      setPage(1);
+                    }}
+                    className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                  />
+                </div>
               </div>
 
               <span className="hidden items-center text-xs text-slate-400 sm:flex">
@@ -555,7 +566,15 @@ const Sales = () => {
               </span>
 
               {/* CUSTOM TO DATE */}
-              <div className="relative w-full sm:w-auto">
+              <div className="relative w-full sm:w-auto"
+              onClick={(e) => {
+                const input = e.currentTarget.querySelector('input[type="date"]');
+                try{
+                  input?.showPicker?.()
+                }catch{
+                  input?.focus()
+                }
+              }}>
                 <input
                   type="date"
                   value={customTo}

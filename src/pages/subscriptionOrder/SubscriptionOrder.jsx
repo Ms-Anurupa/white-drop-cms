@@ -551,7 +551,9 @@ const SubscriptionOrder = () => {
             Refresh
           </button>
           <button
-            onClick={() => navigate("/dashboard/subscription-orders/add-subscription-orders")}
+            onClick={() =>
+              navigate("/dashboard/subscription-orders/add-subscription-orders")
+            }
             className="h-8 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <SquarePen size={16} />
@@ -559,7 +561,6 @@ const SubscriptionOrder = () => {
           </button>
 
           <ExportExcelButton type="subs" />
-
         </div>
 
         <div className="flex w-full items-center gap-2 lg:w-auto">
@@ -622,30 +623,55 @@ const SubscriptionOrder = () => {
 
         {/* CUSTOM DATES */}
         <div className="flex shrink-0 items-center gap-1.5">
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => handleFromDateChange(e.target.value)}
-            className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
-              hasInvalidDateRange
-                ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
-                : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
-            }`}
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => handleFromDateChange(e.target.value)}
+              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+                hasInvalidDateRange
+                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
+                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+              }`}
+            />
+          </div>
 
           <span className="text-xs text-gray-300">→</span>
 
-          <input
-            type="date"
-            value={toDate}
-            min={fromDate || undefined}
-            onChange={(e) => handleToDateChange(e.target.value)}
-            className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
-              hasInvalidDateRange
-                ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
-                : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
-            }`}
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+
+            <input
+              type="date"
+              value={toDate}
+              min={fromDate || undefined}
+              onChange={(e) => handleToDateChange(e.target.value)}
+              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+                hasInvalidDateRange
+                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
+                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+              }`}
+            />
+          </div>
 
           {(fromDate || toDate) && (
             <button

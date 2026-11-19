@@ -223,7 +223,6 @@ const AdhocOrders = () => {
             Refresh
           </button>
           <ExportExcelButton type="adhoc-sales" />
-
         </div>
 
         <div className="flex w-full items-center gap-2 lg:w-auto">
@@ -259,11 +258,10 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => handleDateFilterChange("")}
-            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${
-              !dateFilter
+            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${!dateFilter
                 ? "bg-blue-600 text-white shadow-sm"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-            }`}
+              }`}
           >
             All
           </button>
@@ -271,11 +269,10 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => handleDateFilterChange("today")}
-            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${
-              dateFilter === "today"
+            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "today"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-            }`}
+              }`}
           >
             <CalendarDays size={12} />
             Today
@@ -284,11 +281,10 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => handleDateFilterChange("yesterday")}
-            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${
-              dateFilter === "yesterday"
+            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "yesterday"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-            }`}
+              }`}
           >
             <Clock3 size={12} />
             Yesterday
@@ -297,11 +293,10 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => handleDateFilterChange("thisWeek")}
-            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${
-              dateFilter === "thisWeek"
+            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "thisWeek"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-            }`}
+              }`}
           >
             This Week
           </button>
@@ -309,11 +304,10 @@ const AdhocOrders = () => {
           <button
             type="button"
             onClick={() => handleDateFilterChange("thisMonth")}
-            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${
-              dateFilter === "thisMonth"
+            className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "thisMonth"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-            }`}
+              }`}
           >
             This Month
           </button>
@@ -323,22 +317,46 @@ const AdhocOrders = () => {
 
         {/* CUSTOM DATE */}
         <div className="flex shrink-0 items-center gap-1.5">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => handleStartDateChange(e.target.value)}
-            className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => handleStartDateChange(e.target.value)}
+              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            />
+          </div>
 
           <span className="text-xs text-gray-300">→</span>
 
-          <input
-            type="date"
-            value={endDate}
-            min={startDate || undefined}
-            onChange={(e) => handleEndDateChange(e.target.value)}
-            className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+            <input
+              type="date"
+              value={endDate}
+              min={startDate || undefined}
+              onChange={(e) => handleEndDateChange(e.target.value)}
+              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            />
+          </div>
         </div>
 
         {(search || dateFilter || startDate || endDate) && (
@@ -456,13 +474,12 @@ const AdhocOrders = () => {
                     {Array.from({ length: 8 }).map((__, cellIndex) => (
                       <td key={cellIndex} className="px-2 py-3">
                         <div
-                          className={`h-3 animate-pulse rounded bg-gray-100 dark:bg-slate-800 ${
-                            cellIndex === 0
+                          className={`h-3 animate-pulse rounded bg-gray-100 dark:bg-slate-800 ${cellIndex === 0
                               ? "w-6"
                               : cellIndex === 1
                                 ? "w-32"
                                 : "w-24"
-                          }`}
+                            }`}
                         />
                       </td>
                     ))}
@@ -825,15 +842,15 @@ const AdhocOrders = () => {
 
                       {(!selectedOrder?.details ||
                         selectedOrder.details.length === 0) && (
-                        <tr>
-                          <td
-                            colSpan={4}
-                            className="px-4 py-8 text-center text-sm text-gray-500 dark:text-slate-400"
-                          >
-                            No item details available
-                          </td>
-                        </tr>
-                      )}
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="px-4 py-8 text-center text-sm text-gray-500 dark:text-slate-400"
+                            >
+                              No item details available
+                            </td>
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>

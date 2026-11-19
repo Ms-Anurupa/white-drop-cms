@@ -105,7 +105,14 @@ const CustomerHelpLine = () => {
               value={draftFrom}
               max={draftTo || undefined}
               onChange={(e) => setDraftFrom(e.target.value)}
-              className="ml-2 px-2 py-1.5 text-xs sm:text-sm rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-200"
+              onClick={(e) => {
+                try {
+                  e.currentTarget.showPicker?.();
+                } catch {
+                  e.currentTarget.focus();
+                }
+              }}
+              className="ml-2 cursor-pointer rounded-lg bg-white px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 sm:text-sm"
             />
           </label>
 
@@ -116,24 +123,34 @@ const CustomerHelpLine = () => {
               value={draftTo}
               min={draftFrom || undefined}
               onChange={(e) => setDraftTo(e.target.value)}
-              className="ml-2 px-2 py-1.5 text-xs sm:text-sm rounded-lg bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-200"
+              onClick={(e) => {
+                try {
+                  e.currentTarget.showPicker?.();
+                } catch {
+                  e.currentTarget.focus();
+                }
+              }}
+              className="ml-2 cursor-pointer rounded-lg bg-white px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 sm:text-sm"
             />
           </label>
 
           <button
+            type="button"
             onClick={handleApplyRange}
             disabled={isPartialDraft || !isDirty}
-            className="cursor-pointer px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 text-white shadow-sm disabled:opacity-40"
+            className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-40 sm:text-sm"
           >
             Apply
           </button>
 
-          {(fromDate || toDate) && (
+          {(fromDate || toDate || draftFrom || draftTo) && (
             <button
+              type="button"
               onClick={handleClearRange}
-              className="cursor-pointer flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs sm:text-sm text-gray-500 hover:bg-slate-100"
+              className="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:bg-slate-100 hover:text-red-600 sm:text-sm"
             >
-              <X size={14} /> Clear
+              <X size={14} />
+              Clear
             </button>
           )}
 

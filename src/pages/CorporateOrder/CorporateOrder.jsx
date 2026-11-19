@@ -487,7 +487,7 @@ const CorporateOrder = () => {
       <div className="shrink-0 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <div className="flex items-baseline gap-3 flex-wrap">
           <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
-            Corporate Orders
+            Corporate / Bulk Orders
           </h1>
           <span className="text-xs text-blue-600 font-medium">
             Total: {corporateOrderPagination?.pagination?.totalCount ?? 0}
@@ -500,7 +500,6 @@ const CorporateOrder = () => {
             Refresh
           </button>
           <ExportExcelButton type="corp-orders" />
-          
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap sm:flex-nowrap gap-2 items-stretch sm:items-center">
@@ -568,19 +567,43 @@ const CorporateOrder = () => {
 
         {/* explicit from/to range */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => handleFromDateChange(e.target.value)}
-            className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => handleFromDateChange(e.target.value)}
+              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
+            />
+          </div>
           <span className="text-gray-300 text-xs">→</span>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => handleToDateChange(e.target.value)}
-            className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
-          />
+          <div
+            className="w-full cursor-pointer"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector('input[type="date"]');
+              try {
+                input?.showPicker?.();
+              } catch {
+                input?.focus();
+              }
+            }}
+          >
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => handleToDateChange(e.target.value)}
+              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
+            />
+          </div>
           {(fromDate || toDate) && (
             <button
               onClick={clearDates}
@@ -746,7 +769,11 @@ const CorporateOrder = () => {
                     </td> */}
 
                     <td className="px-2 py-1.5 font-semibold text-green-900 whitespace-nowrap">
-                      {formatCurrency(o.orderDetails?.receivedTotalPrice==0? o.orderDetails?.grandTotal:o.orderDetails?.receivedTotalPrice)}
+                      {formatCurrency(
+                        o.orderDetails?.receivedTotalPrice == 0
+                          ? o.orderDetails?.grandTotal
+                          : o.orderDetails?.receivedTotalPrice,
+                      )}
                     </td>
 
                     <td className="px-2 py-1.5">
@@ -780,7 +807,7 @@ const CorporateOrder = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation(); // Prevents row click
-                              handleDetailsNavigate(o.id)
+                              handleDetailsNavigate(o.id);
                             }}
                             disabled={invoiceLoading.view === o.id}
                             className="h-7 pl-2 pr-2 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium hover:bg-blue-700 transition cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
