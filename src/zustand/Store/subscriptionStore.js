@@ -6,6 +6,8 @@ const subscriptionStore = create((set) => ({
   subscriptionLists: [],
   subscriptionPagination: null,
   subscriptionLoading: false,
+  subscriptionPlan: null,
+  activeSubPlans: [],
 
   getSubscriptionListing: async ({
     page = 1,
@@ -90,14 +92,50 @@ const subscriptionStore = create((set) => ({
 
   getSubdetailsById: async (subId) => {
     try {
-      const res = await api.get("/admin/getSubscriptionListing",{
+      const res = await api.get("/admin/getSubscriptionListing", {
         withAuth: true,
-        params:{
-          subId
-        }
+        params: {
+          subId,
+        },
       });
 
       return res.data.subscription;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getActiveSubPlan: async ({ page = 1, limit = 10, search = "" } = {}) => {
+    try {
+      const res = await api.get("/admin/getActiveSubPlans", {
+        withAuth: true,
+        params: {
+          page,
+          limit,
+          ...(search.trim() && { search: search.trim() }),
+        },
+      });
+
+      const plans = res?.data?.subPlans || [];
+
+      set({
+        activeSubPlans: plans,
+        activeSubPagination: res?.data?.meta || null,
+      });
+
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  createSubscriptionPlan: async (payload) => {
+    try {
+      console.log("api call")
+      const res = api.post("/admin/createSubscriptionPlan", payload, {
+        withAuth: true,
+      });
+      return res.data;
     } catch (error) {
       throw error;
     }

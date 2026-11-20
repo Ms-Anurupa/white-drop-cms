@@ -106,15 +106,16 @@ const sections = [
     ],
   },
   {
-    label: "Offers",
+    label: "Offers & Subscriptions",
     items: [
       {
-        name: "Offers",
+        name: "Offers & Subscriptions",
         key: "offers",
         icon: HelpingHand,
         children: [
           { name: "Offers", path: "offers" },
           { name: "Offer Type", path: "offerType" },
+          { name: "Subscription", path: "subscriptionPlans" },
         ],
       },
     ],

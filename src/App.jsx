@@ -64,6 +64,8 @@ import EmployeeSalary from "./pages/Employee/EmployeeSalary";
 import ManageSalary from "./pages/Employee/ManageSalary";
 import RegisterEmployee from "./pages/Employee/RegisterEmployee";
 import SalaryPaymentLogs from "./pages/Employee/SalaryListing";
+import Subscription from "./pages/SubscriptionPlan/SubscriptionListing";
+import CreateSubscriptionPlan from "./pages/SubscriptionPlan/CreateSubscriptionPlan";
 
 const App = () => {
   return (
@@ -240,6 +242,8 @@ const App = () => {
                 <Route path="offers/create" element={<CreateOffer />} />
                 <Route path="offerType" element={<OfferType />} />
                 <Route path="offers/edit/:offerId" element={<EditOffer />} />
+                <Route path="subscriptionPlans" element={<Subscription/>}/>
+                <Route path="subscriptionPlan/create" element={<CreateSubscriptionPlan/>}/>
               </Route>
             </Route>
 
