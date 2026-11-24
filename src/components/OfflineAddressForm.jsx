@@ -6,6 +6,7 @@ import { APIProvider, Map, AdvancedMarker, useMap, useMapsLibrary } from "@vis.g
 
 import offlineOrderStore from "@/zustand/Store/offlineOrderStore";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_CENTER = { lat: 22.5726, lng: 88.3639 };
 
@@ -111,6 +112,7 @@ const OfflineAddressForm = ({ userUid, onSuccess, showSkip = false, onSkip }) =>
   const [apartment, setApartment] = useState("");
   const [locality, setLocality] = useState("");
   const [addressType, setAddressType] = useState("Home");
+  const navigate = useNavigate();
 
   const handleMapClick = useCallback((e) => {
     const lat = e.detail.latLng.lat;
@@ -156,6 +158,7 @@ const OfflineAddressForm = ({ userUid, onSuccess, showSkip = false, onSkip }) =>
 
       toast.success("Address saved successfully!");
       if (onSuccess) onSuccess(); // Notify parent it succeeded
+      navigate("/dashboard/customer");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to save address.");
     } finally {

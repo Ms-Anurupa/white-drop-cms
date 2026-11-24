@@ -447,7 +447,7 @@ const OrderViewDetails = () => {
                         ).toLocaleString("en-IN")}
                       </h4>
                       <div className="mt-2 flex justify-end">
-                        <StatusPill status={item.deliverStatus} />
+                        <StatusPill status={order?.orderStatus} />
                       </div>
                     </div>
                   </div>
@@ -555,7 +555,15 @@ const OrderViewDetails = () => {
 
             <div className="p-5">
               <button
-                onClick={() => navigate("/dashboard/delivery-job")}
+                onClick={() => {
+                  if (order?.orderStatus.toUpperCase() !== "PLACED") {
+                    toast.error(
+                      "To Manage Delivery change the order status to placed",
+                    );
+                    return;
+                  }
+                  navigate("/dashboard/delivery-job");
+                }}
                 disabled={assigning}
                 className="w-full rounded-xl p-4 text-sm font-medium cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 style={{ border: "1.5px dashed #D3D1C7", color: "#8A8778" }}
@@ -648,12 +656,12 @@ const OrderViewDetails = () => {
                         {/* Hover Details */}
                         <div
                           className="
-        max-h-0
-        overflow-hidden
-        group-hover:max-h-60
-        transition-all
-        duration-300
-      "
+                          max-h-0
+                          overflow-hidden
+                          group-hover:max-h-60
+                          transition-all
+                          duration-300
+                        "
                         >
                           <div
                             className="mx-3 mb-3 rounded-lg p-3 text-xs"

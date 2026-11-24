@@ -19,7 +19,7 @@ import Loader from "../../components/Loader";
 import { toast } from "react-toastify";
 import deliveryJobStore from "@/zustand/Store/deliveryJobStore";
 
-const DATE_FILTERS = ["UPCOMING", "TODAY", "HISTORY", "ALL"];
+const DATE_FILTERS = ["TOMORROW", "TODAY", "HISTORY", "ALL"];
 
 const STATUS_FILTERS = [
   "ALL",

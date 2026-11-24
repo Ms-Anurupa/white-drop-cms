@@ -22,6 +22,10 @@ const AddOfflineCustomer = () => {
     try {
       setLoading(true);
       const res = await createOfflineCustomer({ customer_name: name, phone_num: phone });
+      if(res?.alreadyExists){
+        toast.error(res.message || "Customer already exists.");
+        return;
+      }
       if (res.success) setStep(2);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to create customer.");
