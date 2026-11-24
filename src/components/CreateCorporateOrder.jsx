@@ -389,7 +389,7 @@ const CreateCorporateOrder = () => {
                       className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-10 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20"
                     >
                       <option value="">Select Corporate Account</option>
-                      {corporateOrderAcc?.map((account) => (
+                      {corporateOrderAcc?.filter((account) => account.status === "APPROVED").map((account) => (
                         <option key={account.id} value={account.id}>
                           {account.businessName}
                         </option>

@@ -1155,6 +1155,7 @@ const Order = () => {
               )}
             </tbody>
           </table>
+          
         </div>
 
         {/* PAGINATION */}
@@ -1256,7 +1257,7 @@ const Order = () => {
       {hoveredOrder && (
         <div
           ref={popoverRef}
-          className="fixed z-50 w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
+          className="fixed z-[10001] w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
           style={
             popoverPos
               ? {
