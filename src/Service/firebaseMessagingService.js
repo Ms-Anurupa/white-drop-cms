@@ -1,6 +1,8 @@
 // src/services/firebaseMessaging.js
+import React from 'react';
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { toast } from 'react-toastify';
 
 import { firebaseConfig } from '@/firebaseConfig';
 import { useNotificationStore } from '@/zustand/Store/useNotificationStore';
@@ -39,12 +41,36 @@ export async function generateFCMToken() {
 }
 
 /**
- * Starts foreground message listener and pipes incoming notifications to Zustand.
+ * Starts foreground message listener and pipes incoming notifications to Zustand and in-app toast.
  */
 export function initializeForegroundListener() {
   return onMessage(messaging, (payload) => {
     console.log('[Foreground message received]:', payload);
     useNotificationStore.getState().increaseUnreadCount();
     useNotificationStore.getState().getAdminToAdminNotification({ reset: true });
+
+    const title =
+      payload?.notification?.title ||
+      payload?.data?.title ||
+      'New Notification';
+    const body =
+      payload?.notification?.body ||
+      payload?.data?.body ||
+      payload?.data?.message ||
+      '';
+
+    toast.info(
+      React.createElement(
+        'div',
+        null,
+        React.createElement('p', { className: 'font-semibold text-sm' }, title),
+        body ? React.createElement('p', { className: 'text-xs opacity-90 mt-0.5' }, body) : null
+      ),
+      {
+        toastId: payload?.messageId || undefined,
+        autoClose: 5000,
+        closeOnClick: true,
+      }
+    );
   });
 }
