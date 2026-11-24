@@ -142,7 +142,7 @@ const DeliveryJob = () => {
   );
 
   const [query, setQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState("UPCOMING");
+  const [dateFilter, setDateFilter] = useState("TOMORROW");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   const [loading, setLoading] = useState(true);

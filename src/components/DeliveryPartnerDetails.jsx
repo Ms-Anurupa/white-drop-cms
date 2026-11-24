@@ -1218,7 +1218,7 @@ const DeliveryPartnerDetails = () => {
       {/* ================= IMAGE / PDF PREVIEW MODAL (sliding carousel) ================= */}
       {previewImage?.images?.length > 0 && (
         <div
-          className="fixed inset-0 z-10 bg-black/85 backdrop-blur-sm flex items-center
+          className="fixed inset-0 top-6 left-10 z-10 bg-black/85 backdrop-blur-sm flex items-center
            justify-center p-4 sm:p-8"
           onClick={() => setPreviewImage({ images: [], index: 0, label: "" })}
         >
@@ -1268,7 +1268,7 @@ const DeliveryPartnerDetails = () => {
 
               {/* Sliding track */}
               <div
-                className="relative bg-slate-100 overflow-hidden max-h-[80vh]"
+                className="relative bg-slate-100 overflow-hidden max-h-[60vh]"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >
