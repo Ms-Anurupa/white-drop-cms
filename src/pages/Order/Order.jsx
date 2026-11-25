@@ -72,12 +72,11 @@ const PAYMENT_STATUS_STYLES = {
 const TH_CLASS =
   "px-2.5 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap";
 
-// Forces the (external) export button to match the 40px toolbar height,
-// whether ExportExcelButton's root element is a <button> or a wrapper.
+// Forces the (external) export trigger button to match the 40px toolbar height,
+// without affecting sibling or modal elements.
 const EXPORT_WRAPPER_CLASS =
   "h-10 shrink-0 " +
-  "[&>*]:!h-10 [&>*]:!min-h-0 [&>*]:!py-0 [&>*]:!w-auto [&>*]:!whitespace-nowrap " +
-  "[&_button]:!h-10 [&_button]:!min-h-0 [&_button]:!py-0 [&_button]:!w-auto [&_button]:!whitespace-nowrap";
+  "[&>button]:!h-10 [&>button]:!min-h-0 [&>button]:!py-0 [&>button]:!w-auto [&>button]:!whitespace-nowrap";
 
 const formatDate = (value) => {
   if (!value) return "-";
