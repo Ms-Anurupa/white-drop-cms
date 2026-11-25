@@ -21,7 +21,7 @@ const Support = () => {
               className="w-10 h-10 object-contain"
               loading="lazy"
             />
-            <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-slate-100">
               Service Manager
             </h1>
           </div>
@@ -31,7 +31,7 @@ const Support = () => {
             {/* Locality Manager */}
             <div
               onClick={() => navigate("/dashboard/support/locality-manager")}
-              className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-800 shadow-md dark:shadow-black/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-center gap-4">
                 <img
@@ -52,7 +52,7 @@ const Support = () => {
             {/* Offer Manager */}
             <div
               onClick={() => navigate("/dashboard/support/offer-manager")}
-              className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-green-400 to-green-900 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="cursor-pointer rounded-xl p-6 text-white bg-gradient-to-r from-green-400 to-green-900 dark:from-green-600 dark:to-green-950 shadow-md dark:shadow-black/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-center gap-4">
                 <img

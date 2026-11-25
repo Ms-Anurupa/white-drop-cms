@@ -40,12 +40,12 @@ const DateFilter = ({
   };
 
   const dateInputClass =
-    "h-9 w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 text-sm font-normal text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400";
+    "h-9 w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 text-sm font-normal text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200";
 
   return (
     <div
       className={`${className} ${
-        !bare ? "rounded-2xl border border-gray-100 bg-white p-3 shadow-sm" : ""
+        !bare ? "rounded-2xl border border-gray-100 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900" : ""
       } flex flex-wrap items-end gap-3`}
     >
       {/* FILTER PILLS */}
@@ -59,7 +59,7 @@ const DateFilter = ({
               className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-normal transition ${
                 activeFilter === filter.key
                   ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
             >
               {filter.label}
@@ -69,7 +69,7 @@ const DateFilter = ({
                   className={`rounded-full px-1.5 py-0.5 text-xs font-normal ${
                     activeFilter === filter.key
                       ? "bg-white/20 text-white"
-                      : "bg-gray-100 text-gray-500"
+                      : "bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400"
                   }`}
                 >
                   {filter.count}
@@ -82,7 +82,7 @@ const DateFilter = ({
 
       {/* RANGE LABEL */}
       {!hasPills && rangeLabel && (
-        <div className="flex items-center gap-2 pb-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 pb-2 text-sm text-gray-500 dark:text-slate-400">
           <CalendarRange size={16} />
           <span className="font-normal">{rangeLabel}</span>
         </div>
@@ -94,7 +94,7 @@ const DateFilter = ({
           {/* DATE TYPE */}
           {dateTypeOptions.length > 0 && (
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-normal text-gray-500">
+              <label className="text-[11px] font-normal text-gray-500 dark:text-slate-400">
                 Filter date by
               </label>
 
@@ -102,7 +102,7 @@ const DateFilter = ({
                 <select
                   value={dateFilterType || dateTypeOptions[0]?.value || ""}
                   onChange={(e) => onDateTypeChange?.(e.target.value)}
-                  className="h-9 min-w-[140px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white pl-3 pr-8 text-sm font-normal text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="h-9 min-w-[140px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white pl-3 pr-8 text-sm font-normal text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                 >
                   {dateTypeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -113,7 +113,7 @@ const DateFilter = ({
 
                 <ChevronDown
                   size={15}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ const DateFilter = ({
 
           {/* FROM DATE */}
           <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-normal text-gray-500">
+            <label className="text-[11px] font-normal text-gray-500 dark:text-slate-400">
               From
             </label>
 
@@ -141,11 +141,11 @@ const DateFilter = ({
             </div>
           </div>
 
-          <span className="pb-2 text-gray-300">→</span>
+          <span className="pb-2 text-gray-300 dark:text-slate-600">→</span>
 
           {/* TO DATE */}
           <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-normal text-gray-500">To</label>
+            <label className="text-[11px] font-normal text-gray-500 dark:text-slate-400">To</label>
 
             <div
               onClick={() => openDatePicker(toDateRef)}
@@ -168,7 +168,7 @@ const DateFilter = ({
             <button
               type="button"
               onClick={onClear}
-              className="h-9 shrink-0 cursor-pointer rounded-lg border border-red-200 px-3 text-sm font-normal text-red-600 transition hover:bg-red-50"
+              className="h-9 shrink-0 cursor-pointer rounded-lg border border-red-200 px-3 text-sm font-normal text-red-600 transition hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/40"
             >
               Clear
             </button>

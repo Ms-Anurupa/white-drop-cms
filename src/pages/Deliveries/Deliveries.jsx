@@ -27,44 +27,50 @@ const STATUS_LABELS = {
 const statusMeta = {
   CREATED: {
     dot: "bg-slate-400",
-    badge: "bg-slate-50 text-slate-700 border-slate-200",
+    badge:
+      "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
     bar: "bg-slate-400",
-    text: "text-slate-600",
+    text: "text-slate-600 dark:text-slate-400",
   },
 
   ASSIGNED: {
     dot: "bg-violet-500",
-    badge: "bg-violet-50 text-violet-700 border-violet-200",
+    badge:
+      "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800",
     bar: "bg-violet-500",
-    text: "text-violet-600",
+    text: "text-violet-600 dark:text-violet-400",
   },
 
   PICKED_UP: {
     dot: "bg-blue-500",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
+    badge:
+      "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
     bar: "bg-blue-500",
-    text: "text-blue-600",
+    text: "text-blue-600 dark:text-blue-400",
   },
 
   DELIVERED: {
     dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    badge:
+      "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
     bar: "bg-emerald-500",
-    text: "text-emerald-600",
+    text: "text-emerald-600 dark:text-emerald-400",
   },
 
   FAILED: {
     dot: "bg-orange-500",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
+    badge:
+      "bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
     bar: "bg-orange-500",
-    text: "text-orange-600",
+    text: "text-orange-600 dark:text-orange-400",
   },
 
   CANCELLED: {
     dot: "bg-rose-500",
-    badge: "bg-rose-50 text-rose-700 border-rose-200",
+    badge:
+      "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800",
     bar: "bg-rose-500",
-    text: "text-rose-600",
+    text: "text-rose-600 dark:text-rose-400",
   },
 };
 
@@ -134,15 +140,15 @@ const DeliveryCard = ({ job }) => {
   };
 
   return (
-    <div className="bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-5 flex flex-col gap-4">
+    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-5 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-0.5">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 tracking-wider uppercase mb-0.5">
             Job #{job.serialNumber || "—"}
           </p>
 
-          <h3 className="font-semibold text-gray-900 text-sm truncate">
+          <h3 className="font-semibold text-gray-900 dark:text-slate-100 text-sm truncate">
             {job.name || "Delivery Job"}
           </h3>
         </div>
@@ -169,27 +175,36 @@ const DeliveryCard = ({ job }) => {
       </div>
 
       {/* Job Details */}
-      <div className="space-y-2 text-sm text-gray-500">
+      <div className="space-y-2 text-sm text-gray-500 dark:text-slate-400">
         <div className="flex items-center gap-2">
-          <MapPin size={13} className="shrink-0 text-slate-400" />
+          <MapPin
+            size={13}
+            className="shrink-0 text-slate-400 dark:text-slate-500"
+          />
 
           <span className="truncate">{job.area || "—"}</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Clock3 size={13} className="shrink-0 text-slate-400" />
+          <Clock3
+            size={13}
+            className="shrink-0 text-slate-400 dark:text-slate-500"
+          />
 
           <span>{formatDate(job.deliveryDate)}</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Truck size={13} className="shrink-0 text-slate-400" />
+          <Truck
+            size={13}
+            className="shrink-0 text-slate-400 dark:text-slate-500"
+          />
 
           <span>
             {job.slot?.name || "—"}
 
             {job.slot?.from && job.slot?.to && (
-              <span className="ml-1 text-xs text-slate-400">
+              <span className="ml-1 text-xs text-slate-400 dark:text-slate-500">
                 ({job.slot.from} - {job.slot.to})
               </span>
             )}
@@ -198,7 +213,7 @@ const DeliveryCard = ({ job }) => {
       </div>
 
       {/* Delivery Partner */}
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700">
         <div
           className={`
             w-9
@@ -212,8 +227,8 @@ const DeliveryCard = ({ job }) => {
             font-bold
             ${
               job.deliveryPartner
-                ? "bg-violet-100 text-violet-700"
-                : "bg-slate-200 text-slate-500"
+                ? "bg-violet-100 dark:bg-violet-950/70 text-violet-700 dark:text-violet-300"
+                : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
             }
           `}
         >
@@ -221,11 +236,11 @@ const DeliveryCard = ({ job }) => {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+          <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase tracking-wide">
             Delivery Partner
           </p>
 
-          <p className="text-sm font-medium text-slate-800 truncate">
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
             {partnerName}
           </p>
         </div>
@@ -234,16 +249,16 @@ const DeliveryCard = ({ job }) => {
       {/* Orders */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <Package size={15} className="text-blue-600" />
+          <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center">
+            <Package size={15} className="text-blue-600 dark:text-blue-400" />
           </div>
 
           <div>
-            <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+            <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase tracking-wide">
               Assigned Orders
             </p>
 
-            <p className="text-sm font-semibold text-slate-800">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
               {ordersCount}
             </p>
           </div>
@@ -251,11 +266,11 @@ const DeliveryCard = ({ job }) => {
 
         {ordersCount > 0 && (
           <div className="text-right">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+            <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase tracking-wide">
               Order Value
             </p>
 
-            <p className="text-sm font-semibold text-slate-800">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
               ₹
               {orders
                 .reduce(
@@ -268,7 +283,7 @@ const DeliveryCard = ({ job }) => {
         )}
       </div>
 
-      <div className="rounded-xl border border-slate-100 p-3 bg-white">
+      <div className="rounded-xl border border-slate-100 dark:border-slate-800 p-3 bg-white dark:bg-slate-800/50">
         <div className="flex items-center justify-between gap-3 mb-3">
           {/* Picked Up */}
           <div className="flex items-center gap-2">
@@ -286,9 +301,9 @@ const DeliveryCard = ({ job }) => {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Delivered{" "}
-              <span className="font-semibold text-slate-800">
+              <span className="font-semibold text-slate-800 dark:text-slate-100">
                 {deliveredCount}
               </span>
             </p>
@@ -296,7 +311,7 @@ const DeliveryCard = ({ job }) => {
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden mb-1">
+        <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden mb-1">
           <div
             className="h-full bg-emerald-500 rounded-full transition-all duration-700"
             style={{
@@ -306,11 +321,11 @@ const DeliveryCard = ({ job }) => {
         </div>
 
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] text-slate-400">
+          <span className="text-[10px] text-slate-400 dark:text-slate-400">
             {deliveredCount} of {ordersCount} orders delivered
           </span>
 
-          <span className="text-[10px] font-semibold text-emerald-600">
+          <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
             {deliveryPercentage}%
           </span>
         </div>
@@ -343,8 +358,8 @@ const DeliveryCard = ({ job }) => {
       </div>
 
       {/* Job Progress */}
-      <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-        <span className="text-xs font-semibold text-emerald-600">
+      <div className="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-800">
+        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
           {deliveryPercentage}% orders delivered
         </span>
       </div>
@@ -357,7 +372,7 @@ const DeliveryCard = ({ job }) => {
 ========================================================= */
 
 const StatCard = ({ label, value, Icon, iconClass, bgClass }) => (
-  <div className="bg-white border border-slate-100 rounded-xl shadow-sm px-4 py-4 flex items-center gap-4">
+  <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm px-4 py-4 flex items-center gap-4">
     <div
       className={`
         w-10
@@ -374,9 +389,11 @@ const StatCard = ({ label, value, Icon, iconClass, bgClass }) => (
     </div>
 
     <div>
-      <p className="text-xs text-gray-500 font-medium">{label}</p>
+      <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
+        {label}
+      </p>
 
-      <p className="text-2xl font-semibold text-gray-900 leading-tight">
+      <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100 leading-tight">
         {value}
       </p>
     </div>
@@ -488,11 +505,11 @@ const Deliveries = () => {
     <div className="p-6 md:p-6 space-y-2">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
             Delivery Tracking
           </h1>
 
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
             Track and manage all delivery jobs
           </p>
         </div>
@@ -500,7 +517,7 @@ const Deliveries = () => {
         <div className="relative w-full lg:w-72">
           <Search
             size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
           />
 
           <input
@@ -514,8 +531,12 @@ const Deliveries = () => {
             className="
               w-full
               bg-white
+              dark:bg-slate-900
               border
               border-gray-200
+              dark:border-slate-700
+              dark:text-slate-100
+              dark:placeholder:text-slate-500
               rounded-lg
               py-2
               pl-9
@@ -525,6 +546,7 @@ const Deliveries = () => {
               focus:ring-2
               focus:ring-blue-500/30
               focus:border-blue-400
+              dark:focus:border-blue-500
             "
           />
         </div>
@@ -535,24 +557,24 @@ const Deliveries = () => {
           label="Total Jobs"
           value={stats.total}
           Icon={Package}
-          iconClass="text-slate-600"
-          bgClass="bg-slate-100"
+          iconClass="text-slate-600 dark:text-slate-300"
+          bgClass="bg-slate-100 dark:bg-slate-800"
         />
 
         <StatCard
           label="Picked Up"
           value={stats.outForDelivery}
           Icon={Truck}
-          iconClass="text-blue-600"
-          bgClass="bg-blue-50"
+          iconClass="text-blue-600 dark:text-blue-400"
+          bgClass="bg-blue-50 dark:bg-blue-950/60"
         />
 
         <StatCard
           label="Delivered"
           value={stats.delivered}
           Icon={CheckCircle2}
-          iconClass="text-emerald-600"
-          bgClass="bg-emerald-50"
+          iconClass="text-emerald-600 dark:text-emerald-400"
+          bgClass="bg-emerald-50 dark:bg-emerald-950/60"
         />
       </div>
 
@@ -561,7 +583,7 @@ const Deliveries = () => {
       =================================================== */}
 
       {currentData.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
+        <div className="text-center py-16 text-gray-400 dark:text-slate-500 text-sm">
           No delivery jobs match your search.
         </div>
       ) : (
@@ -577,7 +599,7 @@ const Deliveries = () => {
       =================================================== */}
 
       <div className="flex items-center justify-between pt-2">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 dark:text-slate-400">
           {filteredData.length === 0
             ? "No results"
             : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(
@@ -597,14 +619,19 @@ const Deliveries = () => {
               cursor-pointer
               rounded-lg
               bg-white
+              dark:bg-slate-900
               border
               border-gray-200
+              dark:border-slate-700
+              text-gray-700
+              dark:text-slate-300
               flex
               items-center
               justify-center
               disabled:opacity-40
               disabled:cursor-not-allowed
               hover:bg-gray-50
+              dark:hover:bg-slate-800
               transition-colors
             "
             aria-label="Previous page"
@@ -612,7 +639,7 @@ const Deliveries = () => {
             <ChevronLeft size={15} />
           </button>
 
-          <span className="text-sm font-medium text-gray-700 min-w-[52px] text-center">
+          <span className="text-sm font-medium text-gray-700 dark:text-slate-300 min-w-[52px] text-center">
             {page} / {totalPages}
           </span>
 
@@ -626,14 +653,19 @@ const Deliveries = () => {
               cursor-pointer
               rounded-lg
               bg-white
+              dark:bg-slate-900
               border
               border-gray-200
+              dark:border-slate-700
+              text-gray-700
+              dark:text-slate-300
               flex
               items-center
               justify-center
               disabled:opacity-40
               disabled:cursor-not-allowed
               hover:bg-gray-50
+              dark:hover:bg-slate-800
               transition-colors
             "
             aria-label="Next page"

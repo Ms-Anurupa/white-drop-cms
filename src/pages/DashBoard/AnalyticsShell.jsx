@@ -31,10 +31,11 @@ import {
     sum,
     fmt,
 } from "./analyticsHelpers";
+import useThemeStore from "@/zustand/Store/themeStore";
 
 const Tip = ({ active, payload, label, pre = "" }) =>
     active && payload?.length ? (
-        <div className="rounded-lg bg-[#101828] px-2.5 py-1.5 text-[11px] text-white shadow-2xl">
+        <div className="rounded-lg bg-[#101828] px-2.5 py-1.5 text-[11px] text-white shadow-2xl dark:border dark:border-slate-700 dark:bg-slate-900">
             <p className="mb-0.5 text-white/60">{label}</p>
             {payload.map((p) => (
                 <p key={p.dataKey} className="flex items-center gap-1.5 font-semibold">
@@ -54,7 +55,7 @@ const Tip = ({ active, payload, label, pre = "" }) =>
 
 const Delta = ({ v }) => (
     <span
-        className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-px text-[11px] font-bold ${v >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+        className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-px text-[11px] font-bold ${v >= 0 ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300" : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
             }`}
     >
         {v >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
@@ -93,12 +94,12 @@ const Spark = ({ v, color }) => {
 
 const Panel = ({ title, sub, right, className = "", children }) => (
     <section
-        className={`flex min-w-0 flex-col rounded-2xl border border-[#E6E8EC] bg-white p-4 ${className}`}
+        className={`flex min-w-0 flex-col rounded-2xl border border-[#E6E8EC] bg-white p-4 dark:border-slate-800 dark:bg-slate-900 ${className}`}
     >
         <header className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
-                <h3 className="text-[13px] font-bold text-[#101828]">{title}</h3>
-                {sub && <p className="text-[11px] text-slate-500">{sub}</p>}
+                <h3 className="text-[13px] font-bold text-[#101828] dark:text-slate-100">{title}</h3>
+                {sub && <p className="text-[11px] text-slate-500 dark:text-slate-400">{sub}</p>}
             </div>
             {right && <div className="shrink-0">{right}</div>}
         </header>
@@ -120,15 +121,15 @@ const axis = {
 
 const Sel = ({ label, value, onChange, disabled, children }) => (
     <label
-        className={`flex shrink-0 items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] transition-colors hover:border-slate-300 focus-within:border-slate-900 focus-within:bg-white ${disabled ? "pointer-events-none opacity-45" : ""
+        className={`flex shrink-0 items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] transition-colors hover:border-slate-300 focus-within:border-slate-900 focus-within:bg-white dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600 dark:focus-within:border-slate-500 dark:focus-within:bg-slate-800 ${disabled ? "pointer-events-none opacity-45" : ""
             }`}
     >
-        <span className="font-medium text-slate-500">{label}</span>
+        <span className="font-medium text-slate-500 dark:text-slate-400">{label}</span>
         <select
             value={value}
             onChange={onChange}
             disabled={disabled}
-            className="cursor-pointer bg-transparent font-bold text-[#101828] outline-none"
+            className="cursor-pointer bg-transparent font-bold text-[#101828] outline-none dark:text-slate-100 [&>option]:bg-white [&>option]:text-[#101828] dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
         >
             {children}
         </select>
@@ -144,6 +145,7 @@ const CategoryDropdown = ({
     value,
     onChange,
 }) => {
+    const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
 
@@ -167,19 +169,18 @@ const CategoryDropdown = ({
                 onClick={() => setOpen((o) => !o)}
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[12px] font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+                className="flex items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-1.5 text-[12px] font-bold text-[#101828] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus-visible:outline-slate-400"
                 style={
                     value
-                        ? { background: `${hue}12`, borderColor: hue, color: "#101828" }
-                        : {
-                            background: "#F8FAFC",
-                            borderColor: "#E6E8EC",
-                            color: "#101828",
+                        ? {
+                            background: isDark ? `${hue}24` : `${hue}12`,
+                            borderColor: hue,
                         }
+                        : undefined
                 }
             >
                 <Layers size={14} style={{ color: hue }} />
-                <span className="font-medium text-slate-500">{label}:</span>
+                <span className="font-medium text-slate-500 dark:text-slate-400">{label}:</span>
                 <span className="flex items-center gap-1.5">
                     {value && (
                         <i
@@ -191,7 +192,7 @@ const CategoryDropdown = ({
                 </span>
                 <ChevronDown
                     size={14}
-                    className={`ml-0.5 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+                    className={`ml-0.5 text-slate-400 transition-transform dark:text-slate-500 ${open ? "rotate-180" : ""}`}
                 />
             </button>
 
@@ -199,7 +200,7 @@ const CategoryDropdown = ({
                 <ul
                     role="listbox"
                     aria-label={`Filter by ${label}`}
-                    className="absolute left-0 top-full z-50 mt-1.5 max-h-72 w-68 overflow-y-auto rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl"
+                    className="absolute left-0 top-full z-50 mt-1.5 max-h-72 w-68 overflow-y-auto rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
                 >
                     <li role="option" aria-selected={value === null}>
                         <button
@@ -209,19 +210,19 @@ const CategoryDropdown = ({
                                 setOpen(false);
                             }}
                             className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] font-bold transition-colors ${value === null
-                                    ? "bg-slate-100 text-[#101828]"
-                                    : "text-slate-700 hover:bg-slate-50"
+                                    ? "bg-slate-100 text-[#101828] dark:bg-slate-800 dark:text-slate-100"
+                                    : "text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
                                 }`}
                         >
                             <span>All ({items.length})</span>
-                            <span className="flex items-center gap-2 text-[11px] font-semibold text-slate-500 tabular-nums">
+                            <span className="flex items-center gap-2 text-[11px] font-semibold text-slate-500 tabular-nums dark:text-slate-400">
                                 {fmt(grand, prefix)}
                                 {value === null && <Check size={14} style={{ color: hue }} />}
                             </span>
                         </button>
                     </li>
 
-                    <li className="my-1 border-t border-slate-100" aria-hidden />
+                    <li className="my-1 border-t border-slate-100 dark:border-slate-800" aria-hidden />
 
                     {items.map((item, idx) => {
                         const selected = value === item.name;
@@ -235,10 +236,14 @@ const CategoryDropdown = ({
                                         setOpen(false);
                                     }}
                                     className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${selected
-                                            ? "font-bold text-[#101828]"
-                                            : "font-semibold text-slate-700 hover:bg-slate-50"
+                                            ? "font-bold text-[#101828] dark:text-slate-100"
+                                            : "font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
                                         }`}
-                                    style={selected ? { background: `${hue}14` } : undefined}
+                                    style={
+                                        selected
+                                            ? { background: isDark ? `${hue}24` : `${hue}14` }
+                                            : undefined
+                                    }
                                 >
                                     <span className="flex items-center gap-2 truncate">
                                         <i
@@ -249,10 +254,10 @@ const CategoryDropdown = ({
                                     </span>
 
                                     <span className="ml-2 flex shrink-0 items-center gap-2 text-[11px] tabular-nums">
-                                        <span className="font-bold text-[#101828]">
+                                        <span className="font-bold text-[#101828] dark:text-slate-100">
                                             {fmt(item.total, prefix)}
                                         </span>
-                                        <span className="w-8 text-right text-slate-400">
+                                        <span className="w-8 text-right text-slate-400 dark:text-slate-500">
                                             {share}%
                                         </span>
                                         <span className="w-3.5">
@@ -293,8 +298,13 @@ const AnalyticsShell = ({
     resetFilters,
     subToolbar = null,
 }) => {
+    const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
     const navigate = useNavigate();
     const num = (v) => (v === "all" ? null : Number(v));
+    const themedAxis = {
+        ...axis,
+        tick: { fill: isDark ? "#94A3B8" : "#98A2B3", fontSize: 10 },
+    };
 
     const table = useMemo(
         () =>
@@ -384,14 +394,14 @@ const AnalyticsShell = ({
     return (
         <div className="flex min-w-0 flex-1 flex-col gap-3">
             {/* Header + Filter Bar */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 2xl:flex-row 2xl:items-center 2xl:justify-between">
+            <div className="flex flex-col gap-3 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900 2xl:flex-row 2xl:items-center 2xl:justify-between">
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                            <h1 className="text-[18px] font-extrabold tracking-tight text-[#101828]">
+                            <h1 className="text-[18px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100">
                                 {title}
                             </h1>
-                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                 {when}
                             </span>
                             {loading && (
@@ -403,14 +413,14 @@ const AnalyticsShell = ({
                                 </span>
                             )}
                         </div>
-                        <p className="mt-0.5 text-[11px] text-slate-500">{blurb}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{blurb}</p>
                     </div>
 
                     {managePath && (
                         <button
                             type="button"
                             onClick={() => navigate(managePath)}
-                            className="flex shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] transition-colors hover:border-slate-400 2xl:hidden"
+                            className="flex shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] transition-colors hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-600 2xl:hidden"
                         >
                             Manage <ChevronRight size={13} />
                         </button>
@@ -430,7 +440,7 @@ const AnalyticsShell = ({
                     />
 
                     <span
-                        className="hidden h-5 w-px bg-[#E6E8EC] sm:inline-block"
+                        className="hidden h-5 w-px bg-[#E6E8EC] dark:bg-slate-800 sm:inline-block"
                         aria-hidden
                     />
 
@@ -498,11 +508,11 @@ const AnalyticsShell = ({
                         role="switch"
                         aria-checked={compare}
                         onClick={() => setCompare(!compare)}
-                        className="flex shrink-0 items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:border-slate-300"
+                        className="flex shrink-0 items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600"
                     >
                         <span
                             className="relative h-4 w-7 rounded-full transition-colors"
-                            style={{ background: compare ? hue : "#CBD5E1" }}
+                            style={{ background: compare ? hue : isDark ? "#475569" : "#CBD5E1" }}
                         >
                             <i
                                 className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${compare ? "left-3.5" : "left-0.5"
@@ -516,7 +526,7 @@ const AnalyticsShell = ({
                         <button
                             type="button"
                             onClick={resetFilters}
-                            className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 hover:text-[#101828]"
+                            className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                             title="Reset filters"
                         >
                             <RotateCcw size={12} /> Reset
@@ -527,7 +537,7 @@ const AnalyticsShell = ({
                         <button
                             type="button"
                             onClick={() => navigate(managePath)}
-                            className="hidden shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] transition-colors hover:border-slate-400 2xl:flex"
+                            className="hidden shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] transition-colors hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-600 2xl:flex"
                         >
                             Manage <ChevronRight size={13} />
                         </button>
@@ -540,7 +550,7 @@ const AnalyticsShell = ({
 
             {/* Error banner */}
             {status?.type === "error" && (
-                <div className="flex items-center justify-between rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700">
+                <div className="flex items-center justify-between rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
                     <span>{status.message}</span>
                     {onRetry && (
                         <button
@@ -559,7 +569,7 @@ const AnalyticsShell = ({
                 {kpis.map(([k, v, d, note], i) => (
                     <div
                         key={k}
-                        className="min-w-0 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3"
+                        className="min-w-0 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
                         style={
                             i === 0
                                 ? {
@@ -568,12 +578,12 @@ const AnalyticsShell = ({
                                 : undefined
                         }
                     >
-                        <p className="truncate text-[11px] font-semibold text-slate-500">
+                        <p className="truncate text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                             {k}
                         </p>
                         <div className="mt-0.5 flex flex-wrap items-center gap-2">
                             <p
-                                className={`truncate font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums ${i === 0
+                                className={`truncate font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100 ${i === 0
                                         ? "text-[24px] sm:text-[26px]"
                                         : "text-[19px] sm:text-[20px]"
                                     }`}
@@ -583,7 +593,7 @@ const AnalyticsShell = ({
                             {d}
                         </div>
                         {note && (
-                            <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                            <p className="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400">
                                 {note}
                             </p>
                         )}
@@ -603,7 +613,7 @@ const AnalyticsShell = ({
                         sub={`One point per ${per}`}
                         right={
                             compare && (
-                                <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600">
+                                <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                                     <span className="flex items-center gap-1">
                                         <i
                                             className="h-1.5 w-1.5 rounded-full"
@@ -612,7 +622,7 @@ const AnalyticsShell = ({
                                         {filters.year ?? "Current"}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <i className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+                                        <i className="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
                                         {pv}
                                     </span>
                                 </div>
@@ -637,9 +647,9 @@ const AnalyticsShell = ({
                                             <stop offset="100%" stopColor={hue} stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid vertical={false} stroke="#EEF0F3" />
-                                    <XAxis dataKey="l" {...axis} minTickGap={18} />
-                                    <YAxis {...axis} width={46} tickFormatter={(v) => fmt(v)} />
+                                    <CartesianGrid vertical={false} stroke={isDark ? "#1E293B" : "#EEF0F3"} />
+                                    <XAxis dataKey="l" {...themedAxis} minTickGap={18} />
+                                    <YAxis {...themedAxis} width={46} tickFormatter={(v) => fmt(v)} />
                                     <Tooltip
                                         wrapperStyle={{ zIndex: 30 }}
                                         content={<Tip pre={prefix} />}
@@ -649,7 +659,7 @@ const AnalyticsShell = ({
                                         <Area
                                             name={pv}
                                             dataKey="prev"
-                                            stroke="#CBD5E1"
+                                            stroke={isDark ? "#475569" : "#CBD5E1"}
                                             strokeWidth={2}
                                             strokeDasharray="5 4"
                                             fill="none"
@@ -682,8 +692,8 @@ const AnalyticsShell = ({
                                             )
                                         }
                                         className={`flex items-center gap-1 text-[11px] font-semibold transition-opacity ${selectedCategory && selectedCategory !== r.name
-                                                ? "opacity-40"
-                                                : "text-slate-600"
+                                                ? "text-slate-600 opacity-40 dark:text-slate-400"
+                                                : "text-slate-600 dark:text-slate-300"
                                             }`}
                                     >
                                         <i
@@ -702,13 +712,13 @@ const AnalyticsShell = ({
                                     data={stack}
                                     margin={{ left: 0, right: 8, top: 8, bottom: 0 }}
                                 >
-                                    <CartesianGrid vertical={false} stroke="#EEF0F3" />
-                                    <XAxis dataKey="l" {...axis} minTickGap={18} />
-                                    <YAxis {...axis} width={46} tickFormatter={(v) => fmt(v)} />
+                                    <CartesianGrid vertical={false} stroke={isDark ? "#1E293B" : "#EEF0F3"} />
+                                    <XAxis dataKey="l" {...themedAxis} minTickGap={18} />
+                                    <YAxis {...themedAxis} width={46} tickFormatter={(v) => fmt(v)} />
                                     <Tooltip
                                         wrapperStyle={{ zIndex: 30 }}
                                         content={<Tip pre={prefix} />}
-                                        cursor={{ fill: "#F6F7F9" }}
+                                        cursor={{ fill: isDark ? "rgba(148, 163, 184, 0.1)" : "#F6F7F9" }}
                                     />
                                     {table.map((r, i) => (
                                         <Bar
@@ -723,7 +733,7 @@ const AnalyticsShell = ({
                                                         : 0.12
                                                     : (TINT[i] ?? 0.35)
                                             }
-                                            stroke="#fff"
+                                            stroke={isDark ? "#0F172A" : "#fff"}
                                             strokeWidth={1}
                                             maxBarSize={30}
                                         />
@@ -740,7 +750,7 @@ const AnalyticsShell = ({
                     sub="Select an item here or from the dropdown above."
                 >
                     {table.length === 0 && !loading ? (
-                        <p className="py-8 text-center text-[12px] text-slate-400">
+                        <p className="py-8 text-center text-[12px] text-slate-400 dark:text-slate-500">
                             No data found for this period.
                         </p>
                     ) : (
@@ -754,11 +764,11 @@ const AnalyticsShell = ({
                                             type="button"
                                             onClick={() => setSelectedCategory(on ? null : r.name)}
                                             aria-pressed={on}
-                                            className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-[#F6F7F9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900"
+                                            className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-[#F6F7F9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 dark:hover:bg-slate-800/70 dark:focus-visible:outline-slate-400"
                                             style={
                                                 on
                                                     ? {
-                                                        background: `${hue}14`,
+                                                        background: isDark ? `${hue}24` : `${hue}14`,
                                                         boxShadow: `inset 0 0 0 1.5px ${hue}`,
                                                     }
                                                     : undefined
@@ -769,10 +779,10 @@ const AnalyticsShell = ({
                                                 style={{ background: hue, opacity: TINT[idx] ?? 0.5 }}
                                             />
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate text-[12px] font-bold text-[#101828]">
+                                                <p className="truncate text-[12px] font-bold text-[#101828] dark:text-slate-100">
                                                     {r.name}
                                                 </p>
-                                                <div className="mt-1.5 h-1.5 rounded-full bg-slate-100">
+                                                <div className="mt-1.5 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800">
                                                     <div
                                                         className="h-1.5 rounded-full transition-[width] duration-500"
                                                         style={{
@@ -784,7 +794,7 @@ const AnalyticsShell = ({
                                             </div>
                                             <Spark v={r.cur} color={hue} />
                                             <div className="min-w-[76px] shrink-0 text-right">
-                                                <p className="text-[12px] font-extrabold tabular-nums text-[#101828]">
+                                                <p className="text-[12px] font-extrabold tabular-nums text-[#101828] dark:text-slate-100">
                                                     {fmt(r.total, prefix)}
                                                 </p>
                                                 <Delta v={r.g} />

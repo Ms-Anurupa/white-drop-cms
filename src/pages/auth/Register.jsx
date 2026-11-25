@@ -101,36 +101,36 @@ const Register = () => {
 
   return (
     <section
-      className="h-screen overflow-hidden bg-cover bg-center flex items-center justify-center px-4 sm:px-5"
+      className="h-screen overflow-hidden bg-cover bg-center flex items-center justify-center px-4 sm:px-5 dark:bg-slate-950"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute inset-0 bg-black/10 dark:bg-slate-950/65"></div>
 
       <div className="w-full max-w-md z-10">
         <div
           className="relative overflow-hidden rounded-[28px] sm:rounded-[32px]
-  border border-white/20 bg-white/10 backdrop-blur-2xl
-  shadow-[0_8px_32px_rgba(31,38,135,0.37)]
+  border border-white/20 dark:border-slate-700/60 bg-white/10 dark:bg-slate-900/75 backdrop-blur-2xl
+  shadow-[0_8px_32px_rgba(31,38,135,0.37)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)]
   px-5 sm:px-8"
         >
           {/* Glow */}
-          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-blue-400/30 blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-20 h-20 w-40 rounded-full bg-cyan-300/20 blur-3xl"></div>
+          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-blue-400/30 dark:bg-blue-500/20 blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 h-20 w-40 rounded-full bg-cyan-300/20 dark:bg-cyan-400/15 blur-3xl"></div>
 
           {/* Logo */}
           <div className="flex justify-center p-4">
-            <div className="bg-white p-2 rounded-full shadow-xl">
+            <div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 p-2 rounded-full shadow-xl">
               <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-2 sm:mb-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
               Create Account
             </h1>
-            <p className="text-white text-xs sm:text-sm">
+            <p className="text-white dark:text-slate-300 text-xs sm:text-sm">
               Sign up to get started
             </p>
           </div>
@@ -146,12 +146,12 @@ const Register = () => {
                 value={registerData.first_name}
                 disabled={!!verifiedUser || isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <User
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                 size={18}
               />
             </div>
@@ -165,12 +165,12 @@ const Register = () => {
                 value={registerData.last_name}
                 disabled={isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <User
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                 size={18}
               />
             </div>
@@ -184,12 +184,12 @@ const Register = () => {
                 value={registerData.email}
                 disabled={!!verifiedUser || isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <Mail
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                 size={18}
               />
             </div>
@@ -203,12 +203,12 @@ const Register = () => {
                 value={registerData.phone_number}
                 disabled={isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-2 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-2 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <Phone
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                 size={18}
               />
             </div>
@@ -222,15 +222,15 @@ const Register = () => {
                 value={registerData.password}
                 disabled={isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <button
                 type="button"
                 disabled={isRegistering}
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -245,15 +245,15 @@ const Register = () => {
                 value={registerData.confirmPassword}
                 disabled={isRegistering}
                 onChange={handleChange}
-                className="w-full rounded-2xl bg-white/20 border border-white/30
-                py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                outline-none backdrop-blur-md focus:border-cyan-300"
+                className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-400"
               />
               <button
                 type="button"
                 disabled={isRegistering}
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
               >
                 {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -265,17 +265,17 @@ const Register = () => {
                 value={registerData.privilege}
                 disabled={isRegistering}
                 onChange={handleChange}
-                className="w-full cursor-pointer rounded-2xl bg-white/20 border border-white/30
-    py-3 px-5 text-white outline-none backdrop-blur-md
-    focus:border-cyan-300"
+                className="w-full cursor-pointer rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+    py-3 px-5 text-white dark:text-slate-100 outline-none backdrop-blur-md
+    focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50"
               >
-                <option value="" className="text-black">
+                <option value="" className="text-black dark:bg-slate-900 dark:text-slate-100">
                   Select Role
                 </option>
-                <option value="ADMIN" className="text-black">
+                <option value="ADMIN" className="text-black dark:bg-slate-900 dark:text-slate-100">
                   ADMIN
                 </option>
-                <option value="SUPER USER" className="text-black">
+                <option value="SUPER USER" className="text-black dark:bg-slate-900 dark:text-slate-100">
                   SUPER_USER
                 </option>
               </select>
@@ -288,19 +288,19 @@ const Register = () => {
               className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
     ${
       isRegistering
-        ? "bg-gray-500 cursor-not-allowed opacity-70"
-        : "bg-gradient-to-r from-yellow-500 to-yellow-400 hover:scale-[1.02] cursor-pointer"
+        ? "bg-gray-500 dark:bg-slate-700 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-yellow-500 to-yellow-400 dark:from-yellow-600 dark:to-amber-500 hover:scale-[1.02] cursor-pointer"
     }`}
             >
               {isRegistering ? "Creating Account..." : "Create Account"}
             </button>
 
             {/* Login link */}
-            <p className="mb-4 text-center text-xs sm:text-sm text-white/80">
+            <p className="mb-4 text-center text-xs sm:text-sm text-white/80 dark:text-slate-300">
               Already have an account?{" "}
               <span
                 onClick={() => navigate("/")}
-                className="text-cyan-300 cursor-pointer hover:underline mb-4"
+                className="text-cyan-300 dark:text-cyan-400 cursor-pointer hover:underline mb-4"
               >
                 Login
               </span>

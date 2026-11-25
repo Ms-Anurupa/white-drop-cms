@@ -18,8 +18,9 @@ import {
 } from "lucide-react";
 
 import useOfferStore from "../zustand/Store/offerStore";
+import useThemeStore from "@/zustand/Store/themeStore";
 
-const THEME_VARS = {
+const LIGHT_THEME_VARS = {
   "--bg": "#F7F8FC",
   "--panel": "#FFFFFF",
   "--panel-soft": "#F8FAFC",
@@ -37,6 +38,26 @@ const THEME_VARS = {
   "--success": "#159A72",
   "--success-soft": "rgba(21, 154, 114, 0.09)",
   "--warning": "#D97706",
+};
+
+const DARK_THEME_VARS = {
+  "--bg": "#020617",
+  "--panel": "#0F172A",
+  "--panel-soft": "#1E293B",
+  "--panel-2": "#1E293B",
+  "--line": "#1E293B",
+  "--line-dark": "#334155",
+  "--text": "#F1F5F9",
+  "--muted": "#94A3B8",
+  "--muted-2": "#94A3B8",
+  "--primary": "#818CF8",
+  "--primary-dark": "#6366F1",
+  "--primary-soft": "rgba(129, 140, 248, 0.14)",
+  "--danger": "#F87171",
+  "--danger-soft": "rgba(248, 113, 113, 0.14)",
+  "--success": "#34D399",
+  "--success-soft": "rgba(52, 211, 153, 0.14)",
+  "--warning": "#FBBF24",
 };
 
 const SCOPED_CSS = `
@@ -68,6 +89,10 @@ const SCOPED_CSS = `
   scrollbar-color: #CBD5E1 transparent;
 }
 
+.dark #offer-type-root .scrollbar {
+  scrollbar-color: #334155 transparent;
+}
+
 #offer-type-root .scrollbar::-webkit-scrollbar {
   width: 7px;
   height: 7px;
@@ -80,6 +105,10 @@ const SCOPED_CSS = `
 #offer-type-root .scrollbar::-webkit-scrollbar-thumb {
   background: #CBD5E1;
   border-radius: 10px;
+}
+
+.dark #offer-type-root .scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 
 #offer-type-root .fadein {
@@ -113,6 +142,13 @@ const SCOPED_CSS = `
   border-color: #D9DDF0 !important;
 }
 
+.dark #offer-type-root .card-hover:hover {
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.35),
+    0 3px 8px rgba(0, 0, 0, 0.25);
+  border-color: #334155 !important;
+}
+
 #offer-type-root .search-input:focus {
   outline: none;
   border-color: var(--primary) !important;
@@ -133,6 +169,10 @@ const SCOPED_CSS = `
 
 #offer-type-root .property-row:hover {
   background: #EEF1F7 !important;
+}
+
+.dark #offer-type-root .property-row:hover {
+  background: #283548 !important;
 }
 `;
 
@@ -197,6 +237,7 @@ function ConfirmDialog({
   onConfirm,
   onCancel,
   loading = false,
+  isDark = false,
 }) {
   if (!open) return null;
 
@@ -204,7 +245,7 @@ function ConfirmDialog({
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       style={{
-        background: "rgba(15,23,42,0.42)",
+        background: isDark ? "rgba(2,6,23,0.72)" : "rgba(15,23,42,0.42)",
         backdropFilter: "blur(5px)",
       }}
     >
@@ -219,7 +260,7 @@ function ConfirmDialog({
           <div className="flex items-start gap-3">
             <IconBadge
               Icon={AlertCircle}
-              color={danger ? "#E5484D" : "#5B5BD6"}
+              color={danger ? (isDark ? "#F87171" : "#E5484D") : (isDark ? "#818CF8" : "#5B5BD6")}
               size={18}
             />
 
@@ -268,7 +309,7 @@ function ConfirmDialog({
             disabled={loading}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-[12px] font-semibold text-white disabled:opacity-60"
             style={{
-              background: danger ? "var(--danger)" : "var(--primary)",
+              background: danger ? (isDark ? "#DC2626" : "var(--danger)") : (isDark ? "#4F46E5" : "var(--primary)"),
             }}
           >
             {loading && <Loader2 size={14} className="animate-spin" />}
@@ -291,21 +332,21 @@ function SkeletonCard() {
     >
       <div className="flex items-start justify-between">
         <div className="flex gap-3">
-          <div className="h-11 w-11 rounded-xl bg-slate-100" />
+          <div className="h-11 w-11 rounded-xl bg-slate-100 dark:bg-slate-800" />
 
           <div>
-            <div className="h-4 w-32 rounded bg-slate-100" />
-            <div className="mt-2 h-3 w-48 rounded bg-slate-100" />
+            <div className="h-4 w-32 rounded bg-slate-100 dark:bg-slate-800" />
+            <div className="mt-2 h-3 w-48 rounded bg-slate-100 dark:bg-slate-800" />
           </div>
         </div>
 
-        <div className="h-7 w-16 rounded-full bg-slate-100" />
+        <div className="h-7 w-16 rounded-full bg-slate-100 dark:bg-slate-800" />
       </div>
 
       <div className="mt-6 space-y-2">
-        <div className="h-12 rounded-xl bg-slate-100" />
-        <div className="h-12 rounded-xl bg-slate-100" />
-        <div className="h-12 rounded-xl bg-slate-100" />
+        <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800" />
+        <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800" />
+        <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -313,6 +354,10 @@ function SkeletonCard() {
 
 const OfferType = () => {
   useScopedStyles();
+
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
+  const isDark = resolvedTheme === "dark";
+  const themeVars = isDark ? DARK_THEME_VARS : LIGHT_THEME_VARS;
 
 
   // ZUSTAND
@@ -521,9 +566,13 @@ const OfferType = () => {
         className="filter-pill flex h-9 items-center gap-2 rounded-lg px-3 text-[12px] font-semibold"
         style={{
           background: active ? "var(--text)" : "var(--panel)",
-          color: active ? "#FFFFFF" : "var(--muted)",
+          color: active ? (isDark ? "#0F172A" : "#FFFFFF") : "var(--muted)",
           border: active ? "1px solid var(--text)" : "1px solid var(--line)",
-          boxShadow: active ? "0 4px 12px rgba(15,23,42,0.12)" : "none",
+          boxShadow: active
+            ? isDark
+              ? "0 4px 12px rgba(0,0,0,0.35)"
+              : "0 4px 12px rgba(15,23,42,0.12)"
+            : "none",
         }}
       >
         <Icon size={14} />
@@ -534,8 +583,12 @@ const OfferType = () => {
           <span
             className="rounded-md px-1.5 py-0.5 text-[10px]"
             style={{
-              background: active ? "rgba(255,255,255,0.14)" : "var(--panel-2)",
-              color: active ? "#FFFFFF" : "var(--muted-2)",
+              background: active
+                ? isDark
+                  ? "rgba(15,23,42,0.12)"
+                  : "rgba(255,255,255,0.14)"
+                : "var(--panel-2)",
+              color: active ? (isDark ? "#0F172A" : "#FFFFFF") : "var(--muted-2)",
             }}
           >
             {count}
@@ -549,7 +602,7 @@ const OfferType = () => {
     <div
       id="offer-type-root"
       style={{
-        ...THEME_VARS,
+        ...themeVars,
         minHeight: "100vh",
         background: "var(--bg)",
         color: "var(--text)",
@@ -558,7 +611,9 @@ const OfferType = () => {
 
       <div
         style={{
-          background: "linear-gradient(180deg, #FFFFFF 0%, #FBFCFE 100%)",
+          background: isDark
+            ? "linear-gradient(180deg, #0F172A 0%, #0B1120 100%)"
+            : "linear-gradient(180deg, #FFFFFF 0%, #FBFCFE 100%)",
           borderBottom: "1px solid var(--line)",
         }}
       >
@@ -618,12 +673,14 @@ const OfferType = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by name or description..."
-                  className="search-input h-11 w-full rounded-xl pl-10 pr-10 text-[12px]"
+                  className="search-input h-11 w-full rounded-xl pl-10 pr-10 text-[12px] placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   style={{
                     background: "var(--panel)",
                     border: "1px solid var(--line)",
                     color: "var(--text)",
-                    boxShadow: "0 3px 12px rgba(15,23,42,0.03)",
+                    boxShadow: isDark
+                      ? "0 3px 12px rgba(0,0,0,0.25)"
+                      : "0 3px 12px rgba(15,23,42,0.03)",
                   }}
                 />
 
@@ -710,7 +767,9 @@ const OfferType = () => {
             className="mb-5 flex items-center gap-2 rounded-xl px-4 py-3 text-[12px]"
             style={{
               background: "var(--danger-soft)",
-              border: "1px solid rgba(229,72,77,0.16)",
+              border: isDark
+                ? "1px solid rgba(248,113,113,0.28)"
+                : "1px solid rgba(229,72,77,0.16)",
               color: "var(--danger)",
             }}
           >
@@ -779,7 +838,7 @@ const OfferType = () => {
                 className="mt-5 rounded-lg px-4 py-2 text-[12px] font-semibold"
                 style={{
                   background: "var(--text)",
-                  color: "#fff",
+                  color: isDark ? "#0F172A" : "#FFFFFF",
                 }}
               >
                 Clear filters
@@ -891,7 +950,7 @@ const OfferType = () => {
                             type="button"
                             title="Delete permanently"
                             onClick={() => handlePermanentDelete(item)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-red-50"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-red-50 dark:hover:bg-red-950/60"
                             style={{
                               color: "var(--danger)",
                             }}
@@ -904,7 +963,7 @@ const OfferType = () => {
                             title={isActive ? "Deactivate" : "Activate"}
                             disabled={isStatusUpdating}
                             onClick={() => handleToggleStatus(item)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-slate-800"
                             style={{
                               color: isActive
                                 ? "var(--success)"
@@ -1076,7 +1135,9 @@ const OfferType = () => {
                       className="flex items-center justify-between px-5 py-3.5"
                       style={{
                         borderTop: "1px solid var(--line)",
-                        background: "rgba(248,250,252,0.55)",
+                        background: isDark
+                          ? "rgba(30,41,59,0.55)"
+                          : "rgba(248,250,252,0.55)",
                       }}
                     >
                       <span
@@ -1173,7 +1234,11 @@ const OfferType = () => {
                                 ? "var(--text)"
                                 : "var(--panel)",
                             color:
-                              page === pageNumber ? "#FFFFFF" : "var(--muted)",
+                              page === pageNumber
+                                ? isDark
+                                  ? "#0F172A"
+                                  : "#FFFFFF"
+                                : "var(--muted)",
                             border:
                               page === pageNumber
                                 ? "1px solid var(--text)"
@@ -1214,6 +1279,7 @@ const OfferType = () => {
         confirmLabel="Delete Permanently"
         danger
         loading={deleteLoading}
+        isDark={isDark}
         onConfirm={confirmPermanentDelete}
         onCancel={() => {
           if (!deleteLoading) {

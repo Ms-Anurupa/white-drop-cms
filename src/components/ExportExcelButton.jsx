@@ -100,7 +100,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
         type="button"
         onClick={() => setIsOpen(true)}
         disabled={isDownloading}
-        className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+        className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
       >
         <FileSpreadsheet
           size={18}
@@ -112,18 +112,18 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
       {/* Modal */}
       {isOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-md animate-in fade-in zoom-in-95 rounded-2xl bg-white shadow-xl duration-200">
+          <div className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md animate-in fade-in zoom-in-95 rounded-2xl bg-white dark:bg-slate-900 dark:border dark:border-slate-800 shadow-xl duration-200">
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                <div className="flex items-center gap-2 text-gray-800">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 px-6 py-4">
+                <div className="flex items-center gap-2 text-gray-800 dark:text-slate-100">
                   <FileSpreadsheet size={20} className="text-emerald-500" />
                   <h2 className="text-base font-semibold">Export to Excel</h2>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
                   disabled={isDownloading}
-                  className="cursor-pointer rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
+                  className="cursor-pointer rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 disabled:opacity-50"
                 >
                   <X size={18} />
                 </button>
@@ -133,8 +133,8 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
               <div className="p-6">
                 <div className="space-y-6">
                   {/* Radio Selection */}
-                  <div className="flex gap-6 border-b border-gray-100 pb-4">
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+                  <div className="flex gap-6 border-b border-gray-100 dark:border-slate-800 pb-4">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-200">
                       <input
                         type="radio"
                         checked={dateType === "preset"}
@@ -144,7 +144,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                       />
                       Pre-set Windows
                     </label>
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-200">
                       <input
                         type="radio"
                         checked={dateType === "custom"}
@@ -158,14 +158,14 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
 
                   {/* By Paid Date option for paidSalary */}
                   {type === "paidSalary" && (
-                    <div className="border-gray-100 pt-2">
-                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
+                    <div className="border-gray-100 dark:border-slate-800 pt-2">
+                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-200 select-none">
                         <input
                           type="checkbox"
                           checked={byPaidDate}
                           onChange={(e) => setByPaidDate(e.target.checked)}
                           disabled={isDownloading}
-                          className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition focus:ring-blue-500"
+                          className="h-4 w-4 cursor-pointer rounded border-gray-300 dark:border-slate-600 text-blue-600 transition focus:ring-blue-500"
                         />
                         <span>By paid Date</span>
                       </label>
@@ -174,14 +174,14 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
 
                   {/* By Paid Date option for esiReport */}
                   {type === "esiReport" && (
-                    <div className="border-gray-100 pt-2">
-                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
+                    <div className="border-gray-100 dark:border-slate-800 pt-2">
+                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-200 select-none">
                         <input
                           type="checkbox"
                           checked={byPaidDate}
                           onChange={(e) => setByPaidDate(e.target.checked)}
                           disabled={isDownloading}
-                          className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition focus:ring-blue-500"
+                          className="h-4 w-4 cursor-pointer rounded border-gray-300 dark:border-slate-600 text-blue-600 transition focus:ring-blue-500"
                         />
                         <span>By paid Date</span>
                       </label>
@@ -190,14 +190,14 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
 
                   {/* By Paid Date option for pTaxReport */}
                   {type === "pTaxReport" && (
-                    <div className="border-gray-100 pt-2">
-                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 select-none">
+                    <div className="border-gray-100 dark:border-slate-800 pt-2">
+                      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-200 select-none">
                         <input
                           type="checkbox"
                           checked={byPaidDate}
                           onChange={(e) => setByPaidDate(e.target.checked)}
                           disabled={isDownloading}
-                          className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition focus:ring-blue-500"
+                          className="h-4 w-4 cursor-pointer rounded border-gray-300 dark:border-slate-600 text-blue-600 transition focus:ring-blue-500"
                         />
                         <span>By paid Date</span>
                       </label>
@@ -208,14 +208,14 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                   <div className="min-h-[70px]">
                     {dateType === "preset" ? (
                       <div className="animate-in fade-in duration-200">
-                        <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                        <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                           Select Timeframe <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={presetSelection}
                           onChange={(e) => setPresetSelection(e.target.value)}
                           disabled={isDownloading}
-                          className="w-full cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
+                          className="w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800/50"
                         >
                           <option value="this_month">This Month</option>
                           <option value="this_quarter">This Quarter</option>
@@ -225,7 +225,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                     ) : (
                       <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-200">
                         <div>
-                          <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                          <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                             From Date <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -236,11 +236,11 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                               e.target.showPicker && e.target.showPicker()
                             }
                             disabled={isDownloading}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed cursor-pointer"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800/50"
                           />
                         </div>
                         <div>
-                          <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                          <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                             To Date <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -251,7 +251,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                               e.target.showPicker && e.target.showPicker()
                             }
                             disabled={isDownloading}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed cursor-pointer"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800/50"
                           />
                         </div>
                       </div>
@@ -265,7 +265,7 @@ const ExportExcelButton = ({ type, buttonText = "Export To Excel", employeeId })
                     type="button"
                     onClick={() => setIsOpen(false)}
                     disabled={isDownloading}
-                    className="cursor-pointer rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     Cancel
                   </button>

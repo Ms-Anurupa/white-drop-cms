@@ -90,17 +90,17 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md animate-in fade-in zoom-in-95 rounded-2xl bg-white shadow-xl duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md animate-in fade-in zoom-in-95 rounded-2xl bg-white dark:bg-slate-900 dark:border dark:border-slate-800 shadow-xl duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-          <div className="flex items-center gap-2 text-gray-800">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 px-6 py-4">
+          <div className="flex items-center gap-2 text-gray-800 dark:text-slate-100">
             <PackagePlus size={20} className="text-blue-500" />
             <h2 className="text-base font-semibold">Add New Item Line</h2>
           </div>
           <button
             onClick={onClose}
-            className="cursor-pointer rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="cursor-pointer rounded-full p-1.5 text-gray-400 dark:text-slate-400 transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-600 dark:hover:text-slate-200"
           >
             <X size={18} />
           </button>
@@ -111,7 +111,7 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
           <div className="space-y-4">
             {/* Order Date (Changed to type="date") */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-700">
+              <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                 Order Date <span className="text-red-500">*</span>
               </label>
               <input
@@ -121,14 +121,14 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
                 value={formData.orderDate}
                 onChange={handleInputChange}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm dark:text-slate-100 dark:[color-scheme:dark] outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               {/* Quantity */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                   Quantity <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -140,13 +140,13 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
                   onChange={handleInputChange}
                   required
                   placeholder="e.g. 45"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm dark:text-slate-100 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               {/* Unit (Made Read-Only) */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                   Unit <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -154,14 +154,14 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
                   name="unit"
                   value={formData.unit}
                   readOnly
-                  className="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-500 outline-none"
+                  className="w-full cursor-not-allowed rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800/50 px-3 py-2 text-sm text-gray-500 dark:text-slate-400 outline-none"
                 />
               </div>
             </div>
 
             {/* Price Per Unit */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-700">
+              <label className="mb-1.5 block text-xs font-medium text-gray-700 dark:text-slate-300">
                 Price Per Unit (₹) <span className="text-red-500">*</span>
               </label>
               <input
@@ -173,19 +173,19 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
                 onChange={handleInputChange}
                 required
                 placeholder="e.g. 70"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm dark:text-slate-100 dark:placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             {/* Auto-calculated Total */}
-            <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50 p-3">
-              <div className="flex items-center gap-2 text-emerald-700">
+            <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-100 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 p-3">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
                 <Calculator size={16} />
                 <span className="text-xs font-medium uppercase tracking-wider">
                   Item Total Price
                 </span>
               </div>
-              <span className="text-base font-bold text-emerald-700">
+              <span className="text-base font-bold text-emerald-700 dark:text-emerald-300">
                 ₹{calculatedTotal.toFixed(2)}
               </span>
             </div>
@@ -197,7 +197,7 @@ const AddOrderItemModal = ({ isOpen, onClose, orderId, onSuccess, unitValue, min
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 cursor-pointer"
+              className="rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 transition hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
             >
               Cancel
             </button>

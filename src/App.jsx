@@ -66,8 +66,11 @@ import RegisterEmployee from "./pages/Employee/RegisterEmployee";
 import SalaryPaymentLogs from "./pages/Employee/SalaryListing";
 import Subscription from "./pages/SubscriptionPlan/SubscriptionListing";
 import CreateSubscriptionPlan from "./pages/SubscriptionPlan/CreateSubscriptionPlan";
+import useThemeStore from "./zustand/Store/themeStore";
 
 const App = () => {
+  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+
   return (
     <>
       <ConfirmProvider>
@@ -75,7 +78,7 @@ const App = () => {
           position="top-right"
           autoClose={3000}
           newestOnTop
-          theme="colored"
+          theme={resolvedTheme === "dark" ? "dark" : "colored"}
         />
         <BrowserRouter>
           <GlobalLoader />
@@ -117,7 +120,7 @@ const App = () => {
                 <Route path="sales" element={<Sales />} />
                 <Route
                   path="due-register"
-                  element={<DueRegister theme="light" />}
+                  element={<DueRegister theme={resolvedTheme} />}
                 />
                 <Route path="expense" element={<ExpenseListing />} />
                 <Route path="register-employee" element={<RegisterEmployee />} />

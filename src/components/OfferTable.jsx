@@ -15,18 +15,41 @@ import {
 
 const mono = { fontFamily: "'JetBrains Mono', monospace" };
 
+const OFFER_ICON_DARK_CLASSES = [
+  "dark:bg-cyan-950/60 dark:text-cyan-300 dark:border-cyan-800",
+  "dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
+  "dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800",
+  "dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
+  "dark:bg-pink-950/60 dark:text-pink-300 dark:border-pink-800",
+];
+
 const getStatusClasses = (status) => {
   switch (status) {
     case "ACTIVE":
-      return { wrapper: "bg-[#ECFDF5] text-[#059669]", dot: "bg-[#059669]" };
+      return {
+        wrapper: "bg-[#ECFDF5] text-[#059669] dark:bg-emerald-950/60 dark:text-emerald-300",
+        dot: "bg-[#059669] dark:bg-emerald-400",
+      };
     case "SCHEDULED":
-      return { wrapper: "bg-[#EFF6FF] text-[#2563EB]", dot: "bg-[#2563EB]" };
+      return {
+        wrapper: "bg-[#EFF6FF] text-[#2563EB] dark:bg-blue-950/60 dark:text-blue-300",
+        dot: "bg-[#2563EB] dark:bg-blue-400",
+      };
     case "PAUSED":
-      return { wrapper: "bg-[#FFFBEB] text-[#D97706]", dot: "bg-[#D97706]" };
+      return {
+        wrapper: "bg-[#FFFBEB] text-[#D97706] dark:bg-amber-950/60 dark:text-amber-300",
+        dot: "bg-[#D97706] dark:bg-amber-400",
+      };
     case "EXPIRED":
-      return { wrapper: "bg-[#F1F5F9] text-[#64748B]", dot: "bg-[#64748B]" };
+      return {
+        wrapper: "bg-[#F1F5F9] text-[#64748B] dark:bg-slate-800 dark:text-slate-400",
+        dot: "bg-[#64748B] dark:bg-slate-400",
+      };
     default:
-      return { wrapper: "bg-[#F1F5F9] text-[#64748B]", dot: "bg-[#64748B]" };
+      return {
+        wrapper: "bg-[#F1F5F9] text-[#64748B] dark:bg-slate-800 dark:text-slate-400",
+        dot: "bg-[#64748B] dark:bg-slate-400",
+      };
   }
 };
 
@@ -93,11 +116,11 @@ const OfferTable = ({
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
+      <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:bg-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[850px] border-collapse">
             <thead>
-              <tr className="border-b border-[#E5E7F0] bg-[#F7F8FC]/80">
+              <tr className="border-b border-[#E5E7F0] bg-[#F7F8FC]/80 dark:border-slate-800 dark:bg-slate-800/70">
                 {[
                   "OFFER",
                   "TYPE",
@@ -108,7 +131,7 @@ const OfferTable = ({
                 ].map((h, i) => (
                   <th
                     key={h}
-                    className={`px-3 py-3 text-[9px] font-semibold tracking-[0.08em] text-[#9AA1B8] ${i === 0 ? "w-[24%] text-left" : "text-left"
+                    className={`px-3 py-3 text-[9px] font-semibold tracking-[0.08em] text-[#9AA1B8] dark:text-slate-400 ${i === 0 ? "w-[24%] text-left" : "text-left"
                       }`}
                     style={mono}
                   >
@@ -116,7 +139,7 @@ const OfferTable = ({
                   </th>
                 ))}
                 <th
-                  className="px-3 py-3 text-right text-[9px] font-semibold tracking-[0.08em] text-[#9AA1B8]"
+                  className="px-3 py-3 text-right text-[9px] font-semibold tracking-[0.08em] text-[#9AA1B8] dark:text-slate-400"
                   style={mono}
                 >
                   ACTIONS
@@ -136,7 +159,7 @@ const OfferTable = ({
                 <tr>
                   <td
                     colSpan={7}
-                    className="h-48 text-center text-[11px] text-[#9AA1B8]"
+                    className="h-48 text-center text-[11px] text-[#9AA1B8] dark:text-slate-400"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#6655DF] border-t-transparent" />
@@ -148,13 +171,13 @@ const OfferTable = ({
                 <tr>
                   <td colSpan={7} className="h-48 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-[#F1F5F9]">
-                        <span className="text-[15px] text-[#9AA1B8]">%</span>
+                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-[#F1F5F9] dark:bg-slate-800">
+                        <span className="text-[15px] text-[#9AA1B8] dark:text-slate-400">%</span>
                       </div>
-                      <p className="text-[11px] font-semibold text-[#5C6480]">
+                      <p className="text-[11px] font-semibold text-[#5C6480] dark:text-slate-300">
                         No offers found
                       </p>
-                      <p className="mt-0.5 text-[9px] text-[#9AA1B8]">
+                      <p className="mt-0.5 text-[9px] text-[#9AA1B8] dark:text-slate-400">
                         Try adjusting your filters or search.
                       </p>
                     </div>
@@ -170,9 +193,9 @@ const OfferTable = ({
                     <tr
                       key={offer.offerId}
                       onClick={() => !isDeleting && onEditOffer?.(offer)}
-                      className={`group relative border-b border-[#F0F1F6] transition-all last:border-b-0 ${isDeleting
+                      className={`group relative border-b border-[#F0F1F6] transition-all last:border-b-0 dark:border-slate-800 ${isDeleting
                           ? "cursor-not-allowed opacity-50"
-                          : "cursor-pointer hover:bg-[#F7F8FC]"
+                          : "cursor-pointer hover:bg-[#F7F8FC] dark:hover:bg-slate-800/60"
                         }`}
                     >
                       <td className="relative px-3 py-3">
@@ -181,16 +204,16 @@ const OfferTable = ({
                         <div className="flex items-center gap-2.5">
                           <div
                             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-[13px] transition-transform group-hover:scale-[1.05] ${OFFER_ICON_CLASSES[index % 5]
-                              }`}
+                              } ${OFFER_ICON_DARK_CLASSES[index % 5]}`}
                           >
                             {OFFER_ICONS[index % 5]}
                           </div>
                           <div className="min-w-0">
-                            <p className="max-w-[270px] truncate text-[11px] font-semibold text-[#12151F]">
+                            <p className="max-w-[270px] truncate text-[11px] font-semibold text-[#12151F] dark:text-slate-100">
                               {offer.offerLabel || "-"}
                             </p>
                             <p
-                              className="mt-0.5 truncate text-[9px] text-[#9AA1B8]"
+                              className="mt-0.5 truncate text-[9px] text-[#9AA1B8] dark:text-slate-400"
                               style={mono}
                             >
                               {offer.offerCode || offer.offerId}
@@ -200,14 +223,14 @@ const OfferTable = ({
                       </td>
 
                       <td className="px-3 py-3">
-                        <span className="text-[10px] text-[#5C6480]">
+                        <span className="text-[10px] text-[#5C6480] dark:text-slate-300">
                           {getOfferTypeName(offer)}
                         </span>
                       </td>
 
                       <td className="px-3 py-3">
                         <span
-                          className="whitespace-nowrap text-[10px] text-[#5C6480]"
+                          className="whitespace-nowrap text-[10px] text-[#5C6480] dark:text-slate-300"
                           style={mono}
                         >
                           {formatDate(offer.fromDate)}
@@ -216,7 +239,7 @@ const OfferTable = ({
 
                       <td className="px-3 py-3">
                         <span
-                          className="whitespace-nowrap text-[10px] text-[#5C6480]"
+                          className="whitespace-nowrap text-[10px] text-[#5C6480] dark:text-slate-300"
                           style={mono}
                         >
                           {formatDate(offer.toDate)}
@@ -236,7 +259,7 @@ const OfferTable = ({
 
                       <td className="px-3 py-3">
                         <span
-                          className="text-[11px] font-semibold text-[#12151F]"
+                          className="text-[11px] font-semibold text-[#12151F] dark:text-slate-100"
                           style={mono}
                         >
                           {formatNumber(getRedemptions(offer))}
@@ -262,8 +285,8 @@ const OfferTable = ({
                                 : "Delete offer"
                             }
                             className={`flex h-7 w-7 items-center justify-center rounded-md transition-all ${status === "EXPIRED"
-                                ? "cursor-not-allowed text-[#CBD1E0]"
-                                : "cursor-pointer text-[#9AA1B8] hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+                                ? "cursor-not-allowed text-[#CBD1E0] dark:text-slate-600"
+                                : "cursor-pointer text-[#9AA1B8] hover:bg-[#FEF2F2] hover:text-[#DC2626] dark:text-slate-400 dark:hover:bg-red-950/60 dark:hover:text-red-400"
                               } disabled:opacity-50`}
                           >
                             {isDeleting ? (
@@ -280,7 +303,7 @@ const OfferTable = ({
                               onEditOffer?.(offer);
                             }}
                             title="Edit offer"
-                            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-[#9AA1B8] transition-all hover:bg-[#6655DF]/10 hover:text-[#6655DF]"
+                            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-[#9AA1B8] transition-all hover:bg-[#6655DF]/10 hover:text-[#6655DF] dark:text-slate-400 dark:hover:bg-[#6655DF]/20 dark:hover:text-[#818cf8]"
                           >
                             <Edit size={14} />
                           </button>
@@ -297,24 +320,24 @@ const OfferTable = ({
 
       {confirmModal.open && confirmModal.offer && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-[2px] dark:bg-slate-950/70"
           onClick={closeConfirmModal}
         >
           <div
-            className="w-full max-w-[380px] rounded-xl border border-[#E5E7F0] bg-white p-5 shadow-2xl"
+            className="w-full max-w-[380px] rounded-xl border border-[#E5E7F0] bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3
-                  className="text-sm font-semibold text-[#12151F]"
+                  className="text-sm font-semibold text-[#12151F] dark:text-slate-100"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
                   {confirmModal.action === "deactivate"
                     ? "Deactivate offer?"
                     : "Activate offer?"}
                 </h3>
-                <p className="mt-1 text-[10px] leading-5 text-[#5C6480]">
+                <p className="mt-1 text-[10px] leading-5 text-[#5C6480] dark:text-slate-300">
                   {confirmModal.action === "deactivate"
                     ? "This offer will no longer be active for customers."
                     : "This offer will be activated for customers."}
@@ -324,20 +347,20 @@ const OfferTable = ({
                 type="button"
                 onClick={closeConfirmModal}
                 disabled={!!deletingOfferId}
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#9AA1B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#5C6480] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#9AA1B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#5C6480] disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
               >
                 <X size={15} />
               </button>
             </div>
 
-            <div className="mt-4 rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 py-2.5">
-              <p className="truncate text-[11px] font-semibold text-[#12151F]">
+            <div className="mt-4 rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 py-2.5 dark:border-slate-700 dark:bg-slate-800">
+              <p className="truncate text-[11px] font-semibold text-[#12151F] dark:text-slate-100">
                 {confirmModal.offer.offerLabel ||
                   confirmModal.offer.offerCode ||
                   confirmModal.offer.offerId}
               </p>
               {confirmModal.offer.offerCode && (
-                <p className="mt-0.5 text-[9px] text-[#9AA1B8]" style={mono}>
+                <p className="mt-0.5 text-[9px] text-[#9AA1B8] dark:text-slate-400" style={mono}>
                   {confirmModal.offer.offerCode}
                 </p>
               )}
@@ -348,7 +371,7 @@ const OfferTable = ({
                 type="button"
                 onClick={closeConfirmModal}
                 disabled={!!deletingOfferId}
-                className="rounded-md border border-[#E5E7F0] px-3 py-2 text-[10px] font-medium text-[#5C6480] transition-colors hover:bg-[#F7F8FC] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border border-[#E5E7F0] px-3 py-2 text-[10px] font-medium text-[#5C6480] transition-colors hover:bg-[#F7F8FC] disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Cancel
               </button>

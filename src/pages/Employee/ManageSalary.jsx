@@ -84,7 +84,7 @@ const ICONS = {
 };
 
 const inputBase =
-    "w-full rounded-lg border bg-white py-2 pr-3 text-sm tabular-nums text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-stone-100 disabled:text-stone-400";
+    "w-full rounded-lg border bg-white py-2 pr-3 text-sm tabular-nums text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:bg-stone-100 disabled:text-stone-400 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-500 dark:[color-scheme:dark]";
 
 function Field({
     label,
@@ -101,16 +101,16 @@ function Field({
         <div className={className}>
             <label
                 htmlFor={id}
-                className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
+                className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800 dark:text-slate-200"
             >
                 {label}
                 {optional && (
-                    <span className="text-xs font-normal text-stone-400">Optional</span>
+                    <span className="text-xs font-normal text-stone-400 dark:text-slate-500">Optional</span>
                 )}
             </label>
             <div className="relative">
                 {prefix && (
-                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-stone-400">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-stone-400 dark:text-slate-500">
                         {prefix}
                     </span>
                 )}
@@ -118,17 +118,17 @@ function Field({
                     id={id}
                     aria-invalid={Boolean(error)}
                     aria-describedby={error || hint ? descId : undefined}
-                    className={`${inputBase} ${prefix ? "pl-7" : "pl-3"} ${error ? "border-rose-400" : "border-stone-300"
+                    className={`${inputBase} ${prefix ? "pl-7" : "pl-3"} ${error ? "border-rose-400 dark:border-rose-500" : "border-stone-300 dark:border-slate-700"
                         }`}
                     {...props}
                 />
             </div>
             {error ? (
-                <p id={descId} className="mt-1 text-xs text-rose-700">
+                <p id={descId} className="mt-1 text-xs text-rose-700 dark:text-rose-400">
                     {error}
                 </p>
             ) : hint ? (
-                <p id={descId} className="mt-1 text-xs text-stone-500">
+                <p id={descId} className="mt-1 text-xs text-stone-500 dark:text-slate-400">
                     {hint}
                 </p>
             ) : null}
@@ -142,14 +142,14 @@ function SelectField({ label, error, options, className = "", ...props }) {
         <div className={className}>
             <label
                 htmlFor={id}
-                className="mb-1 block text-sm font-medium text-stone-800"
+                className="mb-1 block text-sm font-medium text-stone-800 dark:text-slate-200"
             >
                 {label}
             </label>
             <select
                 id={id}
                 aria-invalid={Boolean(error)}
-                className={`${inputBase} cursor-pointer pl-3 ${error ? "border-rose-400" : "border-stone-300"
+                className={`${inputBase} cursor-pointer pl-3 ${error ? "border-rose-400 dark:border-rose-500" : "border-stone-300 dark:border-slate-700"
                     }`}
                 {...props}
             >
@@ -162,7 +162,7 @@ function SelectField({ label, error, options, className = "", ...props }) {
                     </option>
                 ))}
             </select>
-            {error && <p className="mt-1 text-xs text-rose-700">{error}</p>}
+            {error && <p className="mt-1 text-xs text-rose-700 dark:text-rose-400">{error}</p>}
         </div>
     );
 }
@@ -174,8 +174,8 @@ function Notice({ notice, onDismiss, children }) {
         <div
             role={ok ? "status" : "alert"}
             className={`mb-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${ok
-                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                : "border-rose-200 bg-rose-50 text-rose-900"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200"
+                : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
                 }`}
         >
             <Icon
@@ -203,8 +203,8 @@ function StatusBadge({ status }) {
     return (
         <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${active
-                ? "bg-emerald-50 text-emerald-800"
-                : "bg-stone-200 text-stone-700"
+                ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+                : "bg-stone-200 text-stone-700 dark:bg-slate-800 dark:text-slate-300"
                 }`}
         >
             {active ? "Active" : "Deactivated"}
@@ -215,14 +215,14 @@ function StatusBadge({ status }) {
 function SummaryRow({ label, value, sign, strong }) {
     return (
         <div
-            className={`flex items-baseline justify-between py-2 ${strong ? "border-t border-stone-200 pt-3" : ""
+            className={`flex items-baseline justify-between py-2 ${strong ? "border-t border-stone-200 pt-3 dark:border-slate-800" : ""
                 }`}
         >
-            <dt className={strong ? "font-medium text-stone-900" : "text-stone-500"}>
+            <dt className={strong ? "font-medium text-stone-900 dark:text-slate-100" : "text-stone-500 dark:text-slate-400"}>
                 {label}
             </dt>
             <dd
-                className={`tabular-nums ${strong ? "text-lg font-semibold text-stone-900" : "text-stone-700"
+                className={`tabular-nums ${strong ? "text-lg font-semibold text-stone-900 dark:text-slate-100" : "text-stone-700 dark:text-slate-300"
                     }`}
             >
                 {sign}
@@ -236,15 +236,15 @@ function CompareRow({ label, from, to, strong }) {
     const changed = from !== to;
     return (
         <div
-            className={`grid grid-cols-[1fr_auto_auto] items-baseline gap-x-4 py-2 tabular-nums ${strong ? "border-t border-stone-200 pt-3" : ""
+            className={`grid grid-cols-[1fr_auto_auto] items-baseline gap-x-4 py-2 tabular-nums ${strong ? "border-t border-stone-200 pt-3 dark:border-slate-800" : ""
                 }`}
         >
-            <dt className={strong ? "font-medium text-stone-900" : "text-stone-500"}>
+            <dt className={strong ? "font-medium text-stone-900 dark:text-slate-100" : "text-stone-500 dark:text-slate-400"}>
                 {label}
             </dt>
-            <dd className="text-right text-stone-500">{money(from)}</dd>
+            <dd className="text-right text-stone-500 dark:text-slate-400">{money(from)}</dd>
             <dd
-                className={`min-w-[5.5rem] text-right ${strong ? "text-lg font-semibold text-stone-900" : "text-stone-800"
+                className={`min-w-[5.5rem] text-right ${strong ? "text-lg font-semibold text-stone-900 dark:text-slate-100" : "text-stone-800 dark:text-slate-200"
                     } ${changed && !strong ? "font-medium" : ""}`}
             >
                 {money(to)}
@@ -267,7 +267,7 @@ function PrimaryButton({ busy, children, ...props }) {
 }
 
 const ghostBtn =
-    "cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600";
+    "cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-300 dark:hover:bg-slate-800";
 
 /* ---------- page ---------- */
 
@@ -740,16 +740,16 @@ const setPackageEditField = (key) => (e) => {
     if (!targetId) {
         return (
             <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
-                <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
-                    <p className="text-sm font-medium text-stone-800">
+                <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center dark:border-slate-800 dark:bg-slate-900">
+                    <p className="text-sm font-medium text-stone-800 dark:text-slate-100">
                         No employee selected
                     </p>
-                    <p className="mt-1 text-sm text-stone-500">
+                    <p className="mt-1 text-sm text-stone-500 dark:text-slate-400">
                         Open this page from the employee list to manage their salary.
                     </p>
                     <Link
                         to={LIST_ROUTE}
-                        className="mt-4 inline-flex items-center gap-1 text-sm text-stone-600 hover:text-stone-900"
+                        className="mt-4 inline-flex items-center gap-1 text-sm text-stone-600 hover:text-stone-900 dark:text-slate-400 dark:hover:text-slate-100"
                     >
                         <Icon d={ICONS.back} />
                         Back to Employees
@@ -765,7 +765,7 @@ const setPackageEditField = (key) => (e) => {
         <Link
             to={getViewRoute(targetId)}
             state={{ employeeId: targetId, employee }}
-            className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+            className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
         >
             View payment history
         </Link>
@@ -775,7 +775,7 @@ const setPackageEditField = (key) => (e) => {
       <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
         <Link
           to={LIST_ROUTE}
-          className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-400 dark:hover:text-slate-100"
         >
           <Icon d={ICONS.back} />
           Employees
@@ -789,12 +789,12 @@ const setPackageEditField = (key) => (e) => {
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-semibold tracking-tight text-stone-900">
+                <h1 className="text-xl font-semibold tracking-tight text-stone-900 dark:text-slate-100">
                   {employee?.empName || "Employee"}
                 </h1>
                 <StatusBadge status={employee?.status} />
               </div>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-stone-500 dark:text-slate-400">
                 {employee?.empPhone ? `${employee.empPhone} · ` : ""}Manage
                 salary
               </p>
@@ -807,7 +807,7 @@ const setPackageEditField = (key) => (e) => {
               type="button"
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <RefreshCw
                 size={15}
@@ -819,8 +819,8 @@ const setPackageEditField = (key) => (e) => {
         </div>
 
         {status === "error" && (
-          <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
-            <p className="text-sm text-stone-700">{historyError}</p>
+          <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-sm text-stone-700 dark:text-slate-300">{historyError}</p>
             <button
               type="button"
               onClick={async () => {
@@ -837,7 +837,7 @@ const setPackageEditField = (key) => (e) => {
         <div
           role="tablist"
           aria-label="Salary actions"
-          className="mb-5 inline-flex rounded-lg border border-stone-300 bg-white p-0.5"
+          className="mb-5 inline-flex rounded-lg border border-stone-300 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-900"
         >
           {TABS.map((t) => (
             <button
@@ -854,7 +854,7 @@ const setPackageEditField = (key) => (e) => {
               className={`cursor-pointer rounded-md px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 ${
                 tab === t.id
                   ? "bg-teal-700 text-white"
-                  : "text-stone-600 hover:bg-stone-100"
+                  : "text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
             >
               {t.label}
@@ -890,25 +890,25 @@ const setPackageEditField = (key) => (e) => {
             <form
               onSubmit={requestPayment}
               noValidate
-              className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6"
+              className="rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6"
             >
-              <h2 className="text-base font-semibold text-stone-900">
+              <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">
                 Record a salary payment
               </h2>
-              <p className="mt-0.5 text-sm text-stone-500">
+              <p className="mt-0.5 text-sm text-stone-500 dark:text-slate-400">
                 Saves the payment for the month and adds it to expenses under
                 Salary.
               </p>
 
               {employee?.status === "DEACTIVATED" && (
-                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-200">
                   This employee is deactivated. You can still record a payment,
                   for example a final settlement.
                 </p>
               )}
 
               {status === "ready" && !hasSalary && (
-                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-200">
                   No salary package is saved yet, so nothing is pre-filled.{" "}
                   <button
                     type="button"
@@ -1028,7 +1028,7 @@ const setPackageEditField = (key) => (e) => {
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="pay-note"
-                    className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
+                    className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800 dark:text-slate-200"
                   >
                     Note
                   </label>
@@ -1038,7 +1038,7 @@ const setPackageEditField = (key) => (e) => {
                     value={pay.note}
                     onChange={setPayField("note")}
                     placeholder="e.g. Includes Diwali bonus"
-                    className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                    className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -1055,9 +1055,9 @@ const setPackageEditField = (key) => (e) => {
 
             <aside
               aria-label="Payment summary"
-              className="h-fit rounded-xl border border-stone-200 bg-white p-5 lg:sticky lg:top-6"
+              className="h-fit rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-6"
             >
-              <h2 className="text-sm font-medium text-stone-800">
+              <h2 className="text-sm font-medium text-stone-800 dark:text-slate-200">
                 Payout for {getMonthName(pay.month)} {pay.fy}
               </h2>
               <dl className="mt-2 text-sm">
@@ -1075,11 +1075,11 @@ const setPackageEditField = (key) => (e) => {
                   strong
                 />
               </dl>
-              <p className="mt-2 text-xs text-stone-500">
+              <p className="mt-2 text-xs text-stone-500 dark:text-slate-400">
                 This total is what is added to expenses.
               </p>
 
-              <dl className="mt-4 border-t border-stone-200 pt-2 text-sm">
+              <dl className="mt-4 border-t border-stone-200 pt-2 text-sm dark:border-slate-800">
                 <SummaryRow
                   label="Professional tax"
                   value={num(pay.pTax)}
@@ -1117,14 +1117,14 @@ const setPackageEditField = (key) => (e) => {
           >
             {/* Edit existing salary package */}
             {canEditPackage && hasSalary && (
-              <div className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6">
+              <div className="rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-base font-semibold text-stone-900">
+                    <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">
                       Current Salary Package
                     </h2>
 
-                    <p className="mt-1 text-sm text-stone-500">
+                    <p className="mt-1 text-sm text-stone-500 dark:text-slate-400">
                       Update the employee's existing salary structure.
                     </p>
                   </div>
@@ -1133,7 +1133,7 @@ const setPackageEditField = (key) => (e) => {
                     <button
                       type="button"
                       onClick={startEditPackage}
-                      className="cursor-pointer rounded-lg border border-teal-700 px-4 py-2 text-sm font-medium text-teal-700 hover:bg-teal-50"
+                      className="cursor-pointer rounded-lg border border-teal-700 px-4 py-2 text-sm font-medium text-teal-700 hover:bg-teal-50 dark:border-teal-500 dark:text-teal-400 dark:hover:bg-teal-950/50"
                     >
                       Edit Package
                     </button>
@@ -1142,40 +1142,40 @@ const setPackageEditField = (key) => (e) => {
 
                 {!editingPackage ? (
                   <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">Base Pay</p>
-                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                    <div className="rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
+                      <p className="text-xs text-stone-500 dark:text-slate-400">Base Pay</p>
+                      <p className="mt-1 text-lg font-semibold text-stone-900 dark:text-slate-100">
                         {money(pkgBase)}
                       </p>
                     </div>
 
-                    <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">Professional Tax</p>
-                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                    <div className="rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
+                      <p className="text-xs text-stone-500 dark:text-slate-400">Professional Tax</p>
+                      <p className="mt-1 text-lg font-semibold text-stone-900 dark:text-slate-100">
                         {money(pkgPTax)}
                       </p>
                     </div>
 
-                    <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">ESI NO</p>
-                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                    <div className="rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
+                      <p className="text-xs text-stone-500 dark:text-slate-400">ESI NO</p>
+                      <p className="mt-1 text-lg font-semibold text-stone-900 dark:text-slate-100">
                         {pkgEsiNo || "—"}
                       </p>
                     </div>
 
-                    <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">
+                    <div className="rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
+                      <p className="text-xs text-stone-500 dark:text-slate-400">
                         Employer Cont. (ESI)
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                      <p className="mt-1 text-lg font-semibold text-stone-900 dark:text-slate-100">
                         {money(pkgEmployerEsi)}
                       </p>
                     </div>
-                    <div className="rounded-lg bg-stone-50 p-4">
-                      <p className="text-xs text-stone-500">
+                    <div className="rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
+                      <p className="text-xs text-stone-500 dark:text-slate-400">
                         Employee Cont. (ESI)
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-stone-900">
+                      <p className="mt-1 text-lg font-semibold text-stone-900 dark:text-slate-100">
                         {money(pkgEmployeeEsi)}
                       </p>
                     </div>
@@ -1252,13 +1252,13 @@ const setPackageEditField = (key) => (e) => {
                       />
                     </div>
 
-                    <div className="mt-5 rounded-lg bg-teal-50 p-4">
+                    <div className="mt-5 rounded-lg bg-teal-50 p-4 dark:bg-teal-950/50">
                       <div className="flex justify-between text-sm">
-                        <span className="text-stone-600">
+                        <span className="text-stone-600 dark:text-slate-300">
                           New monthly net pay
                         </span>
 
-                        <span className="font-semibold text-teal-800">
+                        <span className="font-semibold text-teal-800 dark:text-teal-300">
                           {money(
                             num(packageEdit.basePay) -
                               num(packageEdit.pTax) -
@@ -1299,12 +1299,12 @@ const setPackageEditField = (key) => (e) => {
                 <form
                   onSubmit={submitRevision}
                   noValidate
-                  className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6"
+                  className="rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6"
                 >
-                  <h2 className="text-base font-semibold text-stone-900">
+                  <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">
                     Add a salary increment
                   </h2>
-                  <p className="mt-0.5 text-sm text-stone-500">
+                  <p className="mt-0.5 text-sm text-stone-500 dark:text-slate-400">
                     Raises the base pay and keeps a dated record of the change.
                   </p>
 
@@ -1387,7 +1387,7 @@ const setPackageEditField = (key) => (e) => {
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="rev-note"
-                        className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
+                        className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800 dark:text-slate-200"
                       >
                         Note
                       </label>
@@ -1397,7 +1397,7 @@ const setPackageEditField = (key) => (e) => {
                         value={rev.note}
                         onChange={setRevField("note")}
                         placeholder="e.g. Annual appraisal"
-                        className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+                        className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -1422,12 +1422,12 @@ const setPackageEditField = (key) => (e) => {
                 <form
                   onSubmit={submitSetup}
                   noValidate
-                  className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6"
+                  className="rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6"
                 >
-                  <h2 className="text-base font-semibold text-stone-900">
+                  <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">
                     Set up the salary package
                   </h2>
-                  <p className="mt-0.5 text-sm text-stone-500">
+                  <p className="mt-0.5 text-sm text-stone-500 dark:text-slate-400">
                     No salary is saved for this employee yet. These amounts
                     pre-fill every payment you record.
                   </p>
@@ -1512,14 +1512,14 @@ const setPackageEditField = (key) => (e) => {
 
               <aside
                 aria-label="Package preview"
-                className="h-fit rounded-xl border border-stone-200 bg-white p-5 lg:sticky lg:top-6"
+                className="h-fit rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-6"
               >
-                <h2 className="text-sm font-medium text-stone-800">
+                <h2 className="text-sm font-medium text-stone-800 dark:text-slate-200">
                   After this change
                 </h2>
                 {hasSalary ? (
                   <>
-                    <div className="mt-2 grid grid-cols-[1fr_auto_auto] gap-x-4 text-xs text-stone-400">
+                    <div className="mt-2 grid grid-cols-[1fr_auto_auto] gap-x-4 text-xs text-stone-400 dark:text-slate-500">
                       <span />
                       <span className="text-right">Now</span>
                       <span className="min-w-[5.5rem] text-right">After</span>
@@ -1553,7 +1553,7 @@ const setPackageEditField = (key) => (e) => {
                       />
                     </dl>
                     {revAmount > 0 && (
-                      <p className="mt-2 text-xs text-stone-500">
+                      <p className="mt-2 text-xs text-stone-500 dark:text-slate-400">
                         A {revPercent.toFixed(1)}% raise on base pay.
                       </p>
                     )}
@@ -1587,7 +1587,7 @@ const setPackageEditField = (key) => (e) => {
             </div>
 
             {/* Increment history toggle */}
-            <div className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-5 py-4 sm:px-6">
+            <div className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900 sm:px-6">
               <label
                 htmlFor="showIncrementHistory"
                 className="flex cursor-pointer items-center gap-3"
@@ -1597,16 +1597,16 @@ const setPackageEditField = (key) => (e) => {
                   type="checkbox"
                   checked={showIncrementHistory}
                   onChange={(e) => setShowIncrementHistory(e.target.checked)}
-                  className="h-4 w-4 cursor-pointer rounded border-stone-300 text-teal-700 focus:ring-teal-600"
+                  className="h-4 w-4 cursor-pointer rounded border-stone-300 text-teal-700 focus:ring-teal-600 dark:border-slate-600 dark:bg-slate-800"
                 />
 
-                <span className="text-sm font-semibold text-stone-900">
+                <span className="text-sm font-semibold text-stone-900 dark:text-slate-100">
                   Show increment history
                 </span>
               </label>
 
               {showIncrementHistory && (
-                <span className="text-xs text-stone-500">
+                <span className="text-xs text-stone-500 dark:text-slate-400">
                   {incrementPagination?.totalCount ?? incrementLogs.length}{" "}
                   entries
                 </span>
@@ -1617,14 +1617,14 @@ const setPackageEditField = (key) => (e) => {
             {showIncrementHistory && (
               <section
                 aria-label="Increment history"
-                className="overflow-hidden rounded-xl border border-stone-200 bg-white"
+                className="overflow-hidden rounded-xl border border-stone-200 bg-white dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="flex items-baseline justify-between px-5 py-4 sm:px-6">
-                  <h2 className="text-base font-semibold text-stone-900">
+                  <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">
                     Increment history
                   </h2>
                   {!loading && incrementLogs.length > 0 && (
-                    <span className="text-xs text-stone-500">
+                    <span className="text-xs text-stone-500 dark:text-slate-400">
                       {incrementPagination?.totalCount ?? incrementLogs.length}{" "}
                       {(incrementPagination?.totalCount ??
                         incrementLogs.length) === 1
@@ -1639,17 +1639,17 @@ const setPackageEditField = (key) => (e) => {
                     className="space-y-2 px-5 pb-5 sm:px-6"
                     aria-hidden="true"
                   >
-                    <div className="h-9 animate-pulse rounded bg-stone-100" />
-                    <div className="h-9 animate-pulse rounded bg-stone-100" />
+                    <div className="h-9 animate-pulse rounded bg-stone-100 dark:bg-slate-800" />
+                    <div className="h-9 animate-pulse rounded bg-stone-100 dark:bg-slate-800" />
                   </div>
                 ) : incrementLogs.length === 0 ? (
-                  <p className="border-t border-stone-200 px-6 py-10 text-center text-sm text-stone-500">
+                  <p className="border-t border-stone-200 px-6 py-10 text-center text-sm text-stone-500 dark:border-slate-800 dark:text-slate-400">
                     No increments yet. Each raise you save will be listed here.
                   </p>
                 ) : (
-                  <div className="overflow-x-auto border-t border-stone-200">
+                  <div className="overflow-x-auto border-t border-stone-200 dark:border-slate-800">
                     <table className="w-full min-w-[560px] text-left text-sm">
-                      <thead className="bg-stone-50 text-xs text-stone-500">
+                      <thead className="bg-stone-50 text-xs text-stone-500 dark:bg-slate-800/70 dark:text-slate-400">
                         <tr>
                           <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">
                             Effective
@@ -1674,17 +1674,19 @@ const setPackageEditField = (key) => (e) => {
                           return (
                             <tr
                               key={`${r.date}-${i}`}
-                              className={`border-t border-stone-200 ${
-                                i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
+                              className={`border-t border-stone-200 dark:border-slate-800 ${
+                                i === 0
+                                  ? "bg-teal-50/40 dark:bg-teal-950/30"
+                                  : "hover:bg-stone-50 dark:hover:bg-slate-800/60"
                               }`}
                             >
                               <td className="py-3 pl-5 pr-3 sm:pl-6">
-                                <div className="font-medium text-stone-900">
+                                <div className="font-medium text-stone-900 dark:text-slate-100">
                                   {fmtDate(r.date)}
                                 </div>
                                 {r.note && (
                                   <div
-                                    className="mt-0.5 max-w-[240px] truncate text-xs text-stone-500"
+                                    className="mt-0.5 max-w-[240px] truncate text-xs text-stone-500 dark:text-slate-400"
                                     title={r.note}
                                   >
                                     {r.note}
@@ -1693,24 +1695,24 @@ const setPackageEditField = (key) => (e) => {
                               </td>
                               <td className="px-3 py-3 text-right">
                                 {amt > 0 ? (
-                                  <span className="text-emerald-700">
+                                  <span className="text-emerald-700 dark:text-emerald-400">
                                     +{money(amt)}
                                     {pct !== null && (
-                                      <span className="ml-1 text-xs text-stone-500">
+                                      <span className="ml-1 text-xs text-stone-500 dark:text-slate-400">
                                         {pct.toFixed(1)}%
                                       </span>
                                     )}
                                   </span>
                                 ) : (
-                                  <span className="text-stone-400">
+                                  <span className="text-stone-400 dark:text-slate-500">
                                     Starting pay
                                   </span>
                                 )}
                               </td>
-                              <td className="px-3 py-3 text-right font-semibold text-stone-900">
+                              <td className="px-3 py-3 text-right font-semibold text-stone-900 dark:text-slate-100">
                                 {money(r.basePay ?? r.currentSalary)}
                               </td>
-                              <td className="py-3 pl-3 pr-5 text-right text-stone-600 sm:pr-6">
+                              <td className="py-3 pl-3 pr-5 text-right text-stone-600 dark:text-slate-300 sm:pr-6">
                                 {moneyOrDash(r.finalPay)}
                               </td>
                             </tr>
@@ -1722,7 +1724,7 @@ const setPackageEditField = (key) => (e) => {
                 )}
 
                 {!loading && incrementLogs.length > 0 && (
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 text-sm text-stone-600 sm:px-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 text-sm text-stone-600 dark:border-slate-800 dark:bg-slate-800/70 dark:text-slate-400 sm:px-6">
                     <span>
                       Showing {incrementLogs.length}
                       {incrementPagination?.totalCount
@@ -1730,7 +1732,7 @@ const setPackageEditField = (key) => (e) => {
                         : ""}
                     </span>
                     {historyError && (
-                      <span className="text-rose-700">{historyError}</span>
+                      <span className="text-rose-700 dark:text-rose-400">{historyError}</span>
                     )}
                     {hasMore && (
                       <button
@@ -1754,8 +1756,8 @@ const setPackageEditField = (key) => (e) => {
             role={toast.type === "success" ? "status" : "alert"}
             className={`fixed right-5 top-5 z-[60] flex max-w-sm items-center gap-3 rounded-lg border px-4 py-3 shadow-lg ${
               toast.type === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                : "border-rose-200 bg-rose-50 text-rose-800"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/90 dark:text-emerald-200"
+                : "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/90 dark:text-rose-200"
             }`}
           >
             <span className="text-sm font-medium">{toast.message}</span>
@@ -1772,7 +1774,7 @@ const setPackageEditField = (key) => (e) => {
         {/* Payment confirmation modal */}
         {confirming && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 dark:bg-black/70"
             onClick={(e) => {
               if (e.target === e.currentTarget && !submitting) {
                 setConfirming(false);
@@ -1783,44 +1785,44 @@ const setPackageEditField = (key) => (e) => {
               role="dialog"
               aria-modal="true"
               aria-labelledby="payment-modal-title"
-              className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+              className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:border dark:border-slate-800 dark:bg-slate-900"
             >
               <h2
                 id="payment-modal-title"
-                className="text-lg font-semibold text-stone-900"
+                className="text-lg font-semibold text-stone-900 dark:text-slate-100"
               >
                 Confirm Salary Payment
               </h2>
 
-              <p className="mt-2 text-sm text-stone-500">
+              <p className="mt-2 text-sm text-stone-500 dark:text-slate-400">
                 Are you sure you want to save this salary payment?
               </p>
 
-              <div className="mt-5 rounded-lg bg-stone-50 p-4">
+              <div className="mt-5 rounded-lg bg-stone-50 p-4 dark:bg-slate-800">
                 <div className="flex justify-between py-2 text-sm">
-                  <span className="text-stone-500">Employee</span>
-                  <span className="font-medium text-stone-900">
+                  <span className="text-stone-500 dark:text-slate-400">Employee</span>
+                  <span className="font-medium text-stone-900 dark:text-slate-100">
                     {employee?.empName}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-2 text-sm">
-                  <span className="text-stone-500">Period</span>
-                  <span className="font-medium text-stone-900">
+                  <span className="text-stone-500 dark:text-slate-400">Period</span>
+                  <span className="font-medium text-stone-900 dark:text-slate-100">
                     {getMonthName(pay.month)} {pay.fy}
                   </span>
                 </div>
 
                 <div className="flex justify-between py-2 text-sm">
-                  <span className="text-stone-500">Total payout</span>
-                  <span className="font-semibold text-stone-900">
+                  <span className="text-stone-500 dark:text-slate-400">Total payout</span>
+                  <span className="font-semibold text-stone-900 dark:text-slate-100">
                     {money(payTotal)}
                   </span>
                 </div>
 
-                <div className="flex justify-between border-t border-stone-200 pt-3 text-sm">
-                  <span className="font-medium text-stone-700">In-hand</span>
-                  <span className="font-bold text-teal-700">
+                <div className="flex justify-between border-t border-stone-200 pt-3 text-sm dark:border-slate-700">
+                  <span className="font-medium text-stone-700 dark:text-slate-300">In-hand</span>
+                  <span className="font-bold text-teal-700 dark:text-teal-400">
                     {money(inHand)}
                   </span>
                 </div>

@@ -5,11 +5,11 @@ import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
 import { Plus, ArrowLeft, ImagePlus, X, Trash2 } from "lucide-react";
 
-const labelCls = "text-xs font-medium text-gray-600";
+const labelCls = "text-xs font-medium text-gray-600 dark:text-slate-300";
 const inputCls =
-  "h-8 w-full px-2.5 text-xs rounded-md border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition";
+  "h-8 w-full px-2.5 text-xs rounded-md border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 hover:border-gray-400 dark:hover:border-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition";
 const textareaCls =
-  "w-full px-2.5 py-2 text-xs rounded-md border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition resize-none";
+  "w-full px-2.5 py-2 text-xs rounded-md border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 hover:border-gray-400 dark:hover:border-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition resize-none";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -144,7 +144,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full bg-gray-50 px-3 py-4 sm:px-5 lg:px-6 text-[13px]">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-gray-50 dark:bg-slate-950 px-3 py-4 sm:px-5 lg:px-6 text-[13px]">
       <form
         onSubmit={handleCreateProduct}
         className="max-w-6xl mx-auto space-y-4"
@@ -154,26 +154,26 @@ const AddProduct = () => {
           <button
             type="button"
             onClick={() => navigate("/dashboard/product")}
-            className="inline-flex items-center gap-1.5 -ml-1 px-1.5 py-1 rounded-md cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+            className="inline-flex items-center gap-1.5 -ml-1 px-1.5 py-1 rounded-md cursor-pointer text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
           >
             <ArrowLeft size={14} />
             Back to products
           </button>
 
           <div>
-            <h1 className="text-lg font-semibold text-gray-900 tracking-tight leading-tight">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100 tracking-tight leading-tight">
               Add new product
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
               Fill in the details below to create a new product listing
             </p>
           </div>
         </div>
 
         {/* SECTION: Product identity */}
-        <section className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="px-4 py-2.5 border-b border-gray-100">
-            <h2 className="text-[13px] font-semibold text-gray-900">
+        <section className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm">
+          <div className="px-4 py-2.5 border-b border-gray-100 dark:border-slate-800">
+            <h2 className="text-[13px] font-semibold text-gray-900 dark:text-slate-100">
               Product details
             </h2>
           </div>
@@ -184,15 +184,15 @@ const AddProduct = () => {
               <label className={`${labelCls} block mb-1`}>
                 Product images<span className="text-red-500 ml-0.5">*</span>
               </label>
-              <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-gray-300 rounded-md cursor-pointer bg-gray-50 hover:bg-blue-50/50 hover:border-blue-400 transition-colors group">
+              <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-gray-300 dark:border-slate-700 rounded-md cursor-pointer bg-gray-50 dark:bg-slate-800/70 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 hover:border-blue-400 dark:hover:border-blue-500 transition-colors group">
                 <ImagePlus
                   size={20}
-                  className="text-gray-400 group-hover:text-blue-500 transition-colors"
+                  className="text-gray-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"
                 />
-                <p className="text-xs text-gray-600 mt-1 group-hover:text-blue-600 transition-colors">
+                <p className="text-xs text-gray-600 dark:text-slate-300 mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   Click to upload images
                 </p>
-                <p className="text-[11px] text-gray-400">
+                <p className="text-[11px] text-gray-400 dark:text-slate-500">
                   PNG, JPG, WEBP supported
                 </p>
                 <input
@@ -209,7 +209,7 @@ const AddProduct = () => {
                   {productList.images.map((img, index) => (
                     <div
                       key={index}
-                      className="relative aspect-square rounded-md overflow-hidden border border-gray-200 group"
+                      className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-slate-700 group"
                     >
                       <img
                         src={URL.createObjectURL(img)}
@@ -282,18 +282,18 @@ const AddProduct = () => {
         </section>
 
         {/* SECTION: Variant Details */}
-        <section className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-[13px] font-semibold text-gray-900">
+        <section className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm">
+          <div className="px-4 py-2.5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold text-gray-900 dark:text-slate-100">
               Variants
-              <span className="ml-1.5 text-xs font-normal text-gray-400">
+              <span className="ml-1.5 text-xs font-normal text-gray-400 dark:text-slate-500">
                 ({productList.variants.length})
               </span>
             </h2>
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex items-center cursor-pointer gap-1 h-7 px-2.5 rounded-md bg-white hover:bg-blue-50 text-blue-600 font-medium text-xs transition border border-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+              className="inline-flex items-center cursor-pointer gap-1 h-7 px-2.5 rounded-md bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-medium text-xs transition border border-blue-200 dark:border-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             >
               <Plus size={13} />
               Add variant
@@ -304,17 +304,17 @@ const AddProduct = () => {
             {productList.variants.map((variant, index) => (
               <div
                 key={index}
-                className="rounded-md border border-gray-200 bg-gray-50/60 p-3"
+                className="rounded-md border border-gray-200 dark:border-slate-700 bg-gray-50/60 dark:bg-slate-800/70 p-3"
               >
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-xs font-semibold text-gray-700">
+                  <span className="text-xs font-semibold text-gray-700 dark:text-slate-200">
                     Variant {index + 1}
                   </span>
                   {productList.variants.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeVariant(index)}
-                      className="inline-flex cursor-pointer items-center gap-1 h-6 px-2 rounded-md bg-white hover:bg-red-50 text-red-600 font-medium text-[11px] transition border border-red-100"
+                      className="inline-flex cursor-pointer items-center gap-1 h-6 px-2 rounded-md bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/60 text-red-600 dark:text-red-400 font-medium text-[11px] transition border border-red-100 dark:border-red-900/60"
                     >
                       <Trash2 size={11} />
                       Remove
@@ -446,11 +446,11 @@ const AddProduct = () => {
         </section>
 
         {/* FOOTER BUTTONS */}
-        <div className="sticky bottom-0 z-10 -mx-3 sm:-mx-5 lg:-mx-6 px-3 sm:px-5 lg:px-6 py-2.5 bg-white/95 backdrop-blur border-t border-gray-200 flex justify-end gap-2">
+        <div className="sticky bottom-0 z-10 -mx-3 sm:-mx-5 lg:-mx-6 px-3 sm:px-5 lg:px-6 py-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-gray-200 dark:border-slate-800 flex justify-end gap-2">
           <button
             type="button"
             onClick={() => navigate("/dashboard/product")}
-            className="h-8 px-4 cursor-pointer rounded-md bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium transition text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+            className="h-8 px-4 cursor-pointer rounded-md bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 font-medium transition text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
           >
             Cancel
           </button>

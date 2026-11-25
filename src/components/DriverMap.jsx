@@ -6,6 +6,58 @@ import {
 } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapPinned } from "lucide-react";
+import { useThemeStore } from "../zustand/Store/themeStore";
+
+const DARK_MAP_STYLES = [
+  { elementType: "geometry", stylers: [{ color: "#1e293b" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#cbd5e1" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#94a3b8" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#1e3a2f" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#334155" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#1e293b" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#475569" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [{ color: "#334155" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0f172a" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#64748b" }],
+  },
+];
 
 const containerStyle = {
   width: "100%",
@@ -21,6 +73,7 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const mapRef = useRef(null);
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -155,13 +208,13 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
 
   if (loadError) {
     return (
-      <div className="flex h-[620px] items-center justify-center rounded-2xl border border-red-100 bg-white">
+      <div className="flex h-[620px] items-center justify-center rounded-2xl border border-red-100 dark:border-red-900/60 bg-white dark:bg-slate-900">
         <div className="px-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
-            <MapPinned size={20} className="text-red-500" />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/60">
+            <MapPinned size={20} className="text-red-500 dark:text-red-400" />
           </div>
 
-          <h3 className="text-sm font-semibold text-slate-900">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             Unable to load Google Maps
           </h3>
         </div>
@@ -171,21 +224,21 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
 
   if (!isLoaded) {
     return (
-      <div className="flex h-[620px] items-center justify-center rounded-2xl border border-slate-100 bg-white">
+      <div className="flex h-[620px] items-center justify-center rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div className="text-center">
-          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-800" />
+          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-slate-800 dark:border-t-slate-200" />
 
-          <p className="text-sm font-medium text-slate-700">Loading map...</p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Loading map...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-col gap-3 border-b border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+      <div className="flex flex-col gap-3 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-900">Delivery Route</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Delivery Route</p>
 
           {/* <p className="mt-0.5 text-xs text-slate-500">
             {orders.length} assigned order
@@ -195,7 +248,7 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
           </p> */}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
           {driverPosition && (
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
@@ -225,6 +278,7 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
           zoomControl: true,
           clickableIcons: false,
           gestureHandling: "greedy",
+          styles: resolvedTheme === "dark" ? DARK_MAP_STYLES : undefined,
         }}
       >
         {driverPosition && (
@@ -308,39 +362,39 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
             })}
           >
             <div
-              className="min-w-[240px] max-w-[260px] rounded-xl border border-slate-200 bg-white p-3 shadow-xl"
+              className="min-w-[240px] max-w-[260px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 shadow-xl"
               onMouseEnter={() => setHoveredOrder(hoveredOrder)}
               onMouseLeave={() => setHoveredOrder(null)}
             >
               {/* Order ID */}
               <div className="mb-2">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Order ID
                 </p>
 
-                <p className="text-sm font-bold text-slate-900">
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   {hoveredOrder?.orderId || "-"}
                 </p>
               </div>
 
               {/* Customer */}
               <div className="mb-2">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Customer
                 </p>
 
-                <p className="text-xs font-semibold text-slate-800">
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                   {hoveredOrder?.user?.customer_name || "Customer"}
                 </p>
               </div>
 
               {/* Phone */}
               <div className="mb-2">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Phone
                 </p>
 
-                <p className="text-xs font-medium text-slate-700">
+                <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
                   {hoveredOrder?.user?.phone_num || "Phone unavailable"}
                 </p>
               </div>
@@ -349,30 +403,30 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
               <div className="mb-2 grid grid-cols-2 gap-3">
                 {/* ORDER TOTAL */}
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Order Total
                   </p>
 
-                  <p className="text-sm font-bold text-slate-900">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     ₹{Number(hoveredOrder?.orderTotal || 0).toFixed(2)}
                   </p>
                 </div>
 
                 {/* STATUS */}
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Status
                   </p>
 
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-[10px] font-semibold ${
                       hoveredOrder?.orderStatus === "DELIVERED"
-                        ? "bg-emerald-50 text-emerald-700"
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
                         : hoveredOrder?.orderStatus === "FAILED"
-                          ? "bg-red-50 text-red-700"
+                          ? "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300"
                           : hoveredOrder?.orderStatus === "PLACED"
-                            ? "bg-blue-50 text-blue-700"
-                            : "bg-slate-100 text-slate-700"
+                            ? "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+                            : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                     }`}
                   >
                     {hoveredOrder?.orderStatus || "UNKNOWN"}
@@ -382,11 +436,11 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
 
               {/* Shipping Address */}
               <div>
-                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Shipping Address
                 </p>
 
-                <p className="text-xs font-medium leading-4 text-slate-700">
+                <p className="text-xs font-medium leading-4 text-slate-700 dark:text-slate-300">
                   {getShippingAddress(hoveredOrder)}
                 </p>
               </div>
@@ -396,11 +450,11 @@ export default function DriverMap({ driverLocation, deliveryOrders = [] }) {
       </GoogleMap>
 
       {orders.length > 0 && orderMarkers.length < orders.length && (
-        <div className="border-t border-slate-100 bg-slate-50 px-4 py-2">
+        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 px-4 py-2">
           <div className="flex items-center gap-2">
             <MapPinned size={16} strokeWidth={2.2} className="text-red-400" />
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {orders.length - orderMarkers.length} order
               {orders.length - orderMarkers.length !== 1 ? "s" : ""} could not
               be mapped because valid coordinates were not found.

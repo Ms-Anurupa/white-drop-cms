@@ -34,10 +34,10 @@ const AddOffer = () => {
 
       {/* HEADER */}
       <div className="w-full mx-auto mb-2">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">
           Create New Offer
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           Fill in the details below to add a new promotional offer
         </p>
       </div>
@@ -45,14 +45,14 @@ const AddOffer = () => {
       {/* FORM CARD */}
       <form
         onSubmit={handleSubmit}
-        className="w-full mx-auto bg-white rounded-2xl shadow-sm p-5 sm:p-8"
+        className="w-full mx-auto bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-2xl shadow-sm p-5 sm:p-8"
       >
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
           {/* Offer Label */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Offer Label
             </label>
             <input
@@ -60,13 +60,13 @@ const AddOffer = () => {
               value={form.label}
               onChange={handleChange}
               placeholder="e.g. Summer Special"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Offer Type */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Offer Type
             </label>
             <input
@@ -74,13 +74,13 @@ const AddOffer = () => {
               value={form.type}
               onChange={handleChange}
               placeholder="e.g. Discount / Combo"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Offer Category
             </label>
             <input
@@ -88,13 +88,13 @@ const AddOffer = () => {
               value={form.category}
               onChange={handleChange}
               placeholder="e.g. Festival / Seasonal"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Products */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Associated Products
             </label>
             <input
@@ -102,13 +102,13 @@ const AddOffer = () => {
               value={form.products}
               onChange={handleChange}
               placeholder="e.g. Milk, Butter"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Buy Qty */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Buy Quantity
             </label>
             <input
@@ -117,13 +117,13 @@ const AddOffer = () => {
               value={form.buyQty}
               onChange={handleChange}
               placeholder="e.g. 2"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
 
           {/* Get Qty */}
           <div>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Get Quantity
             </label>
             <input
@@ -132,7 +132,7 @@ const AddOffer = () => {
               value={form.getQty}
               onChange={handleChange}
               placeholder="e.g. 1"
-              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="mt-1 w-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
           </div>
         </div>
@@ -143,7 +143,7 @@ const AddOffer = () => {
           <button
             type="button"
             onClick={() => navigate("/dashboard/support/offer-manager")}
-            className="px-5 py-2.5 cursor-pointer border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+            className="px-5 py-2.5 cursor-pointer border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
             Cancel
           </button>

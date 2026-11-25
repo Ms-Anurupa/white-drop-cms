@@ -45,7 +45,7 @@ const initialForm = {
 
 const Field = ({ label, required, className = "", children }) => (
   <div className={className}>
-    <label className="mb-1.5 block text-xs font-medium text-gray-600">
+    <label className="mb-1.5 block text-xs font-medium text-gray-600 dark:text-slate-300">
       {label}
       {required && <span className="ml-0.5 text-red-500">*</span>}
     </label>
@@ -54,7 +54,7 @@ const Field = ({ label, required, className = "", children }) => (
 );
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-400";
+  "w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-blue-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:disabled:bg-slate-800/50";
 
 const Input = (props) => <input {...props} className={inputClass} />;
 
@@ -71,13 +71,13 @@ const Select = ({ options, placeholder, ...props }) => (
 
 const SectionCard = ({ title, subtitle, children }) => {
   return (
-    <div className="mb-4 rounded-xl border border-slate-200 bg-white">
+    <div className="mb-4 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <div className="px-4 py-3.5">
-        <p className="text-sm font-semibold text-gray-900">{title}</p>
-        {subtitle && <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>}
+        <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">{title}</p>
+        {subtitle && <p className="mt-0.5 text-xs text-gray-400 dark:text-slate-400">{subtitle}</p>}
       </div>
 
-      <div className="border-t border-slate-100 p-4">{children}</div>
+      <div className="border-t border-slate-100 p-4 dark:border-slate-800">{children}</div>
     </div>
   );
 };
@@ -147,29 +147,29 @@ const CreateExpense = () => {
         <button
           type="button"
           onClick={() => navigate("/dashboard/expense")}
-          className="flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 p-2 text-gray-500 hover:bg-slate-50"
+          className="flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 p-2 text-gray-500 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ArrowLeft size={16} />
         </button>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">
             Create expense
           </h1>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <p className="mt-0.5 text-sm text-gray-500 dark:text-slate-400">
             Record a purchase and its GST details
           </p>
         </div>
       </div>
 
       {formError && (
-        <div className="mb-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="mb-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300">
           {formError}
         </div>
       )}
 
       {/* Basic details */}
-      <div className="mb-4 rounded-xl border border-slate-200 bg-white p-4">
-        <p className="mb-3 text-sm font-semibold text-gray-900">
+      <div className="mb-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+        <p className="mb-3 text-sm font-semibold text-gray-900 dark:text-slate-100">
           Basic details
         </p>
 
@@ -181,7 +181,7 @@ const CreateExpense = () => {
               placeholder="Select category"
             />
             {errors.categoryId && (
-              <p className="mt-1 text-xs text-red-500">{errors.categoryId}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.categoryId}</p>
             )}
           </Field>
 
@@ -192,7 +192,7 @@ const CreateExpense = () => {
               placeholder="e.g. Packaging boxes"
             />
             {errors.itemName && (
-              <p className="mt-1 text-xs text-red-500">{errors.itemName}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.itemName}</p>
             )}
           </Field>
 
@@ -231,7 +231,7 @@ const CreateExpense = () => {
               placeholder="0.00"
             />
             {errors.price && (
-              <p className="mt-1 text-xs text-red-500">{errors.price}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.price}</p>
             )}
           </Field>
 
@@ -242,16 +242,16 @@ const CreateExpense = () => {
               onChange={setField("purchaseDate")}
             />
             {errors.purchaseDate && (
-              <p className="mt-1 text-xs text-red-500">{errors.purchaseDate}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.purchaseDate}</p>
             )}
           </Field>
 
           <div className="flex items-end sm:col-span-1 lg:col-span-2">
-            <div className="w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2">
-              <p className="text-xs text-gray-500">Total price</p>
+            <div className="w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/70">
+              <p className="text-xs text-gray-500 dark:text-slate-400">Total price</p>
               {hasPrice ? (
-                <p className="text-sm text-gray-900">
-                  <span className="text-gray-500">
+                <p className="text-sm text-gray-900 dark:text-slate-100">
+                  <span className="text-gray-500 dark:text-slate-400">
                     {fmt(price)}
                     {form.unit ? ` / ${form.unit}` : ""}
                     {` × ${qty}${form.unit ? ` ${form.unit}` : ""} = `}
@@ -261,7 +261,7 @@ const CreateExpense = () => {
                   </span>
                 </p>
               ) : (
-                <p className="text-sm text-gray-400">Enter price</p>
+                <p className="text-sm text-gray-400 dark:text-slate-500">Enter price</p>
               )}
             </div>
           </div>
@@ -444,7 +444,7 @@ const CreateExpense = () => {
         <button
           type="button"
           onClick={() => navigate("/dashboard/expense")}
-          className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-slate-50"
+          className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
         >
           Cancel
         </button>

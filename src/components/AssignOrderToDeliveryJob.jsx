@@ -26,19 +26,28 @@ import orderDataStore from "../zustand/Store/orderDataStore";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const STATUS_STYLES = {
-  PLACED: "bg-blue-50 text-blue-700 border-blue-100",
-  PROCESSING: "bg-amber-50 text-amber-700 border-amber-100",
-  CONFIRMED: "bg-indigo-50 text-indigo-700 border-indigo-100",
-  SHIPPED: "bg-violet-50 text-violet-700 border-violet-100",
-  INTRANSIT: "bg-purple-50 text-purple-700 border-purple-100",
-  DELIVERED: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  CANCELLED: "bg-rose-50 text-rose-700 border-rose-100",
-  FAILED: "bg-red-50 text-red-700 border-red-100",
+  PLACED:
+    "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
+  PROCESSING:
+    "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
+  CONFIRMED:
+    "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800",
+  SHIPPED:
+    "bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800",
+  INTRANSIT:
+    "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800",
+  DELIVERED:
+    "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
+  CANCELLED:
+    "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
+  FAILED:
+    "bg-red-50 text-red-700 border-red-100 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800",
 };
 const MAX_ORDERS = 20;
 
 const getStatusStyle = (status) =>
-  STATUS_STYLES[status] || "bg-slate-50 text-slate-600 border-slate-200";
+  STATUS_STYLES[status] ||
+  "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
 
 const formatDate = (date) => {
   if (!date) return "—";
@@ -275,7 +284,7 @@ const AssignOrderToDeliveryJob = () => {
   const hasPreviousPage = page > 1;
 
   return (
-    <div className="w-full min-h-full bg-slate-50 p-4 sm:p-5">
+    <div className="w-full min-h-full bg-slate-50 dark:bg-slate-950 p-4 sm:p-5">
       <div className="max-w-7xl mx-auto">
         
         {/* TOP HEADER */}
@@ -322,16 +331,16 @@ const AssignOrderToDeliveryJob = () => {
         </div>
 
         {/* FILTER CARD */}
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm mb-4">
           <div className="p-4 sm:p-5">
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
               <div className="relative flex-1">
-                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search order number, customer..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50" />
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search order number, customer..." className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-500/20" />
               </div>
 
               <div className="relative">
-                <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="appearance-none w-full lg:w-44 px-4 pr-9 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none cursor-pointer focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50">
+                <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="appearance-none w-full lg:w-44 px-4 pr-9 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm outline-none cursor-pointer focus:bg-white dark:focus:bg-slate-800 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-500/20">
                   <option value="">All Status</option>
                   <option value="PLACED">Placed</option>
                   <option value="PROCESSING">Processing</option>
@@ -339,35 +348,35 @@ const AssignOrderToDeliveryJob = () => {
                   <option value="DELIVERED">Delivered</option>
                   <option value="CANCELLED">Cancelled</option>
                 </select>
-                <ChevronRight size={14} className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 pointer-events-none" />
+                <ChevronRight size={14} className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 dark:text-slate-500 pointer-events-none" />
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <button type="button" onClick={() => setAssociationFilter("all")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${associationFilter === "all" ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-200"}`}>All</button>
-                <button type="button" onClick={() => setAssociationFilter("associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "associated" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-white text-slate-600 border-slate-200"}`}>Associated <span className="bg-white/50 px-1 rounded-sm">{associatedCount}</span></button>
-                <button type="button" onClick={() => setAssociationFilter("non-associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "non-associated" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-white text-slate-600 border-slate-200"}`}>Available <span className="bg-white/50 px-1 rounded-sm">{nonAssociatedCount}</span></button>
+                <button type="button" onClick={() => setAssociationFilter("all")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${associationFilter === "all" ? "bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100" : "bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>All</button>
+                <button type="button" onClick={() => setAssociationFilter("associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "associated" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800" : "bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>Associated <span className="bg-white/50 dark:bg-slate-900/50 px-1 rounded-sm">{associatedCount}</span></button>
+                <button type="button" onClick={() => setAssociationFilter("non-associated")} className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 ${associationFilter === "non-associated" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800" : "bg-white text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>Available <span className="bg-white/50 dark:bg-slate-900/50 px-1 rounded-sm">{nonAssociatedCount}</span></button>
               </div>
             </div>
           </div>
         </div>
 
         {/* TASK LIST */}
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Available Tasks</h2>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Available Tasks</h2>
             </div>
             {filteredOrders.length > 0 && visibleSelectableOrderIds.length <= MAX_ORDERS && (
-              <button onClick={toggleSelectAll} className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+              <button onClick={toggleSelectAll} className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                 {allVisibleSelected ? "Deselect All" : "Select All Visible"}
               </button>
             )}
           </div>
 
           {!filteredOrders.length ? (
-            <div className="py-16 text-center text-slate-500 text-sm">No tasks found.</div>
+            <div className="py-16 text-center text-slate-500 dark:text-slate-400 text-sm">No tasks found.</div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredOrders.map((order) => {
                 const orderId = getOrderId(order);
                 const isSelected = selectedOrders.includes(orderId);
@@ -380,16 +389,16 @@ const AssignOrderToDeliveryJob = () => {
                   <button
                     key={orderId}
                     onClick={() => toggleOrder(order)}
-                    className={`w-full text-left px-5 sm:px-6 py-4 transition-all flex items-center gap-4 ${isSelected ? "bg-blue-50/60" : isMarkedForRemoval ? "bg-rose-50/40" : "hover:bg-slate-50/70"}`}
+                    className={`w-full text-left px-5 sm:px-6 py-4 transition-all flex items-center gap-4 ${isSelected ? "bg-blue-50/60 dark:bg-blue-950/40" : isMarkedForRemoval ? "bg-rose-50/40 dark:bg-rose-950/30" : "hover:bg-slate-50/70 dark:hover:bg-slate-800/60"}`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-300"}`}
+                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600"}`}
                     >
                       {isSelected && <Check size={13} strokeWidth={3} />}
                     </div>
 
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${order.type === "SUBSCRIPTION" ? "bg-amber-100 text-amber-600" : isSelected ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-500"}`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${order.type === "SUBSCRIPTION" ? "bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300" : isSelected ? "bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"}`}
                     >
                       {order.type === "SUBSCRIPTION" ? (
                         <Repeat size={18} />
@@ -400,13 +409,13 @@ const AssignOrderToDeliveryJob = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                           {getOrderNumber(order)}
                         </p>
 
                         {/* NEW: Subscription Visual Badge */}
                         {order.type === "SUBSCRIPTION" && (
-                          <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold flex items-center gap-1">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[10px] font-bold flex items-center gap-1">
                             SUBSCRIPTION
                           </span>
                         )}
@@ -418,28 +427,28 @@ const AssignOrderToDeliveryJob = () => {
                         </span>
 
                         {isAssociated && isSelected && !isMarkedForRemoval && (
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-semibold flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold flex items-center gap-1">
                             <CheckCircle2 size={10} /> Assigned
                           </span>
                         )}
                         {isMarkedForRemoval && (
-                          <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-100 text-rose-700 text-[10px] font-semibold flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-[10px] font-semibold flex items-center gap-1">
                             <X size={10} /> Will remove
                           </span>
                         )}
                         {isMarkedForAssociation && (
-                          <span className="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-semibold flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-[10px] font-semibold flex items-center gap-1">
                             <Check size={10} /> Will assign
                           </span>
                         )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
-                        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                           <UserRound size={12} /> {getCustomerName(order)}
                         </span>
                         {getOrderAddress(order) && (
-                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 truncate max-w-xs">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-400 truncate max-w-xs">
                             <MapPin size={12} /> {getOrderAddress(order)}
                           </span>
                         )}
@@ -449,20 +458,20 @@ const AssignOrderToDeliveryJob = () => {
                     {/* Amount & Quantity */}
 
                     <div className="text-right shrink-0 flex flex-col items-end">
-                      <p className="text-[10px] uppercase tracking-wide text-slate-400 mb-0.5">
+                      <p className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-0.5">
                         {order.type === "SUBSCRIPTION" ? "Qty" : "Total / Qty"}
                       </p>
 
                       {order.type === "ORDER" && (
-                        <p className="text-sm font-bold text-slate-800">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
                           {getOrderAmount(order)}
                         </p>
                       )}
                       <p className={`
                           ${
                             order.type === "ORDER"
-                              ? "text-xs font-semibold text-slate-500"
-                              : "text-sm font-bold text-slate-800"
+                              ? "text-xs font-semibold text-slate-500 dark:text-slate-400"
+                              : "text-sm font-bold text-slate-800 dark:text-slate-100"
                           }
                         `}
                       >
@@ -476,24 +485,24 @@ const AssignOrderToDeliveryJob = () => {
           )}
 
           {/* PAGINATION */}
-          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500">Page {page} of {totalPages}</span>
+          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <span className="text-xs text-slate-500 dark:text-slate-400">Page {page} of {totalPages}</span>
             <div className="flex gap-2">
-              <button disabled={!hasPreviousPage} onClick={() => setPage(p => p - 1)} className="p-1 border rounded disabled:opacity-40"><ChevronLeft size={16}/></button>
-              <button disabled={!hasNextPage} onClick={() => setPage(p => p + 1)} className="p-1 border rounded disabled:opacity-40"><ChevronRight size={16}/></button>
+              <button disabled={!hasPreviousPage} onClick={() => setPage(p => p - 1)} className="p-1 border border-slate-200 dark:border-slate-700 rounded text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40"><ChevronLeft size={16}/></button>
+              <button disabled={!hasNextPage} onClick={() => setPage(p => p + 1)} className="p-1 border border-slate-200 dark:border-slate-700 rounded text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40"><ChevronRight size={16}/></button>
             </div>
           </div>
         </div>
 
         {/* STICKY CHANGE BAR */}
         {hasAssociationChanges && (
-          <div className="sticky bottom-4 z-20 mt-4 bg-slate-900 rounded-2xl shadow-2xl px-5 py-3.5 flex items-center justify-between">
+          <div className="sticky bottom-4 z-20 mt-4 bg-slate-900 dark:bg-slate-800 dark:border dark:border-slate-700 rounded-2xl shadow-2xl px-5 py-3.5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="text-white">
                 <p className="text-sm font-semibold">{ordersToAssociate.length} to add · {ordersToRemove.length} to remove</p>
               </div>
             </div>
-            <button onClick={handleAssociateOrder} disabled={isAssociating} className="px-5 py-2.5 rounded-xl bg-white text-slate-900 text-sm font-semibold disabled:opacity-60">
+            <button onClick={handleAssociateOrder} disabled={isAssociating} className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-100 text-slate-900 text-sm font-semibold disabled:opacity-60">
               {isAssociating ? "Saving..." : "Save Route Changes"}
             </button>
           </div>

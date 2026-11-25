@@ -31,8 +31,8 @@ const OrdersAnalytics = () => {
   );
 
   const orderTypePills = (
-    <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-2.5">
-      <span className="mr-1 text-[11px] font-bold text-slate-500">
+    <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900">
+      <span className="mr-1 text-[11px] font-bold text-slate-500 dark:text-slate-400">
         Order Types:
       </span>
       <button
@@ -41,7 +41,7 @@ const OrdersAnalytics = () => {
         className={`rounded-full px-3 py-1 text-[11px] font-bold transition-colors ${
           selectedCategory === null
             ? "text-white"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
         }`}
         style={selectedCategory === null ? { background: HUE } : undefined}
       >
@@ -57,7 +57,7 @@ const OrdersAnalytics = () => {
             className={`rounded-full px-3 py-1 text-[11px] font-bold transition-colors ${
               isSel
                 ? "text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             }`}
             style={isSel ? { background: HUE } : undefined}
           >

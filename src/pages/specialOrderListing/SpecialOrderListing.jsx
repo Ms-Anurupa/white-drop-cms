@@ -107,19 +107,19 @@ const SpecialOrderListing = () => {
   const getStatusClass = (status) => {
     switch (status?.toUpperCase()) {
       case "APPROVED":
-        return "bg-green-50 text-green-600 border-green-100";
+        return "bg-green-50 text-green-600 border-green-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800";
 
       case "PENDING":
-        return "bg-yellow-50 text-yellow-600 border-yellow-100";
+        return "bg-yellow-50 text-yellow-600 border-yellow-100 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800";
 
       case "REJECTED":
-        return "bg-red-50 text-red-600 border-red-100";
+        return "bg-red-50 text-red-600 border-red-100 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800";
 
       case "CANCELLED":
-        return "bg-gray-50 text-gray-600 border-gray-200";
+        return "bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
 
       default:
-        return "bg-blue-50 text-blue-600 border-blue-100";
+        return "bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800";
     }
   };
 
@@ -147,36 +147,36 @@ const SpecialOrderListing = () => {
   }
 
   return (
-    <div className="min-h-full bg-gray-50 p-4 sm:p-6">
+    <div className="min-h-full bg-gray-50 dark:bg-slate-950 p-4 sm:p-6">
       {/* Header */}
       <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
             Special Orders
           </h1>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Manage and review special order requests
           </p>
         </div>
 
-        <div className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5">
-          <span className="text-xs font-medium text-blue-600">
+        <div className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/60 px-3 py-1.5">
+          <span className="text-xs font-medium text-blue-600 dark:text-blue-300">
             Total Orders
           </span>
 
-          <span className="text-sm font-semibold text-blue-700">{total}</span>
+          <span className="text-sm font-semibold text-blue-700 dark:text-blue-200">{total}</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-4">
+      <div className="mb-4 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           {/* Search */}
           <div className="relative w-full lg:w-80">
             <Search
               size={17}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
 
             <input
@@ -190,15 +190,21 @@ const SpecialOrderListing = () => {
                 rounded-lg
                 border
                 border-gray-200
+                dark:border-slate-700
                 bg-white
+                dark:bg-slate-800
                 pl-9
                 pr-3
                 text-sm
                 text-gray-700
+                dark:text-slate-100
+                placeholder:text-gray-400
+                dark:placeholder:text-slate-500
                 outline-none
                 focus:border-blue-400
                 focus:ring-1
                 focus:ring-blue-100
+                dark:focus:ring-blue-500/20
               "
             />
           </div>
@@ -217,10 +223,13 @@ const SpecialOrderListing = () => {
                 rounded-lg
                 border
                 border-gray-200
+                dark:border-slate-700
                 bg-white
+                dark:bg-slate-800
                 px-3
                 text-sm
                 text-gray-600
+                dark:text-slate-200
                 outline-none
               "
             >
@@ -255,10 +264,14 @@ const SpecialOrderListing = () => {
                   rounded-lg
                   border
                   border-gray-200
+                  dark:border-slate-700
                   bg-white
+                  dark:bg-slate-800
                   px-3
                   text-sm
                   text-gray-600
+                  dark:text-slate-200
+                  dark:[color-scheme:dark]
                   outline-none
                 "
               />
@@ -289,10 +302,14 @@ const SpecialOrderListing = () => {
                   rounded-lg
                   border
                   border-gray-200
+                  dark:border-slate-700
                   bg-white
+                  dark:bg-slate-800
                   px-3
                   text-sm
                   text-gray-600
+                  dark:text-slate-200
+                  dark:[color-scheme:dark]
                   outline-none
                 "
               />
@@ -302,48 +319,48 @@ const SpecialOrderListing = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1400px] text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+              <tr className="border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/70">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Sl No.
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Customer
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Contact
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Product
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Qty
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Total
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Payment
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Date
                 </th>
 
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-slate-300">
                   Status
                 </th>
 
-                <th className="w-16 px-2.5 py-2.5 mr-6 text-left text-xs font-semibold text-gray-500">
+                <th className="w-16 px-2.5 py-2.5 mr-6 text-left text-xs font-semibold text-gray-500 dark:text-slate-400">
                   Action
                 </th>
               </tr>
@@ -353,11 +370,11 @@ const SpecialOrderListing = () => {
               {loading ? (
                 Array.from({ length: limit > 8 ? 8 : limit }).map(
                   (_, index) => (
-                    <tr key={index} className="border-b border-gray-100">
+                    <tr key={index} className="border-b border-gray-100 dark:border-slate-800">
                       {Array.from({ length: 10 }).map((__, cellIndex) => (
                         <td key={cellIndex} className="px-4 py-3">
                           <div
-                            className={`h-3 animate-pulse rounded bg-gray-100 ${
+                            className={`h-3 animate-pulse rounded bg-gray-100 dark:bg-slate-800 ${
                               cellIndex === 0
                                 ? "w-6"
                                 : cellIndex === 1
@@ -388,12 +405,14 @@ const SpecialOrderListing = () => {
                       className="
                         border-b
                         border-gray-100
+                        dark:border-slate-800
                         transition
                         hover:bg-gray-50
+                        dark:hover:bg-slate-800/60
                       "
                     >
                       {/* Sl No */}
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">
                         {(page - 1) * limit + index + 1}
                       </td>
 
@@ -410,18 +429,20 @@ const SpecialOrderListing = () => {
                               justify-center
                               rounded-full
                               bg-blue-50
+                              dark:bg-blue-950/60
                               text-blue-600
+                              dark:text-blue-400
                             "
                           >
                             <UserRound size={15} />
                           </div>
 
                           <div>
-                            <div className="font-medium text-gray-700">
+                            <div className="font-medium text-gray-700 dark:text-slate-200">
                               {customerName}
                             </div>
 
-                            <div className="mt-0.5 text-xs text-gray-400">
+                            <div className="mt-0.5 text-xs text-gray-400 dark:text-slate-500">
                               CUSTOMER
                             </div>
                           </div>
@@ -430,8 +451,8 @@ const SpecialOrderListing = () => {
 
                       {/* Contact */}
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-2 whitespace-nowrap text-gray-600">
-                          <Phone size={14} className="text-gray-400" />
+                        <div className="flex items-center gap-2 whitespace-nowrap text-gray-600 dark:text-slate-300">
+                          <Phone size={14} className="text-gray-400 dark:text-slate-500" />
 
                           {phone}
                         </div>
@@ -440,18 +461,18 @@ const SpecialOrderListing = () => {
                       {/* Product */}
                       <td className="px-4 py-3">
                         <div className="max-w-[280px]">
-                          <div className="font-medium text-gray-700">
+                          <div className="font-medium text-gray-700 dark:text-slate-200">
                             {firstItem?.product_name || "-"}
                           </div>
 
-                          <div className="mt-1 text-xs text-gray-400">
+                          <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
                             {firstItem?.quantity
                               ? `${firstItem.quantity} ${firstItem.unit || ""}`
                               : "-"}
                           </div>
 
                           {productCount > 1 && (
-                            <div className="mt-1 text-xs text-blue-600">
+                            <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                               + {productCount - 1} more product
                               {productCount - 1 !== 1 ? "s" : ""}
                             </div>
@@ -460,19 +481,19 @@ const SpecialOrderListing = () => {
                       </td>
 
                       {/* Qty */}
-                      <td className="px-4 py-3 text-gray-600">{itemCount}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-slate-300">{itemCount}</td>
 
                       {/* Total */}
-                      <td className="whitespace-nowrap px-4 py-3 font-semibold text-gray-800">
+                      <td className="whitespace-nowrap px-4 py-3 font-semibold text-gray-800 dark:text-slate-100">
                         ₹{Number(order?.orderTotal || 0).toFixed(2)}
                       </td>
 
                       {/* Payment */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <CreditCard size={14} className="text-gray-400" />
+                          <CreditCard size={14} className="text-gray-400 dark:text-slate-500" />
 
-                          <span className="text-sm font-medium text-gray-600">
+                          <span className="text-sm font-medium text-gray-600 dark:text-slate-300">
                             {order?.paymentMode || "-"}
                           </span>
                         </div>
@@ -480,11 +501,11 @@ const SpecialOrderListing = () => {
 
                       {/* Date */}
                       <td className="whitespace-nowrap px-4 py-3">
-                        <div className="text-gray-600">
+                        <div className="text-gray-600 dark:text-slate-300">
                           {formatDate(order?.createdAt)}
                         </div>
 
-                        <div className="mt-1 text-xs text-gray-400">
+                        <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
                           {formatTime(order?.createdAt)}
                         </div>
                       </td>
@@ -514,7 +535,7 @@ const SpecialOrderListing = () => {
                               `/dashboard/special-orders/specialOrderDetails/${order.id}`,
                             )
                           }
-                          className="inline-flex items-center gap-1 px-2 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
+                          className="inline-flex items-center gap-1 px-2 py-1.5 cursor-pointer text-xs font-medium rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 transition"
                         >
                           <Eye size={12} />
                           View
@@ -527,7 +548,7 @@ const SpecialOrderListing = () => {
                 <tr>
                   <td
                     colSpan="9"
-                    className="px-4 py-12 text-center text-sm text-gray-400"
+                    className="px-4 py-12 text-center text-sm text-gray-400 dark:text-slate-500"
                   >
                     No special orders found
                   </td>
@@ -538,8 +559,8 @@ const SpecialOrderListing = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-4 py-3 sm:flex-row">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 dark:border-slate-800 px-4 py-3 sm:flex-row">
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
             <span>Rows:</span>
 
             <select
@@ -554,7 +575,11 @@ const SpecialOrderListing = () => {
                 rounded-md
                 border
                 border-gray-200
+                dark:border-slate-700
                 bg-white
+                dark:bg-slate-800
+                text-gray-700
+                dark:text-slate-200
                 px-2
                 text-sm
                 outline-none
@@ -589,8 +614,13 @@ const SpecialOrderListing = () => {
                 rounded-md
                 border
                 border-gray-200
+                dark:border-slate-700
+                bg-white
+                dark:bg-slate-800
                 text-gray-500
+                dark:text-slate-400
                 hover:bg-gray-50
+                dark:hover:bg-slate-700
                 disabled:cursor-not-allowed
                 disabled:opacity-40
               "
@@ -613,8 +643,13 @@ const SpecialOrderListing = () => {
                 rounded-md
                 border
                 border-gray-200
+                dark:border-slate-700
+                bg-white
+                dark:bg-slate-800
                 text-gray-500
+                dark:text-slate-400
                 hover:bg-gray-50
+                dark:hover:bg-slate-700
                 disabled:cursor-not-allowed
                 disabled:opacity-40
               "
@@ -622,7 +657,7 @@ const SpecialOrderListing = () => {
               <ChevronLeft size={16} />
             </button>
 
-            <span className="px-3 text-sm text-gray-600">
+            <span className="px-3 text-sm text-gray-600 dark:text-slate-300">
               {page} / {totalPages}
             </span>
 
@@ -641,8 +676,13 @@ const SpecialOrderListing = () => {
                 rounded-md
                 border
                 border-gray-200
+                dark:border-slate-700
+                bg-white
+                dark:bg-slate-800
                 text-gray-500
+                dark:text-slate-400
                 hover:bg-gray-50
+                dark:hover:bg-slate-700
                 disabled:cursor-not-allowed
                 disabled:opacity-40
               "
@@ -665,8 +705,13 @@ const SpecialOrderListing = () => {
                 rounded-md
                 border
                 border-gray-200
+                dark:border-slate-700
+                bg-white
+                dark:bg-slate-800
                 text-gray-500
+                dark:text-slate-400
                 hover:bg-gray-50
+                dark:hover:bg-slate-700
                 disabled:cursor-not-allowed
                 disabled:opacity-40
               "

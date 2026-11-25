@@ -102,13 +102,13 @@ const ForgotPasswordOtp = ({ email, onSuccess }) => {
   return (
     <>
       <div className="text-center mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
           Verify OTP
         </h1>
 
-        <p className="text-white/80 text-sm mt-1">Enter the OTP sent to</p>
+        <p className="text-white/80 dark:text-slate-300 text-sm mt-1">Enter the OTP sent to</p>
 
-        <p className="text-cyan-300 text-sm break-all">{email}</p>
+        <p className="text-cyan-300 dark:text-cyan-400 text-sm break-all">{email}</p>
       </div>
 
       <div className="flex justify-center gap-2 mb-6">
@@ -124,10 +124,10 @@ const ForgotPasswordOtp = ({ email, onSuccess }) => {
             onKeyDown={(e) => handleKeyDown(e, index)}
             onPaste={handlePaste}
             className="w-12 h-12 rounded-xl
-    bg-white/20 border border-white/30
+    bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
     text-center text-lg font-semibold
-    text-white outline-none
-    focus:border-cyan-300"
+    text-white dark:text-slate-100 outline-none
+    focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50"
           />
         ))}
       </div>
@@ -138,8 +138,8 @@ const ForgotPasswordOtp = ({ email, onSuccess }) => {
         className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
     ${
       isVerifyingOtp
-        ? "bg-gray-500 cursor-not-allowed opacity-70"
-        : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] cursor-pointer"
+        ? "bg-gray-500 dark:bg-slate-700 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-500 dark:to-cyan-500 hover:scale-[1.02] cursor-pointer"
     }`}
       >
         {isVerifyingOtp ? "Verifying..." : "Verify OTP"}

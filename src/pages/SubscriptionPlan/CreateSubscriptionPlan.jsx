@@ -51,19 +51,19 @@ const sortDays = (days) =>
 const pluralize = (n, word) => `${n} ${word}${Number(n) === 1 ? "" : "s"}`;
 
 const inputClass = (hasError) =>
-  `mt-1.5 w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-stone-50 ${
+  `mt-1.5 w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-stone-800 outline-none transition placeholder:text-stone-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-stone-50 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800/50 ${
     hasError
-      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-      : "border-stone-200 focus:border-teal-500 focus:ring-teal-100"
+      ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:border-red-500 dark:focus:border-red-400 dark:focus:ring-red-950/50"
+      : "border-stone-200 focus:border-teal-500 focus:ring-teal-100 dark:border-slate-700 dark:focus:border-teal-500 dark:focus:ring-teal-950/50"
   }`;
 
 /* ------------------------------ UI primitives ----------------------------- */
 
 const Card = ({ title, description, children }) => (
-  <section className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6">
-    <h2 className="text-base font-semibold text-stone-900">{title}</h2>
+  <section className="rounded-xl border border-stone-200 bg-white p-5 sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+    <h2 className="text-base font-semibold text-stone-900 dark:text-slate-100">{title}</h2>
     {description && (
-      <p className="mt-1 text-sm text-stone-500">{description}</p>
+      <p className="mt-1 text-sm text-stone-500 dark:text-slate-400">{description}</p>
     )}
     <div className="mt-5">{children}</div>
   </section>
@@ -74,7 +74,7 @@ const Field = ({ id, label, required, hint, error, counter, children }) => (
     <div className="flex items-baseline justify-between gap-2">
       <label
         htmlFor={`field-${id}`}
-        className="text-sm font-medium text-stone-700"
+        className="text-sm font-medium text-stone-700 dark:text-slate-300"
       >
         {label}
         {required && <span className="ml-0.5 text-red-500">*</span>}
@@ -86,13 +86,13 @@ const Field = ({ id, label, required, hint, error, counter, children }) => (
       <p
         id={`${id}-error`}
         role="alert"
-        className="mt-1.5 text-xs text-red-600"
+        className="mt-1.5 text-xs text-red-600 dark:text-red-400"
       >
         {error}
       </p>
     ) : (
       hint && (
-        <p id={`${id}-hint`} className="mt-1.5 text-xs text-stone-500">
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-stone-500 dark:text-slate-400">
           {hint}
         </p>
       )
@@ -112,13 +112,13 @@ const Stepper = ({
 }) => {
   const num = Number(value) || 0;
   const btn =
-    "cursor-pointer flex h-10 w-10 items-center justify-center text-lg text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40";
+    "cursor-pointer flex h-10 w-10 items-center justify-center text-lg text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:bg-slate-700";
   return (
     <div
-      className={`mt-1.5 flex items-center overflow-hidden rounded-lg border bg-white focus-within:ring-2 ${
+      className={`mt-1.5 flex items-center overflow-hidden rounded-lg border bg-white focus-within:ring-2 dark:bg-slate-800 ${
         invalid
-          ? "border-red-400 focus-within:ring-red-100"
-          : "border-stone-200 focus-within:border-teal-500 focus-within:ring-teal-100"
+          ? "border-red-400 focus-within:ring-red-100 dark:border-red-500 dark:focus-within:ring-red-950/50"
+          : "border-stone-200 focus-within:border-teal-500 focus-within:ring-teal-100 dark:border-slate-700 dark:focus-within:border-teal-500 dark:focus-within:ring-teal-950/50"
       }`}
     >
       <button
@@ -142,7 +142,7 @@ const Stepper = ({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
-        className="h-10 w-full border-x border-stone-200 text-center text-sm font-medium text-stone-800 outline-none [appearance:textfield] disabled:bg-stone-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="h-10 w-full border-x border-stone-200 text-center text-sm font-medium text-stone-800 outline-none [appearance:textfield] disabled:bg-stone-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800/50"
       />
       <button
         type="button"
@@ -159,7 +159,7 @@ const Stepper = ({
 
 const Counter = ({ value, max }) => (
   <span
-    className={`text-xs ${value.length >= max ? "text-amber-600" : "text-stone-400"}`}
+    className={`text-xs ${value.length >= max ? "text-amber-600 dark:text-amber-400" : "text-stone-400 dark:text-slate-500"}`}
   >
     {value.length}/{max}
   </span>
@@ -355,14 +355,14 @@ const CreateSubscriptionPlan = () => {
         <button
           type="button"
           onClick={handleLeave}
-          className="mb-3 inline-flex cursor-pointer items-center gap-1 rounded text-sm font-medium text-teal-700 transition hover:text-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+          className="mb-3 inline-flex cursor-pointer items-center gap-1 rounded text-sm font-medium text-teal-700 transition hover:text-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:text-teal-400 dark:hover:text-teal-300"
         >
           <span aria-hidden="true">←</span> Subscription Plans
         </button>
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-slate-100">
           Create Subscription Plan
         </h1>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-stone-500 dark:text-slate-400">
           Set up a delivery schedule customers can subscribe to.
         </p>
       </header>
@@ -375,7 +375,7 @@ const CreateSubscriptionPlan = () => {
             {success && (
               <div
                 role="status"
-                className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+                className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
               >
                 <span aria-hidden="true">✓</span>
                 Plan created successfully. Redirecting…
@@ -384,7 +384,7 @@ const CreateSubscriptionPlan = () => {
             {apiError && (
               <div
                 role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300"
               >
                 {apiError}
               </div>
@@ -510,7 +510,7 @@ const CreateSubscriptionPlan = () => {
                     type="button"
                     disabled={busy}
                     onClick={() => applyPreset(p.days)}
-                    className="cursor-pointer rounded-full border border-stone-200 px-3 py-1 text-xs font-medium text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:opacity-50"
+                    className="cursor-pointer rounded-full border border-stone-200 px-3 py-1 text-xs font-medium text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   >
                     {p.label}
                   </button>
@@ -520,7 +520,7 @@ const CreateSubscriptionPlan = () => {
                     type="button"
                     disabled={busy}
                     onClick={() => applyPreset([])}
-                    className="cursor-pointer rounded-full px-3 py-1 text-xs font-medium text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                    className="cursor-pointer rounded-full px-3 py-1 text-xs font-medium text-stone-500 transition hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     Clear
                   </button>
@@ -552,8 +552,8 @@ const CreateSubscriptionPlan = () => {
                         selected
                           ? "border-teal-600 bg-teal-600 text-white shadow-sm"
                           : errors.defaultDays
-                            ? "border-red-300 text-stone-600 hover:bg-red-50"
-                            : "border-stone-200 text-stone-600 hover:bg-stone-50"
+                            ? "border-red-300 text-stone-600 hover:bg-red-50 dark:border-red-700 dark:text-slate-300 dark:hover:bg-red-950/40"
+                            : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                       }`}
                     >
                       {day.short}
@@ -566,12 +566,12 @@ const CreateSubscriptionPlan = () => {
                 <p
                   id="defaultDays-error"
                   role="alert"
-                  className="mt-2 text-xs text-red-600"
+                  className="mt-2 text-xs text-red-600 dark:text-red-400"
                 >
                   {errors.defaultDays}
                 </p>
               ) : (
-                <p className="mt-2 text-xs text-stone-500" aria-live="polite">
+                <p className="mt-2 text-xs text-stone-500 dark:text-slate-400" aria-live="polite">
                   {form.defaultDays.length === 0
                     ? "No days selected yet."
                     : `${pluralize(form.defaultDays.length, "day")} selected.`}
@@ -584,11 +584,11 @@ const CreateSubscriptionPlan = () => {
                 <div>
                   <p
                     id="active-label"
-                    className="text-sm font-medium text-stone-800"
+                    className="text-sm font-medium text-stone-800 dark:text-slate-200"
                   >
                     Active plan
                   </p>
-                  <p className="mt-0.5 text-xs text-stone-500">
+                  <p className="mt-0.5 text-xs text-stone-500 dark:text-slate-400">
                     {form.isActive
                       ? "Customers can subscribe to this plan right away."
                       : "Saved as inactive. Customers won't see it until you activate it."}
@@ -601,8 +601,8 @@ const CreateSubscriptionPlan = () => {
                   aria-labelledby="active-label"
                   disabled={busy}
                   onClick={() => updateField("isActive", !form.isActive)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:opacity-50 ${
-                    form.isActive ? "bg-teal-600" : "bg-stone-300"
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:opacity-50 dark:focus-visible:ring-offset-slate-900 ${
+                    form.isActive ? "bg-teal-600" : "bg-stone-300 dark:bg-slate-700"
                   }`}
                 >
                   <span
@@ -617,52 +617,52 @@ const CreateSubscriptionPlan = () => {
 
           {/* RIGHT: LIVE SUMMARY */}
           <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="rounded-xl border border-stone-200 bg-white p-5">
-              <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
+            <div className="rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+              <p className="text-xs font-medium uppercase tracking-wide text-stone-400 dark:text-slate-400">
                 Plan summary
               </p>
 
               <h3
                 className={`mt-3 break-words text-base font-semibold ${
-                  form.name.trim() ? "text-stone-900" : "text-stone-300"
+                  form.name.trim() ? "text-stone-900 dark:text-slate-100" : "text-stone-300 dark:text-slate-600"
                 }`}
               >
                 {form.name.trim() || "Untitled plan"}
               </h3>
-              <p className="mt-1 line-clamp-3 break-words text-sm text-stone-500">
+              <p className="mt-1 line-clamp-3 break-words text-sm text-stone-500 dark:text-slate-400">
                 {form.description.trim() ||
                   "Your description will appear here."}
               </p>
 
-              <dl className="mt-4 space-y-3 border-t border-stone-100 pt-4 text-sm">
+              <dl className="mt-4 space-y-3 border-t border-stone-100 pt-4 text-sm dark:border-slate-800">
                 <div className="flex justify-between gap-3">
-                  <dt className="text-stone-500">Frequency</dt>
-                  <dd className="text-right font-medium text-stone-800">
+                  <dt className="text-stone-500 dark:text-slate-400">Frequency</dt>
+                  <dd className="text-right font-medium text-stone-800 dark:text-slate-200">
                     {intervalNum === 1
                       ? "Every week"
                       : `Every ${intervalNum} weeks`}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-stone-500">Days</dt>
-                  <dd className="text-right font-medium text-stone-800">
+                  <dt className="text-stone-500 dark:text-slate-400">Days</dt>
+                  <dd className="text-right font-medium text-stone-800 dark:text-slate-200">
                     {selectedLabels.length ? selectedLabels.join(", ") : "—"}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-stone-500">Min. duration</dt>
-                  <dd className="text-right font-medium text-stone-800">
+                  <dt className="text-stone-500 dark:text-slate-400">Min. duration</dt>
+                  <dd className="text-right font-medium text-stone-800 dark:text-slate-200">
                     {pluralize(monthsNum, "month")}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-stone-500">Status</dt>
+                  <dt className="text-stone-500 dark:text-slate-400">Status</dt>
                   <dd>
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
                         form.isActive
-                          ? "bg-teal-50 text-teal-700"
-                          : "bg-stone-100 text-stone-600"
+                          ? "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300"
+                          : "bg-stone-100 text-stone-600 dark:bg-slate-800 dark:text-slate-300"
                       }`}
                     >
                       <span
@@ -681,8 +681,8 @@ const CreateSubscriptionPlan = () => {
 
         {/* STICKY ACTION BAR */}
         <div className="sticky bottom-4 z-10 mt-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white/90 p-3 shadow-lg backdrop-blur">
-            <p className="px-2 text-xs text-stone-500" aria-live="polite">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white/90 p-3 shadow-lg backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
+            <p className="px-2 text-xs text-stone-500 dark:text-slate-400" aria-live="polite">
               {isDirty && !success ? "You have unsaved changes" : "\u00A0"}
             </p>
             <div className="flex items-center gap-2">
@@ -690,14 +690,14 @@ const CreateSubscriptionPlan = () => {
                 type="button"
                 onClick={handleLeave}
                 disabled={busy}
-                className="cursor-pointer rounded-lg border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer rounded-lg border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={busy}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus-visible:ring-offset-slate-900"
               >
                 {loading && <Spinner />}
                 {loading ? "Creating…" : success ? "Created" : "Create Plan"}

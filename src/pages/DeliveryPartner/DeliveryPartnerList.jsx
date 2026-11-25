@@ -121,7 +121,11 @@ const AreaCoverCell = ({ text }) => {
   }, [text]);
 
   if (!text) {
-    return <span className="italic text-gray-400">Not Assigned</span>;
+    return (
+      <span className="italic text-gray-400 dark:text-slate-500">
+        Not Assigned
+      </span>
+    );
   }
 
   const handleMouseEnter = () => {
@@ -135,8 +139,11 @@ const AreaCoverCell = ({ text }) => {
 
   return (
     <>
-      <span className="flex items-center gap-1.5 text-gray-600 max-w-[180px]">
-        <MapPin size={14} className="text-gray-400 shrink-0" />
+      <span className="flex items-center gap-1.5 text-gray-600 dark:text-slate-300 max-w-[180px]">
+        <MapPin
+          size={14}
+          className="text-gray-400 dark:text-slate-500 shrink-0"
+        />
         <span
           ref={textRef}
           className="truncate"
@@ -151,7 +158,7 @@ const AreaCoverCell = ({ text }) => {
         createPortal(
           <div
             style={{ top: tooltipPos.top, left: tooltipPos.left }}
-            className="fixed z-100 w-64 text-gray-950 bg-white text-xs shadow-gray-500 rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none break-words"
+            className="fixed z-100 w-64 text-gray-950 dark:text-slate-100 bg-white dark:bg-slate-800 dark:border dark:border-slate-700 text-xs shadow-gray-500 dark:shadow-black/50 rounded-lg px-3 py-2 shadow-lg leading-relaxed pointer-events-none break-words"
           >
             {text}
           </div>,
@@ -275,16 +282,16 @@ const DeliveryPartnerList = () => {
   }
 
   return (
-    <div className="p-6 sm:p-4 md:p-6 space-y-2 bg-gray-50 min-h-screen">
+    <div className="p-6 sm:p-4 md:p-6 space-y-2 bg-gray-50 dark:bg-slate-950 min-h-screen">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-slate-100 tracking-tight">
             Delivery Partners
           </h1>
-          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>Manage riders, verify documents, and track onboarding.</span>
-            <span className="text-blue-600 font-medium">
+            <span className="text-blue-600 dark:text-blue-400 font-medium">
               {JOIN_FILTERS.find((f) => f.key === joinFilter)?.countLabel}:{" "}
               {joinCounts[joinFilter]}
             </span>
@@ -294,14 +301,14 @@ const DeliveryPartnerList = () => {
         <div className="flex items-center gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-72">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
               size={16}
             />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search partners..."
-              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white border border-gray-200 shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition"
+              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 shadow-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 dark:focus:border-blue-500 transition"
             />
           </div>
 
@@ -322,34 +329,34 @@ const DeliveryPartnerList = () => {
             label: "Total partners",
             value: total,
             icon: Users,
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-600",
+            iconBg: "bg-blue-50 dark:bg-blue-950/60",
+            iconColor: "text-blue-600 dark:text-blue-400",
           },
           {
             label: "Active (this page)",
             value: activeOnPage,
             icon: CheckCircle2,
-            iconBg: "bg-emerald-50",
-            iconColor: "text-emerald-600",
+            iconBg: "bg-emerald-50 dark:bg-emerald-950/60",
+            iconColor: "text-emerald-600 dark:text-emerald-400",
           },
           {
             label: "Inactive (this page)",
             value: filteredPartners.length - activeOnPage,
             icon: XCircle,
-            iconBg: "bg-gray-100",
-            iconColor: "text-gray-500",
+            iconBg: "bg-gray-100 dark:bg-slate-800",
+            iconColor: "text-gray-500 dark:text-slate-400",
           },
           {
             label: "Docs verified (this page)",
             value: verifiedOnPage,
             icon: ShieldCheck,
-            iconBg: "bg-purple-50",
-            iconColor: "text-purple-600",
+            iconBg: "bg-purple-50 dark:bg-purple-950/60",
+            iconColor: "text-purple-600 dark:text-purple-400",
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow"
           >
             <div
               className={`w-10 h-10 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center shrink-0`}
@@ -357,10 +364,10 @@ const DeliveryPartnerList = () => {
               <stat.icon size={18} />
             </div>
             <div className="min-w-0">
-              <p className="text-xl font-semibold text-gray-900 leading-none">
+              <p className="text-xl font-semibold text-gray-900 dark:text-slate-100 leading-none">
                 {stat.value}
               </p>
-              <p className="text-xs text-gray-500 mt-1.5 truncate">
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1.5 truncate">
                 {stat.label}
               </p>
             </div>
@@ -386,7 +393,7 @@ const DeliveryPartnerList = () => {
       />
 
       {filteredPartners.length === 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-gray-500 text-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-10 text-center text-gray-500 dark:text-slate-400 text-sm">
           No delivery partners match these filters.
         </div>
       )}
@@ -394,10 +401,10 @@ const DeliveryPartnerList = () => {
       {filteredPartners.length > 0 && (
         <>
           {/* ================= DESKTOP TABLE ================= */}
-          <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50/80 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <thead className="bg-gray-50/80 dark:bg-slate-800/70 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-slate-400">
                   <tr>
                     <th className="p-3 w-14">SL.NO.</th>
                     <th className="p-3">Name</th>
@@ -417,14 +424,14 @@ const DeliveryPartnerList = () => {
                     return (
                       <tr
                         key={p?.deliveryPersonId}
-                        className="border-b border-gray-100 last:border-0 hover:bg-blue-50/30 transition-colors"
+                        className="border-b border-gray-100 dark:border-slate-800 last:border-0 hover:bg-blue-50/30 dark:hover:bg-slate-800/60 transition-colors"
                       >
-                        <td className="p-3 text-sm text-gray-400 font-medium">
+                        <td className="p-3 text-sm text-gray-400 dark:text-slate-500 font-medium">
                           {serialNo}
                         </td>
                         <td className="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center overflow-hidden ring-2 ring-white shadow-sm shrink-0">
+                            <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-xs font-semibold flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-slate-800 shadow-sm shrink-0">
                               {p?.photo?.length > 0 ? (
                                 <img
                                   src={imageUrls[p.deliveryPersonId] || noDoc}
@@ -438,27 +445,33 @@ const DeliveryPartnerList = () => {
                             <span
                               className={
                                 p?.firstName
-                                  ? "font-medium text-gray-800"
-                                  : "italic text-gray-400"
+                                  ? "font-medium text-gray-800 dark:text-slate-100"
+                                  : "italic text-gray-400 dark:text-slate-500"
                               }
                             >
                               {getFullName(p)}
                             </span>
                           </div>
                         </td>
-                        <td className="p-3 text-gray-600 text-sm">
+                        <td className="p-3 text-gray-600 dark:text-slate-300 text-sm">
                           <span className="flex items-center gap-1.5">
-                            <Bike size={14} className="text-gray-400" />
+                            <Bike
+                              size={14}
+                              className="text-gray-400 dark:text-slate-500"
+                            />
                             {p?.vehicleNumber || "Not Provided"}
                           </span>
                         </td>
-                        <td className="p-3 text-sm text-gray-600">
+                        <td className="p-3 text-sm text-gray-600 dark:text-slate-300">
                           <span className="flex items-center gap-1.5">
-                            <Phone size={14} className="text-gray-400" />
+                            <Phone
+                              size={14}
+                              className="text-gray-400 dark:text-slate-500"
+                            />
                             {p?.phoneNo || "Not Provided"}
                           </span>
                         </td>
-                        <td className="p-3 text-sm text-gray-600">
+                        <td className="p-3 text-sm text-gray-600 dark:text-slate-300">
                           {formatDate(p?.createdAt)}
                         </td>
                         <td className="p-3">
@@ -468,7 +481,7 @@ const DeliveryPartnerList = () => {
                             className="w-28"
                           />
                         </td>
-                        <td className="p-3 text-sm text-black bg-white">
+                        <td className="p-3 text-sm text-black dark:text-slate-200 bg-white dark:bg-transparent">
                           <AreaCoverCell text={p?.areaCovered} />
                         </td>
                         <td className="p-3">
@@ -478,7 +491,7 @@ const DeliveryPartnerList = () => {
                                 `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonId}`,
                               )
                             }
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 border border-blue-100 bg-blue-50/50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg cursor-pointer transition"
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/50 hover:bg-blue-50 dark:hover:bg-blue-950/80 px-2.5 py-1.5 rounded-lg cursor-pointer transition"
                           >
                             <Eye size={14} />
                             View
@@ -500,17 +513,17 @@ const DeliveryPartnerList = () => {
               return (
                 <div
                   key={p?.deliveryPersonId}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3"
+                  className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-4 space-y-3"
                 >
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-xs text-gray-400">
+                    <span className="font-medium text-xs text-gray-400 dark:text-slate-500">
                       SL.NO. {serialNo}
                     </span>
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${
                         p?.active
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-gray-100 text-gray-500"
+                          ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+                          : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"
                       }`}
                     >
                       <span
@@ -523,7 +536,7 @@ const DeliveryPartnerList = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center overflow-hidden ring-2 ring-white shadow-sm shrink-0">
+                    <div className="w-11 h-11 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-xs font-semibold flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-slate-800 shadow-sm shrink-0">
                       {p?.photo?.length > 0 ? (
                         <img
                           src={imageUrls[p.deliveryPersonId] || noDoc}
@@ -538,34 +551,34 @@ const DeliveryPartnerList = () => {
                       <p
                         className={
                           p?.firstName
-                            ? "font-medium text-sm text-gray-800"
-                            : "italic text-gray-400 text-sm"
+                            ? "font-medium text-sm text-gray-800 dark:text-slate-100"
+                            : "italic text-gray-400 dark:text-slate-500 text-sm"
                         }
                       >
                         {getFullName(p)}
                       </p>
-                      <p className="text-gray-500 flex items-center gap-1 text-xs mt-0.5">
+                      <p className="text-gray-500 dark:text-slate-400 flex items-center gap-1 text-xs mt-0.5">
                         <Bike size={12} />
                         {p?.vehicleNumber || "No vehicle on file"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="text-xs text-gray-600 space-y-1">
+                  <div className="text-xs text-gray-600 dark:text-slate-300 space-y-1">
                     <p className="flex items-center gap-1.5">
                       <Phone size={12} /> {p?.phoneNo || "Not Provided"}
                     </p>
-                    <p className="text-gray-400">
+                    <p className="text-gray-400 dark:text-slate-500">
                       Joined {formatDate(p?.createdAt)}
                     </p>
                     <p className="flex items-start gap-1.5">
                       <MapPin size={12} className="mt-0.5 shrink-0" />
                       {p?.areaCovered ? (
-                        <span className="p-3 text-sm text-black bg-white">
+                        <span className="p-3 text-sm text-black dark:text-slate-200 bg-white dark:bg-transparent">
                           {p.areaCovered}
                         </span>
                       ) : (
-                        <span className="italic text-gray-400">
+                        <span className="italic text-gray-400 dark:text-slate-500">
                           Area not assigned
                         </span>
                       )}
@@ -578,7 +591,7 @@ const DeliveryPartnerList = () => {
                         `/dashboard/deliveryPartnerDetails/${p?.deliveryPersonId}`,
                       )
                     }
-                    className="w-full mt-1 py-2 cursor-pointer rounded-xl bg-blue-50 text-blue-600 text-sm font-medium flex items-center justify-center gap-1.5"
+                    className="w-full mt-1 py-2 cursor-pointer rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 text-sm font-medium flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Eye size={14} />
                     View
@@ -589,8 +602,8 @@ const DeliveryPartnerList = () => {
           </div>
 
           {/* PAGINATION */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <p className="text-xs sm:text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
               Showing page {page} of {totalPages} · {total} total
             </p>
 
@@ -598,7 +611,7 @@ const DeliveryPartnerList = () => {
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
                 disabled={!pagination.hasPreviousPage && page === 1}
-                className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer transition"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer transition"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -607,7 +620,7 @@ const DeliveryPartnerList = () => {
                 num === "..." ? (
                   <span
                     key={`ellipsis-${i}`}
-                    className="px-2 text-sm text-gray-400"
+                    className="px-2 text-sm text-gray-400 dark:text-slate-500"
                   >
                     ...
                   </span>
@@ -618,7 +631,7 @@ const DeliveryPartnerList = () => {
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition ${
                       num === page
                         ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-50 border border-gray-200"
+                        : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700"
                     }`}
                   >
                     {num}
@@ -629,7 +642,7 @@ const DeliveryPartnerList = () => {
               <button
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                 disabled={!pagination.hasNextPage && page === totalPages}
-                className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer transition"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer transition"
               >
                 <ChevronRight size={16} />
               </button>
@@ -665,7 +678,9 @@ const DeliveryStatusSelect = ({
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>Active</span>
               </div>
-              {isActive && <span className="text-blue-600">✓</span>}
+              {isActive && (
+                <span className="text-blue-600 dark:text-blue-400">✓</span>
+              )}
             </div>
           </SplitButtonItem>
           <SplitButtonItem
@@ -676,7 +691,9 @@ const DeliveryStatusSelect = ({
                 <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
                 <span>Inactive</span>
               </div>
-              {!isActive && <span className="text-blue-600">✓</span>}
+              {!isActive && (
+                <span className="text-blue-600 dark:text-blue-400">✓</span>
+              )}
             </div>
           </SplitButtonItem>
         </>

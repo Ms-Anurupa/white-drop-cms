@@ -30,35 +30,43 @@ import ExportExcelButton from "@/components/ExportExcelButton";
 const TYPE_META = {
   CORPORATE: {
     icon: Building2,
-    badge: "border-blue-200 bg-blue-50 text-blue-700",
+    badge:
+      "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300",
     accent: "#2563EB",
-    avatar: "bg-blue-50 text-blue-700",
+    avatar: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   },
   RETAIL: {
     icon: Store,
-    badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    badge:
+      "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
     accent: "#059669",
-    avatar: "bg-emerald-50 text-emerald-700",
+    avatar:
+      "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
   },
   ADHOC: {
     icon: ClipboardList,
-    badge: "border-orange-200 bg-orange-50 text-orange-700",
+    badge:
+      "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950/60 dark:text-orange-300",
     accent: "#EA580C",
-    avatar: "bg-orange-50 text-orange-700",
+    avatar:
+      "bg-orange-50 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
   },
   SUBSCRIPTION: {
     icon: RefreshCw,
-    badge: "border-violet-200 bg-violet-50 text-violet-700",
+    badge:
+      "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300",
     accent: "#7C3AED",
-    avatar: "bg-violet-50 text-violet-700",
+    avatar:
+      "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
   },
 };
 
 const DEFAULT_META = {
   icon: ShoppingBag,
-  badge: "border-slate-200 bg-slate-50 text-slate-600",
+  badge:
+    "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300",
   accent: "#94A3B8",
-  avatar: "bg-slate-100 text-slate-500",
+  avatar: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
@@ -138,7 +146,9 @@ const displayValue = (value) => {
     value === "" ||
     (Array.isArray(value) && value.length === 0)
   ) {
-    return <span className="text-slate-300">Not available</span>;
+    return (
+      <span className="text-slate-300 dark:text-slate-600">Not available</span>
+    );
   }
 
   return value;
@@ -360,7 +370,7 @@ const Sales = () => {
   ];
 
   return (
-    <div className="min-h-full bg-slate-50 p-4 lg:p-5">
+    <div className="min-h-full bg-slate-50 dark:bg-slate-950 p-4 lg:p-5">
       {/* HEADER */}
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
@@ -369,11 +379,11 @@ const Sales = () => {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
               Sales
             </h1>
 
-            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
               Track and monitor sales across all channels.
             </p>
           </div>
@@ -384,7 +394,7 @@ const Sales = () => {
             type="button"
             onClick={fetchSales}
             disabled={salesJobLoading}
-            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <RefreshCw
               size={16}
@@ -400,21 +410,21 @@ const Sales = () => {
       {/* MAIN SUMMARY */}
       <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.3fr_1fr]">
         {/* TOTAL REVENUE */}
-        <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/60 p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl border border-blue-100 dark:border-blue-900/60 bg-blue-50/60 dark:bg-blue-950/30 p-5 shadow-sm">
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-blue-600">
+                <p className="text-xs font-medium uppercase tracking-wider text-blue-600 dark:text-blue-400">
                   Total Sales
                 </p>
 
-                <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
+                <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
                   {salesJobLoading
                     ? "Loading..."
                     : formatCurrency(totalRevenue)}
                 </p>
 
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                   Total revenue for the current filter
                 </p>
               </div>
@@ -424,8 +434,8 @@ const Sales = () => {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-              <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 font-semibold text-blue-600 tabular-nums">
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span className="flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/60 px-2 py-1 font-semibold text-blue-600 dark:text-blue-300 tabular-nums">
                 <TrendingUp size={12} />
                 {totalTransactions}
               </span>
@@ -434,28 +444,28 @@ const Sales = () => {
             </div>
           </div>
 
-          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-blue-100/50" />
-          <div className="absolute -bottom-14 right-20 h-28 w-28 rounded-full bg-blue-100/40" />
+          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-blue-100/50 dark:bg-blue-900/20" />
+          <div className="absolute -bottom-14 right-20 h-28 w-28 rounded-full bg-blue-100/40 dark:bg-blue-900/15" />
         </div>
 
         {/* TRANSACTIONS */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Transactions
               </p>
 
-              <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
+              <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
                 {salesJobLoading ? "..." : totalTransactions}
               </p>
 
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Total recorded sales
               </p>
             </div>
 
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
               <ShoppingBag size={20} />
             </div>
           </div>
@@ -467,27 +477,27 @@ const Sales = () => {
         {periodCards.map((card) => (
           <div
             key={card.key}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   {card.label}
                 </p>
 
-                <p className="mt-2 text-lg font-bold text-slate-900 tabular-nums">
+                <p className="mt-2 text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                   {salesJobLoading
                     ? "..."
                     : formatCurrency(card.data?.totalRevenue)}
                 </p>
               </div>
 
-              <div className="rounded-lg bg-slate-100 p-2 text-slate-500">
+              <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-2 text-slate-500 dark:text-slate-400">
                 <IndianRupee size={15} />
               </div>
             </div>
 
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               {salesJobLoading
                 ? "Loading..."
                 : `${card.data?.totalCount ?? 0} transactions`}
@@ -497,9 +507,9 @@ const Sales = () => {
       </div>
 
       {/* FILTERS + TABLE */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         {/* FILTER BAR */}
-        <div className="border-b border-slate-100 p-4">
+        <div className="border-b border-slate-100 dark:border-slate-800 p-4">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             {/* SEARCH + CUSTOM DATE RANGE */}
             <div className="flex w-full flex-col gap-2 sm:flex-row xl:max-w-3xl">
@@ -507,7 +517,7 @@ const Sales = () => {
               <div className="relative w-full sm:max-w-md">
                 <Search
                   size={17}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 />
 
                 <input
@@ -515,14 +525,14 @@ const Sales = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search loaded results..."
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-50"
+                  className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-10 pr-9 text-sm text-slate-700 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-400 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-500/20"
                 />
 
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch("")}
-                    className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200"
                   >
                     <X size={14} />
                   </button>
@@ -533,7 +543,7 @@ const Sales = () => {
               <div className="relative w-full sm:w-auto">
                 <CalendarDays
                   size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 />
 
                 <div
@@ -556,12 +566,12 @@ const Sales = () => {
                       setDateFilter("ALL");
                       setPage(1);
                     }}
-                    className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                    className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 text-sm font-medium text-slate-600 dark:text-slate-200 dark:[color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-500/20 sm:w-40"
                   />
                 </div>
               </div>
 
-              <span className="hidden items-center text-xs text-slate-400 sm:flex">
+              <span className="hidden items-center text-xs text-slate-400 dark:text-slate-500 sm:flex">
                 to
               </span>
 
@@ -584,7 +594,7 @@ const Sales = () => {
                     setDateFilter("ALL");
                     setPage(1);
                   }}
-                  className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-40"
+                  className="h-10 w-full cursor-pointer rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-sm font-medium text-slate-600 dark:text-slate-200 dark:[color-scheme:dark] outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-500/20 sm:w-40"
                 />
               </div>
 
@@ -594,7 +604,7 @@ const Sales = () => {
                   type="button"
                   onClick={clearCustomDateRange}
                   title="Clear date range"
-                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600"
+                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 transition hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   <X size={15} />
                 </button>
@@ -607,7 +617,7 @@ const Sales = () => {
               <div className="relative">
                 <CalendarDays
                   size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 />
 
                 <select
@@ -620,7 +630,7 @@ const Sales = () => {
                     setCustomTo("");
                     setPage(1);
                   }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-9 text-sm font-medium text-slate-600 dark:text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-500/20 sm:w-44"
                 >
                   {DATE_FILTERS.map((filter) => (
                     <option key={filter.value} value={filter.value}>
@@ -634,7 +644,7 @@ const Sales = () => {
               <div className="relative">
                 <Filter
                   size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 />
 
                 <select
@@ -643,7 +653,7 @@ const Sales = () => {
                     setSaleType(e.target.value);
                     setPage(1);
                   }}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-9 text-sm font-medium text-slate-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 sm:w-44"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-9 text-sm font-medium text-slate-600 dark:text-slate-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 dark:focus:ring-blue-500/20 sm:w-44"
                 >
                   {SALE_TYPES.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -658,7 +668,7 @@ const Sales = () => {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   <X size={15} />
                   Clear
@@ -669,7 +679,7 @@ const Sales = () => {
 
           {/* CUSTOM RANGE VALIDATION */}
           {isCustomRangeInvalid && (
-            <p className="mt-2 text-xs font-medium text-red-500">
+            <p className="mt-2 text-xs font-medium text-red-500 dark:text-red-400">
               "From" date cannot be after "To" date.
             </p>
           )}
@@ -677,14 +687,14 @@ const Sales = () => {
           {/* CUSTOM RANGE INCOMPLETE */}
           {!isCustomRangeInvalid &&
             ((customFrom && !customTo) || (!customFrom && customTo)) && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
                 Pick both a "from" and "to" date to apply the custom range.
               </p>
             )}
 
           {/* SEARCH INFO */}
           {search && (
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
               Search applies to the currently loaded page.
             </p>
           )}
@@ -694,42 +704,42 @@ const Sales = () => {
         <div className="max-h-[640px] overflow-auto">
           <table className="w-full min-w-[850px] text-sm">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-slate-100 bg-slate-50/95 backdrop-blur">
-                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-800/80 backdrop-blur">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   <button
                     type="button"
                     onClick={() => toggleSort("date")}
-                    className="flex cursor-pointer items-center gap-1 hover:text-slate-600"
+                    className="flex cursor-pointer items-center gap-1 hover:text-slate-600 dark:hover:text-slate-200"
                   >
                     Sale Date
                     <SortIcon column="date" sort={sort} />
                   </button>
                 </th>
 
-                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Sale Type
                 </th>
 
-                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Customer
                 </th>
 
-                <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   Items
                 </th>
 
-                <th className="px-5 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3.5 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   <button
                     type="button"
                     onClick={() => toggleSort("value")}
-                    className="ml-auto flex cursor-pointer items-center gap-1 hover:text-slate-600"
+                    className="ml-auto flex cursor-pointer items-center gap-1 hover:text-slate-600 dark:hover:text-slate-200"
                   >
                     Sale Value
                     <SortIcon column="value" sort={sort} />
                   </button>
                 </th>
 
-                <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <th className="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                   View
                 </th>
               </tr>
@@ -738,7 +748,7 @@ const Sales = () => {
             <tbody>
               {salesJobLoading ? (
                 Array.from({ length: 6 }).map((_, index) => (
-                  <tr key={index} className="border-b border-slate-100">
+                  <tr key={index} className="border-b border-slate-100 dark:border-slate-800">
                     <td className="px-5 py-4">
                       <Skeleton width="w-20" />
                       <Skeleton width="w-12" className="mt-2" />
@@ -750,7 +760,7 @@ const Sales = () => {
 
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-8 w-8 animate-pulse rounded-full bg-slate-100" />
+                        <div className="h-8 w-8 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
 
                         <div>
                           <Skeleton width="w-28" />
@@ -789,19 +799,19 @@ const Sales = () => {
                     <tr
                       key={sale.id}
                       onClick={() => setSelectedSale(sale)}
-                      className="group cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-slate-50/70"
+                      className="group cursor-pointer border-b border-slate-100 dark:border-slate-800 transition last:border-0 hover:bg-slate-50/70 dark:hover:bg-slate-800/60"
                       style={{
                         borderLeft: `3px solid ${meta.accent}`,
                       }}
                     >
                       {/* DATE */}
                       <td className="px-5 py-4">
-                        <p className="font-medium text-slate-700">
+                        <p className="font-medium text-slate-700 dark:text-slate-200">
                           {formatDate(sale.occurredAt ?? sale.saleDate)}
                         </p>
 
                         {sale.occurredAt && (
-                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
                             <Clock3 size={11} />
                             {formatTime(sale.occurredAt)}
                           </p>
@@ -828,12 +838,12 @@ const Sales = () => {
                           </div>
 
                           <div className="min-w-0">
-                            <p className="max-w-[180px] truncate font-medium text-slate-700">
+                            <p className="max-w-[180px] truncate font-medium text-slate-700 dark:text-slate-200">
                               {displayValue(customerName)}
                             </p>
 
                             {customerPhone && (
-                              <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                              <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
                                 <Phone size={10} />
                                 {customerPhone}
                               </p>
@@ -844,14 +854,14 @@ const Sales = () => {
 
                       {/* ITEMS */}
                       <td className="px-5 py-4 text-center">
-                        <span className="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 tabular-nums">
+                        <span className="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 tabular-nums">
                           {sale.details?.itemCount ?? 0}
                         </span>
                       </td>
 
                       {/* VALUE */}
                       <td className="px-5 py-4 text-right">
-                        <span className="font-bold text-slate-800 tabular-nums">
+                        <span className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">
                           {formatCurrency(sale.saleValue)}
                         </span>
                       </td>
@@ -864,7 +874,7 @@ const Sales = () => {
                             event.stopPropagation();
                             setSelectedSale(sale);
                           }}
-                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400"
                           title="View sale"
                         >
                           <Eye size={15} />
@@ -877,17 +887,17 @@ const Sales = () => {
                 <tr>
                   <td colSpan={6} className="px-5 py-16 text-center">
                     <div className="mx-auto flex max-w-xs flex-col items-center">
-                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
-                        <ShoppingBag size={22} className="text-slate-400" />
+                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+                        <ShoppingBag size={22} className="text-slate-400 dark:text-slate-500" />
                       </div>
 
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                         {hasActiveFilters
                           ? "No matching sales"
                           : "No sales yet"}
                       </p>
 
-                      <p className="mt-1 text-xs text-slate-400">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                         {hasActiveFilters
                           ? "Try a different search term or clear your filters."
                           : "Sales will show up here once transactions come in."}
@@ -897,7 +907,7 @@ const Sales = () => {
                         <button
                           type="button"
                           onClick={clearFilters}
-                          className="mt-4 inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                          className="mt-4 inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                         >
                           Clear filters
                         </button>
@@ -911,26 +921,26 @@ const Sales = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-slate-100 dark:border-slate-800 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Showing{" "}
-              <span className="font-semibold text-slate-700 tabular-nums">
+              <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
                 {rangeStart}
               </span>{" "}
               to{" "}
-              <span className="font-semibold text-slate-700 tabular-nums">
+              <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
                 {rangeEnd}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-slate-700 tabular-nums">
+              <span className="font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
                 {totalTransactions}
               </span>{" "}
               sales
             </p>
 
             <div className="hidden items-center gap-1.5 sm:flex">
-              <label htmlFor="page-size" className="text-xs text-slate-400">
+              <label htmlFor="page-size" className="text-xs text-slate-400 dark:text-slate-500">
                 Rows
               </label>
 
@@ -941,7 +951,7 @@ const Sales = () => {
                   setLimit(Number(e.target.value));
                   setPage(1);
                 }}
-                className="h-7 cursor-pointer rounded-md border border-slate-200 bg-white px-1.5 text-xs font-medium text-slate-600 outline-none focus:border-blue-400"
+                className="h-7 cursor-pointer rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-1.5 text-xs font-medium text-slate-600 dark:text-slate-200 outline-none focus:border-blue-400"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -1003,19 +1013,19 @@ const Sales = () => {
 
 const SortIcon = ({ column, sort }) => {
   if (sort.key !== column) {
-    return <ArrowUpDown size={13} className="text-slate-300" />;
+    return <ArrowUpDown size={13} className="text-slate-300 dark:text-slate-600" />;
   }
 
   return sort.direction === "asc" ? (
-    <ArrowUp size={13} className="text-blue-600" />
+    <ArrowUp size={13} className="text-blue-600 dark:text-blue-400" />
   ) : (
-    <ArrowDown size={13} className="text-blue-600" />
+    <ArrowDown size={13} className="text-blue-600 dark:text-blue-400" />
   );
 };
 
 const Skeleton = ({ width = "w-16", className = "" }) => (
   <div
-    className={`h-3.5 animate-pulse rounded bg-slate-100 ${width} ${className}`}
+    className={`h-3.5 animate-pulse rounded bg-slate-100 dark:bg-slate-800 ${width} ${className}`}
   />
 );
 
@@ -1024,7 +1034,7 @@ const PaginationButton = ({ onClick, disabled, children }) => (
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition hover:bg-slate-50 dark:hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
   >
     {children}
   </button>
@@ -1048,15 +1058,15 @@ const SaleDetailModal = ({ sale, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-black/60 p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl"
+        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white dark:bg-slate-900 dark:border dark:border-slate-800 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
         {/* MODAL HEADER */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-5 py-4">
           <div className="flex items-center gap-2">
             <span
               className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${meta.badge}`}
@@ -1065,7 +1075,7 @@ const SaleDetailModal = ({ sale, onClose }) => {
               {sale.saleType || "Unknown"}
             </span>
 
-            <h2 className="text-sm font-semibold text-slate-800">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
               Sale Details
             </h2>
           </div>
@@ -1073,7 +1083,7 @@ const SaleDetailModal = ({ sale, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-200"
           >
             <X size={16} />
           </button>
@@ -1095,7 +1105,7 @@ const SaleDetailModal = ({ sale, onClose }) => {
             <DetailItem
               label="Sale Value"
               value={formatCurrency(sale.saleValue)}
-              valueClass="font-bold text-slate-800"
+              valueClass="font-bold text-slate-800 dark:text-slate-100"
             />
 
             <DetailItem
@@ -1116,8 +1126,8 @@ const SaleDetailModal = ({ sale, onClose }) => {
           </div>
 
           {additionalDetails.length > 0 && (
-            <div className="mt-5 border-t border-slate-100 pt-4">
-              <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+            <div className="mt-5 border-t border-slate-100 dark:border-slate-800 pt-4">
+              <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 Additional Details
               </p>
 
@@ -1143,10 +1153,10 @@ const DetailItem = ({
   value,
   icon,
   mono = false,
-  valueClass = "text-slate-700",
+  valueClass = "text-slate-700 dark:text-slate-200",
 }) => (
   <div className="min-w-0">
-    <dt className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+    <dt className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
       {icon}
       {label}
     </dt>

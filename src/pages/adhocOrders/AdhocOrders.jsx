@@ -202,14 +202,14 @@ const AdhocOrders = () => {
       <div className="flex shrink-0 flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-baseline gap-3">
           <div className="flex items-center gap-2">
-            <PackageSearch size={17} className="text-blue-600" />
+            <PackageSearch size={17} className="text-blue-600 dark:text-blue-400" />
 
             <h1 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
               Adhoc Orders
             </h1>
           </div>
 
-          <span className="text-xs font-medium text-blue-600">
+          <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
             Total: {totalCount}
           </span>
 
@@ -229,7 +229,7 @@ const AdhocOrders = () => {
           <div className="relative w-full sm:w-72 lg:w-80">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
 
             <input
@@ -260,7 +260,7 @@ const AdhocOrders = () => {
             onClick={() => handleDateFilterChange("")}
             className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${!dateFilter
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
           >
             All
@@ -271,7 +271,7 @@ const AdhocOrders = () => {
             onClick={() => handleDateFilterChange("today")}
             className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "today"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
           >
             <CalendarDays size={12} />
@@ -283,7 +283,7 @@ const AdhocOrders = () => {
             onClick={() => handleDateFilterChange("yesterday")}
             className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "yesterday"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
           >
             <Clock3 size={12} />
@@ -295,7 +295,7 @@ const AdhocOrders = () => {
             onClick={() => handleDateFilterChange("thisWeek")}
             className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "thisWeek"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
           >
             This Week
@@ -306,7 +306,7 @@ const AdhocOrders = () => {
             onClick={() => handleDateFilterChange("thisMonth")}
             className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition ${dateFilter === "thisMonth"
                 ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
               }`}
           >
             This Month
@@ -332,11 +332,11 @@ const AdhocOrders = () => {
               type="date"
               value={startDate}
               onChange={(e) => handleStartDateChange(e.target.value)}
-              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:[color-scheme:dark]"
             />
           </div>
 
-          <span className="text-xs text-gray-300">→</span>
+          <span className="text-xs text-gray-300 dark:text-slate-600">→</span>
 
           <div
             className="w-full cursor-pointer"
@@ -354,7 +354,7 @@ const AdhocOrders = () => {
               value={endDate}
               min={startDate || undefined}
               onChange={(e) => handleEndDateChange(e.target.value)}
-              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+              className="h-8 cursor-pointer rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:[color-scheme:dark]"
             />
           </div>
         </div>
@@ -421,17 +421,17 @@ const AdhocOrders = () => {
           </span>
         </div>
 
-        <span className="ml-auto text-[11px] text-gray-400">
+        <span className="ml-auto text-[11px] text-gray-400 dark:text-slate-500">
           Showing {orders.length} of {totalCount}
         </span>
       </div>
 
       {/* TABLE */}
-      <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb] dark:border-slate-800">
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb] dark:border-slate-800 dark:bg-slate-900">
         <div className="min-h-0 flex-1 overflow-auto">
           <table className="w-full min-w-[1050px] table-fixed text-xs">
-            <thead className="sticky top-0 z-10 bg-[#274de4]">
-              <tr className="border-b border-gray-300">
+            <thead className="sticky top-0 z-10 bg-[#274de4] dark:bg-blue-900">
+              <tr className="border-b border-gray-300 dark:border-slate-700">
                 <th className="w-14 whitespace-nowrap px-2 py-2 text-left text-[11px] font-semibold text-white">
                   Sl No.
                 </th>
@@ -488,8 +488,8 @@ const AdhocOrders = () => {
               ) : orders.length === 0 ? (
                 /* EMPTY */
                 <tr>
-                  <td colSpan={8} className="px-6 py-16">
-                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
+                    <td colSpan={8} className="px-6 py-16">
+                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-slate-500">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-slate-800">
                         <PackageSearch
                           size={25}
@@ -524,7 +524,7 @@ const AdhocOrders = () => {
                         <div className="flex items-center gap-1.5">
                           <CalendarDays
                             size={11}
-                            className="shrink-0 text-gray-400"
+                            className="shrink-0 text-gray-400 dark:text-slate-500"
                           />
 
                           <p className="truncate font-medium text-gray-800 dark:text-slate-200">
@@ -532,7 +532,7 @@ const AdhocOrders = () => {
                           </p>
                         </div>
 
-                        <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-gray-400">
+                        <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-slate-500">
                           <Clock3 size={10} />
                           {formatTime(order?.soldOn)}
                         </div>
@@ -542,7 +542,7 @@ const AdhocOrders = () => {
                     {/* SELLER */}
                     <td className="px-2 py-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
                           <UserRound size={12} />
                         </div>
 
@@ -561,7 +561,7 @@ const AdhocOrders = () => {
                     {/* PHONE */}
                     <td className="px-2 py-2">
                       <div className="flex items-center gap-1.5 text-gray-700 dark:text-slate-300">
-                        <Phone size={11} className="text-gray-400" />
+                        <Phone size={11} className="text-gray-400 dark:text-slate-500" />
 
                         <span className="truncate">
                           {order?.phoneNo || "-"}
@@ -572,7 +572,7 @@ const AdhocOrders = () => {
                     {/* ITEMS */}
                     <td className="px-2 py-2">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-blue-50 px-1.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-950/50 dark:text-blue-400">
+                        <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-blue-50 px-1.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
                           {getItemCount(order)}
                         </span>
 
@@ -596,7 +596,7 @@ const AdhocOrders = () => {
 
                     {/* STATUS */}
                     <td className="px-2 py-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         Completed
                       </span>
@@ -643,7 +643,7 @@ const AdhocOrders = () => {
             </span>
 
             <div className="hidden items-center gap-1.5 sm:flex">
-              <span className="text-[11px] text-gray-400">Rows</span>
+              <span className="text-[11px] text-gray-400 dark:text-slate-500">Rows</span>
 
               <select
                 value={limit}
@@ -732,7 +732,7 @@ const AdhocOrders = () => {
             {/* CONTENT */}
             <div className="space-y-5 p-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800">
+                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-800/40">
                   <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                     <UserRound size={14} />
                     Seller
@@ -743,7 +743,7 @@ const AdhocOrders = () => {
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800">
+                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-800/40">
                   <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                     <Phone size={14} />
                     Phone
@@ -754,7 +754,7 @@ const AdhocOrders = () => {
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800">
+                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-800/40">
                   <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                     <CalendarDays size={14} />
                     Sold On
@@ -764,12 +764,12 @@ const AdhocOrders = () => {
                     {formatDate(selectedOrder?.soldOn)}
                   </p>
 
-                  <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                     {formatTime(selectedOrder?.soldOn)}
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800">
+                <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-800/40">
                   <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                     <IndianRupee size={14} />
                     Sale Value
@@ -795,7 +795,7 @@ const AdhocOrders = () => {
 
                 <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-800">
                   <table className="w-full min-w-[450px] text-left">
-                    <thead className="bg-gray-50 dark:bg-slate-950">
+                    <thead className="bg-gray-50 dark:bg-slate-800/70">
                       <tr>
                         <th className="px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-slate-400">
                           Sl No.
@@ -858,8 +858,8 @@ const AdhocOrders = () => {
 
               {/* FOOTER INFO */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-950">
-                  <p className="text-xs text-gray-500 dark:text-slate-500">
+                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-800/70">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     Created At
                   </p>
 
@@ -869,8 +869,8 @@ const AdhocOrders = () => {
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-950">
-                  <p className="text-xs text-gray-500 dark:text-slate-500">
+                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-800/70">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     Updated At
                   </p>
 
@@ -880,12 +880,12 @@ const AdhocOrders = () => {
                   </p>
                 </div>
 
-                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-950">
-                  <p className="text-xs text-gray-500 dark:text-slate-500">
+                <div className="rounded-lg bg-gray-50 p-3 dark:bg-slate-800/70">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     Status
                   </p>
 
-                  <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+                  <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     Completed
                   </span>

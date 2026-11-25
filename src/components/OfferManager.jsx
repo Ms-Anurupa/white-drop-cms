@@ -63,8 +63,8 @@ const OfferManager = () => {
       {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Offer Manager</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Offer Manager</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Manage all offers & promotions
           </p>
         </div>
@@ -74,7 +74,7 @@ const OfferManager = () => {
           <div className="relative w-full sm:w-56">
             <Search
               size={16}
-              className="absolute left-3 top-2.5 text-gray-400"
+              className="absolute left-3 top-2.5 text-gray-400 dark:text-slate-500"
             />
             <input
               value={search}
@@ -83,7 +83,7 @@ const OfferManager = () => {
                 setPage(1);
               }}
               placeholder="Search offer..."
-              className="w-full pl-9 pr-3 py-2 text-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
           </div>
 
@@ -101,11 +101,11 @@ const OfferManager = () => {
       </div>
 
       {/* TABLE WRAPPER */}
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         {/* ───────── DESKTOP TABLE ───────── */}
         <div className="hidden md:block">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 border-b dark:bg-slate-800/70 dark:border-slate-800">
               <tr>
                 {[
                   "Sl No.",
@@ -122,7 +122,7 @@ const OfferManager = () => {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-3 py-3 text-left text-xs text-gray-500 uppercase"
+                    className="px-3 py-3 text-left text-xs text-gray-500 uppercase dark:text-slate-400"
                   >
                     {h}
                   </th>
@@ -130,25 +130,25 @@ const OfferManager = () => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="dark:divide-y dark:divide-slate-800 dark:text-slate-300">
               {paginated.map((o, i) => (
-                <tr key={o.id} className=" hover:bg-gray-50">
+                <tr key={o.id} className=" hover:bg-gray-50 dark:hover:bg-slate-800/60">
                   <td className="px-3 py-3">{start + i + 1}</td>
-                  <td className="px-3 py-3 font-medium">{o.label}</td>
+                  <td className="px-3 py-3 font-medium dark:text-slate-100">{o.label}</td>
                   <td className="px-3 py-3">{o.type}</td>
                   <td className="px-3 py-3">{o.category}</td>
                   <td className="px-3 py-3">{o.products}</td>
                   <td className="px-3 py-3">{o.buyQty}</td>
                   <td className="px-3 py-3">{o.getQty}</td>
                   <td className="px-3 py-3">{o.addedBy}</td>
-                  <td className="px-3 py-3 text-gray-500">{o.createdAt}</td>
+                  <td className="px-3 py-3 text-gray-500 dark:text-slate-400">{o.createdAt}</td>
 
                   <td className="px-3 py-3">
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
                         o.status === "Active"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-gray-100 text-gray-600"
+                          ? "bg-green-50 text-green-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                          : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300"
                       }`}
                     >
                       {o.status}
@@ -160,7 +160,7 @@ const OfferManager = () => {
                     <button
                       onClick={() => toggleStatus(o.id)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                        o.status === "Active" ? "bg-green-500" : "bg-gray-300"
+                        o.status === "Active" ? "bg-green-500" : "bg-gray-300 dark:bg-slate-700"
                       }`}
                     >
                       <span
@@ -181,21 +181,21 @@ const OfferManager = () => {
         {/* ───────── MOBILE CARD UI ───────── */}
         <div className="md:hidden space-y-3 p-3">
           {paginated.map((o) => (
-            <div key={o.id} className="border rounded-xl p-3 space-y-2">
+            <div key={o.id} className="border rounded-xl p-3 space-y-2 dark:border-slate-800 dark:bg-slate-800/40">
               <div className="flex justify-between">
-                <h3 className="font-semibold">{o.label}</h3>
-                <span className="text-xs px-2 py-1 rounded bg-green-50 text-green-700">
+                <h3 className="font-semibold dark:text-slate-100">{o.label}</h3>
+                <span className="text-xs px-2 py-1 rounded bg-green-50 text-green-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                   {o.status}
                 </span>
               </div>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-slate-400">
                 {o.type} • {o.category}
               </p>
 
-              <p className="text-sm">Products: {o.products}</p>
+              <p className="text-sm dark:text-slate-200">Products: {o.products}</p>
 
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
                 <span>Buy: {o.buyQty}</span>
                 <span>Get: {o.getQty}</span>
               </div>
@@ -203,7 +203,7 @@ const OfferManager = () => {
               <button
                 onClick={() => toggleStatus(o.id)}
                 className={`w-full mt-2 relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                  o.status === "Active" ? "bg-green-500" : "bg-gray-300"
+                  o.status === "Active" ? "bg-green-500" : "bg-gray-300 dark:bg-slate-700"
                 }`}
               >
                 <span
@@ -221,18 +221,18 @@ const OfferManager = () => {
       <div className="flex justify-end items-center gap-2">
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          className="p-1 cursor-pointer border rounded"
+          className="p-1 cursor-pointer border rounded dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           <ChevronLeft size={16} />
         </button>
 
-        <span className="text-sm">
+        <span className="text-sm dark:text-slate-300">
           {page} / {totalPages || 1}
         </span>
 
         <button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-          className="p-1 cursor-pointer border rounded"
+          className="p-1 cursor-pointer border rounded dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           <ChevronRight size={16} />
         </button>

@@ -191,11 +191,11 @@ const CreateCorporateAccount = () => {
   };;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50 p-6 dark:bg-slate-950">
       <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition mb-6 cursor-pointer group"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-100 transition mb-6 cursor-pointer group"
         >
           <ArrowLeft
             size={16}
@@ -204,19 +204,19 @@ const CreateCorporateAccount = () => {
           Back to Corporate accounts list
         </button>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
           {/* Header */}
-          <div className="px-6 sm:px-8 pt-2 pb-2 border-b border-gray-100">
+          <div className="px-6 sm:px-8 pt-2 pb-2 border-b border-gray-100 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
-                <ShoppingCart size={20} className="text-blue-600" />
+              <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center">
+                <ShoppingCart size={20} className="text-blue-600 dark:text-blue-400" />
               </div>
 
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                   Create Corporate Account
                 </h1>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                   Add a new corporate account
                 </p>
               </div>
@@ -225,12 +225,12 @@ const CreateCorporateAccount = () => {
 
           <div className="p-4">
             {/* Warning */}
-            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
+            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 dark:border-amber-800 dark:bg-amber-950/60">
               <AlertTriangle
                 size={16}
-                className="text-amber-500 mt-0.5 shrink-0"
+                className="text-amber-500 dark:text-amber-400 mt-0.5 shrink-0"
               />
-              <p className="text-xs text-amber-800 leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
                 Please verify all corporate account information before creating
                 the account.
               </p>
@@ -239,14 +239,14 @@ const CreateCorporateAccount = () => {
             {/* Account ID & Business Name */}
             <div>
               {/* Business Name */}
-              <label className="mb-2 block text-xs font-medium text-gray-700">
+              <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                 Business Name <span className="text-red-500">*</span>
               </label>
 
               <div className="relative">
                 <Building2
                   size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
 
                 <input
@@ -254,7 +254,7 @@ const CreateCorporateAccount = () => {
                   value={corporateData.businessName}
                   onChange={handleChange}
                   placeholder="Enter Business Name"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                 />
               </div>
             </div>
@@ -263,7 +263,7 @@ const CreateCorporateAccount = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 {/* GST Number */}
-                <label className="mb-2 block text-xs font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                   GST Number <span className="text-red-500">*</span>
                 </label>
 
@@ -273,13 +273,13 @@ const CreateCorporateAccount = () => {
                   onChange={handleChange}
                   placeholder="22AAAAA0000A1Z5"
                   maxLength={15}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                 />
               </div>
 
               <div>
                 {/* Contact Number */}
-                <label className="mb-2 block text-xs font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                   Contact Number <span className="text-red-500">*</span>
                 </label>
 
@@ -291,7 +291,7 @@ const CreateCorporateAccount = () => {
                   maxLength={10}
                   inputMode="numeric"
                   pattern="[6-9][0-9]{9}"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                 />
               </div>
             </div>
@@ -302,7 +302,7 @@ const CreateCorporateAccount = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   {/* House / Flat No. */}
-                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                     House / Flat No. <span className="text-red-500">*</span>
                   </label>
 
@@ -311,13 +311,13 @@ const CreateCorporateAccount = () => {
                     value={corporateData.addressDetails.houseNo}
                     onChange={handleAddressChange}
                     placeholder="Flat 3A"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                   />
                 </div>
 
                 <div>
                   {/* Street / Road */}
-                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                     Street / Road <span className="text-red-500">*</span>
                   </label>
 
@@ -326,14 +326,14 @@ const CreateCorporateAccount = () => {
                     value={corporateData.addressDetails.street}
                     onChange={handleAddressChange}
                     placeholder="MG Road"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               <div>
                 {/* Area / Locality */}
-                <label className="mb-2 block text-xs font-medium text-gray-700">
+                <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                   Area / Locality <span className="text-red-500">*</span>
                 </label>
 
@@ -342,14 +342,14 @@ const CreateCorporateAccount = () => {
                   value={corporateData.addressDetails.area}
                   onChange={handleAddressChange}
                   placeholder="Salt Lake Sector V"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   {/* City */}
-                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                     City <span className="text-red-500">*</span>
                   </label>
 
@@ -358,13 +358,13 @@ const CreateCorporateAccount = () => {
                     value={corporateData.addressDetails.city}
                     onChange={handleAddressChange}
                     placeholder="Kolkata"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                   />
                 </div>
 
                 <div>
                   {/* State */}
-                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                     State <span className="text-red-500">*</span>
                   </label>
 
@@ -373,13 +373,13 @@ const CreateCorporateAccount = () => {
                     value={corporateData.addressDetails.state}
                     onChange={handleAddressChange}
                     placeholder="West Bengal"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                   />
                 </div>
 
                 <div>
                   {/* Pincode */}
-                  <label className="mb-2 block text-xs font-medium text-gray-700">
+                  <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                     Pincode <span className="text-red-500">*</span>
                   </label>
 
@@ -391,7 +391,7 @@ const CreateCorporateAccount = () => {
                     inputMode="numeric"
                     placeholder="700091"
                     pattern="[1-9][0-9]{5}"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -400,7 +400,7 @@ const CreateCorporateAccount = () => {
             {/* Landmark */}
             <div>
               {/* Landmark */}
-              <label className="mb-2 block text-xs font-medium text-gray-700">
+              <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-slate-300">
                 Landmark <span className="text-red-500">*</span>
               </label>
 
@@ -409,16 +409,16 @@ const CreateCorporateAccount = () => {
                 value={corporateData.location.landmark}
                 onChange={handleLocationChange}
                 placeholder="Near City Centre Mall"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
               />
             </div>
 
             {/* Footer */}
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Cancel
               </button>

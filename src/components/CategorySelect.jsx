@@ -101,13 +101,13 @@ const CategorySelect = ({
                 type="button"
                 onClick={() => setOpen((prev) => !prev)}
                 className={[
-                    "flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2 text-sm transition-colors",
+                    "flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white dark:bg-slate-900 px-3 py-2 text-sm transition-colors",
                     error
-                        ? "border-red-300"
-                        : "border-slate-200 hover:border-slate-300",
+                        ? "border-red-300 dark:border-red-700"
+                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
                     selected
-                        ? "text-gray-900"
-                        : "text-gray-400",
+                        ? "text-gray-900 dark:text-slate-100"
+                        : "text-gray-400 dark:text-slate-500",
                 ].join(" ")}
             >
                 <span className="truncate">
@@ -117,25 +117,25 @@ const CategorySelect = ({
                 <ChevronDown
                     size={15}
                     className={[
-                        "shrink-0 text-gray-400 transition-transform",
+                        "shrink-0 text-gray-400 dark:text-slate-500 transition-transform",
                         open ? "rotate-180" : "",
                     ].join(" ")}
                 />
             </button>
 
             {error && (
-                <p className="mt-1 text-xs text-red-600">
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                     {error}
                 </p>
             )}
 
             {open && (
-                <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+                <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg">
                     {/* Search */}
-                    <div className="flex items-center gap-2 border-b border-slate-100 px-3 py-2">
+                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 px-3 py-2">
                         <Search
                             size={14}
-                            className="shrink-0 text-gray-400"
+                            className="shrink-0 text-gray-400 dark:text-slate-500"
                         />
 
                         <input
@@ -148,7 +148,7 @@ const CategorySelect = ({
                                 )
                             }
                             placeholder="Search categories"
-                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                            className="w-full bg-transparent text-sm text-gray-700 dark:text-slate-200 outline-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
                         />
                     </div>
 
@@ -161,8 +161,8 @@ const CategorySelect = ({
                                 className={[
                                     "flex w-full cursor-pointer items-center px-3 py-2 text-left text-sm",
                                     !value
-                                        ? "bg-blue-50 text-blue-700"
-                                        : "text-gray-500 hover:bg-slate-50",
+                                        ? "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+                                        : "text-gray-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800",
                                 ].join(" ")}
                             >
                                 <span>All categories</span>
@@ -170,7 +170,7 @@ const CategorySelect = ({
                                 {!value && (
                                     <Check
                                         size={14}
-                                        className="ml-auto text-blue-600"
+                                        className="ml-auto text-blue-600 dark:text-blue-400"
                                     />
                                 )}
                             </button>
@@ -190,8 +190,8 @@ const CategorySelect = ({
                                     className={[
                                         "flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-sm transition-colors",
                                         isSelected
-                                            ? "bg-blue-50 text-blue-700"
-                                            : "text-gray-700 hover:bg-slate-50",
+                                            ? "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+                                            : "text-gray-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800",
                                     ].join(" ")}
                                 >
                                     <span className="truncate">
@@ -201,7 +201,7 @@ const CategorySelect = ({
                                     {isSelected && (
                                         <Check
                                             size={14}
-                                            className="shrink-0 text-blue-600"
+                                            className="shrink-0 text-blue-600 dark:text-blue-400"
                                         />
                                     )}
                                 </button>
@@ -210,7 +210,7 @@ const CategorySelect = ({
 
                         {/* Loading */}
                         {loading && (
-                            <div className="px-3 py-3 text-center text-xs text-gray-400">
+                            <div className="px-3 py-3 text-center text-xs text-gray-400 dark:text-slate-500">
                                 Loading categories...
                             </div>
                         )}
@@ -219,12 +219,12 @@ const CategorySelect = ({
                         {!loading &&
                             categories.length === 0 && (
                                 <div className="px-3 py-4 text-center">
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-gray-400 dark:text-slate-500">
                                         No categories found.
                                     </p>
 
                                     {search && (
-                                        <p className="mt-1 text-xs text-gray-400">
+                                        <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">
                                             Try a different search.
                                         </p>
                                     )}
@@ -236,7 +236,7 @@ const CategorySelect = ({
                             <button
                                 type="button"
                                 onClick={loadMoreCategories}
-                                className="w-full cursor-pointer border-t border-slate-100 px-3 py-2 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
+                                className="w-full cursor-pointer border-t border-slate-100 dark:border-slate-800 px-3 py-2 text-xs font-medium text-blue-600 dark:text-blue-400 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950/50"
                             >
                                 Load more
                             </button>

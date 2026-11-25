@@ -21,13 +21,32 @@ import Loader from "./Loader";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
 
 const STATUS_TOKENS = {
-  DELIVERED: { bg: "#EAF3DE", text: "#27500A", dot: "#639922" },
-  SHIPPED: { bg: "#FAEEDA", text: "#633806", dot: "#BA7517" },
-  PROCESSING: { bg: "#E6F1FB", text: "#0C447C", dot: "#378ADD" },
-  CANCELLED: { bg: "#FCEBEB", text: "#791F1F", dot: "#E24B4A" },
+  DELIVERED: {
+    badge:
+      "bg-[#EAF3DE] text-[#27500A] dark:bg-emerald-950/60 dark:text-emerald-300",
+    dot: "bg-[#639922] dark:bg-emerald-400",
+  },
+  SHIPPED: {
+    badge:
+      "bg-[#FAEEDA] text-[#633806] dark:bg-amber-950/60 dark:text-amber-300",
+    dot: "bg-[#BA7517] dark:bg-amber-400",
+  },
+  PROCESSING: {
+    badge:
+      "bg-[#E6F1FB] text-[#0C447C] dark:bg-blue-950/60 dark:text-blue-300",
+    dot: "bg-[#378ADD] dark:bg-blue-400",
+  },
+  CANCELLED: {
+    badge:
+      "bg-[#FCEBEB] text-[#791F1F] dark:bg-red-950/60 dark:text-red-300",
+    dot: "bg-[#E24B4A] dark:bg-red-400",
+  },
 };
 
-const DEFAULT_TOKEN = { bg: "#F1EFE8", text: "#444441", dot: "#888780" };
+const DEFAULT_TOKEN = {
+  badge: "bg-[#F1EFE8] text-[#444441] dark:bg-slate-800 dark:text-slate-300",
+  dot: "bg-[#888780] dark:bg-slate-400",
+};
 
 const statusToken = (status) => STATUS_TOKENS[status] || DEFAULT_TOKEN;
 
@@ -35,13 +54,9 @@ const StatusPill = ({ status }) => {
   const t = statusToken(status);
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide whitespace-nowrap"
-      style={{ background: t.bg, color: t.text }}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide whitespace-nowrap ${t.badge}`}
     >
-      <span
-        className="h-1.5 w-1.5 rounded-full shrink-0"
-        style={{ background: t.dot }}
-      />
+      <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${t.dot}`} />
       {status}
     </span>
   );
@@ -58,12 +73,12 @@ const initials = (name = "") =>
     .join("") || "?";
 
 const AVATAR_PALETTE = [
-  { bg: "#EEEDFE", text: "#3C3489" },
-  { bg: "#E1F5EE", text: "#085041" },
-  { bg: "#FAECE7", text: "#712B13" },
-  { bg: "#FBEAF0", text: "#72243E" },
-  { bg: "#E6F1FB", text: "#0C447C" },
-  { bg: "#EAF3DE", text: "#27500A" },
+  "bg-[#EEEDFE] text-[#3C3489] dark:bg-indigo-950/60 dark:text-indigo-300",
+  "bg-[#E1F5EE] text-[#085041] dark:bg-emerald-950/60 dark:text-emerald-300",
+  "bg-[#FAECE7] text-[#712B13] dark:bg-orange-950/60 dark:text-orange-300",
+  "bg-[#FBEAF0] text-[#72243E] dark:bg-rose-950/60 dark:text-rose-300",
+  "bg-[#E6F1FB] text-[#0C447C] dark:bg-blue-950/60 dark:text-blue-300",
+  "bg-[#EAF3DE] text-[#27500A] dark:bg-lime-950/60 dark:text-lime-300",
 ];
 
 const avatarStyle = (seed = "") => {
@@ -179,34 +194,24 @@ const OrderViewDetails = () => {
   if (!orderDetails) {
     return (
       <div
-        className="min-h-screen w-full flex flex-col items-center justify-center gap-4"
+        className="min-h-screen w-full flex flex-col items-center justify-center gap-4 dark:bg-slate-950"
         style={pageStyle}
       >
         {fontImport}
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center"
-          style={{ background: "#F1EFE8" }}
-        >
-          <Package size={20} style={{ color: "#B4B2A9" }} />
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#F1EFE8] dark:bg-slate-800">
+          <Package size={20} className="text-[#B4B2A9] dark:text-slate-400" />
         </div>
         <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: "#14213D" }}>
+          <p className="text-sm font-medium text-[#14213D] dark:text-slate-100">
             Order not found
           </p>
-          <p className="text-xs mt-0.5" style={{ color: "#8A8778" }}>
+          <p className="text-xs mt-0.5 text-[#8A8778] dark:text-slate-400">
             It may have been removed or the link is incorrect.
           </p>
         </div>
         <button
           onClick={handleBack}
-          className="px-3.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
-          style={{
-            border: "1px solid #E4E1D6",
-            background: "#FFFFFF",
-            color: "#14213D",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#FAF9F5")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "#FFFFFF")}
+          className="px-3.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors border border-[#E4E1D6] bg-white text-[#14213D] hover:bg-[#FAF9F5] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
         >
           Go back
         </button>
@@ -224,45 +229,28 @@ const OrderViewDetails = () => {
   const isCancelled = order.orderStatus === "CANCELLED";
 
   return (
-    <div className="min-h-[85vh] w-full p-6" style={pageStyle}>
+    <div className="min-h-[85vh] w-full p-6 dark:bg-slate-950" style={pageStyle}>
       {fontImport}
 
       {/* Header */}
-      <div
-        className="sticky -mt-4 z-20"
-        style={{
-          background: "rgba(247,246,242,0.92)",
-          backdropFilter: "blur(8px)",
-          borderBottom: "1px solid #faf7ed",
-        }}
-      >
+      <div className="sticky -mt-4 z-20 bg-[#f7f6f2]/92 backdrop-blur-md border-b border-[#faf7ed] dark:bg-slate-950/90 dark:border-slate-800">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer transition-colors"
-              style={{ border: "1px solid #E4E1D6", color: "#14213D" }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#EFECE1")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
+              className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer transition-colors border border-[#E4E1D6] text-[#14213D] hover:bg-[#EFECE1] dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
             >
               <ArrowLeft size={17} />
             </button>
 
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1
-                  className="mono text-lg font-bold tracking-tight"
-                  style={{ color: "#264da3" }}
-                >
+                <h1 className="mono text-lg font-bold tracking-tight text-[#264da3] dark:text-blue-400">
                   {order.orderId}
                 </h1>
                 <StatusPill status={order.orderStatus} />
               </div>
-              <p className="flex items-center text-gray-950 gap-1.5 mt-1 text-xs">
+              <p className="flex items-center text-gray-950 dark:text-slate-400 gap-1.5 mt-1 text-xs">
                 <Clock size={12} />
                 {new Date(order.createdAt).toLocaleString("en-IN", {
                   dateStyle: "medium",
@@ -273,13 +261,10 @@ const OrderViewDetails = () => {
           </div>
 
           <div className="text-right">
-            <p className="text-[11px] uppercase text-gray-950 tracking-wider font-medium">
+            <p className="text-[11px] uppercase text-gray-950 dark:text-slate-400 tracking-wider font-medium">
               Total amount
             </p>
-            <h2
-              className="mono text-2xl font-bold"
-              style={{ color: "#14213D" }}
-            >
+            <h2 className="mono text-2xl font-bold text-[#14213D] dark:text-slate-100">
               ₹{Number(order.orderTotal || 0).toLocaleString("en-IN")}
             </h2>
           </div>
@@ -300,22 +285,30 @@ const OrderViewDetails = () => {
                     <div className="flex items-center gap-2">
                       <CircleDot
                         size={14}
-                        style={{ color: done ? "#8a340e" : "#D3D1C7" }}
+                        className={
+                          done
+                            ? "text-[#8a340e] dark:text-amber-400"
+                            : "text-[#D3D1C7] dark:text-slate-700"
+                        }
                         strokeWidth={2.5}
                       />
                       <span
-                        className="text-xs font-medium whitespace-nowrap"
-                        style={{ color: done ? "#14213D" : "#B4B2A9" }}
+                        className={`text-xs font-medium whitespace-nowrap ${
+                          done
+                            ? "text-[#14213D] dark:text-slate-100"
+                            : "text-[#B4B2A9] dark:text-slate-500"
+                        }`}
                       >
                         {stage.charAt(0) + stage.slice(1).toLowerCase()}
                       </span>
                     </div>
                     {!isLast && (
                       <div
-                        className="flex-1 h-px mx-3"
-                        style={{
-                          background: i < stageIdx ? "#C65D2E" : "#E4E1D6",
-                        }}
+                        className={`flex-1 h-px mx-3 ${
+                          i < stageIdx
+                            ? "bg-[#C65D2E] dark:bg-amber-500"
+                            : "bg-[#E4E1D6] dark:bg-slate-800"
+                        }`}
                       />
                     )}
                   </div>
@@ -330,49 +323,31 @@ const OrderViewDetails = () => {
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-2">
           {/* Products */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#FFFFFF", border: "1px solid #E4E1D6" }}
-          >
-            <div
-              className="px-5 py-4 flex items-center gap-2"
-              style={{ borderBottom: "1px solid #E4E1D6" }}
-            >
-              <Package size={16} style={{ color: "#8A8778" }} />
-              <h2
-                className="font-semibold text-sm"
-                style={{ color: "#14213D" }}
-              >
+          <div className="rounded-2xl overflow-hidden bg-white border border-[#E4E1D6] dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 flex items-center gap-2 border-b border-[#E4E1D6] dark:border-slate-800">
+              <Package size={16} className="text-[#8A8778] dark:text-slate-400" />
+              <h2 className="font-semibold text-sm text-[#14213D] dark:text-slate-100">
                 Ordered products
               </h2>
-              <span className="mono text-xs" style={{ color: "#B4B2A9" }}>
+              <span className="mono text-xs text-[#B4B2A9] dark:text-slate-400">
                 {items.length}
               </span>
             </div>
 
             <div>
               {items.length === 0 ? (
-                <p
-                  className="text-sm text-center py-10"
-                  style={{ color: "#B4B2A9" }}
-                >
+                <p className="text-sm text-center py-10 text-[#B4B2A9] dark:text-slate-500">
                   No products found on this order.
                 </p>
               ) : (
                 items.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="p-2 flex gap-4 items-center transition-colors"
-                    style={{
-                      borderBottom:
-                        idx < items.length - 1 ? "1px solid #F0EEE5" : "none",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = "#FAF9F5")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = "transparent")
-                    }
+                    className={`p-2 flex gap-4 items-center transition-colors hover:bg-[#FAF9F5] dark:hover:bg-slate-800/60 ${
+                      idx < items.length - 1
+                        ? "border-b border-[#F0EEE5] dark:border-slate-800"
+                        : ""
+                    }`}
                   >
                     <img
                       src={resolveFirebaseUrl({
@@ -380,53 +355,34 @@ const OrderViewDetails = () => {
                         fileName: item.product?.product_images?.[0],
                       })}
                       alt={item.product?.product_name}
-                      className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
-                      style={{ border: "1px solid #E4E1D6" }}
+                      className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-[#E4E1D6] dark:border-slate-700"
                     />
 
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className="font-medium text-sm"
-                        style={{ color: "#14213D" }}
-                      >
+                      <h3 className="font-medium text-sm text-[#14213D] dark:text-slate-100">
                         {item.product?.product_name}
                       </h3>
-                      <p
-                        className="text-xs mt-0.5 whitespace-normal"
-                        style={{ color: "#8A8778" }}
-                      >
+                      <p className="text-xs mt-0.5 whitespace-normal text-[#8A8778] dark:text-slate-400">
                         {item.product?.product_description}
                       </p>
 
-                      <div
-                        className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5 text-xs"
-                        style={{ color: "#5F5E5A" }}
-                      >
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5 text-xs text-[#5F5E5A] dark:text-slate-400">
                         <span>
                           Variant{" "}
-                          <strong
-                            className="mono font-semibold"
-                            style={{ color: "#14213D" }}
-                          >
+                          <strong className="mono font-semibold text-[#14213D] dark:text-slate-200">
                             {item.variant?.quantity}
                             {item.variant?.unit}
                           </strong>
                         </span>
                         <span>
                           Package{" "}
-                          <strong
-                            className="font-semibold capitalize"
-                            style={{ color: "#14213D" }}
-                          >
+                          <strong className="font-semibold capitalize text-[#14213D] dark:text-slate-200">
                             {item.variant?.package}
                           </strong>
                         </span>
                         <span>
                           Qty{" "}
-                          <strong
-                            className="mono font-semibold"
-                            style={{ color: "#14213D" }}
-                          >
+                          <strong className="mono font-semibold text-[#14213D] dark:text-slate-200">
                             {item.qty}
                           </strong>
                         </span>
@@ -434,13 +390,10 @@ const OrderViewDetails = () => {
                     </div>
 
                     <div className="text-right flex-shrink-0">
-                      <p className="mono text-xs" style={{ color: "#8A8778" }}>
+                      <p className="mono text-xs text-[#8A8778] dark:text-slate-400">
                         ₹{item.variant?.price} × {item.qty}
                       </p>
-                      <h4
-                        className="mono text-base font-semibold mt-0.5"
-                        style={{ color: "#14213D" }}
-                      >
+                      <h4 className="mono text-base font-semibold mt-0.5 text-[#14213D] dark:text-slate-100">
                         ₹
                         {(
                           (item.variant?.price || 0) * (item.qty || 0)
@@ -457,56 +410,38 @@ const OrderViewDetails = () => {
           </div>
 
           {/* Shipping */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#FFFFFF", border: "1px solid #E4E1D6" }}
-          >
-            <div
-              className="px-5 py-4 flex items-center gap-2"
-              style={{ borderBottom: "1px solid #E4E1D6" }}
-            >
-              <MapPin size={16} style={{ color: "#8A8778" }} />
-              <h2
-                className="font-semibold text-sm"
-                style={{ color: "#14213D" }}
-              >
+          <div className="rounded-2xl overflow-hidden bg-white border border-[#E4E1D6] dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 flex items-center gap-2 border-b border-[#E4E1D6] dark:border-slate-800">
+              <MapPin size={16} className="text-[#8A8778] dark:text-slate-400" />
+              <h2 className="font-semibold text-sm text-[#14213D] dark:text-slate-100">
                 Shipping address
               </h2>
             </div>
 
             <div className="px-5 py-4 space-y-2">
               <div>
-                <p
-                  className="text-[11px] uppercase tracking-wider font-medium mb-1"
-                  style={{ color: "#B4B2A9" }}
-                >
+                <p className="text-[11px] uppercase tracking-wider font-medium mb-1 text-[#B4B2A9] dark:text-slate-400">
                   Address type
                 </p>
-                <p className="text-sm font-medium" style={{ color: "#14213D" }}>
+                <p className="text-sm font-medium text-[#14213D] dark:text-slate-100">
                   {order.shippingAddress?.addressType}
                 </p>
               </div>
 
               <div>
-                <p
-                  className="text-[11px] uppercase tracking-wider font-medium mb-1"
-                  style={{ color: "#B4B2A9" }}
-                >
+                <p className="text-[11px] uppercase tracking-wider font-medium mb-1 text-[#B4B2A9] dark:text-slate-400">
                   Apartment
                 </p>
-                <p className="text-sm" style={{ color: "#3A3936" }}>
+                <p className="text-sm text-[#3A3936] dark:text-slate-300">
                   {order.shippingAddress?.apartment}
                 </p>
               </div>
 
               <div>
-                <p
-                  className="text-[11px] uppercase tracking-wider font-medium mb-1"
-                  style={{ color: "#B4B2A9" }}
-                >
+                <p className="text-[11px] uppercase tracking-wider font-medium mb-1 text-[#B4B2A9] dark:text-slate-400">
                   Locality
                 </p>
-                <p className="text-sm" style={{ color: "#3A3936" }}>
+                <p className="text-sm text-[#3A3936] dark:text-slate-300">
                   {order.shippingAddress?.locality}
                 </p>
               </div>
@@ -516,14 +451,7 @@ const OrderViewDetails = () => {
                   href={`https://www.google.com/maps?q=${order.shippingAddress.coordinate.lat},${order.shippingAddress.coordinate.lng}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full mt-1 rounded-xl py-2.5 flex items-center justify-center gap-2 text-xs font-medium cursor-pointer transition-colors"
-                  style={{ border: "1px solid #E4E1D6", color: "#5F5E5A" }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#FAF9F5")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
+                  className="w-full mt-1 rounded-xl py-2.5 flex items-center justify-center gap-2 text-xs font-medium cursor-pointer transition-colors border border-[#E4E1D6] text-[#5F5E5A] hover:bg-[#FAF9F5] dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <Navigation size={13} />
                   Open in maps
@@ -536,19 +464,10 @@ const OrderViewDetails = () => {
         {/* RIGHT */}
         <div className="space-y-2">
           {/* Delivery Partner */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#FFFFFF", border: "1px solid #E4E1D6" }}
-          >
-            <div
-              className="px-5 py-4 flex items-center gap-2"
-              style={{ borderBottom: "1px solid #E4E1D6" }}
-            >
-              <Truck size={16} style={{ color: "#C65D2E" }} />
-              <h2
-                className="font-semibold text-sm"
-                style={{ color: "#14213D" }}
-              >
+          <div className="rounded-2xl overflow-hidden bg-white border border-[#E4E1D6] dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 flex items-center gap-2 border-b border-[#E4E1D6] dark:border-slate-800">
+              <Truck size={16} className="text-[#C65D2E] dark:text-orange-400" />
+              <h2 className="font-semibold text-sm text-[#14213D] dark:text-slate-100">
                 Manage Delivery
               </h2>
             </div>
@@ -565,40 +484,23 @@ const OrderViewDetails = () => {
                   navigate("/dashboard/delivery-job");
                 }}
                 disabled={assigning}
-                className="w-full rounded-xl p-4 text-sm font-medium cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                style={{ border: "1.5px dashed #D3D1C7", color: "#8A8778" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#C65D2E";
-                  e.currentTarget.style.color = "#C65D2E";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "#D3D1C7";
-                  e.currentTarget.style.color = "#8A8778";
-                }}
+                className="w-full rounded-xl p-4 text-sm font-medium cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-60 border-[1.5px] border-dashed border-[#D3D1C7] text-[#8A8778] hover:border-[#C65D2E] hover:text-[#C65D2E] dark:border-slate-700 dark:text-slate-400 dark:hover:border-orange-400 dark:hover:text-orange-400"
               >
                 Manage delivery
               </button>
 
               {dpMenuOpen && (
-                <div
-                  className="mt-4 rounded-xl overflow-visible relative"
-                  style={{ border: "1px solid #E4E1D6" }}
-                >
-                  <div
-                    className="relative p-2.5"
-                    style={{ borderBottom: "1px solid #E4E1D6" }}
-                  >
+                <div className="mt-4 rounded-xl overflow-visible relative border border-[#E4E1D6] dark:border-slate-700 dark:bg-slate-900">
+                  <div className="relative p-2.5 border-b border-[#E4E1D6] dark:border-slate-800">
                     <Search
                       size={14}
-                      className="absolute left-5 top-1/2 -translate-y-1/2"
-                      style={{ color: "#B4B2A9" }}
+                      className="absolute left-5 top-1/2 -translate-y-1/2 text-[#B4B2A9] dark:text-slate-400"
                     />
                     <input
                       value={dpSearch}
                       onChange={(e) => setDpSearch(e.target.value)}
                       placeholder="Search partners…"
-                      className="w-full rounded-lg py-2 pl-9 pr-3 text-sm outline-none"
-                      style={{ border: "1px solid #E4E1D6", color: "#14213D" }}
+                      className="w-full rounded-lg py-2 pl-9 pr-3 text-sm outline-none border border-[#E4E1D6] text-[#14213D] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
 
@@ -606,7 +508,7 @@ const OrderViewDetails = () => {
                     {filteredPartners.map((dp) => (
                       <div
                         key={dp.deliveryPersonId}
-                        className="group border-b border-gray-100 last:border-b-0"
+                        className="group border-b border-gray-100 dark:border-slate-800 last:border-b-0"
                       >
                         <button
                           onClick={() => handleAssign(dp)}
@@ -614,42 +516,30 @@ const OrderViewDetails = () => {
                             assigning ||
                             assignedDpId === (dp.deliveryPersonId || dp.id)
                           }
-                          className="w-full p-3 flex items-center justify-between transition-colors hover:bg-[#FAF9F5] disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="w-full p-3 flex items-center justify-between transition-colors hover:bg-[#FAF9F5] dark:hover:bg-slate-800/60 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold"
-                              style={{
-                                background: avatarStyle(
-                                  `${dp.firstName} ${dp.lastName}`,
-                                ).bg,
-                                color: avatarStyle(
-                                  `${dp.firstName} ${dp.lastName}`,
-                                ).text,
-                              }}
+                              className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${avatarStyle(
+                                `${dp.firstName} ${dp.lastName}`,
+                              )}`}
                             >
                               {initials(`${dp.firstName} ${dp.lastName}`)}
                             </div>
 
                             <div className="text-left">
-                              <p
-                                className="text-sm font-medium"
-                                style={{ color: "#14213D" }}
-                              >
+                              <p className="text-sm font-medium text-[#14213D] dark:text-slate-100">
                                 {dp.firstName} {dp.lastName}
                               </p>
 
-                              <p
-                                className="text-xs whitespace-normal"
-                                style={{ color: "#8A8778" }}
-                              >
+                              <p className="text-xs whitespace-normal text-[#8A8778] dark:text-slate-400">
                                 {dp.areaCovered || "Area not assigned"}
                               </p>
                             </div>
                           </div>
 
                           {assignedDpId === (dp.deliveryPersonId || dp.id) && (
-                            <Check size={16} style={{ color: "#C65D2E" }} />
+                            <Check size={16} className="text-[#C65D2E] dark:text-orange-400" />
                           )}
                         </button>
 
@@ -663,43 +553,38 @@ const OrderViewDetails = () => {
                           duration-300
                         "
                         >
-                          <div
-                            className="mx-3 mb-3 rounded-lg p-3 text-xs"
-                            style={{
-                              background: "#FAF9F5",
-                              border: "1px solid #E4E1D6",
-                              color: "#14213D",
-                            }}
-                          >
+                          <div className="mx-3 mb-3 rounded-lg p-3 text-xs bg-[#FAF9F5] border border-[#E4E1D6] text-[#14213D] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
                             <div className="grid grid-cols-2 gap-y-2">
-                              <span style={{ color: "#8A8778" }}>Phone</span>
+                              <span className="text-[#8A8778] dark:text-slate-400">Phone</span>
                               <span>{dp.phoneNo}</span>
 
-                              <span style={{ color: "#8A8778" }}>Vehicle</span>
+                              <span className="text-[#8A8778] dark:text-slate-400">Vehicle</span>
                               <span>{dp.vehicleNumber}</span>
 
-                              <span style={{ color: "#8A8778" }}>Area</span>
+                              <span className="text-[#8A8778] dark:text-slate-400">Area</span>
                               <span className="whitespace-normal">
                                 {dp.areaCovered || "-"}
                               </span>
 
-                              <span style={{ color: "#8A8778" }}>Status</span>
+                              <span className="text-[#8A8778] dark:text-slate-400">Status</span>
                               <span
                                 className={
-                                  dp.active ? "text-green-600" : "text-red-500"
+                                  dp.active
+                                    ? "text-green-600 dark:text-emerald-400"
+                                    : "text-red-500 dark:text-red-400"
                                 }
                               >
                                 {dp.active ? "Active" : "Inactive"}
                               </span>
 
-                              <span style={{ color: "#8A8778" }}>
+                              <span className="text-[#8A8778] dark:text-slate-400">
                                 Documents
                               </span>
                               <span
                                 className={
                                   dp.documentsVerified
-                                    ? "text-green-600"
-                                    : "text-yellow-600"
+                                    ? "text-green-600 dark:text-emerald-400"
+                                    : "text-yellow-600 dark:text-amber-400"
                                 }
                               >
                                 {dp.documentsVerified ? "Verified" : "Pending"}
@@ -711,18 +596,12 @@ const OrderViewDetails = () => {
                     ))}
 
                     {filteredPartners.length === 0 && (
-                      <p
-                        className="text-center text-xs py-6"
-                        style={{ color: "#B4B2A9" }}
-                      >
+                      <p className="text-center text-xs py-6 text-[#B4B2A9] dark:text-slate-500">
                         No partners match that search.
                       </p>
                     )}
                     {filteredPartners.length === 0 && (
-                      <p
-                        className="text-center text-xs py-6"
-                        style={{ color: "#B4B2A9" }}
-                      >
+                      <p className="text-center text-xs py-6 text-[#B4B2A9] dark:text-slate-500">
                         No partners match that search.
                       </p>
                     )}
@@ -733,51 +612,33 @@ const OrderViewDetails = () => {
           </div>
 
           {/* Summary */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#FFFFFF", border: "1px solid #E4E1D6" }}
-          >
-            <div
-              className="px-5 py-4 flex items-center gap-2"
-              style={{ borderBottom: "1px solid #E4E1D6" }}
-            >
-              <Receipt size={16} style={{ color: "#8A8778" }} />
-              <h2
-                className="font-semibold text-sm"
-                style={{ color: "#14213D" }}
-              >
+          <div className="rounded-2xl overflow-hidden bg-white border border-[#E4E1D6] dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 flex items-center gap-2 border-b border-[#E4E1D6] dark:border-slate-800">
+              <Receipt size={16} className="text-[#8A8778] dark:text-slate-400" />
+              <h2 className="font-semibold text-sm text-[#14213D] dark:text-slate-100">
                 Order summary
               </h2>
             </div>
 
             <div className="p-5 space-y-3">
               <div className="flex justify-between text-sm">
-                <span style={{ color: "#8A8778" }}>Items</span>
-                <span className="mono font-medium" style={{ color: "#14213D" }}>
+                <span className="text-[#8A8778] dark:text-slate-400">Items</span>
+                <span className="mono font-medium text-[#14213D] dark:text-slate-100">
                   {items.length}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span style={{ color: "#8A8778" }}>Subtotal</span>
-                <span className="mono font-medium" style={{ color: "#14213D" }}>
+                <span className="text-[#8A8778] dark:text-slate-400">Subtotal</span>
+                <span className="mono font-medium text-[#14213D] dark:text-slate-100">
                   ₹{subtotal.toLocaleString("en-IN")}
                 </span>
               </div>
 
-              <div
-                className="pt-3 flex justify-between items-baseline"
-                style={{ borderTop: "1px solid #E4E1D6" }}
-              >
-                <span
-                  className="text-sm font-semibold"
-                  style={{ color: "#14213D" }}
-                >
+              <div className="pt-3 flex justify-between items-baseline border-t border-[#E4E1D6] dark:border-slate-800">
+                <span className="text-sm font-semibold text-[#14213D] dark:text-slate-100">
                   Total
                 </span>
-                <span
-                  className="mono text-xl font-semibold"
-                  style={{ color: "#14213D" }}
-                >
+                <span className="mono text-xl font-semibold text-[#14213D] dark:text-slate-100">
                   ₹{Number(order.orderTotal || 0).toLocaleString("en-IN")}
                 </span>
               </div>

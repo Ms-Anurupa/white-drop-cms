@@ -28,40 +28,40 @@ const TYPE_CONFIG = {
     icon: Bell,
     label: "General",
     group: "general", // Fallback
-    iconColors: "bg-gray-100 text-gray-600",
-    badgeColors: "bg-gray-50 text-gray-600 border-gray-200",
-    barColor: "bg-gray-300",
+    iconColors: "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300",
+    badgeColors: "bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
+    barColor: "bg-gray-300 dark:bg-slate-600",
   },
   ADMIN_ORDER_REC: {
     icon: ShoppingCart,
     label: "New Order",
     group: "order", // Changed to match filter
-    iconColors: "bg-blue-100 text-blue-600",
-    badgeColors: "bg-blue-50 text-blue-700 border-blue-200",
+    iconColors: "bg-blue-100 text-blue-600 dark:bg-blue-950/70 dark:text-blue-400",
+    badgeColors: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
     barColor: "bg-blue-500",
   },
   ADMIN_PCK_JOB_FNS: {
     icon: Gift,
     label: "Packing Finished",
     group: "packaging", // Changed to match filter
-    iconColors: "bg-purple-100 text-purple-600",
-    badgeColors: "bg-purple-50 text-purple-700 border-purple-200",
+    iconColors: "bg-purple-100 text-purple-600 dark:bg-purple-950/70 dark:text-purple-400",
+    badgeColors: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800",
     barColor: "bg-purple-500",
   },
   ADMIN_ADHOC_REC: {
     icon: Gem,
     label: "Adhoc Request",
     group: "adhoc", // Changed to match filter
-    iconColors: "bg-amber-100 text-amber-600",
-    badgeColors: "bg-amber-50 text-amber-700 border-amber-200",
+    iconColors: "bg-amber-100 text-amber-600 dark:bg-amber-950/70 dark:text-amber-400",
+    badgeColors: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
     barColor: "bg-amber-500",
   },
   DELIVERY_JOB_COMPLETE: {
     icon: PackageCheck,
     label: "Delivery Complete",
     group: "order", // Grouping delivery under orders
-    iconColors: "bg-emerald-100 text-emerald-600",
-    badgeColors: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    iconColors: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-400",
+    badgeColors: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
     barColor: "bg-emerald-500",
   },
 };
@@ -123,12 +123,12 @@ const senderName = (n) => n?.from?.customer_name || n?.from?.name || n?.from?.us
 const NotificationSkeleton = () => (
   <div className="space-y-2">
     {[0, 1, 2, 3, 4].map((i) => (
-      <div key={i} className="flex animate-pulse gap-3 rounded-xl border border-gray-100 bg-white p-4">
-        <div className="h-9 w-9 shrink-0 rounded-lg bg-gray-100" />
+      <div key={i} className="flex animate-pulse gap-3 rounded-xl border border-gray-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+        <div className="h-9 w-9 shrink-0 rounded-lg bg-gray-100 dark:bg-slate-800" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 w-2/5 rounded bg-gray-100" />
-          <div className="h-3 w-4/5 rounded bg-gray-100" />
-          <div className="h-3 w-1/4 rounded bg-gray-100" />
+          <div className="h-3 w-2/5 rounded bg-gray-100 dark:bg-slate-800" />
+          <div className="h-3 w-4/5 rounded bg-gray-100 dark:bg-slate-800" />
+          <div className="h-3 w-1/4 rounded bg-gray-100 dark:bg-slate-800" />
         </div>
       </div>
     ))}
@@ -137,13 +137,13 @@ const NotificationSkeleton = () => (
 
 const EmptyState = ({ filtered, onReset }) => (
   <div className="flex h-full flex-col items-center justify-center px-6 py-16 text-center">
-    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-slate-500">
       <BellOff size={22} />
     </div>
-    <p className="mt-4 text-sm font-medium text-gray-700">
+    <p className="mt-4 text-sm font-medium text-gray-700 dark:text-slate-200">
       {filtered ? "Nothing matches your filters" : "You're all caught up"}
     </p>
-    <p className="mt-1 max-w-[240px] text-xs text-gray-400">
+    <p className="mt-1 max-w-[240px] text-xs text-gray-400 dark:text-slate-400">
       {filtered
         ? "Try a different filter or clear your search."
         : "New notifications from other admins will show up here."}
@@ -152,7 +152,7 @@ const EmptyState = ({ filtered, onReset }) => (
       <button
         type="button"
         onClick={onReset}
-        className="mt-4 cursor-pointer rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50"
+        className="mt-4 cursor-pointer rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
       >
         Clear filters
       </button>
@@ -162,15 +162,15 @@ const EmptyState = ({ filtered, onReset }) => (
 
 const ErrorState = ({ message, onRetry }) => (
   <div className="flex h-full flex-col items-center justify-center px-6 py-16 text-center">
-    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500 dark:bg-red-950/60 dark:text-red-400">
       <WifiOff size={22} />
     </div>
-    <p className="mt-4 text-sm font-medium text-gray-700">Couldn't load notifications</p>
-    <p className="mt-1 max-w-[260px] text-xs text-gray-400">{message}</p>
+    <p className="mt-4 text-sm font-medium text-gray-700 dark:text-slate-200">Couldn't load notifications</p>
+    <p className="mt-1 max-w-[260px] text-xs text-gray-400 dark:text-slate-400">{message}</p>
     <button
       type="button"
       onClick={onRetry}
-      className="mt-4 cursor-pointer rounded-lg bg-gray-900 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-gray-800"
+      className="mt-4 cursor-pointer rounded-lg bg-gray-900 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-gray-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
     >
       Try again
     </button>
@@ -185,8 +185,8 @@ const NotificationIcon = ({ type, unread }) => {
     <div
       className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all ${
         unread
-          ? `${cfg.iconColors} shadow-sm ring-1 ring-black/5`
-          : "bg-gray-50 text-gray-400 border border-gray-100"
+          ? `${cfg.iconColors} shadow-sm ring-1 ring-black/5 dark:ring-white/10`
+          : "bg-gray-50 text-gray-400 border border-gray-100 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700"
       }`}
     >
       <Icon size={18} strokeWidth={unread ? 2.5 : 2} />
@@ -225,7 +225,9 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
   return (
     <div
       className={`group relative overflow-hidden rounded-xl border transition-colors cursor-pointer ${
-        unread ? "border-blue-200 bg-blue-50/70 shadow-sm" : "border-gray-200 bg-white"
+        unread
+          ? "border-blue-200 bg-blue-50/70 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/30"
+          : "border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900"
       } ${deleting ? "pointer-events-none opacity-60" : ""}`}
     >
       {unread && <span className={`absolute inset-y-0 left-0 w-1 ${cfg.barColor}`} />}
@@ -245,14 +247,14 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
             <div className="flex items-start justify-between gap-2">
               <p
                 className={`text-sm leading-snug ${
-                  unread ? "font-semibold text-gray-900" : "font-medium text-gray-500"
+                  unread ? "font-semibold text-gray-900 dark:text-slate-100" : "font-medium text-gray-500 dark:text-slate-400"
                 }`}
               >
                 {notification.title}
               </p>
               <span
                 className={`mt-0.5 shrink-0 text-[11px] ${
-                  unread ? "font-medium text-blue-600" : "text-gray-400"
+                  unread ? "font-medium text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-slate-500"
                 }`}
                 title={formatFull(notification.createdAt)}
               >
@@ -262,7 +264,7 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
 
             <p
               className={`mt-1 whitespace-pre-line text-xs leading-relaxed ${
-                unread ? "text-gray-600" : "text-gray-400"
+                unread ? "text-gray-600 dark:text-slate-300" : "text-gray-400 dark:text-slate-500"
               } ${expanded ? "" : "line-clamp-2"}`}
             >
               {notification.body}
@@ -270,14 +272,14 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
           </div>
 
           {confirming ? (
-            <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-              <p className="text-xs font-medium text-red-700">Delete this notification?</p>
+            <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 dark:border-red-900/60 dark:bg-red-950/40">
+              <p className="text-xs font-medium text-red-700 dark:text-red-300">Delete this notification?</p>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setConfirming(false)}
                   disabled={deleting}
-                  className="cursor-pointer rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -296,12 +298,12 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-                  unread ? cfg.badgeColors : "border-gray-200 bg-gray-50 text-gray-500"
+                  unread ? cfg.badgeColors : "border-gray-200 bg-gray-50 text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
                 }`}
               >
                 {cfg.label}
               </span>
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-gray-400 dark:text-slate-500">
                 from {senderName(notification)}
               </span>
 
@@ -310,7 +312,7 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
                   <button
                     type="button"
                     onClick={() => setExpanded((v) => !v)}
-                    className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-black/5 hover:text-gray-600 cursor-pointer"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-black/5 hover:text-gray-600 dark:text-slate-500 dark:hover:bg-white/5 dark:hover:text-slate-300 cursor-pointer"
                   >
                     <ChevronDown size={15} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
                   </button>
@@ -319,7 +321,7 @@ const NotificationItem = ({ notification, onDelete, onRead }) => {
                   type="button"
                   onClick={() => setConfirming(true)}
                   title="Delete"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-600 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-950/50 dark:hover:text-red-400 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -443,22 +445,22 @@ const NotificationSidebar = ({ open, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[100]">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/30 dark:bg-black/60" onClick={onClose} />
 
-      <aside className="absolute right-0 top-0 flex h-full w-full flex-col bg-gray-50 shadow-2xl sm:w-[480px]">
+      <aside className="absolute right-0 top-0 flex h-full w-full flex-col bg-gray-50 dark:bg-slate-950 shadow-2xl sm:w-[480px]">
         {/* Header */}
-        <div className="shrink-0 border-b border-gray-200 bg-white">
+        <div className="shrink-0 border-b border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <div className="flex h-16 items-center justify-between px-5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-gray-900">Notifications</h2>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">Notifications</h2>
                 {counts.unread > 0 && (
                   <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-semibold text-white">
                     {counts.unread} new
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 text-xs text-gray-400">Event Updates</p>
+              <p className="mt-0.5 text-xs text-gray-400 dark:text-slate-400">Event Updates</p>
             </div>
 
             <div className="flex items-center gap-1">
@@ -466,7 +468,7 @@ const NotificationSidebar = ({ open, onClose }) => {
                 <button
                   onClick={handleMarkAllRead}
                   title="Mark all as read"
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 transition cursor-pointer"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/60 transition cursor-pointer"
                 >
                   <CheckCheckIcon size={18} />
                 </button>
@@ -476,13 +478,13 @@ const NotificationSidebar = ({ open, onClose }) => {
                 onClick={() => getAdminToAdminNotification({ reset: true })}
                 disabled={loading}
                 title="Refresh"
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 transition disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
               </button>
               <button
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -500,12 +502,12 @@ const NotificationSidebar = ({ open, onClose }) => {
                   onClick={() => setFilter(f.key)}
                   className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
                     active
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                      ? "border-gray-900 bg-gray-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   }`}
                 >
                   {f.label}
-                  <span className={active ? "text-gray-300" : "text-gray-400"}>
+                  <span className={active ? "text-gray-300 dark:text-slate-600" : "text-gray-400 dark:text-slate-500"}>
                     {counts[f.key] || 0}
                   </span>
                 </button>
@@ -517,7 +519,7 @@ const NotificationSidebar = ({ open, onClose }) => {
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4">
           {actionError && (
-            <div className="mb-3 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <div className="mb-3 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
               <p>{actionError}</p>
               <button onClick={() => setActionError("")} className="cursor-pointer"><X size={14} /></button>
             </div>
@@ -533,7 +535,7 @@ const NotificationSidebar = ({ open, onClose }) => {
             <div className="space-y-5 pb-6">
               {grouped.map(({ bucket, items }) => (
                 <section key={bucket}>
-                  <h3 className="mb-2 px-1 text-xs font-medium text-gray-400">{bucket}</h3>
+                  <h3 className="mb-2 px-1 text-xs font-medium text-gray-400 dark:text-slate-500">{bucket}</h3>
                   <div className="space-y-2">
                     {items.map((n) => (
                       <NotificationItem
@@ -553,7 +555,7 @@ const NotificationSidebar = ({ open, onClose }) => {
                   <button
                     onClick={handleLoadMore}
                     disabled={fetchingMore}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {fetchingMore && <Loader2 size={16} className="animate-spin" />}
                     {fetchingMore ? "Loading..." : "Load older notifications"}
@@ -592,11 +594,12 @@ export const NotificationBell = () => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition cursor-pointer"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+        aria-label="Notifications"
       >
         <Bell size={19} />
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white dark:ring-slate-900">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}

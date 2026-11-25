@@ -71,29 +71,29 @@ const MapAutocomplete = ({ onPlaceSelect }) => {
 
   return (
     <div className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-lg z-10">
-      <div className="relative shadow-md rounded-lg bg-white">
-        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="relative shadow-md rounded-lg bg-white dark:bg-slate-900">
+        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-400" />
         <input
           type="text"
           value={inputValue}
           onChange={handleInputChange}
           placeholder="Search for an address or landmark..."
-          className="w-full pl-10 pr-4 py-3 text-sm rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="w-full pl-10 pr-4 py-3 text-sm rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
         />
       </div>
 
       {isOpen && predictions.length > 0 && (
-        <ul className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-100 max-h-64 overflow-y-auto z-20 divide-y divide-gray-50">
+        <ul className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-gray-100 dark:border-slate-800 max-h-64 overflow-y-auto z-20 divide-y divide-gray-50 dark:divide-slate-800">
           {predictions.map((prediction) => (
             <li
               key={prediction.place_id}
               onClick={() => handlePredictionSelect(prediction)}
-              className="px-4 py-3 hover:bg-blue-50 transition flex items-start gap-3 cursor-pointer group"
+              className="px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-800 transition flex items-start gap-3 cursor-pointer group"
             >
-              <MapPinIcon size={18} className="text-gray-400 group-hover:text-blue-500 shrink-0 mt-0.5" />
+              <MapPinIcon size={18} className="text-gray-400 dark:text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 shrink-0 mt-0.5" />
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">{prediction.structured_formatting?.main_text}</span>
-                <span className="text-xs text-gray-500 mt-0.5">{prediction.structured_formatting?.secondary_text}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-slate-100">{prediction.structured_formatting?.main_text}</span>
+                <span className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{prediction.structured_formatting?.secondary_text}</span>
               </div>
             </li>
           ))}
@@ -172,11 +172,11 @@ const OfflineAddressForm = ({ userUid, onSuccess, showSkip = false, onSkip }) =>
     <div className="space-y-5">
       {/* Warning Banner (Only show if this is the initial setup) */}
       {showSkip && (
-        <div className="flex items-start gap-3 p-3 bg-amber-50 text-amber-800 rounded-lg border border-amber-100">
-          <AlertCircle size={20} className="shrink-0 mt-0.5 text-amber-600" />
+        <div className="flex items-start gap-3 p-3 bg-amber-50 text-amber-800 rounded-lg border border-amber-100 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+          <AlertCircle size={20} className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
           <div className="text-sm">
             <p className="font-medium">Address is highly recommended</p>
-            <p className="mt-0.5 text-amber-700/90">
+            <p className="mt-0.5 text-amber-700/90 dark:text-amber-300/90">
               You cannot place an offline order without selecting a valid delivery address.
             </p>
           </div>
@@ -186,26 +186,26 @@ const OfflineAddressForm = ({ userUid, onSuccess, showSkip = false, onSkip }) =>
       <form onSubmit={handleSaveAddress} className="space-y-6">
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">Pinpoint Location</label>
-            <div className="h-[400px] w-full relative rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Pinpoint Location</label>
+            <div className="h-[400px] w-full relative rounded-lg overflow-hidden border border-gray-200 bg-gray-100 dark:border-slate-700 dark:bg-slate-800">
               <MapAutocomplete onPlaceSelect={handleAutocompleteSelect} />
               <Map mapId={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID} defaultCenter={DEFAULT_CENTER} defaultZoom={14} onClick={handleMapClick} disableDefaultUI={true} zoomControl={true}>
                 <AdvancedMarker position={markerPosition} />
               </Map>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Search for an address or click directly on the map.</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Search for an address or click directly on the map.</p>
           </div>
         </APIProvider>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Apartment / Flat / Block</label>
-            <input type="text" value={apartment} onChange={(e) => setApartment(e.target.value)} placeholder="e.g. Block 6, Flat 2A" className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Apartment / Flat / Block</label>
+            <input type="text" value={apartment} onChange={(e) => setApartment(e.target.value)} placeholder="e.g. Block 6, Flat 2A" className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500" />
           </div>
 
           <div className="lg:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Address Type</label>
-            <select value={addressType} onChange={(e) => setAddressType(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition cursor-pointer">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Address Type</label>
+            <select value={addressType} onChange={(e) => setAddressType(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition cursor-pointer dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
               <option value="Home">Home</option>
               <option value="Work">Work</option>
               <option value="Other">Other</option>
@@ -213,14 +213,14 @@ const OfflineAddressForm = ({ userUid, onSuccess, showSkip = false, onSkip }) =>
           </div>
 
           <div className="md:col-span-2 lg:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Locality / Street</label>
-            <textarea required value={locality} onChange={(e) => setLocality(e.target.value)} rows={2} placeholder="Search on map or type here..." className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition resize-none" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Locality / Street</label>
+            <textarea required value={locality} onChange={(e) => setLocality(e.target.value)} rows={2} placeholder="Search on map or type here..." className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition resize-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500" />
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-slate-800">
           {showSkip ? (
-            <button type="button" onClick={onSkip} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition cursor-pointer">
+            <button type="button" onClick={onSkip} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100 transition cursor-pointer">
               Skip for now
             </button>
           ) : (

@@ -169,35 +169,35 @@ const VerifyMail = () => {
 
   return (
     <section
-      className="h-screen overflow-hidden bg-cover bg-center flex items-center justify-center px-4 sm:px-5"
+      className="h-screen overflow-hidden bg-cover bg-center flex items-center justify-center px-4 sm:px-5 dark:bg-slate-950"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
-      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute inset-0 bg-black/10 dark:bg-slate-950/65"></div>
 
       <div className="w-full max-w-md z-10">
         <div
           className="relative overflow-hidden rounded-[28px] sm:rounded-[32px]
-        border border-white/20 bg-white/10 backdrop-blur-2xl
-        shadow-[0_8px_32px_rgba(31,38,135,0.37)]
+        border border-white/20 dark:border-slate-700/60 bg-white/10 dark:bg-slate-900/75 backdrop-blur-2xl
+        shadow-[0_8px_32px_rgba(31,38,135,0.37)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)]
         px-5 sm:px-8 py-8"
         >
           {/* Glow */}
-          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-blue-400/30 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-20 w-40 rounded-full bg-cyan-300/20 blur-3xl" />
+          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-blue-400/30 dark:bg-blue-500/20 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 h-20 w-40 rounded-full bg-cyan-300/20 dark:bg-cyan-400/15 blur-3xl" />
 
           {/* Logo */}
           <div className="flex justify-center mb-5">
-            <div className="bg-white p-2 rounded-full shadow-xl">
+            <div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 p-2 rounded-full shadow-xl">
               <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
               Verify Email
             </h1>
-            <p className="text-white text-sm">
+            <p className="text-white dark:text-slate-300 text-sm">
               {isOtpRequested
                 ? "Enter OTP sent to your email"
                 : "Enter details to receive OTP"}
@@ -217,12 +217,12 @@ const VerifyMail = () => {
                     placeholder="First Name"
                     value={emailData.name}
                     onChange={handleChange}
-                    className="w-full rounded-2xl bg-white/20 border border-white/30
-                  py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                  outline-none backdrop-blur-md focus:border-cyan-300"
+                    className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                  py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                  outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50"
                   />
                   <User
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                     size={18}
                   />
                 </div>
@@ -236,12 +236,12 @@ const VerifyMail = () => {
                     placeholder="Email Address"
                     value={emailData.email}
                     onChange={handleChange}
-                    className="w-full rounded-2xl bg-white/20 border border-white/30
-                  py-3 pl-5 pr-12 text-white placeholder:text-white/60
-                  outline-none backdrop-blur-md focus:border-cyan-300"
+                    className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+                  py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+                  outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400 dark:disabled:bg-slate-800/50"
                   />
                   <Mail
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400"
                     size={18}
                   />
                 </div>
@@ -252,8 +252,8 @@ const VerifyMail = () => {
                   className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
     ${
       isSendingOtp
-        ? "bg-gray-500 cursor-not-allowed opacity-70"
-        : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] cursor-pointer"
+        ? "bg-gray-500 dark:bg-slate-700 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-500 dark:to-cyan-500 hover:scale-[1.02] cursor-pointer"
     }`}
                 >
                   {isSendingOtp ? "Sending..." : "Send OTP"}
@@ -265,9 +265,9 @@ const VerifyMail = () => {
             {isOtpRequested && (
               <>
                 {/* Email preview */}
-                <div className="text-center text-xs text-white/70">
+                <div className="text-center text-xs text-white/70 dark:text-slate-400">
                   OTP sent to:{" "}
-                  <span className="text-white">{emailData.email}</span>
+                  <span className="text-white dark:text-slate-100">{emailData.email}</span>
                 </div>
 
                 <div className="flex justify-center gap-2 mb-4">
@@ -283,11 +283,12 @@ const VerifyMail = () => {
                       onKeyDown={(e) => handleOtpKeyDown(e, index)}
                       onPaste={handleOtpPaste}
                       className="w-12 h-12 rounded-xl
-      bg-white/20 border border-white/30
+      bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
       text-center text-lg font-semibold
-      text-white outline-none
+      text-white dark:text-slate-100 outline-none
       backdrop-blur-md
-      focus:border-cyan-300
+      focus:border-cyan-300 dark:focus:border-cyan-400
+      dark:disabled:bg-slate-800/50
       disabled:opacity-70
       disabled:cursor-not-allowed"
                     />
@@ -312,8 +313,8 @@ const VerifyMail = () => {
                   className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
     ${
       isVerifyingOtp
-        ? "bg-gray-500 cursor-not-allowed opacity-70"
-        : "bg-gradient-to-r from-yellow-500 to-yellow-400 hover:scale-[1.02] cursor-pointer"
+        ? "bg-gray-500 dark:bg-slate-700 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-yellow-500 to-yellow-400 dark:from-yellow-600 dark:to-amber-500 hover:scale-[1.02] cursor-pointer"
     }`}
                 >
                   {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
@@ -324,8 +325,8 @@ const VerifyMail = () => {
                   disabled={isSendingOtp || isVerifyingOtp}
                   className={`w-full text-sm ${
                     isSendingOtp
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-cyan-300 hover:underline cursor-pointer"
+                      ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                      : "text-cyan-300 dark:text-cyan-400 hover:underline cursor-pointer"
                   }`}
                 >
                   {isSendingOtp ? "Sending..." : "Resend OTP"}
@@ -334,11 +335,11 @@ const VerifyMail = () => {
             )}
 
             {/* Back */}
-            <p className="text-center text-sm text-white/80">
+            <p className="text-center text-sm text-white/80 dark:text-slate-300">
               Back to{" "}
               <span
                 onClick={() => navigate("/")}
-                className="text-cyan-300 cursor-pointer hover:underline"
+                className="text-cyan-300 dark:text-cyan-400 cursor-pointer hover:underline"
               >
                 Login
               </span>

@@ -55,11 +55,11 @@ const STATUS_DOTS = {
 };
 
 const PAYMENT_STATUS_STYLES = {
-  COMPLETE: "bg-emerald-50 text-emerald-700",
-  POSTPAID: "bg-purple-50 text-purple-700",
-  PENDING: "bg-amber-50 text-amber-700",
-  FAILED: "bg-red-50 text-red-700",
-  FAILED_AUTH: "bg-red-50 text-red-700",
+  COMPLETE: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  POSTPAID: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
+  PENDING: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  FAILED: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+  FAILED_AUTH: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
 };
 
 const PAYMENT_STATUS_DOTS = {
@@ -212,6 +212,22 @@ const ScrollbarStyle = () => (
     .subscription-scroll::-webkit-scrollbar-corner {
       background: transparent;
     }
+
+    .dark .subscription-scroll {
+      scrollbar-color: #475569 #0f172a;
+    }
+
+    .dark .subscription-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+
+    .dark .subscription-scroll::-webkit-scrollbar-thumb {
+      background: #475569;
+    }
+
+    .dark .subscription-scroll::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
   `}</style>
 );
 
@@ -219,7 +235,7 @@ const StatusPill = ({ status, styles = {}, dots = {} }) => {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${
-        styles?.[status] || "bg-gray-100 text-gray-700"
+        styles?.[status] || "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300"
       }`}
     >
       <span
@@ -240,7 +256,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     disabled={disabled}
     title={label}
     aria-label={label}
-    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
   >
     {children}
   </button>
@@ -520,21 +536,21 @@ const SubscriptionOrder = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3">
+    <div className="flex h-screen flex-col gap-2 overflow-hidden bg-gray-50 px-4 py-3 dark:bg-slate-950">
       <ScrollbarStyle />
 
       {/* HEADER */}
       <div className="flex shrink-0 flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-baseline gap-3">
           <div className="flex items-center gap-2">
-            <Repeat size={17} className="text-blue-600" />
+            <Repeat size={17} className="text-blue-600 dark:text-blue-400" />
 
-            <h1 className="text-lg font-semibold tracking-tight text-gray-900">
+            <h1 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">
               Subscription Orders
             </h1>
           </div>
 
-          <span className="text-xs font-medium text-blue-600">
+          <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
             Total: {totalItems}
           </span>
 
@@ -542,7 +558,7 @@ const SubscriptionOrder = () => {
             type="button"
             onClick={handleRefresh}
             disabled={subscriptionLoading}
-            className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             <RefreshCw
               size={14}
@@ -554,7 +570,7 @@ const SubscriptionOrder = () => {
             onClick={() =>
               navigate("/dashboard/subscription-orders/add-subscription-orders")
             }
-            className="h-8 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="h-8 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 bg-white text-black text-sm hover:bg-blue-400 transition disabled:opacity-60 disabled:cursor-not-allowed dark:border dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-blue-600 dark:hover:text-white"
           >
             <SquarePen size={16} />
             Add Offline Subscription
@@ -567,7 +583,7 @@ const SubscriptionOrder = () => {
           <div className="relative w-full sm:w-72 lg:w-80">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
 
             <input
@@ -577,14 +593,14 @@ const SubscriptionOrder = () => {
                 setPage(1);
               }}
               placeholder="Search subscription, customer, phone..."
-              className="h-8 w-full rounded-lg border border-gray-200 bg-white pl-8 pr-3 text-xs text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+              className="h-8 w-full rounded-lg border border-gray-200 bg-white pl-8 pr-3 text-xs text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
             />
           </div>
         </div>
       </div>
 
       {/* FILTER BAR */}
-      <div className="subscription-scroll flex shrink-0 items-center gap-2 overflow-x-auto rounded-xl border border-gray-100 bg-white px-3 py-2 shadow-sm">
+      <div className="subscription-scroll flex shrink-0 items-center gap-2 overflow-x-auto rounded-xl border border-gray-100 bg-white px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         {/* DATE FILTERS */}
         <div className="flex shrink-0 items-center gap-1.5">
           {DATE_FILTERS.map((filter) => {
@@ -598,7 +614,7 @@ const SubscriptionOrder = () => {
                 className={`flex h-8 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-xs font-medium transition ${
                   active
                     ? "bg-blue-600 text-white shadow-sm"
-                    : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 }`}
               >
                 {filter.key !== "all" && <CalendarDays size={12} />}
@@ -609,7 +625,7 @@ const SubscriptionOrder = () => {
                   className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                     active
                       ? "bg-white/20 text-white"
-                      : "bg-gray-100 text-gray-500"
+                      : "bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-300"
                   }`}
                 >
                   {getDateCount(filter.key)}
@@ -619,7 +635,7 @@ const SubscriptionOrder = () => {
           })}
         </div>
 
-        <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block" />
+        <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block dark:bg-slate-800" />
 
         {/* CUSTOM DATES */}
         <div className="flex shrink-0 items-center gap-1.5">
@@ -638,15 +654,15 @@ const SubscriptionOrder = () => {
               type="date"
               value={fromDate}
               onChange={(e) => handleFromDateChange(e.target.value)}
-              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 dark:bg-slate-800 dark:text-slate-200 dark:[color-scheme:dark] ${
                 hasInvalidDateRange
-                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
-                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20 dark:border-red-700 dark:focus:border-red-500"
+                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20 dark:border-slate-700 dark:focus:border-blue-500"
               }`}
             />
           </div>
 
-          <span className="text-xs text-gray-300">→</span>
+          <span className="text-xs text-gray-300 dark:text-slate-600">→</span>
 
           <div
             className="w-full cursor-pointer"
@@ -665,10 +681,10 @@ const SubscriptionOrder = () => {
               value={toDate}
               min={fromDate || undefined}
               onChange={(e) => handleToDateChange(e.target.value)}
-              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 ${
+              className={`h-8 cursor-pointer rounded-lg border bg-white px-2 text-xs text-gray-600 outline-none transition focus:ring-2 dark:bg-slate-800 dark:text-slate-200 dark:[color-scheme:dark] ${
                 hasInvalidDateRange
-                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20"
-                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20"
+                  ? "border-red-300 focus:border-red-400 focus:ring-red-500/20 dark:border-red-700 dark:focus:border-red-500"
+                  : "border-gray-200 focus:border-blue-400 focus:ring-blue-500/20 dark:border-slate-700 dark:focus:border-blue-500"
               }`}
             />
           </div>
@@ -678,14 +694,14 @@ const SubscriptionOrder = () => {
               type="button"
               onClick={clearDates}
               title="Clear dates"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-50 hover:text-gray-600"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-50 hover:text-gray-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <X size={14} />
             </button>
           )}
         </div>
 
-        <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block" />
+        <div className="hidden h-6 w-px shrink-0 bg-gray-100 xl:block dark:bg-slate-800" />
 
         {/* STATUS FILTERS */}
         <div className="flex shrink-0 items-center gap-1.5">
@@ -697,7 +713,7 @@ const SubscriptionOrder = () => {
                 setStatus(e.target.value);
                 setPage(1);
               }}
-              className="h-8 min-w-[125px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+              className="h-8 min-w-[125px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500"
             >
               <option value="">All status</option>
 
@@ -710,7 +726,7 @@ const SubscriptionOrder = () => {
 
             <ChevronDown
               size={13}
-              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
           </div>
 
@@ -722,7 +738,7 @@ const SubscriptionOrder = () => {
                 setPaymentStatus(e.target.value);
                 setPage(1);
               }}
-              className="h-8 min-w-[125px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+              className="h-8 min-w-[125px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500"
             >
               <option value="">All payment</option>
               <option value="COMPLETE">Complete</option>
@@ -734,7 +750,7 @@ const SubscriptionOrder = () => {
 
             <ChevronDown
               size={13}
-              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
           </div>
 
@@ -746,7 +762,7 @@ const SubscriptionOrder = () => {
                 setPaymentMode(e.target.value);
                 setPage(1);
               }}
-              className="h-8 min-w-[115px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+              className="h-8 min-w-[115px] cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white px-2.5 pr-7 text-xs text-gray-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500"
             >
               <option value="">All modes</option>
               <option value="COD">COD</option>
@@ -755,7 +771,7 @@ const SubscriptionOrder = () => {
 
             <ChevronDown
               size={13}
-              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
           </div>
         </div>
@@ -765,7 +781,7 @@ const SubscriptionOrder = () => {
           <button
             type="button"
             onClick={resetFilters}
-            className="ml-auto flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+            className="ml-auto flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             <Undo2 size={13} />
             Reset
@@ -775,7 +791,7 @@ const SubscriptionOrder = () => {
 
       {/* INVALID DATE MESSAGE */}
       {hasInvalidDateRange && (
-        <div className="shrink-0 rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-[11px] font-medium text-red-600">
+        <div className="shrink-0 rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-[11px] font-medium text-red-600 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300">
           The start date cannot be after the end date.
         </div>
       )}
@@ -785,9 +801,9 @@ const SubscriptionOrder = () => {
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
 
-          <span className="text-[11px] text-gray-500">Active</span>
+          <span className="text-[11px] text-gray-500 dark:text-slate-400">Active</span>
 
-          <span className="text-[11px] font-semibold text-gray-700">
+          <span className="text-[11px] font-semibold text-gray-700 dark:text-slate-200">
             {stats.active}
           </span>
         </div>
@@ -795,71 +811,71 @@ const SubscriptionOrder = () => {
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
 
-          <span className="text-[11px] text-gray-500">Pending</span>
+          <span className="text-[11px] text-gray-500 dark:text-slate-400">Pending</span>
 
-          <span className="text-[11px] font-semibold text-gray-700">
+          <span className="text-[11px] font-semibold text-gray-700 dark:text-slate-200">
             {stats.pending}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-          <span className="text-[11px] text-gray-500">Paused</span>
-          <span className="text-[11px] font-semibold text-gray-700">
+          <span className="text-[11px] text-gray-500 dark:text-slate-400">Paused</span>
+          <span className="text-[11px] font-semibold text-gray-700 dark:text-slate-200">
             {stats.paused}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-          <span className="text-[11px] text-gray-500">Expired</span>
-          <span className="text-[11px] font-semibold text-gray-700">
+          <span className="text-[11px] text-gray-500 dark:text-slate-400">Expired</span>
+          <span className="text-[11px] font-semibold text-gray-700 dark:text-slate-200">
             {stats.expired}
           </span>
         </div>
 
-        <span className="ml-auto text-[11px] text-gray-400">
+        <span className="ml-auto text-[11px] text-gray-400 dark:text-slate-400">
           Showing {subscriptions.length} of {totalItems}
         </span>
       </div>
 
       {/* TABLE */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-100 bg-[#dfe1eb] dark:border-slate-800 dark:bg-slate-900">
         <div className="subscription-scroll min-h-0 flex-1 overflow-auto">
           <table className="w-full min-w-[1370px] table-fixed text-xs">
-            <thead className="sticky top-0 z-10 bg-[#274de4]">
-              <tr className="border-b border-gray-300">
-                <th className="w-12 px-2 py-2 text-left text-[11px] font-semibold whitespace-nowrap text-white">
+            <thead className="sticky top-0 z-10 bg-[#274de4] dark:bg-slate-800">
+              <tr className="border-b border-gray-300 dark:border-slate-700">
+                <th className="w-12 px-2 py-2 text-left text-[11px] font-semibold whitespace-nowrap text-white dark:text-slate-200">
                   Sl No.
                 </th>
-                <th className="w-40 px-2 py-2 text-left text-[11px] font-semibold whitespace-nowrap text-white">
+                <th className="w-40 px-2 py-2 text-left text-[11px] font-semibold whitespace-nowrap text-white dark:text-slate-200">
                   Subscription
                 </th>
-                <th className="w-44 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-44 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Customer
                 </th>
-                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Product
                 </th>
-                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Plan
                 </th>
-                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-48 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Delivery
                 </th>
-                <th className="w-28 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-28 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Amount
                 </th>
-                <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Payment
                 </th>
-                <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white">
+                <th className="w-32 px-2 py-2 text-left text-[11px] font-semibold text-white dark:text-slate-200">
                   Status
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50 bg-white">
+            <tbody className="divide-y divide-gray-50 bg-white dark:divide-slate-800 dark:bg-slate-900">
               {/* LOADING */}
               {subscriptionLoading ? (
                 Array.from({
@@ -871,7 +887,7 @@ const SubscriptionOrder = () => {
                     }).map((__, cellIndex) => (
                       <td key={cellIndex} className="px-2 py-3">
                         <div
-                          className={`h-3 animate-pulse rounded bg-gray-100 ${
+                          className={`h-3 animate-pulse rounded bg-gray-100 dark:bg-slate-800 ${
                             cellIndex === 0
                               ? "w-6"
                               : cellIndex === 1
@@ -887,16 +903,16 @@ const SubscriptionOrder = () => {
                 /* EMPTY */
                 <tr>
                   <td colSpan={9} className="px-6 py-16">
-                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50">
-                        <Repeat size={25} className="text-gray-300" />
+                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-slate-500">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-slate-800">
+                        <Repeat size={25} className="text-gray-300 dark:text-slate-600" />
                       </div>
 
-                      <p className="mt-1 text-sm font-medium text-gray-500">
+                      <p className="mt-1 text-sm font-medium text-gray-500 dark:text-slate-300">
                         No subscriptions found
                       </p>
 
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-slate-400">
                         Try adjusting your search or filters
                       </p>
 
@@ -920,22 +936,22 @@ const SubscriptionOrder = () => {
                   return (
                     <tr
                       key={item?.id || item?.subId || index}
-                      className="transition hover:bg-slate-50 cursor-pointer"
+                      className="transition hover:bg-slate-50 cursor-pointer dark:hover:bg-slate-800/60"
                       title="Click to view more details"
                       onClick={() => handleDetailsNavigate(item.id)}
                     >
                       {/* SL NO */}
-                      <td className="px-2 py-2 text-gray-400">
+                      <td className="px-2 py-2 text-gray-400 dark:text-slate-500">
                         {startIndex + index + 1}
                       </td>
 
                       {/* SUBSCRIPTION */}
                       <td className="px-2 py-2">
-                        <p className="truncate font-semibold text-blue-900">
+                        <p className="truncate font-semibold text-blue-900 dark:text-blue-400">
                           {item?.subId || "-"}
                         </p>
 
-                        <div className="mt-0.5 flex items-center gap-1 text-[10px] text-gray-400">
+                        <div className="mt-0.5 flex items-center gap-1 text-[10px] text-gray-400 dark:text-slate-400">
                           <CalendarDays size={10} />
 
                           {formatShortDate(item?.startDate)}
@@ -945,16 +961,16 @@ const SubscriptionOrder = () => {
                       {/* CUSTOMER */}
                       <td className="px-2 py-2">
                         <div className="flex min-w-0 items-center gap-2">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
                             <User size={12} />
                           </div>
 
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-gray-800">
+                            <p className="truncate font-medium text-gray-800 dark:text-slate-200">
                               {item?.user?.customer_name || "Unknown"}
                             </p>
 
-                            <p className="truncate text-[10px] text-gray-400">
+                            <p className="truncate text-[10px] text-gray-400 dark:text-slate-400">
                               {item?.user?.phone_num || "-"}
                             </p>
                           </div>
@@ -964,7 +980,7 @@ const SubscriptionOrder = () => {
                       {/* PRODUCT */}
                       <td className="px-2 py-2">
                         <div className="flex min-w-0 items-center gap-2">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-100 bg-gray-50">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-100 bg-gray-50 dark:border-slate-700 dark:bg-slate-800">
                             {item?.product?.product_images?.[0] ? (
                               <img
                                 src={resolveFirebaseUrl({
@@ -975,16 +991,16 @@ const SubscriptionOrder = () => {
                                 className="h-full w-full object-cover"
                               />
                             ) : (
-                              <Package size={13} className="text-gray-400" />
+                              <Package size={13} className="text-gray-400 dark:text-slate-500" />
                             )}
                           </div>
 
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-gray-900">
+                            <p className="truncate font-medium text-gray-900 dark:text-slate-100">
                               {item?.product?.product_name || "-"}
                             </p>
 
-                            <p className="truncate text-[10px] text-gray-500">
+                            <p className="truncate text-[10px] text-gray-500 dark:text-slate-400">
                               {item?.variant?.quantity
                                 ? `${item.variant.quantity} ${
                                     item?.variant?.unit || ""
@@ -1001,18 +1017,18 @@ const SubscriptionOrder = () => {
 
                       {/* PLAN */}
                       <td className="px-2 py-2">
-                        <p className="truncate font-medium text-gray-900">
+                        <p className="truncate font-medium text-gray-900 dark:text-slate-100">
                           {item?.plan?.name || "-"}
                         </p>
 
-                        <p className="mt-0.5 truncate text-[10px] text-gray-500">
+                        <p className="mt-0.5 truncate text-[10px] text-gray-500 dark:text-slate-400">
                           {item?.durationMonths || 0} month
                           {Number(item?.durationMonths) > 1 ? "s" : ""} ·{" "}
                           {item?.totalDeliveries || 0} deliveries
                         </p>
 
                         {item?.plan?.description && (
-                          <p className="mt-0.5 truncate text-[10px] text-gray-400">
+                          <p className="mt-0.5 truncate text-[10px] text-gray-400 dark:text-slate-500">
                             {item.plan.description}
                           </p>
                         )}
@@ -1021,10 +1037,10 @@ const SubscriptionOrder = () => {
                       {/* DELIVERY */}
                       <td className="px-2 py-2">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 truncate font-medium text-gray-700">
+                          <div className="flex items-center gap-1.5 truncate font-medium text-gray-700 dark:text-slate-200">
                             <Clock3
                               size={11}
-                              className="shrink-0 text-gray-400"
+                              className="shrink-0 text-gray-400 dark:text-slate-500"
                             />
 
                             <span className="truncate">
@@ -1034,7 +1050,7 @@ const SubscriptionOrder = () => {
 
                           {(item?.deliverySlot?.from ||
                             item?.deliverySlot?.to) && (
-                            <p className="text-[10px] text-gray-400">
+                            <p className="text-[10px] text-gray-400 dark:text-slate-400">
                               {item?.deliverySlot?.from || ""}
 
                               {item?.deliverySlot?.to
@@ -1046,10 +1062,10 @@ const SubscriptionOrder = () => {
                           <div className="flex items-center gap-1.5">
                             <Truck
                               size={11}
-                              className="shrink-0 text-gray-400"
+                              className="shrink-0 text-gray-400 dark:text-slate-500"
                             />
 
-                            <span className="truncate text-[10px] text-gray-400">
+                            <span className="truncate text-[10px] text-gray-400 dark:text-slate-400">
                               {Array.isArray(item?.selectedDays)
                                 ? item.selectedDays
                                     .map(
@@ -1073,15 +1089,15 @@ const SubscriptionOrder = () => {
 
                       {/* AMOUNT */}
                       <td className="px-2 py-2">
-                        <p className="font-semibold text-green-900">
+                        <p className="font-semibold text-green-900 dark:text-emerald-400">
                           {formatCurrency(item?.totalAmount)}
                         </p>
 
-                        <p className="mt-0.5 text-[10px] text-gray-500">
+                        <p className="mt-0.5 text-[10px] text-gray-500 dark:text-slate-400">
                           Qty {item?.qtyPerDelivery || 0} / delivery
                         </p>
 
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-[10px] text-gray-400 dark:text-slate-400">
                           {item?.deliveriesRemaining || 0} remaining
                         </p>
                       </td>
@@ -1094,7 +1110,7 @@ const SubscriptionOrder = () => {
                           dots={PAYMENT_STATUS_DOTS}
                         />
 
-                        <div className="mt-1 flex items-center gap-1 text-[10px] text-gray-400">
+                        <div className="mt-1 flex items-center gap-1 text-[10px] text-gray-400 dark:text-slate-400">
                           <CreditCard size={10} />
 
                           <span className="truncate">
@@ -1105,7 +1121,7 @@ const SubscriptionOrder = () => {
                         </div>
 
                         {item?.paymentInfo?.paymentMethod && (
-                          <p className="mt-0.5 truncate text-[10px] text-gray-400">
+                          <p className="mt-0.5 truncate text-[10px] text-gray-400 dark:text-slate-400">
                             {item.paymentInfo.paymentMethod}
                           </p>
                         )}
@@ -1144,7 +1160,7 @@ const SubscriptionOrder = () => {
                                       </div>
 
                                       {rowStatus === option.value && (
-                                        <span className="text-blue-600">✓</span>
+                                        <span className="text-blue-600 dark:text-blue-400">✓</span>
                                       )}
                                     </div>
                                   </SplitButtonItem>
@@ -1174,23 +1190,23 @@ const SubscriptionOrder = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50/70 px-3 py-2">
+        <div className="flex shrink-0 items-center justify-between border-t border-gray-100 bg-gray-50/70 px-3 py-2 dark:border-slate-800 dark:bg-slate-800/70">
           {/* LEFT */}
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-gray-500">
+            <span className="text-[11px] text-gray-500 dark:text-slate-400">
               Page{" "}
-              <span className="font-semibold text-gray-700">{currentPage}</span>{" "}
+              <span className="font-semibold text-gray-700 dark:text-slate-200">{currentPage}</span>{" "}
               of{" "}
-              <span className="font-semibold text-gray-700">{totalPages}</span>
+              <span className="font-semibold text-gray-700 dark:text-slate-200">{totalPages}</span>
             </span>
 
-            <span className="hidden text-[11px] text-gray-400 sm:block">
+            <span className="hidden text-[11px] text-gray-400 sm:block dark:text-slate-400">
               {totalItems} subscriptions
             </span>
 
             {/* PAGE SIZE */}
             <div className="hidden items-center gap-1.5 sm:flex">
-              <span className="text-[11px] text-gray-400">Rows</span>
+              <span className="text-[11px] text-gray-400 dark:text-slate-400">Rows</span>
 
               <select
                 value={pageSize}
@@ -1198,7 +1214,7 @@ const SubscriptionOrder = () => {
                   setPageSize(Number(e.target.value));
                   setPage(1);
                 }}
-                className="h-7 cursor-pointer rounded-md border border-gray-200 bg-white px-1.5 text-[11px] text-gray-600 outline-none focus:border-blue-400"
+                className="h-7 cursor-pointer rounded-md border border-gray-200 bg-white px-1.5 text-[11px] text-gray-600 outline-none focus:border-blue-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-blue-500"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -1219,7 +1235,7 @@ const SubscriptionOrder = () => {
               <ChevronLeft size={14} />
             </PageButton>
 
-            <span className="min-w-[25px] text-center text-[11px] font-medium text-gray-500">
+            <span className="min-w-[25px] text-center text-[11px] font-medium text-gray-500 dark:text-slate-300">
               {currentPage}
             </span>
 

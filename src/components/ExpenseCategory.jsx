@@ -98,10 +98,10 @@ const ExpenseCategory = () => {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                         Expense Categories
                     </h1>
-                    <p className="text-sm text-gray-500 mt-0.5">
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                         Manage and organize expense types for your accounting
                     </p>
                 </div>
@@ -120,60 +120,60 @@ const ExpenseCategory = () => {
             </div>
 
             {/* Control Bar: Search */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
                 <div className="relative w-full sm:w-80">
                     <Search
                         size={18}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                     />
                     <input
                         type="text"
                         placeholder="Search categories..."
                         value={categorySearch}
                         onChange={handleSearchChange}
-                        className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                        className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition"
                     />
                 </div>
 
-                <span className="text-xs text-gray-500 font-medium self-end sm:self-center">
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-medium self-end sm:self-center">
                     Showing {categories.length} item(s)
                 </span>
             </div>
 
             {/* Category List / Table */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {categoryLoading && categories.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-gray-400 space-y-3">
-                        <Loader2 className="animate-spin text-blue-600" size={32} />
+                    <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-slate-400 space-y-3">
+                        <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={32} />
                         <p className="text-sm font-medium">Loading categories...</p>
                     </div>
                 ) : categories.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                        <div className="w-12 h-12 rounded-full bg-slate-100 text-gray-400 flex items-center justify-center mb-3">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 flex items-center justify-center mb-3">
                             <FolderPlus size={24} />
                         </div>
-                        <h3 className="text-base font-semibold text-gray-800">
+                        <h3 className="text-base font-semibold text-gray-800 dark:text-slate-100">
                             No categories found
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1 max-w-sm">
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 max-w-sm">
                             {categorySearch
                                 ? `No results match "${categorySearch}". Try searching for something else.`
                                 : "Get started by creating your first expense category."}
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-slate-100">
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
                         {categories.map((cat, idx) => (
                             <div
                                 key={cat.id || idx}
-                                className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/80 transition-colors group"
+                                className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition-colors group"
                             >
                                 <div className="flex items-center gap-3.5">
-                                    <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                    <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                                         <Tag size={18} />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-semibold text-gray-800 capitalize">
+                                        <h4 className="text-sm font-semibold text-gray-800 dark:text-slate-100 capitalize">
                                             {cat.name.toUpperCase()}
                                         </h4>
                                     </div>
@@ -185,11 +185,11 @@ const ExpenseCategory = () => {
 
                 {/* Load More Button (Cursor Pagination) */}
                 {categoryHasMore && (
-                    <div className="p-4 bg-slate-50/50 border-t border-slate-100 text-center">
+                    <div className="p-4 bg-slate-50/50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 text-center">
                         <button
                             onClick={loadMoreCategories}
                             disabled={categoryLoading}
-                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition disabled:opacity-50 cursor-pointer"
+                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition disabled:opacity-50 cursor-pointer"
                         >
                             {categoryLoading && (
                                 <Loader2 size={14} className="animate-spin" />
@@ -203,15 +203,15 @@ const ExpenseCategory = () => {
             {/* Create Category Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div className="bg-white dark:bg-slate-900 dark:border dark:border-slate-800 w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                            <h3 className="text-base font-semibold text-gray-900">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">
                                 Create Expense Category
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-slate-100 transition"
+                                className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                             >
                                 <X size={18} />
                             </button>
@@ -220,14 +220,14 @@ const ExpenseCategory = () => {
                         {/* Modal Form */}
                         <form onSubmit={handleCreateCategory} className="p-6 space-y-4">
                             {formError && (
-                                <div className="p-3 text-xs bg-red-50 text-red-600 rounded-lg border border-red-100 flex items-center gap-2">
+                                <div className="p-3 text-xs bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-300 rounded-lg border border-red-100 dark:border-red-800 flex items-center gap-2">
                                     <AlertCircle size={15} className="shrink-0" />
                                     <span>{formError}</span>
                                 </div>
                             )}
 
                             <div>
-                                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Category Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -235,7 +235,7 @@ const ExpenseCategory = () => {
                                     placeholder="e.g., Office Supplies, Utilities, Travel"
                                     value={newCategoryName}
                                     onChange={(e) => setNewCategoryName(e.target.value)}
-                                    className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                                    className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition"
                                     autoFocus
                                 />
                             </div>
@@ -245,7 +245,7 @@ const ExpenseCategory = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-slate-100 rounded-lg transition"
+                                    className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
                                 >
                                     Cancel
                                 </button>
@@ -269,7 +269,7 @@ const ExpenseCategory = () => {
 const ChevronDownRightIcon = () => (
     <ChevronRight
         size={16}
-        className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition"
+        className="text-gray-300 dark:text-slate-600 group-hover:text-gray-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition"
     />
 );
 

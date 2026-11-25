@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import logo from "../assets/images/logo_nobg.png";
 import authStore from "../zustand/Store/authStore";
+import ThemeToggle from "./ThemeToggle";
 
 /* ------------------------------------------------------------------ */
 /* Menu config: sections -> items -> optional children (dropdown)      */
@@ -184,7 +185,7 @@ const NavItem = ({ item, onClick, collapsed }) => {
           collapsed ? "justify-center h-11" : "gap-3 px-3 py-2.5",
           active
             ? "bg-blue-600 text-white shadow-sm"
-            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
+            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100",
         ].join(" ");
       }}
     >
@@ -197,7 +198,7 @@ const NavItem = ({ item, onClick, collapsed }) => {
                 "flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md transition-colors",
                 active
                   ? "bg-white/20"
-                  : "bg-slate-100 group-hover:bg-slate-200",
+                  : "bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700",
               ].join(" ")}
             >
               <Icon size={16} />
@@ -232,8 +233,8 @@ const SubNavItem = ({ item, onClick }) => {
         return [
           "flex items-center gap-3 rounded-lg py-2 pl-3 pr-3 text-sm transition-colors cursor-pointer",
           active
-            ? "bg-blue-50 font-medium text-blue-700"
-            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
+            ? "bg-blue-50 font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100",
         ].join(" ");
       }}
     >
@@ -244,7 +245,7 @@ const SubNavItem = ({ item, onClick }) => {
             <span
               className={[
                 "h-1.5 w-1.5 shrink-0 rounded-full transition-colors",
-                active ? "bg-blue-600" : "bg-slate-300",
+                active ? "bg-blue-600 dark:bg-blue-400" : "bg-slate-300 dark:bg-slate-600",
               ].join(" ")}
             />
             <span className="truncate">{item.name}</span>
@@ -279,8 +280,8 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
           hasActiveChild
             ? collapsed
               ? "bg-blue-600 text-white shadow-sm"
-              : "text-blue-700"
-            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900",
+              : "text-blue-700 dark:text-blue-400"
+            : "text-gray-500 hover:bg-slate-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100",
         ].join(" ")}
       >
         <span
@@ -289,8 +290,8 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
             hasActiveChild && collapsed
               ? "bg-white/20"
               : hasActiveChild
-                ? "bg-blue-100 text-blue-700"
-                : "bg-slate-100 group-hover:bg-slate-200",
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300"
+                : "bg-slate-100 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700",
           ].join(" ")}
         >
           <Icon size={16} />
@@ -319,7 +320,7 @@ const NavGroup = ({ item, collapsed, open, onToggle, onNavClick }) => {
           ].join(" ")}
         >
           <div className="overflow-hidden">
-            <div className="ml-[20px] mt-1 space-y-0.5 border-l border-slate-200">
+            <div className="ml-[20px] mt-1 space-y-0.5 border-l border-slate-200 dark:border-slate-700">
               {item.children.map((child) => (
                 <SubNavItem
                   key={child.path}
@@ -402,7 +403,7 @@ const SidebarBody = ({
       <div
         className={`h-14 flex items-center ${
           isCollapsed ? "justify-center" : "justify-between"
-        } px-4 border-b border-slate-100 shrink-0`}
+        } px-4 border-b border-slate-100 dark:border-slate-800 shrink-0`}
       >
         {!isCollapsed && (
           <div className="flex items-center gap-2.5 min-w-0">
@@ -411,7 +412,7 @@ const SidebarBody = ({
               alt="Logo"
               className="h-12 sm:h-14 w-auto object-contain shrink-0"
             />
-            <span className="text-xl font-semibold text-gray-900 tracking-tight">
+            <span className="text-xl font-semibold text-gray-900 dark:text-slate-100 tracking-tight">
               CMS
             </span>
           </div>
@@ -425,7 +426,7 @@ const SidebarBody = ({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="hidden lg:flex cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition"
+            className="hidden lg:flex cursor-pointer p-2 rounded-lg text-gray-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <Menu size={18} />
@@ -440,7 +441,7 @@ const SidebarBody = ({
             type="button"
             onClick={onExpandAndSearch}
             title="Search menu"
-            className="w-full h-10 flex items-center justify-center rounded-lg bg-slate-100 text-gray-500 hover:bg-slate-200 hover:text-gray-900 transition cursor-pointer"
+            className="w-full h-10 flex items-center justify-center rounded-lg bg-slate-100 text-gray-500 hover:bg-slate-200 hover:text-gray-900 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100 transition cursor-pointer"
             aria-label="Search menu"
           >
             <Search size={17} />
@@ -449,7 +450,7 @@ const SidebarBody = ({
           <div className="relative flex items-center">
             <Search
               size={15}
-              className="absolute left-3 text-gray-400 pointer-events-none"
+              className="absolute left-3 text-gray-400 dark:text-slate-500 pointer-events-none"
             />
             <input
               ref={!isMobile ? searchInputRef : undefined}
@@ -457,13 +458,13 @@ const SidebarBody = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search menu..."
-              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:bg-slate-900 transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 p-0.5 rounded text-gray-400 hover:text-gray-600 cursor-pointer"
+                className="absolute right-2.5 p-0.5 rounded text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300 cursor-pointer"
                 aria-label="Clear search"
               >
                 <X size={14} />
@@ -479,7 +480,7 @@ const SidebarBody = ({
           ? filteredSections.map((section, index) => (
               <div key={section.label} className={index > 0 ? "pt-5" : ""}>
                 {!isCollapsed && (
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                  <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
                     {section.label}
                   </p>
                 )}
@@ -510,7 +511,7 @@ const SidebarBody = ({
             ))
           : !isCollapsed && (
               <div className="px-3 py-8 text-center">
-                <p className="text-xs text-gray-400">No menu items found</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500">No menu items found</p>
               </div>
             )}
       </nav>
@@ -521,7 +522,7 @@ const SidebarBody = ({
           <button
             type="button"
             onClick={onLogOut}
-            className="w-full cursor-pointer rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+            className="w-full cursor-pointer rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/70 transition-colors"
           >
             Logout
           </button>
@@ -529,22 +530,22 @@ const SidebarBody = ({
       )}
 
       {/* Footer */}
-      <div className="shrink-0 px-4 py-3 border-t border-slate-100">
+      <div className="shrink-0 px-4 py-3 border-t border-slate-100 dark:border-slate-800">
         <div
           className={`flex items-center ${
             isCollapsed ? "justify-center" : "gap-3"
           }`}
         >
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
+          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/70 flex items-center justify-center text-blue-700 dark:text-blue-300 font-semibold text-sm shrink-0">
             {user?.first_name?.charAt(0)?.toUpperCase() || "U"}
           </div>
 
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-800 truncate">
+              <p className="text-xs font-medium text-gray-800 dark:text-slate-200 truncate">
                 {user?.first_name} {user?.last_name}
               </p>
-              <p className="text-[11px] text-gray-400 truncate">
+              <p className="text-[11px] text-gray-400 dark:text-slate-400 truncate">
                 {user?.email}
               </p>
             </div>
@@ -626,30 +627,34 @@ const Sidebar = ({ onLogOut }) => {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-[60] h-14 bg-white border-b border-slate-100 flex items-center px-3 sm:px-4 gap-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-[60] h-14 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center px-3 sm:px-4 gap-3 transition-colors">
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="flex items-center justify-center w-9 h-9 p-1.5 cursor-pointer rounded-lg text-gray-500 hover:bg-slate-100 active:bg-slate-100 transition-colors shrink-0"
+          className="flex items-center justify-center w-9 h-9 p-1.5 cursor-pointer rounded-lg text-gray-500 hover:bg-slate-100 active:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:active:bg-slate-800 transition-colors shrink-0"
           aria-label="Open menu"
         >
           <Menu size={21} />
         </button>
 
         <div className="flex items-center min-w-0">
-          <span className="text-base font-semibold text-gray-900 tracking-tight truncate">
+          <span className="text-base font-semibold text-gray-900 dark:text-slate-100 tracking-tight truncate">
             CMS
           </span>
-          <span className="text-base font-semibold text-blue-600 ml-1 truncate">
+          <span className="text-base font-semibold text-blue-600 dark:text-blue-400 ml-1 truncate">
             {user?.first_name || ""}
           </span>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2 shrink-0">
+          <ThemeToggle />
         </div>
       </div>
 
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-[70] bg-black/30 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-[70] bg-black/30 dark:bg-black/60 backdrop-blur-sm"
           onClick={close}
           aria-hidden="true"
         />
@@ -659,7 +664,7 @@ const Sidebar = ({ onLogOut }) => {
       <div
         className={[
           "lg:hidden fixed top-0 left-0 z-[80] h-[100dvh] w-[280px] max-w-[85vw]",
-          "bg-white border-r border-slate-100 shadow-2xl",
+          "bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-2xl",
           "transition-transform duration-300 ease-in-out",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
@@ -667,7 +672,7 @@ const Sidebar = ({ onLogOut }) => {
         <button
           type="button"
           onClick={close}
-          className="absolute cursor-pointer top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-slate-100 hover:text-gray-700 transition-colors"
+          className="absolute cursor-pointer top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-slate-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           aria-label="Close menu"
         >
           <X size={19} />
@@ -678,7 +683,7 @@ const Sidebar = ({ onLogOut }) => {
 
       {/* Desktop Sidebar — fixed */}
       <aside
-        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white border-r border-slate-100 transition-all duration-300 ${
+        className={`hidden lg:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 transition-all duration-300 ${
           collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH
         }`}
       >

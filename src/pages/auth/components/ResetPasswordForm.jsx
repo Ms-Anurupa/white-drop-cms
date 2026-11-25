@@ -70,13 +70,13 @@ const ResetPasswordForm = ({ email }) => {
   return (
     <>
       <div className="text-center mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
           Reset Password
         </h1>
 
-        <p className="text-white/80 text-sm mt-1">Reset password for</p>
+        <p className="text-white/80 dark:text-slate-300 text-sm mt-1">Reset password for</p>
 
-        <p className="text-cyan-300 text-sm break-all">{email}</p>
+        <p className="text-cyan-300 dark:text-cyan-400 text-sm break-all">{email}</p>
       </div>
 
       <div className="space-y-4">
@@ -88,17 +88,17 @@ const ResetPasswordForm = ({ email }) => {
             value={registerData.password}
             disabled={isResettingPassword}
             onChange={handleChange}
-            className="w-full rounded-2xl bg-white/20 border border-white/30
-    py-3 pl-5 pr-12 text-white placeholder:text-white/60
-    outline-none backdrop-blur-md focus:border-cyan-300
-    disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+    py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+    outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400
+    dark:disabled:bg-slate-800/50 disabled:opacity-70 disabled:cursor-not-allowed"
           />
 
           <button
             type="button"
             disabled={isResettingPassword}
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400
     disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -113,17 +113,17 @@ const ResetPasswordForm = ({ email }) => {
             value={registerData.confirmPassword}
             disabled={isResettingPassword}
             onChange={handleChange}
-            className="w-full rounded-2xl bg-white/20 border border-white/30
-    py-3 pl-5 pr-12 text-white placeholder:text-white/60
-    outline-none backdrop-blur-md focus:border-cyan-300
-    disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full rounded-2xl bg-white/20 dark:bg-slate-800/80 border border-white/30 dark:border-slate-700
+    py-3 pl-5 pr-12 text-white dark:text-slate-100 placeholder:text-white/60 dark:placeholder:text-slate-400
+    outline-none backdrop-blur-md focus:border-cyan-300 dark:focus:border-cyan-400
+    dark:disabled:bg-slate-800/50 disabled:opacity-70 disabled:cursor-not-allowed"
           />
 
           <button
             type="button"
             disabled={isResettingPassword}
             onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 dark:text-slate-400
     disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -136,8 +136,8 @@ const ResetPasswordForm = ({ email }) => {
           className={`w-full rounded-2xl py-3 text-white font-semibold shadow-lg transition
     ${
       isResettingPassword
-        ? "bg-gray-500 cursor-not-allowed opacity-70"
-        : "bg-gradient-to-r from-yellow-500 to-yellow-400 hover:scale-[1.02] cursor-pointer"
+        ? "bg-gray-500 dark:bg-slate-700 cursor-not-allowed opacity-70"
+        : "bg-gradient-to-r from-yellow-500 to-yellow-400 dark:from-yellow-600 dark:to-amber-500 hover:scale-[1.02] cursor-pointer"
     }`}
         >
           {isResettingPassword ? "Resetting..." : "Reset Password"}

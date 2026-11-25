@@ -55,24 +55,24 @@ const OfferFilters = ({
   return (
     <div className="mb-5 space-y-3">
       {/* SEARCH + STATUS */}
-      <div className="rounded-xl border border-[#E5E7F0] bg-white p-3 shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
+      <div className="rounded-xl border border-[#E5E7F0] bg-white p-3 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:w-[320px]">
             <Search
               size={15}
               strokeWidth={2}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA1B8]"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA1B8] dark:text-slate-500"
             />
             <input
               type="text"
               value={search}
               onChange={handleSearch}
               placeholder="Search offers..."
-              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] pl-9 pr-3 text-[11px] font-medium text-[#12151F] outline-none transition-all placeholder:font-normal placeholder:text-[#9AA1B8] hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] pl-9 pr-3 text-[11px] font-medium text-[#12151F] outline-none transition-all placeholder:font-normal placeholder:text-[#9AA1B8] hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus:border-[#8475F5] dark:focus:bg-slate-800 dark:focus:ring-[#6655DF]/25"
             />
           </div>
 
-          <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] p-1">
+          <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] p-1 dark:border-slate-800 dark:bg-slate-800/70">
             {STATUS_TABS.map((tab) => {
               const isActive = activeTab === tab.key;
               return (
@@ -82,8 +82,8 @@ const OfferFilters = ({
                   onClick={() => handleStatusChange(tab.key)}
                   className={`flex h-7 shrink-0 items-center gap-1.5 rounded-md px-3 text-[10px] font-semibold transition-all ${
                     isActive
-                      ? "bg-white text-[#6655DF] shadow-sm ring-1 ring-[#E5E7F0]"
-                      : "text-[#5C6480] hover:bg-white/70 hover:text-[#12151F]"
+                      ? "bg-white text-[#6655DF] shadow-sm ring-1 ring-[#E5E7F0] dark:bg-slate-900 dark:text-[#9B8FF7] dark:ring-slate-700"
+                      : "text-[#5C6480] hover:bg-white/70 hover:text-[#12151F] dark:text-slate-400 dark:hover:bg-slate-700/70 dark:hover:text-slate-100"
                   }`}
                 >
                   {getStatusIcon(tab.key)}
@@ -96,21 +96,21 @@ const OfferFilters = ({
       </div>
 
       {/* ADVANCED FILTERS */}
-      <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.03)]">
-        <div className="flex items-center justify-between border-b border-[#F0F1F6] px-4 py-2.5">
+      <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.03)] dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center justify-between border-b border-[#F0F1F6] px-4 py-2.5 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6655DF]/10">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6655DF]/10 dark:bg-[#6655DF]/20">
               <SlidersHorizontal
                 size={13}
                 strokeWidth={2}
-                className="text-[#6655DF]"
+                className="text-[#6655DF] dark:text-[#9B8FF7]"
               />
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-[#12151F]">
+              <p className="text-[10px] font-semibold text-[#12151F] dark:text-slate-100">
                 Advanced Filters
               </p>
-              <p className="text-[9px] text-[#9AA1B8]">
+              <p className="text-[9px] text-[#9AA1B8] dark:text-slate-400">
                 Refine your offer results
               </p>
             </div>
@@ -118,7 +118,7 @@ const OfferFilters = ({
 
           {(offerType || isDateRangeComplete) && (
             <span
-              className="rounded-full bg-[#14B8A6]/10 px-2 py-1 text-[8px] font-semibold uppercase tracking-wide text-[#0D9488]"
+              className="rounded-full bg-[#14B8A6]/10 px-2 py-1 text-[8px] font-semibold uppercase tracking-wide text-[#0D9488] dark:bg-teal-950/60 dark:text-teal-300"
               style={mono}
             >
               Filters active
@@ -129,7 +129,7 @@ const OfferFilters = ({
         <div className="flex flex-col gap-3 p-4 lg:flex-row lg:items-end">
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <label
-              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8]"
+              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8] dark:text-slate-400"
               style={mono}
             >
               Offer Type
@@ -139,13 +139,13 @@ const OfferFilters = ({
               value={offerType}
               onChange={(e) => setOfferType(e.target.value)}
               placeholder="Search by offer type..."
-              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#12151F] outline-none transition-all placeholder:font-normal placeholder:text-[#9AA1B8] hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#12151F] outline-none transition-all placeholder:font-normal placeholder:text-[#9AA1B8] hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus:border-[#8475F5] dark:focus:bg-slate-800 dark:focus:ring-[#6655DF]/25"
             />
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <label
-              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8]"
+              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8] dark:text-slate-400"
               style={mono}
             >
               From Date
@@ -163,13 +163,13 @@ const OfferFilters = ({
                 }
               }}
               max={toDate || undefined}
-              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:focus:border-[#8475F5] dark:focus:bg-slate-800 dark:focus:ring-[#6655DF]/25 dark:[color-scheme:dark]"
             />
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <label
-              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8]"
+              className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9AA1B8] dark:text-slate-400"
               style={mono}
             >
               To Date
@@ -187,14 +187,14 @@ const OfferFilters = ({
                 }
               }}
               min={fromDate || undefined}
-              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12"
+              className="cursor-pointer h-9 w-full rounded-lg border border-[#E5E7F0] bg-[#F7F8FC] px-3 text-[10px] font-medium text-[#5C6480] outline-none transition-all hover:border-[#D0D4E4] focus:border-[#6655DF] focus:bg-white focus:ring-2 focus:ring-[#6655DF]/12 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:focus:border-[#8475F5] dark:focus:bg-slate-800 dark:focus:ring-[#6655DF]/25 dark:[color-scheme:dark]"
             />
           </div>
 
           <button
             type="button"
             onClick={onReset}
-            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#E5E7F0] bg-white px-4 text-[10px] font-semibold text-[#5C6480] transition-all hover:border-[#6655DF]/30 hover:bg-[#6655DF]/5 hover:text-[#6655DF] active:scale-[0.98]"
+            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#E5E7F0] bg-white px-4 text-[10px] font-semibold text-[#5C6480] transition-all hover:border-[#6655DF]/30 hover:bg-[#6655DF]/5 hover:text-[#6655DF] active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-[#8475F5]/40 dark:hover:bg-[#6655DF]/15 dark:hover:text-[#A59BF9]"
           >
             <RotateCcw size={12} strokeWidth={2} />
             Reset

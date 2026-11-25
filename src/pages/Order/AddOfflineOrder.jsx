@@ -63,13 +63,13 @@ const AddOfflineOrder = () => {
   };
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 bg-gray-50 min-h-full">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 bg-gray-50 dark:bg-slate-950 min-h-full">
       <div className="max-w-5xl mx-auto w-full space-y-6">
         
         {/* HEADER */}
         <button
           onClick={() => navigate(-1)}
-          className="group mb-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-900"
+          className="group mb-5 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 transition hover:text-gray-900 dark:hover:text-slate-100"
         >
           <ArrowLeft
             size={16}
@@ -78,10 +78,10 @@ const AddOfflineOrder = () => {
           Back
         </button>
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-slate-100 tracking-tight">
             Create Offline Order
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Build the cart and assign delivery slots for offline customers.
           </p>
         </div>
@@ -97,7 +97,7 @@ const AddOfflineOrder = () => {
           <button
             onClick={handleSubmit}
             disabled={loading || !formData?.cart?.length}
-            className="px-8 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
+            className="px-8 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-slate-700 disabled:cursor-not-allowed shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
           >
             {loading ? (
               "Processing..."

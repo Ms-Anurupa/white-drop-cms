@@ -175,7 +175,7 @@ const OfferList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8FC]">
+    <div className="min-h-screen bg-[#F7F8FC] dark:bg-slate-950">
       <div className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-5 lg:px-6">
         <OfferHeader onCreateOffer={() => setShowCreateOffer(true)} />
 
@@ -201,19 +201,21 @@ const OfferList = () => {
         />
 
         {error && (
-          <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2.5">
-            <p className="text-[11px] text-red-600">{error}</p>
+          <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/60 px-3 py-2.5">
+            <p className="text-[11px] text-red-600 dark:text-red-300">
+              {error}
+            </p>
             <button
               type="button"
               onClick={clearOfferError}
-              className="text-[11px] font-medium text-red-500 hover:text-red-700"
+              className="text-[11px] font-medium text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        <div className="overflow-hidden rounded-xl border border-[#E5E7F0] bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-[#E5E7F0] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
           <OfferTable
             offers={filteredOffers}
             loading={loading}

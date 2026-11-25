@@ -79,18 +79,18 @@ function SummaryStrip({ summary, loading }) {
         return (
           <div
             key={key}
-            className="rounded-lg border border-slate-200 bg-white p-4"
+            className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
           >
-            <p className="text-sm text-slate-500">{label}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
             {loading || !s ? (
-              <div className="mt-2 h-7 w-16 animate-pulse rounded bg-slate-100" />
+              <div className="mt-2 h-7 w-16 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
             ) : (
-              <p className="mt-1 font-mono text-2xl font-semibold tabular-nums text-slate-900">
+              <p className="mt-1 font-mono text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                 {fmtNum(s.totalCount)}
               </p>
             )}
             {!loading && s && (
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                 {fmtNum(s.jobsDone)} {s.jobsDone === 1 ? "job" : "jobs"} ·{" "}
                 {fmtNum(s.totalOrders)} orders · {fmtNum(s.totalSubscriptions)}{" "}
                 subs
@@ -108,11 +108,11 @@ function SummaryStrip({ summary, loading }) {
 // -----------------------------------------------------------------------
 function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenerate }) {
   return (
-    <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+    <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500">From</label>
+        <label className="text-xs font-medium text-slate-500 dark:text-slate-400">From</label>
         <div className="relative">
-          <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+          <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <input
             type="date"
             value={filters.startDate}
@@ -128,15 +128,15 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
                 input?.focus();
               }
             }}
-            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500">To</label>
+        <label className="text-xs font-medium text-slate-500 dark:text-slate-400">To</label>
         <div className="relative">
-          <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+          <Calendar className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <input
             type="date"
             value={filters.endDate}
@@ -154,7 +154,7 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
                 input?.focus();
               }
             }}
-            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="cursor-pointer rounded-md border border-slate-300 py-1.5 pl-8 pr-2 text-sm text-slate-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
             sortOrder: filters.sortOrder === "asc" ? "desc" : "asc",
           })
         }
-        className="flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+        className="flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
       >
         {filters.sortOrder === "asc" ? (
           <ArrowUp className="h-3.5 w-3.5" />
@@ -180,7 +180,7 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
         <button
           type="button"
           onClick={onReset}
-          className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-sm text-red-500 decoration-slate-300 underline-offset-2 hover:text-red-700"
+          className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-sm text-red-500 decoration-slate-300 underline-offset-2 hover:text-red-700 dark:border-slate-700 dark:text-red-400 dark:hover:bg-slate-800 dark:hover:text-red-300"
         >
           Clear dates
         </button>
@@ -191,7 +191,7 @@ function FilterBar({ filters, onChange, onReset, onRefresh, refreshing, onGenera
           variant="outline"
           disabled={refreshing}
           onClick={onRefresh}
-          className="!bg-slate-100 !text-gray-700 hover:!bg-slate-200"
+          className="!bg-slate-100 !text-gray-700 hover:!bg-slate-200 dark:!bg-slate-800 dark:!text-slate-200 dark:hover:!bg-slate-700"
           menuContent={
             <SplitButtonItem onClick={onGenerate} disabled={refreshing}>
               <div className="flex w-full items-center gap-2">
@@ -227,7 +227,7 @@ function SortHeader({ field, label, filters, onChange, align = "left" }) {
           sortOrder: active && filters.sortOrder === "desc" ? "asc" : "desc",
         })
       }
-      className={`flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wide text-slate-500 hover:text-slate-700 ${
+      className={`flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wide text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 ${
         align === "right" ? "justify-end" : "justify-start"
       }`}
     >
@@ -294,13 +294,13 @@ function ExtraCell({ job }) {
         className="flex items-center gap-1.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="font-mono text-base font-semibold tabular-nums text-slate-900">
+        <span className="font-mono text-base font-semibold tabular-nums text-slate-900 dark:text-slate-100">
           {fmtNum(job.extra)}
         </span>
         <button
           type="button"
           onClick={startEditing}
-          className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           title="Add extra"
         >
           <Plus className="cursor-pointer h-3.5 w-3.5" />
@@ -323,13 +323,13 @@ function ExtraCell({ job }) {
           }}
           placeholder="±qty"
           disabled={isSaving}
-          className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm tabular-nums focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50"
+          className="w-20 rounded-md border border-slate-300 px-2 py-1 text-sm tabular-nums focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         />
         <button
           type="button"
           onClick={submit}
           disabled={isSaving}
-          className="flex h-6 w-6 items-center justify-center rounded text-emerald-600 hover:bg-emerald-50 disabled:opacity-50"
+          className="flex h-6 w-6 items-center justify-center rounded text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 dark:text-emerald-400 dark:hover:bg-emerald-950/60"
           title="Save"
         >
           {isSaving ? (
@@ -342,14 +342,14 @@ function ExtraCell({ job }) {
           type="button"
           onClick={cancelEditing}
           disabled={isSaving}
-          className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 disabled:opacity-50"
+          className="flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-100 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800"
           title="Cancel"
         >
           <X className="cursor-pointer h-3.5 w-3.5" />
         </button>
       </div>
       {extraUpdateError && (
-        <span className="text-[11px] text-red-500">{extraUpdateError}</span>
+        <span className="text-[11px] text-red-500 dark:text-red-400">{extraUpdateError}</span>
       )}
     </div>
   );
@@ -358,13 +358,13 @@ function ExtraCell({ job }) {
 function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
   if (loading) {
     return (
-      <div className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white">
+      <div className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex items-center gap-4 px-4 py-3.5">
-            <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
-            <div className="ml-auto h-4 w-12 animate-pulse rounded bg-slate-100" />
-            <div className="h-4 w-12 animate-pulse rounded bg-slate-100" />
-            <div className="h-4 w-16 animate-pulse rounded bg-slate-100" />
+            <div className="h-4 w-24 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+            <div className="ml-auto h-4 w-12 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+            <div className="h-4 w-12 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+            <div className="h-4 w-16 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
           </div>
         ))}
       </div>
@@ -373,12 +373,12 @@ function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
 
   if (!jobs.length) {
     return (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white py-16 text-center">
-        <Boxes className="h-8 w-8 text-slate-300" />
-        <p className="text-sm font-medium text-slate-600">
+      <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white py-16 text-center dark:border-slate-700 dark:bg-slate-900">
+        <Boxes className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
           No packaging jobs in this range
         </p>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
           Try widening the date filter or clearing it.
         </p>
       </div>
@@ -386,9 +386,9 @@ function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <table className="w-full text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50">
+        <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70">
           <tr>
             <th className="px-4 py-2.5 text-left">
               <SortHeader
@@ -445,42 +445,42 @@ function JobsTable({ jobs, loading, filters, onChange, onSelect }) {
             <th className="px-4 py-2.5" />
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {jobs.map((job) => (
             <tr
               key={job.id}
               onClick={() => onSelect(job.id)}
-              className="cursor-pointer hover:bg-sky-50/60"
+              className="cursor-pointer hover:bg-sky-50/60 dark:hover:bg-slate-800/60"
             >
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     {fmtDate(job.deliveryDate)}
                   </span>
                   {isToday(job.deliveryDate) && (
-                    <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+                    <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
                       Today
                     </span>
                   )}
                 </div>
               </td>
-              <td className="px-4 py-3 text-left font-mono tabular-nums text-slate-600">
+              <td className="px-4 py-3 text-left font-mono tabular-nums text-slate-600 dark:text-slate-300">
                 {fmtNum(job.totalOrders)}
               </td>
-              <td className="px-4 py-3 text-left font-mono tabular-nums text-slate-600">
+              <td className="px-4 py-3 text-left font-mono tabular-nums text-slate-600 dark:text-slate-300">
                 {fmtNum(job.totalSubscriptions)}
               </td>
               <td className="px-4 py-3 text-left">
                 <ExtraCell job={job} />
               </td>
-              <td className="px-4 py-3 text-left font-mono text-base font-semibold tabular-nums text-slate-900">
+              <td className="px-4 py-3 text-left font-mono text-base font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                 {fmtNum(job.totalCount + job.extra)}
               </td>
-              <td className="px-4 py-3 text-slate-500">
+              <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                 {fmtDateTime(job.createdAt)}
               </td>
               <td className="px-4 py-3 text-left">
-                <span className="text-xs font-medium text-sky-600">
+                <span className="text-xs font-medium text-sky-600 dark:text-sky-400">
                   View breakdown &rsaquo;
                 </span>
               </td>
@@ -507,13 +507,13 @@ function Pagination({ pagination, onPageChange }) {
 
   return (
     <div className="flex items-center justify-between px-1 py-2">
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-500 dark:text-slate-400">
         Showing{" "}
-        <span className="font-medium text-slate-700">
+        <span className="font-medium text-slate-700 dark:text-slate-200">
           {start}–{end}
         </span>{" "}
         of{" "}
-        <span className="font-medium text-slate-700">
+        <span className="font-medium text-slate-700 dark:text-slate-200">
           {fmtNum(totalRecords)}
         </span>
       </p>
@@ -522,18 +522,18 @@ function Pagination({ pagination, onPageChange }) {
           type="button"
           disabled={!hasPrevPage}
           onClick={() => onPageChange(currentPage - 1)}
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="px-2 text-xs text-slate-500">
+        <span className="px-2 text-xs text-slate-500 dark:text-slate-400">
           Page {currentPage} of {Math.max(totalPages, 1)}
         </span>
         <button
           type="button"
           disabled={!hasNextPage}
           onClick={() => onPageChange(currentPage + 1)}
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -559,24 +559,24 @@ function JobDetailPanel({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
-        className="absolute inset-0 bg-slate-900/30"
+        className="absolute inset-0 bg-slate-900/30 dark:bg-black/60"
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative flex h-full w-full max-w-md flex-col bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <div className="relative flex h-full w-full max-w-md flex-col bg-white shadow-xl dark:border-l dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
           <div>
-            <h2 className="text-sm font-medium text-slate-500">
+            <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Packaging job
             </h2>
-            <p className="text-lg font-semibold text-slate-900">
+            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               {job ? fmtDate(job.deliveryDate) : loading ? "Loading…" : "—"}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <X className="h-4 w-4" />
           </button>
@@ -584,13 +584,13 @@ function JobDetailPanel({ onClose }) {
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {loading && (
-            <div className="flex items-center justify-center py-16 text-slate-400">
+            <div className="flex items-center justify-center py-16 text-slate-400 dark:text-slate-500">
               <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           )}
 
           {error && (
-            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -599,41 +599,41 @@ function JobDetailPanel({ onClose }) {
           {job && !loading && (
             <>
               <div className="mb-5 grid grid-cols-3 gap-2">
-                <div className="rounded-md bg-slate-50 p-3 text-center">
+                <div className="rounded-md bg-slate-50 p-3 text-center dark:bg-slate-800/70">
                   <ShoppingBag className="mx-auto mb-1 h-4 w-4 text-slate-400" />
-                  <p className="font-mono text-lg font-semibold tabular-nums text-slate-900">
+                  <p className="font-mono text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                     {fmtNum(job.totalOrders)}
                   </p>
-                  <p className="text-[11px] text-slate-500">Orders</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Orders</p>
                 </div>
-                <div className="rounded-md bg-slate-50 p-3 text-center">
+                <div className="rounded-md bg-slate-50 p-3 text-center dark:bg-slate-800/70">
                   <Repeat className="mx-auto mb-1 h-4 w-4 text-slate-400" />
-                  <p className="font-mono text-lg font-semibold tabular-nums text-slate-900">
+                  <p className="font-mono text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                     {fmtNum(job.totalSubscriptions)}
                   </p>
-                  <p className="text-[11px] text-slate-500">Subscriptions</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Subscriptions</p>
                 </div>
-                <div className="rounded-md bg-sky-50 p-3 text-center">
-                  <Package className="mx-auto mb-1 h-4 w-4 text-sky-500" />
-                  <p className="font-mono text-lg font-semibold tabular-nums text-sky-700">
+                <div className="rounded-md bg-sky-50 p-3 text-center dark:bg-sky-950/60">
+                  <Package className="mx-auto mb-1 h-4 w-4 text-sky-500 dark:text-sky-400" />
+                  <p className="font-mono text-lg font-semibold tabular-nums text-sky-700 dark:text-sky-300">
                     {fmtNum(job.totalCount)}
                   </p>
-                  <p className="text-[11px] text-sky-600">Total</p>
+                  <p className="text-[11px] text-sky-600 dark:text-sky-400">Total</p>
                 </div>
               </div>
 
-              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+              <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Breakdown by variant
               </h3>
 
               {details.length === 0 ? (
-                <p className="rounded-md border border-dashed border-slate-200 p-4 text-center text-sm text-slate-400">
+                <p className="rounded-md border border-dashed border-slate-200 p-4 text-center text-sm text-slate-400 dark:border-slate-700 dark:text-slate-500">
                   No variant breakdown recorded for this job.
                 </p>
               ) : (
-                <div className="overflow-hidden rounded-md border border-slate-200">
+                <div className="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-xs text-slate-500">
+                    <thead className="bg-slate-50 text-xs text-slate-500 dark:bg-slate-800/70 dark:text-slate-400">
                       <tr>
                         <th className="px-3 py-2 text-left font-medium">
                           Variant
@@ -646,16 +646,16 @@ function JobDetailPanel({ onClose }) {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {details.map((d) => (
                         <tr key={d.variantId}>
-                          <td className="px-3 py-2 text-slate-700">
+                          <td className="px-3 py-2 text-slate-700 dark:text-slate-200">
                             {d.quantity} {d.unit}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-500">
+                          <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-500 dark:text-slate-400">
                             {fmtNum(d.bottleCount)}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono font-medium tabular-nums text-slate-900">
+                          <td className="px-3 py-2 text-right font-mono font-medium tabular-nums text-slate-900 dark:text-slate-100">
                             {fmtNum(d.quantity * d.bottleCount)} {d.unit}
                           </td>
                         </tr>
@@ -665,7 +665,7 @@ function JobDetailPanel({ onClose }) {
                 </div>
               )}
 
-              <p className="mt-4 text-xs text-slate-400">
+              <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">
                 Generated {fmtDateTime(job.createdAt)}
                 {job.updatedAt !== job.createdAt &&
                   ` · Updated ${fmtDateTime(job.updatedAt)}`}
@@ -732,14 +732,14 @@ export default function PackagingJob() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8 dark:bg-slate-950">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
               Packaging jobs
             </h1>
-            <p className="text-sm text-slate-500">{rangeLabel}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{rangeLabel}</p>
           </div>
         </div>
 

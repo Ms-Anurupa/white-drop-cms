@@ -171,14 +171,14 @@ const AddOfflineSubscription = () => {
   };
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 bg-gray-50 min-h-full">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 bg-gray-50 min-h-full dark:bg-slate-950">
       <div className="max-w-5xl mx-auto w-full space-y-6">
         
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight dark:text-slate-100">
             Create Offline Subscription
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1 dark:text-slate-400">
             Setup a recurring dairy or grocery schedule for an offline customer.
           </p>
         </div>
@@ -190,21 +190,21 @@ const AddOfflineSubscription = () => {
         />
 
         {/* 2. SUBSCRIPTION CONFIGURATION */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-4">
-            <Repeat size={18} className="text-blue-600" /> Subscription Plan Details
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5 dark:bg-slate-900 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-4 dark:text-slate-100 dark:border-slate-800">
+            <Repeat size={18} className="text-blue-600 dark:text-blue-400" /> Subscription Plan Details
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Select Plan</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5 dark:text-slate-300">Select Plan</label>
               <select
                 value={planId}
                 onChange={(e) => {
                   setPlanId(e.target.value);
                   setPricingQuote(null);
                 }}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               >
                 <option value="">Choose a plan...</option>
                 {activeSubPlans?.map(plan => (
@@ -216,8 +216,8 @@ const AddOfflineSubscription = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                <CalendarRange size={14} className="text-gray-400"/> Start Date
+              <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5 dark:text-slate-300">
+                <CalendarRange size={14} className="text-gray-400 dark:text-slate-500"/> Start Date
               </label>
               <input
                 type="date"
@@ -228,20 +228,20 @@ const AddOfflineSubscription = () => {
                 }}
                 onClick={(e) => e.target.showPicker && e.target.showPicker()}
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:[color-scheme:dark]"
               />
             </div>
           </div>
 
           {activePlan && (
-            <div className="pt-4 border-t border-gray-50">
+            <div className="pt-4 border-t border-gray-50 dark:border-slate-800">
               {activePlan.isCustom ? (
                 /* CUSTOM PLAN: End Date & Clickable Days */
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                        <CalendarRange size={14} className="text-gray-400"/> End Date (Custom)
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5 dark:text-slate-300">
+                        <CalendarRange size={14} className="text-gray-400 dark:text-slate-500"/> End Date (Custom)
                       </label>
                       <input
                         type="date"
@@ -252,13 +252,13 @@ const AddOfflineSubscription = () => {
                         }}
                         onClick={(e) => e.target.showPicker && e.target.showPicker()}
                         min={startDate || new Date().toISOString().split("T")[0]}
-                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:[color-scheme:dark]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Delivery Days</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">Select Delivery Days</label>
                     <div className="flex flex-wrap gap-2">
                       {DAYS_OF_WEEK.map(day => (
                         <button
@@ -267,8 +267,8 @@ const AddOfflineSubscription = () => {
                           onClick={() => toggleDay(day.value)}
                           className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
                             selectedDays.includes(day.value) 
-                              ? "bg-blue-50 border-blue-200 text-blue-700" 
-                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                              ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/60 dark:border-blue-800 dark:text-blue-300" 
+                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
                           }`}
                         >
                           {day.label}
@@ -281,10 +281,10 @@ const AddOfflineSubscription = () => {
                 /* FIXED PLAN: Duration Selector & Read-Only Days */
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Fixed Delivery Days</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">Fixed Delivery Days</label>
                     <div className="flex flex-wrap gap-2">
                       {activePlan.defaultDays?.map(day => (
-                        <span key={day} className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                        <span key={day} className="px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 border border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                           {day.substring(0, 3)}
                         </span>
                       ))}
@@ -292,7 +292,7 @@ const AddOfflineSubscription = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Duration</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">Select Duration</label>
                     <div className="flex flex-wrap gap-3">
                       {[1, 2, 3].map(months => {
                         const isSelected = durationMonths === months;
@@ -307,7 +307,7 @@ const AddOfflineSubscription = () => {
                             className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer ${
                               isSelected 
                                 ? "bg-blue-600 border-blue-600 text-white shadow-sm" 
-                                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
                             }`}
                           >
                             {months} {months === 1 ? 'Month' : 'Months'}
@@ -323,23 +323,23 @@ const AddOfflineSubscription = () => {
         </div>
 
         {/* 3. PRICING ENGINE & ACTION BUTTONS */}
-        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col items-center justify-center space-y-4">
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col items-center justify-center space-y-4 dark:bg-slate-900 dark:border-slate-800">
           
           {pricingQuote ? (
-             <div className="w-full max-w-md bg-white p-6 rounded-lg border border-green-200 shadow-sm text-center">
-                <CheckCircle className="text-green-500 mx-auto mb-2" size={28} />
-                <h3 className="text-2xl font-bold text-gray-900">
+             <div className="w-full max-w-md bg-white p-6 rounded-lg border border-green-200 shadow-sm text-center dark:bg-slate-800 dark:border-emerald-800">
+                <CheckCircle className="text-green-500 mx-auto mb-2 dark:text-emerald-400" size={28} />
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                   ₹{pricingQuote.finalAmount?.toString() || pricingQuote.totalPrice?.toString() || "0.00"}
                 </h3>
-                <div className="mt-2 text-sm text-gray-600 space-y-1">
+                <div className="mt-2 text-sm text-gray-600 space-y-1 dark:text-slate-300">
                   <p><strong>{pricingQuote.totalDeliveries || 0}</strong> deliveries calculated.</p>
                   {pricingQuote.baseTotal && <p>Base: ₹{pricingQuote.baseTotal}</p>}
                 </div>
                 
-                <div className="mt-5 pt-5 border-t border-gray-100 flex gap-3">
+                <div className="mt-5 pt-5 border-t border-gray-100 flex gap-3 dark:border-slate-700">
                    <button
                     onClick={() => setPricingQuote(null)}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors"
+                    className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
                    >
                      Recalculate
                    </button>
@@ -356,7 +356,7 @@ const AddOfflineSubscription = () => {
              <button
               onClick={handleCalculatePricing}
               disabled={loading || !formData?.cart?.length || !planId}
-              className="px-8 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
+              className="px-8 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition inline-flex items-center gap-2 cursor-pointer dark:text-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700"
             >
               {loading ? <Loader size={16}/> : <Calculator size={18} />}
               Calculate Subscription Pricing

@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
     --font-heading: var(--font-sans);
@@ -126,5 +126,9 @@
     }
   html {
     @apply font-sans;
+    color-scheme: light;
+    }
+  html.dark {
+    color-scheme: dark;
     }
 }

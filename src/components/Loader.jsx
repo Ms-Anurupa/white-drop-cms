@@ -15,7 +15,7 @@ const Loader = ({ text = "Loading" }) => {
     <div
       role="status"
       aria-live="polite"
-      className="relative flex min-h-[calc(100vh-64px)] w-full items-center justify-center overflow-hidden bg-gray-50"
+      className="relative flex min-h-[calc(100vh-64px)] w-full items-center justify-center overflow-hidden bg-gray-50 dark:bg-slate-950"
     >
       <style>{`
         @keyframes loader-rotate {
@@ -134,7 +134,7 @@ const Loader = ({ text = "Loading" }) => {
         }
       `}</style>
 
-      <div className="loader-card relative flex flex-col items-center gap-6 rounded-2xl border border-gray-100 bg-white px-12 py-10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-12px_rgba(79,70,229,0.18)]">
+      <div className="loader-card relative flex flex-col items-center gap-6 rounded-2xl border border-gray-100 bg-white px-12 py-10 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-12px_rgba(79,70,229,0.18)] dark:border-slate-800 dark:bg-slate-900">
         <div className="relative flex h-14 w-14 items-center justify-center">
           <div
             className="loader-glow absolute h-14 w-14 rounded-full bg-indigo-400 blur-xl"

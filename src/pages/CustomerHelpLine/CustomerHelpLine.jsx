@@ -74,7 +74,7 @@ const CustomerHelpLine = () => {
       {/* HEADER */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
+          <h1 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-slate-100">
             Customer Help Line
           </h1>
 
@@ -87,7 +87,7 @@ const CustomerHelpLine = () => {
                 className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   filter === f.value && !fromDate && !toDate
                     ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-white text-gray-600 hover:bg-slate-100 shadow-sm"
+                    : "bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-sm border border-transparent dark:border-slate-800"
                 }`}
               >
                 {f.label}
@@ -98,7 +98,7 @@ const CustomerHelpLine = () => {
 
         {/* CUSTOM DATE RANGE */}
         <div className="flex flex-wrap items-center gap-2">
-          <label className="text-xs text-gray-500">
+          <label className="text-xs text-gray-500 dark:text-slate-400">
             From
             <input
               type="date"
@@ -112,11 +112,11 @@ const CustomerHelpLine = () => {
                   e.currentTarget.focus();
                 }
               }}
-              className="ml-2 cursor-pointer rounded-lg bg-white px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 sm:text-sm"
+              className="ml-2 cursor-pointer rounded-lg bg-white dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-slate-100 dark:[color-scheme:dark] px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/50 sm:text-sm"
             />
           </label>
 
-          <label className="text-xs text-gray-500">
+          <label className="text-xs text-gray-500 dark:text-slate-400">
             To
             <input
               type="date"
@@ -130,7 +130,7 @@ const CustomerHelpLine = () => {
                   e.currentTarget.focus();
                 }
               }}
-              className="ml-2 cursor-pointer rounded-lg bg-white px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 sm:text-sm"
+              className="ml-2 cursor-pointer rounded-lg bg-white dark:bg-slate-900 dark:border dark:border-slate-700 dark:text-slate-100 dark:[color-scheme:dark] px-2 py-1.5 text-xs shadow-sm outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/50 sm:text-sm"
             />
           </label>
 
@@ -147,7 +147,7 @@ const CustomerHelpLine = () => {
             <button
               type="button"
               onClick={handleClearRange}
-              className="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:bg-slate-100 hover:text-red-600 sm:text-sm"
+              className="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-gray-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-red-600 dark:hover:text-red-400 sm:text-sm"
             >
               <X size={14} />
               Clear
@@ -155,7 +155,7 @@ const CustomerHelpLine = () => {
           )}
 
           {isPartialDraft && (
-            <span className="text-xs text-amber-600">
+            <span className="text-xs text-amber-600 dark:text-amber-400">
               Pick both a from and a to date.
             </span>
           )}
@@ -164,7 +164,7 @@ const CustomerHelpLine = () => {
 
       {/* LOADING */}
       {loading && (
-        <div className="flex items-center justify-center py-16 text-gray-400 gap-2">
+        <div className="flex items-center justify-center py-16 text-gray-400 dark:text-slate-500 gap-2">
           <Loader2 className="animate-spin" size={18} />
           <span className="text-sm">Loading requests...</span>
         </div>
@@ -172,14 +172,14 @@ const CustomerHelpLine = () => {
 
       {/* ERROR */}
       {!loading && error && (
-        <div className="flex flex-col items-center justify-center py-16 text-red-500 gap-2">
+        <div className="flex flex-col items-center justify-center py-16 text-red-500 dark:text-red-400 gap-2">
           <span className="text-sm">{error}</span>
         </div>
       )}
 
       {/* EMPTY */}
       {!loading && !error && contacts.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-400 gap-2">
+        <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-slate-500 gap-2">
           <Inbox size={28} />
           <span className="text-sm">No contact requests found.</span>
         </div>
@@ -188,10 +188,10 @@ const CustomerHelpLine = () => {
       {!loading && !error && contacts.length > 0 && (
         <>
           {/* ================= DESKTOP TABLE ================= */}
-          <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 text-left text-sm text-gray-600">
+                <thead className="bg-gray-50 dark:bg-slate-800/70 text-left text-sm text-gray-600 dark:text-slate-300">
                   <tr>
                     <th className="p-3">Name</th>
                     <th className="p-3">Email</th>
@@ -205,21 +205,25 @@ const CustomerHelpLine = () => {
                   {contacts.map((c) => (
                     <tr
                       key={c.id}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition align-top"
+                      className="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/60 transition align-top"
                     >
-                      <td className="p-3 font-medium">{c.name}</td>
-                      <td className="p-3 text-sm text-gray-600">
+                      <td className="p-3 font-medium text-gray-900 dark:text-slate-100">
+                        {c.name}
+                      </td>
+                      <td className="p-3 text-sm text-gray-600 dark:text-slate-300">
                         <span className="flex items-center gap-1">
                           <Mail size={14} /> {c.email}
                         </span>
                       </td>
-                      <td className="p-3 text-gray-700">{c.subject}</td>
-                      <td className="p-3 text-gray-600 max-w-xs">
+                      <td className="p-3 text-gray-700 dark:text-slate-200">
+                        {c.subject}
+                      </td>
+                      <td className="p-3 text-gray-600 dark:text-slate-400 max-w-xs">
                         <p className="line-clamp-2" title={c.message}>
                           {c.message}
                         </p>
                       </td>
-                      <td className="p-3 text-gray-500 whitespace-nowrap">
+                      <td className="p-3 text-gray-500 dark:text-slate-400 whitespace-nowrap">
                         {formatDate(c.createdAt)}
                       </td>
                     </tr>
@@ -234,19 +238,25 @@ const CustomerHelpLine = () => {
             {contacts.map((c) => (
               <div
                 key={c.id}
-                className="bg-white rounded-xl shadow-sm p-4 space-y-2"
+                className="bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-xl shadow-sm p-4 space-y-2"
               >
                 <div className="flex justify-between items-start gap-2">
-                  <p className="font-medium text-gray-800">{c.name}</p>
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                  <p className="font-medium text-gray-800 dark:text-slate-100">
+                    {c.name}
+                  </p>
+                  <span className="text-xs text-gray-400 dark:text-slate-500 whitespace-nowrap">
                     {formatDate(c.createdAt)}
                   </span>
                 </div>
 
-                <p className="text-sm font-medium text-gray-700">{c.subject}</p>
-                <p className="text-sm text-gray-500">{c.message}</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-slate-200">
+                  {c.subject}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
+                  {c.message}
+                </p>
 
-                <p className="text-xs text-gray-600 flex items-center gap-1 pt-1">
+                <p className="text-xs text-gray-600 dark:text-slate-300 flex items-center gap-1 pt-1">
                   <Mail size={12} /> {c.email}
                 </p>
               </div>
@@ -256,8 +266,8 @@ const CustomerHelpLine = () => {
       )}
 
       {/* PAGINATION */}
-      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-        <p className="text-xs sm:text-sm text-gray-600">
+      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 dark:border dark:border-slate-800 rounded-lg">
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-400">
           Page {page} of {totalPages || 1} · {total} total
         </p>
 
@@ -265,7 +275,7 @@ const CustomerHelpLine = () => {
           <button
             onClick={() => setPage(Math.max(page - 1, 1))}
             disabled={page === 1 || loading}
-            className="cursor-pointer p-2 rounded-lg bg-white shadow disabled:opacity-40"
+            className="cursor-pointer p-2 rounded-lg bg-white dark:bg-slate-800 dark:text-slate-200 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow disabled:opacity-40"
           >
             <ChevronLeft size={16} />
           </button>
@@ -273,7 +283,7 @@ const CustomerHelpLine = () => {
           <button
             onClick={() => setPage(Math.min(page + 1, totalPages))}
             disabled={page === totalPages || loading}
-            className="cursor-pointer p-2 rounded-lg bg-white shadow disabled:opacity-40"
+            className="cursor-pointer p-2 rounded-lg bg-white dark:bg-slate-800 dark:text-slate-200 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow disabled:opacity-40"
           >
             <ChevronRight size={16} />
           </button>

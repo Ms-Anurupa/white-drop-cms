@@ -47,15 +47,15 @@ const formatDate = (d) =>
     : "—";
 
 const StatusBadge = ({ status }) => {
-  if (!status) return <span className="text-slate-400">—</span>;
+  if (!status) return <span className="text-slate-400 dark:text-slate-500">—</span>;
   const isFiled =
     status.toLowerCase() === "filed" || status.toLowerCase() === "yes";
   return (
     <span
       className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold ${
         isFiled
-          ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
-          : "bg-amber-50 text-amber-700 border border-amber-200/60"
+          ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60"
+          : "bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60"
       }`}
     >
       {status}
@@ -67,14 +67,14 @@ const MetricCard = ({ label, amount, highlight = false }) => (
   <div
     className={`rounded-2xl border p-4 transition-all ${
       highlight
-        ? "border-blue-200 bg-blue-50/50 shadow-sm"
-        : "border-slate-200/80 bg-white"
+        ? "border-blue-200 bg-blue-50/50 shadow-sm dark:border-blue-800/70 dark:bg-blue-950/40"
+        : "border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900"
     }`}
   >
-    <p className="text-xs font-semibold uppercase text-slate-500">{label}</p>
+    <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">{label}</p>
     <p
       className={`mt-1.5 text-2xl font-bold tracking-tight ${
-        highlight ? "text-blue-600" : "text-slate-900"
+        highlight ? "text-blue-600 dark:text-blue-400" : "text-slate-900 dark:text-slate-100"
       }`}
     >
       {inr(amount)}
@@ -153,14 +153,14 @@ const ExpenseListing = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Expenses
             </h1>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
               {pagination.total || 0}
             </span>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Comprehensive ledger showing purchase, GST, and filing breakdown.
           </p>
         </div>
@@ -205,8 +205,8 @@ const ExpenseListing = () => {
       </div>
 
       {/* Control Panel */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-4 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
           <div className="flex items-center gap-1.5 overflow-x-auto py-1">
             {DATE_PILLS.map((pill) => {
               const active = filters.dateFilter === pill.value;
@@ -217,8 +217,8 @@ const ExpenseListing = () => {
                   onClick={() => setDateFilter(pill.value)}
                   className={`cursor-pointer whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                     active
-                      ? "bg-slate-900 text-white shadow-sm"
-                      : "bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900"
+                      : "bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                   }`}
                 >
                   {pill.label}
@@ -230,7 +230,7 @@ const ExpenseListing = () => {
           <button
             type="button"
             onClick={resetFilters}
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
+            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <RotateCcw size={13} />
             Reset Filters
@@ -241,13 +241,13 @@ const ExpenseListing = () => {
           <div className="relative">
             <Search
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
             />
             <input
               value={filters.search}
               onChange={(e) => setFilter("search", e.target.value)}
               placeholder="Search vendor / supplier..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-3 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:bg-slate-800 dark:focus:ring-blue-500/20"
             />
           </div>
 
@@ -277,7 +277,7 @@ const ExpenseListing = () => {
                   value={filters.dateFrom}
                   max={filters.dateTo || undefined}
                   onChange={(e) => setFilter("dateFrom", e.target.value)}
-                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
+                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-blue-500 dark:focus:bg-slate-800 dark:[color-scheme:dark]"
                 />
               </div>
 
@@ -298,7 +298,7 @@ const ExpenseListing = () => {
                   value={filters.dateTo}
                   min={filters.dateFrom || undefined}
                   onChange={(e) => setFilter("dateTo", e.target.value)}
-                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
+                  className="cursor-pointer w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-blue-500 dark:focus:bg-slate-800 dark:[color-scheme:dark]"
                 />
               </div>
             </>
@@ -307,32 +307,32 @@ const ExpenseListing = () => {
       </div>
 
       {/* Comprehensive Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs whitespace-nowrap">
             <thead>
               {/* Categorized Column Headers */}
-              <tr className="border-b border-slate-200 bg-slate-100/70 font-semibold text-slate-600 uppercase tracking-wider">
-                <th colSpan={6} className="px-4 py-2 border-r border-slate-200">
+              <tr className="border-b border-slate-200 bg-slate-100/70 font-semibold text-slate-600 uppercase tracking-wider dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
+                <th colSpan={6} className="px-4 py-2 border-r border-slate-200 dark:border-slate-700">
                   Basic Expense Details
                 </th>
-                <th colSpan={7} className="px-4 py-2 border-r border-slate-200">
+                <th colSpan={7} className="px-4 py-2 border-r border-slate-200 dark:border-slate-700">
                   Invoice & Supplier Details
                 </th>
-                <th colSpan={6} className="px-4 py-2 border-r border-slate-200">
+                <th colSpan={6} className="px-4 py-2 border-r border-slate-200 dark:border-slate-700">
                   Tax Breakdown
                 </th>
                 <th colSpan={4} className="px-4 py-2">
                   Filing Compliance
                 </th>
               </tr>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="px-3 py-3 border-r border-slate-100">#</th>
+              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider dark:border-slate-800 dark:bg-slate-800/70 dark:text-slate-400">
+                <th className="px-3 py-3 border-r border-slate-100 dark:border-slate-800">#</th>
                 <th className="px-4 py-3">Item Name</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-3 py-3">Qty</th>
                 <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3 border-r border-slate-200">
+                <th className="px-4 py-3 border-r border-slate-200 dark:border-slate-700">
                   Expense Date
                 </th>
 
@@ -342,7 +342,7 @@ const ExpenseListing = () => {
                 <th className="px-4 py-3">Invoice Type</th>
                 <th className="px-4 py-3">Invoice Date</th>
                 <th className="px-4 py-3">Invoice Value</th>
-                <th className="px-4 py-3 border-r border-slate-200">
+                <th className="px-4 py-3 border-r border-slate-200 dark:border-slate-700">
                   Place of Supply
                 </th>
 
@@ -351,7 +351,7 @@ const ExpenseListing = () => {
                 <th className="px-4 py-3">CGST</th>
                 <th className="px-4 py-3">SGST / UTGST</th>
                 <th className="px-4 py-3">Cess</th>
-                <th className="px-4 py-3 border-r border-slate-200">
+                <th className="px-4 py-3 border-r border-slate-200 dark:border-slate-700">
                   Reverse Tax (Rate)
                 </th>
 
@@ -362,12 +362,12 @@ const ExpenseListing = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-slate-700 dark:divide-slate-800 dark:text-slate-300">
               {showSkeleton &&
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
                     <td colSpan={23} className="px-4 py-4">
-                      <div className="h-5 w-full animate-pulse rounded bg-slate-100" />
+                      <div className="h-5 w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
                     </td>
                   </tr>
                 ))}
@@ -376,22 +376,22 @@ const ExpenseListing = () => {
                 expenses.map((expense, idx) => (
                   <tr
                     key={expense.id}
-                    className="hover:bg-slate-50/80 transition-colors"
+                    className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60"
                   >
                     {/* Basic Purchase Details */}
-                    <td className="px-3 py-3 font-mono text-slate-400 border-r border-slate-100">
+                    <td className="px-3 py-3 font-mono text-slate-400 border-r border-slate-100 dark:text-slate-500 dark:border-slate-800">
                       {serial(idx)}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-slate-900">
+                    <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">
                       <div>{expense.itemName}</div>
                       {expense.notes && (
-                        <div className="max-w-[180px] truncate text-[11px] font-normal text-slate-400">
+                        <div className="max-w-[180px] truncate text-[11px] font-normal text-slate-400 dark:text-slate-500">
                           {expense.notes}
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+                      <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         {expense.category?.name || expense.category || "—"}
                       </span>
                     </td>
@@ -400,35 +400,35 @@ const ExpenseListing = () => {
                         ? `${expense.quantity} ${expense.unit || ""}`.trim()
                         : "—"}
                     </td>
-                    <td className="px-4 py-3 font-bold text-slate-900">
+                    <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
                       {inr(
                         expense.category?.name === "SALARY"
                           ? expense.price
                           : expense.price * expense.quantity,
                       )}
                     </td>
-                    <td className="px-4 py-3 border-r border-slate-200 text-slate-500">
+                    <td className="px-4 py-3 border-r border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-400">
                       {formatDate(expense.purchaseDate)}
                     </td>
 
                     {/* Invoice & Supplier Details */}
-                    <td className="px-4 py-3 font-medium text-slate-800">
+                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">
                       {expense.supplierName || expense.supplierName || "—"}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-600">
+                    <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-300">
                       {expense.gstin || "—"}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-600">
+                    <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-300">
                       {expense.invoiceNumber || "—"}
                     </td>
                     <td className="px-4 py-3">{expense.invoiceType || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {formatDate(expense.invoiceDate)}
                     </td>
                     <td className="px-4 py-3 font-medium">
                       {inr(expense.invoiceValue)}
                     </td>
-                    <td className="px-4 py-3 border-r border-slate-200">
+                    <td className="px-4 py-3 border-r border-slate-200 dark:border-slate-800">
                       {expense.placeOfSupply || "—"}
                     </td>
 
@@ -436,19 +436,19 @@ const ExpenseListing = () => {
                     <td className="px-4 py-3 font-medium">
                       {inr(expense.taxableValue)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {inr(expense.integratedTax)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {inr(expense.centralTax)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {inr(expense.stateUtTax)}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {inr(expense.cess)}
                     </td>
-                    <td className="px-4 py-3 border-r border-slate-200">
+                    <td className="px-4 py-3 border-r border-slate-200 dark:border-slate-800">
                       {expense.supplyAttractReverseTax ? (
                         <span>
                           {expense.supplyAttractReverseTax}{" "}
@@ -470,7 +470,7 @@ const ExpenseListing = () => {
                     <td className="px-4 py-3">
                       {expense.gstr1IffGstr1A5FilingPeriod || "—"}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {formatDate(expense.gstr1IffGstr1A5FilingDate)}
                     </td>
                     <td className="px-4 py-3">
@@ -482,10 +482,10 @@ const ExpenseListing = () => {
               {!showSkeleton && expenses.length === 0 && !error && (
                 <tr>
                   <td colSpan={23} className="px-4 py-16 text-center">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
                       <Inbox size={24} />
                     </div>
-                    <p className="mt-3 text-base font-semibold text-slate-800">
+                    <p className="mt-3 text-base font-semibold text-slate-800 dark:text-slate-200">
                       No expense entries found
                     </p>
                   </td>
@@ -495,16 +495,16 @@ const ExpenseListing = () => {
               {!showSkeleton && error && (
                 <tr>
                   <td colSpan={23} className="px-4 py-12 text-center">
-                    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+                    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400">
                       <AlertCircle size={20} />
                     </div>
-                    <p className="mt-2 text-sm font-medium text-red-600">
+                    <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
                       {error}
                     </p>
                     <button
                       type="button"
                       onClick={getExpenseListing}
-                      className="mt-3 rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      className="mt-3 rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                       Try Again
                     </button>
@@ -517,15 +517,15 @@ const ExpenseListing = () => {
 
         {/* Numbered Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3.5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3.5 dark:border-slate-800 dark:bg-slate-800/50">
             {/* Page Info */}
-            <p className="text-xs font-medium text-slate-500">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               Page{" "}
-              <span className="font-semibold text-slate-800">
+              <span className="font-semibold text-slate-800 dark:text-slate-200">
                 {pagination.page}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-slate-800">
+              <span className="font-semibold text-slate-800 dark:text-slate-200">
                 {pagination.totalPages}
               </span>
             </p>
@@ -537,7 +537,7 @@ const ExpenseListing = () => {
                 type="button"
                 disabled={pagination.page === 1 || showSkeleton}
                 onClick={() => setPage(1)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 title="First Page"
               >
                 «
@@ -548,7 +548,7 @@ const ExpenseListing = () => {
                 type="button"
                 disabled={!pagination.hasPrevPage || showSkeleton}
                 onClick={() => setPage(pagination.page - 1)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 title="Previous Page"
               >
                 ‹
@@ -572,7 +572,7 @@ const ExpenseListing = () => {
                       key={1}
                       type="button"
                       onClick={() => setPage(1)}
-                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                       1
                     </button>,
@@ -581,7 +581,7 @@ const ExpenseListing = () => {
                     pages.push(
                       <span
                         key="dots-start"
-                        className="px-1 text-xs text-slate-400 select-none"
+                        className="px-1 text-xs text-slate-400 select-none dark:text-slate-500"
                       >
                         ...
                       </span>,
@@ -598,8 +598,8 @@ const ExpenseListing = () => {
                       onClick={() => setPage(i)}
                       className={`h-8 w-8 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                         isActive
-                          ? "bg-slate-900 text-white shadow-sm"
-                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                          ? "bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900"
+                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                       }`}
                     >
                       {i}
@@ -612,7 +612,7 @@ const ExpenseListing = () => {
                     pages.push(
                       <span
                         key="dots-end"
-                        className="px-1 text-xs text-slate-400 select-none"
+                        className="px-1 text-xs text-slate-400 select-none dark:text-slate-500"
                       >
                         ...
                       </span>,
@@ -623,7 +623,7 @@ const ExpenseListing = () => {
                       key={total}
                       type="button"
                       onClick={() => setPage(total)}
-                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                      className="h-8 w-8 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                       {total}
                     </button>,
@@ -638,7 +638,7 @@ const ExpenseListing = () => {
                 type="button"
                 disabled={!pagination.hasNextPage || showSkeleton}
                 onClick={() => setPage(pagination.page + 1)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 title="Next Page"
               >
                 ›
@@ -651,7 +651,7 @@ const ExpenseListing = () => {
                   pagination.page === pagination.totalPages || showSkeleton
                 }
                 onClick={() => setPage(pagination.totalPages)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 title="Last Page"
               >
                 »

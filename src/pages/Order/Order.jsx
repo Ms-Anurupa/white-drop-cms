@@ -48,29 +48,34 @@ const STATUS_DOT = {
 const PAYMENT_STATUS_STYLES = {
   COMPLETE: {
     dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    badge:
+      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
   },
   PENDING: {
     dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
+    badge:
+      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
   },
   FAILED: {
     dot: "bg-red-500",
-    badge: "bg-red-50 text-red-700 border-red-200",
+    badge:
+      "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800",
   },
   POSTPAID: {
     dot: "bg-blue-500",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
+    badge:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800",
   },
   FAILED_AUTH: {
     dot: "bg-orange-500",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
+    badge:
+      "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800",
   },
 };
 
 /* UI-only class strings */
 const TH_CLASS =
-  "px-2.5 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap";
+  "px-2.5 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 whitespace-nowrap";
 
 // Forces the (external) export trigger button to match the 40px toolbar height,
 // without affecting sibling or modal elements.
@@ -292,6 +297,39 @@ const PageStyles = () => (
 
     .date-click-area input[type="date"] {
       cursor: pointer;
+    }
+
+    .dark .futuristic-scroll {
+      scrollbar-color: #6366f1 rgba(15, 23, 42, 0.75);
+    }
+
+    .dark .futuristic-scroll::-webkit-scrollbar-track {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .dark .futuristic-scroll::-webkit-scrollbar-thumb {
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+        0 0 6px rgba(99, 102, 241, 0.45);
+    }
+
+    .dark .order-table-card {
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(99, 102, 241, 0.14),
+        0 12px 32px -16px rgba(2, 6, 23, 0.8);
+    }
+
+    .dark .order-table-head {
+      background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.96) 0%,
+        rgba(15, 23, 42, 0.88) 100%
+      );
+    }
+
+    .dark .date-click-area input[type="date"] {
+      color-scheme: dark;
     }
   `}</style>
 );
@@ -710,20 +748,20 @@ const Order = () => {
   }
 
   return (
-    <div className="relative p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50">
+    <div className="relative p-4 sm:px-2 lg:p-5 space-y-4 bg-gray-50 dark:bg-slate-950">
       <PageStyles />
 
       {/* HEADER */}
       <div className="relative z-[10000] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-slate-100 tracking-tight">
             Order Management
           </h1>
 
-          <p className="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>Track orders, delivery &amp; status:</span>
 
-            <span className="text-blue-600 font-medium">
+            <span className="text-blue-600 dark:text-blue-400 font-medium">
               Total Order Count: {dateCounts.all}
             </span>
           </p>
@@ -734,7 +772,7 @@ const Order = () => {
           <div className="relative w-full sm:w-64 lg:w-72">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
 
             <input
@@ -744,7 +782,7 @@ const Order = () => {
                 setPage(1);
               }}
               placeholder="Search orders..."
-              className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+              className="w-full h-10 pl-9 pr-3 text-sm rounded-lg bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
             />
           </div>
 
@@ -764,7 +802,7 @@ const Order = () => {
             <button
               onClick={() => navigate("/dashboard/orders/add-offline-orders")}
               disabled={refreshing}
-              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 whitespace-nowrap bg-white text-gray-800 text-sm font-medium border border-gray-200 hover:bg-gray-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-10 cursor-pointer px-4 flex items-center gap-2 rounded-lg shrink-0 whitespace-nowrap bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-200 text-sm font-medium border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <SquarePen size={16} />
               Add Offline Order
@@ -778,7 +816,7 @@ const Order = () => {
       </div>
 
       {/* DATE FILTER + STATUS */}
-      <div className="relative z-40 bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+      <div className="relative z-40 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-3">
         {/* items-end → status dropdown sits on the same line as From / To inputs */}
         <div className="flex items-end gap-3 futuristic-scroll">
           {/* display:contents keeps layout identical; the wrapper only listens
@@ -810,11 +848,11 @@ const Order = () => {
           </div>
 
           <div className="ml-auto flex shrink-0 items-end gap-3">
-            <div className="w-px h-10 shrink-0 bg-gray-100" />
+            <div className="w-px h-10 shrink-0 bg-gray-100 dark:bg-slate-800" />
 
             {/* STATUS FILTER */}
             <div className="relative z-100 shrink-0">
-              <p className="mb-1 text-[11px] leading-4 text-gray-500">
+              <p className="mb-1 text-[11px] leading-4 text-gray-500 dark:text-slate-400">
                 Order status
               </p>
 
@@ -838,7 +876,7 @@ const Order = () => {
                         </div>
 
                         {status === "" && (
-                          <span className="text-blue-600">✓</span>
+                          <span className="text-blue-600 dark:text-blue-400">✓</span>
                         )}
                       </div>
                     </SplitButtonItem>
@@ -868,7 +906,7 @@ const Order = () => {
                           </div>
 
                           {status === item && (
-                            <span className="text-blue-600">✓</span>
+                            <span className="text-blue-600 dark:text-blue-400">✓</span>
                           )}
                         </div>
                       </SplitButtonItem>
@@ -901,27 +939,27 @@ const Order = () => {
       </div>
 
       {/* TABLE CARD */}
-      <div className="order-table-card relative bg-white rounded-xl border border-gray-100 overflow-visible">
+      <div className="order-table-card relative bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 overflow-visible">
         {/* MOBILE VIEW */}
-        <div className="block sm:hidden divide-y divide-gray-100 max-h-[70vh] overflow-y-auto futuristic-scroll">
+        <div className="block sm:hidden divide-y divide-gray-100 dark:divide-slate-800 max-h-[70vh] overflow-y-auto futuristic-scroll">
           {paginated.length === 0 ? (
             <EmptyState />
           ) : (
             paginated.map((o, idx) => (
-              <div key={o.orderId} className="p-4 hover:bg-slate-50">
+              <div key={o.orderId} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                 <div className="flex justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400 shrink-0">
+                      <span className="text-xs text-gray-400 dark:text-slate-500 shrink-0">
                         #{start + idx + 1}
                       </span>
 
-                      <h3 className="font-medium text-gray-900 truncate">
+                      <h3 className="font-medium text-gray-900 dark:text-slate-100 truncate">
                         {o.orderId}
                       </h3>
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                       {formatDate(o.deliveryDate)}
                     </p>
 
@@ -942,12 +980,12 @@ const Order = () => {
                         o?.orderItems?.[0]?.product?.product_images?.[0],
                     })}
                     alt="Product"
-                    className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
+                    className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100 dark:border-slate-800"
                   />
                 </div>
 
-                <div className="mt-3 text-xs text-gray-500 leading-relaxed">
-                  <p className="font-medium text-gray-700">
+                <div className="mt-3 text-xs text-gray-500 dark:text-slate-400 leading-relaxed">
+                  <p className="font-medium text-gray-700 dark:text-slate-300">
                     {o.user?.customer_name}
                   </p>
 
@@ -964,7 +1002,7 @@ const Order = () => {
                   onClick={() =>
                     navigate(`/dashboard/orders/orderDetails/${o.id}`)
                   }
-                  className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
+                  className="mt-3 w-full py-2 text-xs font-medium rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 inline-flex items-center justify-center gap-1.5"
                 >
                   <Eye size={13} />
                   View details
@@ -976,7 +1014,7 @@ const Order = () => {
 
         {/* DESKTOP TABLE — compact rows, light font weights */}
         <div className="hidden sm:block max-h-[calc(100vh-250px)] overflow-x-auto overflow-y-auto futuristic-scroll">
-          <table className="w-full table-fixed text-[13px] text-gray-700">
+          <table className="w-full table-fixed text-[13px] text-gray-700 dark:text-slate-300">
             <thead
               className="order-table-head sticky top-0"
               style={{ zIndex: "1000" }}
@@ -996,7 +1034,7 @@ const Order = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
               {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={11}>
@@ -1005,13 +1043,13 @@ const Order = () => {
                 </tr>
               ) : (
                 paginated.map((o, idx) => (
-                  <tr key={o.orderId} className="order-row hover:bg-slate-50">
-                    <td className="px-2.5 py-1.5 text-gray-400">
+                  <tr key={o.orderId} className="order-row hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <td className="px-2.5 py-1.5 text-gray-400 dark:text-slate-500">
                       {start + idx + 1}
                     </td>
 
                     <td
-                      className="px-2.5 py-1.5 text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis cursor-default"
+                      className="px-2.5 py-1.5 text-gray-900 dark:text-slate-100 whitespace-nowrap overflow-hidden text-ellipsis cursor-default"
                       onMouseEnter={(e) => showPopover(e, o, "orderId")}
                       onMouseLeave={hidePopover}
                     >
@@ -1026,11 +1064,11 @@ const Order = () => {
                             o?.orderItems?.[0]?.product?.product_images?.[0],
                         })}
                         alt="Product"
-                        className="w-8 h-8 rounded-md object-cover border border-gray-100"
+                        className="w-8 h-8 rounded-md object-cover border border-gray-100 dark:border-slate-800"
                       />
                     </td>
 
-                    <td className="px-2.5 py-1.5 text-gray-900 whitespace-nowrap tabular-nums">
+                    <td className="px-2.5 py-1.5 text-gray-900 dark:text-slate-100 whitespace-nowrap tabular-nums">
                       ₹{o.orderTotal}
                     </td>
 
@@ -1039,11 +1077,11 @@ const Order = () => {
                       onMouseEnter={(e) => showAddressPopover(e, o, "customer")}
                       onMouseLeave={hidePopover}
                     >
-                      <p className="truncate text-[13px] leading-4 text-gray-900">
+                      <p className="truncate text-[13px] leading-4 text-gray-900 dark:text-slate-100">
                         {o.user?.customer_name}
                       </p>
 
-                      <p className="mt-0.5 truncate text-xs leading-4 text-gray-500">
+                      <p className="mt-0.5 truncate text-xs leading-4 text-gray-500 dark:text-slate-400">
                         {[
                           o.user?.phone_num,
                           [
@@ -1075,10 +1113,10 @@ const Order = () => {
                       <span
                         className={`font-medium ${
                           o.paymentMode === "PG"
-                            ? "text-emerald-600"
+                            ? "text-emerald-600 dark:text-emerald-400"
                             : o.paymentMode === "COD"
-                              ? "text-blue-900"
-                              : "text-gray-700"
+                              ? "text-blue-900 dark:text-blue-300"
+                              : "text-gray-700 dark:text-slate-300"
                         }`}
                       >
                         {o.paymentMode === "PG"
@@ -1096,7 +1134,7 @@ const Order = () => {
                     >
                       {o.deliverySlot?.name ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
+                          <span className="w-5 h-5 rounded-md bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center shrink-0 overflow-hidden">
                             {o.deliverySlot?.icon ? (
                               <img
                                 src={resolveFirebaseUrl({
@@ -1107,33 +1145,33 @@ const Order = () => {
                                 className="w-3.5 h-3.5 object-contain"
                               />
                             ) : (
-                              <Clock3 size={11} className="text-blue-600" />
+                              <Clock3 size={11} className="text-blue-600 dark:text-blue-400" />
                             )}
                           </span>
 
                           <div className="min-w-0">
-                            <p className="text-xs leading-4 text-gray-800 truncate">
+                            <p className="text-xs leading-4 text-gray-800 dark:text-slate-200 truncate">
                               {o.deliverySlot.name}
                             </p>
 
                             {o.deliverySlot?.from && o.deliverySlot?.to && (
-                              <p className="text-[11px] leading-4 text-gray-400 truncate">
+                              <p className="text-[11px] leading-4 text-gray-400 dark:text-slate-500 truncate">
                                 {o.deliverySlot.from}–{o.deliverySlot.to}
                               </p>
                             )}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400">—</span>
+                        <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
                       )}
                     </td>
 
                     <td className="px-2.5 py-1.5 whitespace-nowrap">
-                      <p className="text-xs leading-4 text-gray-700">
+                      <p className="text-xs leading-4 text-gray-700 dark:text-slate-300">
                         {formatDateOnly(o.deliveryDate)}
                       </p>
 
-                      <p className="text-[11px] leading-4 text-gray-400">
+                      <p className="text-[11px] leading-4 text-gray-400 dark:text-slate-500">
                         {formatTimeOnly(o.deliveryDate)}
                       </p>
                     </td>
@@ -1143,7 +1181,7 @@ const Order = () => {
                         onClick={() =>
                           navigate(`/dashboard/orders/orderDetails/${o.id}`)
                         }
-                        className="inline-flex items-center gap-1 px-2 py-1 cursor-pointer text-xs font-normal rounded-md border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1 cursor-pointer text-xs font-normal rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 transition"
                       >
                         <Eye size={12} />
                         View
@@ -1158,8 +1196,8 @@ const Order = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="border-t border-gray-100 px-4 sm:px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+        <div className="border-t border-gray-100 dark:border-slate-800 px-4 sm:px-5 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
             <span>
               {totalItems === 0
                 ? "No results"
@@ -1179,7 +1217,7 @@ const Order = () => {
 
                   setPage(1);
                 }}
-                className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="cursor-pointer text-xs border border-gray-200 dark:border-slate-700 rounded-md px-1.5 py-1 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -1217,7 +1255,7 @@ const Order = () => {
                     className={`min-w-8 h-8 px-1 cursor-pointer rounded-md text-xs font-medium transition ${
                       p === currentPage
                         ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800"
                     }`}
                   >
                     {p}
@@ -1225,7 +1263,7 @@ const Order = () => {
                 ) : (
                   <span
                     key={`${p}-${i}`}
-                    className="w-8 h-8 flex items-center justify-center text-gray-300 text-xs"
+                    className="w-8 h-8 flex items-center justify-center text-gray-300 dark:text-slate-600 text-xs"
                   >
                     …
                   </span>
@@ -1256,7 +1294,7 @@ const Order = () => {
       {hoveredOrder && (
         <div
           ref={popoverRef}
-          className="fixed z-[10001] w-72 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
+          className="fixed z-[10001] w-72 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
           style={
             popoverPos
               ? {
@@ -1273,15 +1311,15 @@ const Order = () => {
         >
           {hoveredOrder.type === "orderId" && (
             <>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
                 Order ID
               </p>
 
-              <p className="text-sm font-semibold text-gray-900 break-all">
+              <p className="text-sm font-semibold text-gray-900 dark:text-slate-100 break-all">
                 {hoveredOrder.order.orderId}
               </p>
 
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-slate-500">
                 Created: {formatDate(hoveredOrder.order.createdAt)}
               </p>
             </>
@@ -1289,12 +1327,12 @@ const Order = () => {
 
           {hoveredOrder.type === "deliverySlot" && (
             <>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
                 Delivery Slot
               </p>
 
               <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                <span className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center shrink-0">
                   {hoveredOrder.order.deliverySlot?.icon ? (
                     <img
                       src={resolveFirebaseUrl({
@@ -1305,15 +1343,15 @@ const Order = () => {
                       className="w-4 h-4 object-contain"
                     />
                   ) : (
-                    <Clock3 size={14} className="text-blue-600" />
+                    <Clock3 size={14} className="text-blue-600 dark:text-blue-400" />
                   )}
                 </span>
 
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                     {hoveredOrder.order.deliverySlot?.name || "—"}
                   </p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                     {hoveredOrder.order.deliveryDate
                       ? new Intl.DateTimeFormat("en-US", {
                           dateStyle: "medium",
@@ -1323,7 +1361,7 @@ const Order = () => {
 
                   {hoveredOrder.order.deliverySlot?.from &&
                     hoveredOrder.order.deliverySlot?.to && (
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                         {hoveredOrder.order.deliverySlot.from} -{" "}
                         {hoveredOrder.order.deliverySlot.to}
                       </p>
@@ -1335,19 +1373,19 @@ const Order = () => {
 
           {hoveredOrder.type === "customer" && (
             <>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide mb-2">
                 Delivery address
               </p>
 
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
                 {hoveredOrder.order.user?.customer_name}
               </p>
 
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                 {hoveredOrder.order.user?.phone_num}
               </p>
 
-              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p className="text-sm text-gray-600 dark:text-slate-300 mt-2 leading-relaxed">
                 {[
                   hoveredOrder.order.shippingAddress?.apartment,
                   hoveredOrder.order.shippingAddress?.locality,
@@ -1379,7 +1417,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     disabled={disabled}
     title={label}
     aria-label={label}
-    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
   >
     {children}
   </button>
@@ -1424,7 +1462,7 @@ const StatusSelect = ({
                 </div>
 
                 {order.orderStatus === status && (
-                  <span className="text-blue-600">✓</span>
+                  <span className="text-blue-600 dark:text-blue-400">✓</span>
                 )}
               </div>
             </SplitButtonItem>
@@ -1434,7 +1472,7 @@ const StatusSelect = ({
     >
       <div className="flex items-center gap-2">
         {disabled ? (
-          <Loader2 size={11} className="animate-spin text-gray-500" />
+          <Loader2 size={11} className="animate-spin text-gray-500 dark:text-slate-400" />
         ) : (
           <span
             className={`h-1.5 w-1.5 rounded-full ${
@@ -1457,7 +1495,8 @@ const StatusSelect = ({
 const PaymentStatusBadge = ({ status }) => {
   const config = PAYMENT_STATUS_STYLES[status] || {
     dot: "bg-gray-400",
-    badge: "bg-gray-50 text-gray-600 border-gray-200",
+    badge:
+      "bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
   };
 
   const label = status
@@ -1484,12 +1523,12 @@ const PaymentStatusBadge = ({ status }) => {
  */
 
 const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
-    <PackageSearch size={32} className="text-gray-300" />
+  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400 dark:text-slate-500">
+    <PackageSearch size={32} className="text-gray-300 dark:text-slate-600" />
 
-    <p className="text-sm font-medium text-gray-500">No orders found</p>
+    <p className="text-sm font-medium text-gray-500 dark:text-slate-400">No orders found</p>
 
-    <p className="text-xs text-gray-400">
+    <p className="text-xs text-gray-400 dark:text-slate-500">
       Try adjusting your search or filters
     </p>
   </div>

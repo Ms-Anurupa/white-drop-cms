@@ -29,6 +29,7 @@ import {
 import productSaleStore, {
   expenseAnalyticsStore,
 } from "@/zustand/Store/analyticsStore";
+import useThemeStore from "@/zustand/Store/themeStore";
 
 /* ============================================================
    1. CONFIG & HELPERS
@@ -363,7 +364,7 @@ const axisProps = {
 const ChartTooltip = ({ active, payload, label, pre = "" }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-white/10 bg-[#101828] px-3 py-2 text-[11px] text-white shadow-2xl">
+    <div className="rounded-xl border border-white/10 bg-[#101828] px-3 py-2 text-[11px] text-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
       <p className="mb-1.5 font-semibold text-white/60">{label}</p>
       {payload.map((p) => (
         <div
@@ -394,7 +395,9 @@ const Delta = ({ v, inverse = false }) => {
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-        good ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+        good
+          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+          : "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
       }`}
     >
       {up ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
@@ -435,12 +438,18 @@ const Spark = ({ values = [], color }) => {
 
 const Panel = ({ title, sub, right, className = "", children }) => (
   <section
-    className={`flex min-w-0 flex-col rounded-2xl border border-[#E6E8EC] bg-white p-4 ${className}`}
+    className={`flex min-w-0 flex-col rounded-2xl border border-[#E6E8EC] bg-white p-4 dark:border-slate-800 dark:bg-slate-900 ${className}`}
   >
     <header className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-2">
       <div className="min-w-0">
-        <h3 className="text-[13px] font-bold text-[#101828]">{title}</h3>
-        {sub && <p className="text-[11px] text-slate-500">{sub}</p>}
+        <h3 className="text-[13px] font-bold text-[#101828] dark:text-slate-100">
+          {title}
+        </h3>
+        {sub && (
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            {sub}
+          </p>
+        )}
       </div>
       {right && <div className="shrink-0">{right}</div>}
     </header>
@@ -450,16 +459,18 @@ const Panel = ({ title, sub, right, className = "", children }) => (
 
 const Select = ({ label, value, onChange, disabled, children }) => (
   <label
-    className={`flex shrink-0 items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] transition-colors focus-within:border-slate-900 focus-within:bg-white hover:border-slate-300 ${
+    className={`flex shrink-0 items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] transition-colors focus-within:border-slate-900 focus-within:bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-slate-500 dark:focus-within:bg-slate-800 dark:hover:border-slate-600 ${
       disabled ? "pointer-events-none opacity-45" : ""
     }`}
   >
-    <span className="font-medium text-slate-500">{label}</span>
+    <span className="font-medium text-slate-500 dark:text-slate-400">
+      {label}
+    </span>
     <select
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className="cursor-pointer bg-transparent font-bold text-[#101828] outline-none"
+      className="cursor-pointer bg-transparent font-bold text-[#101828] outline-none dark:text-slate-100 [&>option]:bg-white [&>option]:text-[#101828] dark:[&>option]:bg-slate-900 dark:[&>option]:text-slate-100"
     >
       {children}
     </select>
@@ -467,7 +478,9 @@ const Select = ({ label, value, onChange, disabled, children }) => (
 );
 
 const Skeleton = ({ className = "" }) => (
-  <div className={`animate-pulse rounded-lg bg-slate-100 ${className}`} />
+  <div
+    className={`animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800 ${className}`}
+  />
 );
 
 /* ============================================================
@@ -483,6 +496,7 @@ const CategoryDropdown = ({
   value,
   onChange,
 }) => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -513,14 +527,20 @@ const CategoryDropdown = ({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[12px] font-bold text-[#101828] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
-        style={{
-          background: value ? `${activeColor}12` : "#F8FAFC",
-          borderColor: value ? `${activeColor}70` : "#E6E8EC",
-        }}
+        className="flex items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-1.5 text-[12px] font-bold text-[#101828] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus-visible:outline-slate-400"
+        style={
+          value
+            ? {
+                background: isDark ? `${activeColor}24` : `${activeColor}12`,
+                borderColor: `${activeColor}70`,
+              }
+            : undefined
+        }
       >
         <Layers size={14} style={{ color: activeColor }} />
-        <span className="font-medium text-slate-500">{label}:</span>
+        <span className="font-medium text-slate-500 dark:text-slate-400">
+          {label}:
+        </span>
         <span className="flex items-center gap-1.5">
           {value && (
             <i
@@ -532,7 +552,7 @@ const CategoryDropdown = ({
         </span>
         <ChevronDown
           size={14}
-          className={`ml-0.5 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`ml-0.5 text-slate-400 transition-transform dark:text-slate-500 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -540,7 +560,7 @@ const CategoryDropdown = ({
         <ul
           role="listbox"
           aria-label={`Filter by ${label}`}
-          className="absolute left-0 top-full z-50 mt-1.5 max-h-72 w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl"
+          className="absolute left-0 top-full z-50 mt-1.5 max-h-72 w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
         >
           <li role="option" aria-selected={value === null}>
             <button
@@ -548,19 +568,22 @@ const CategoryDropdown = ({
               onClick={() => choose(null)}
               className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] font-bold ${
                 value === null
-                  ? "bg-slate-100 text-[#101828]"
-                  : "text-slate-700 hover:bg-slate-50"
+                  ? "bg-slate-100 text-[#101828] dark:bg-slate-800 dark:text-slate-100"
+                  : "text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
               }`}
             >
               <span>All ({items.length})</span>
-              <span className="flex items-center gap-2 text-[11px] text-slate-500">
+              <span className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                 {fmt(grand, prefix)}
                 {value === null && <Check size={14} style={{ color: hue }} />}
               </span>
             </button>
           </li>
 
-          <li className="my-1 border-t border-slate-100" aria-hidden />
+          <li
+            className="my-1 border-t border-slate-100 dark:border-slate-800"
+            aria-hidden
+          />
 
           {items.map((item) => {
             const selected = value === item.name;
@@ -571,11 +594,17 @@ const CategoryDropdown = ({
                   onClick={() => choose(item.name)}
                   className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${
                     selected
-                      ? "font-bold text-[#101828]"
-                      : "font-semibold text-slate-700 hover:bg-slate-50"
+                      ? "font-bold text-[#101828] dark:text-slate-100"
+                      : "font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
                   }`}
                   style={
-                    selected ? { background: `${item.color}12` } : undefined
+                    selected
+                      ? {
+                          background: isDark
+                            ? `${item.color}24`
+                            : `${item.color}12`,
+                        }
+                      : undefined
                   }
                 >
                   <span className="flex min-w-0 items-center gap-2">
@@ -586,10 +615,10 @@ const CategoryDropdown = ({
                     <span className="truncate">{item.name}</span>
                   </span>
                   <span className="ml-2 flex shrink-0 items-center gap-2 text-[11px] tabular-nums">
-                    <span className="font-bold text-[#101828]">
+                    <span className="font-bold text-[#101828] dark:text-slate-100">
                       {fmt(item.total, prefix)}
                     </span>
-                    <span className="w-8 text-right text-slate-400">
+                    <span className="w-8 text-right text-slate-400 dark:text-slate-500">
                       {pct(item.total, grand)}%
                     </span>
                     <span className="w-3.5">
@@ -613,6 +642,7 @@ const CategoryDropdown = ({
    ============================================================ */
 
 const FilterBar = ({ d }) => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const navigate = useNavigate();
   const {
     tab,
@@ -647,21 +677,21 @@ const FilterBar = ({ d }) => {
     <button
       type="button"
       onClick={() => navigate(tab.managePath)}
-      className={`shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] hover:border-slate-400 ${className}`}
+      className={`shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-600 ${className}`}
     >
       Manage <ChevronRight size={13} />
     </button>
   );
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 2xl:flex-row 2xl:items-center 2xl:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900 2xl:flex-row 2xl:items-center 2xl:justify-between">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[18px] font-extrabold tracking-tight text-[#101828]">
+            <h1 className="text-[18px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100">
               {tab.title}
             </h1>
-            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
               {when}
             </span>
             {loading && (
@@ -673,7 +703,9 @@ const FilterBar = ({ d }) => {
               </span>
             )}
           </div>
-          <p className="mt-0.5 text-[11px] text-slate-500">{tab.blurb}</p>
+          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+            {tab.blurb}
+          </p>
         </div>
         <ManageButton className="flex 2xl:hidden" />
       </div>
@@ -689,7 +721,7 @@ const FilterBar = ({ d }) => {
           onChange={d.setSelectedCategory}
         />
 
-        <span className="hidden h-5 w-px bg-[#E6E8EC] sm:inline-block" />
+        <span className="hidden h-5 w-px bg-[#E6E8EC] dark:bg-slate-800 sm:inline-block" />
 
         <Select
           label="Year"
@@ -755,11 +787,17 @@ const FilterBar = ({ d }) => {
           role="switch"
           aria-checked={compare}
           onClick={() => setCompare(!compare)}
-          className="flex shrink-0 items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:border-slate-300"
+          className="flex shrink-0 items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600"
         >
           <span
             className="relative h-4 w-7 rounded-full transition-colors"
-            style={{ background: compare ? d.selectedColor : "#CBD5E1" }}
+            style={{
+              background: compare
+                ? d.selectedColor
+                : isDark
+                  ? "#475569"
+                  : "#CBD5E1",
+            }}
           >
             <i
               className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${compare ? "left-3.5" : "left-0.5"}`}
@@ -772,7 +810,7 @@ const FilterBar = ({ d }) => {
           <button
             type="button"
             onClick={resetFilters}
-            className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 hover:text-[#101828]"
+            className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-500 hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <RotateCcw size={12} /> Reset
           </button>
@@ -840,7 +878,7 @@ const KpiCards = ({ d }) => {
       {kpis.map((k, i) => (
         <div
           key={k.key}
-          className="min-w-0 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3"
+          className="min-w-0 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
           style={
             i === 0
               ? {
@@ -850,7 +888,7 @@ const KpiCards = ({ d }) => {
               : undefined
           }
         >
-          <p className="truncate text-[11px] font-semibold text-slate-500">
+          <p className="truncate text-[11px] font-semibold text-slate-500 dark:text-slate-400">
             {k.key}
           </p>
           {loading && !k.value ? (
@@ -858,7 +896,7 @@ const KpiCards = ({ d }) => {
           ) : (
             <div className="mt-0.5 flex flex-wrap items-center gap-2">
               <p
-                className={`truncate font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums ${
+                className={`truncate font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100 ${
                   i === 0
                     ? "text-[24px] sm:text-[26px]"
                     : "text-[19px] sm:text-[20px]"
@@ -870,7 +908,7 @@ const KpiCards = ({ d }) => {
             </div>
           )}
           {k.note && (
-            <p className="mt-0.5 truncate text-[11px] text-slate-500">
+            <p className="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400">
               {k.note}
             </p>
           )}
@@ -881,11 +919,16 @@ const KpiCards = ({ d }) => {
 };
 
 const TrendPanel = ({ d }) => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const { tab, selectedCategory, selectedColor, compare, filters, per, trend } =
     d;
   const previousPeriod =
     filters.year == null ? "previous year" : `${filters.year - 1}`;
   const prefixName = selectedCategory ? `${selectedCategory} ` : "";
+  const themedAxisProps = {
+    ...axisProps,
+    tick: { fill: isDark ? "#94A3B8" : "#98A2B3", fontSize: 10 },
+  };
 
   return (
     <Panel
@@ -897,7 +940,7 @@ const TrendPanel = ({ d }) => {
       sub={`One point per ${per}`}
       right={
         compare && (
-          <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600">
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1">
               <i
                 className="h-1.5 w-1.5 rounded-full"
@@ -906,7 +949,7 @@ const TrendPanel = ({ d }) => {
               {filters.year ?? "Current"}
             </span>
             <span className="flex items-center gap-1">
-              <i className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+              <i className="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
               {previousPeriod}
             </span>
           </div>
@@ -925,9 +968,16 @@ const TrendPanel = ({ d }) => {
                 <stop offset="100%" stopColor={selectedColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="#EEF0F3" />
-            <XAxis dataKey="l" {...axisProps} minTickGap={18} />
-            <YAxis {...axisProps} width={46} tickFormatter={(v) => fmt(v)} />
+            <CartesianGrid
+              vertical={false}
+              stroke={isDark ? "#1E293B" : "#EEF0F3"}
+            />
+            <XAxis dataKey="l" {...themedAxisProps} minTickGap={18} />
+            <YAxis
+              {...themedAxisProps}
+              width={46}
+              tickFormatter={(v) => fmt(v)}
+            />
             <Tooltip
               wrapperStyle={{ zIndex: 30 }}
               content={<ChartTooltip pre={tab.prefix} />}
@@ -937,7 +987,7 @@ const TrendPanel = ({ d }) => {
               <Area
                 name={previousPeriod}
                 dataKey="prev"
-                stroke="#CBD5E1"
+                stroke={isDark ? "#475569" : "#CBD5E1"}
                 strokeWidth={2}
                 strokeDasharray="5 4"
                 fill="none"
@@ -958,6 +1008,7 @@ const TrendPanel = ({ d }) => {
 };
 
 const CategoryLinesPanel = ({ d }) => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const {
     tab,
     rows,
@@ -990,6 +1041,11 @@ const CategoryLinesPanel = ({ d }) => {
     );
   }, [rows, table, selectedCategory]);
 
+  const cardBgHex = isDark ? "#0F172A" : "#FFFFFF";
+  const axisColor = isDark ? "#94A3B8" : "#64748B";
+  const gridColor = isDark ? "#1E293B" : "#EEF0F3";
+  const axisLineColor = isDark ? "#334155" : "#E2E8F0";
+
   const renderCallout =
     (name, color) =>
     ({ x, y, index, value }) => {
@@ -1003,14 +1059,14 @@ const CategoryLinesPanel = ({ d }) => {
             cy={y}
             r={5.5}
             fill={color}
-            stroke="#1F2226"
+            stroke={cardBgHex}
             strokeWidth={2}
           />
           <text
             x={nearEnd ? x - 10 : x + 10}
             y={nearEnd ? y - 10 : y + 4}
             textAnchor={nearEnd ? "end" : "start"}
-            fill="#E5E7EB"
+            fill={isDark ? "#E2E8F0" : "#101828"}
             fontSize={11}
             fontWeight={700}
           >
@@ -1021,12 +1077,11 @@ const CategoryLinesPanel = ({ d }) => {
     };
 
   return (
-    <section className="min-w-0 rounded-2xl bg-[#1F2226] p-5 text-white shadow-[0_10px_30px_-12px_rgba(0,0,0,.5)]">
-      <h3 className="text-[15px] font-bold">
-        {tab.metric} by {tab.categoryLabel.toLowerCase()} · {when}
-      </h3>
-
-      <ul className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+    <Panel
+      title={`${tab.metric} by ${tab.categoryLabel.toLowerCase()} · ${when}`}
+      sub="Click any item below to highlight or isolate its trend."
+    >
+      <ul className="mt-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
         {rows.map((row) => {
           const dim = selectedCategory && selectedCategory !== row.name;
           return (
@@ -1039,13 +1094,13 @@ const CategoryLinesPanel = ({ d }) => {
                   )
                 }
                 aria-pressed={selectedCategory === row.name}
-                className={`flex items-center gap-1.5 text-[11px] transition-opacity ${dim ? "opacity-35" : "opacity-100"}`}
+                className={`flex cursor-pointer items-center gap-1.5 text-[11px] transition-opacity ${dim ? "opacity-35" : "opacity-100"}`}
               >
                 <i
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ background: row.color }}
                 />
-                <span className="font-semibold text-slate-200">{row.name}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{row.name}</span>
               </button>
             </li>
           );
@@ -1058,16 +1113,16 @@ const CategoryLinesPanel = ({ d }) => {
             data={stack}
             margin={{ left: 4, right: 16, top: 30, bottom: 0 }}
           >
-            <CartesianGrid stroke="#30353B" />
+            <CartesianGrid stroke={gridColor} />
             <XAxis
               dataKey="l"
-              tick={{ fill: "#9CA3AF", fontSize: 10 }}
-              axisLine={{ stroke: "#4B5563" }}
+              tick={{ fill: axisColor, fontSize: 10 }}
+              axisLine={{ stroke: axisLineColor }}
               tickLine={false}
               minTickGap={18}
             />
             <YAxis
-              tick={{ fill: "#9CA3AF", fontSize: 10 }}
+              tick={{ fill: axisColor, fontSize: 10 }}
               axisLine={false}
               tickLine={false}
               width={62}
@@ -1076,16 +1131,16 @@ const CategoryLinesPanel = ({ d }) => {
                 value: `${tab.metric}${tab.prefix ? ` (${tab.prefix})` : ""}`,
                 angle: -90,
                 position: "insideLeft",
-                fill: "#9CA3AF",
+                fill: axisColor,
                 fontSize: 10,
                 style: { textAnchor: "middle" },
               }}
             />
-            <ReferenceLine y={0} stroke="#6B7280" />
+            <ReferenceLine y={0} stroke={axisLineColor} />
             <Tooltip
               wrapperStyle={{ zIndex: 30 }}
               content={<ChartTooltip pre={tab.prefix} />}
-              cursor={{ stroke: "#6B7280", strokeDasharray: 4 }}
+              cursor={{ stroke: axisColor, strokeDasharray: 4 }}
             />
             {rows.map((row) => {
               const dim = selectedCategory && selectedCategory !== row.name;
@@ -1104,7 +1159,7 @@ const CategoryLinesPanel = ({ d }) => {
                     stroke: row.color,
                     fillOpacity: dim ? 0.2 : 1,
                   }}
-                  activeDot={{ r: 5, stroke: "#1F2226", strokeWidth: 2 }}
+                  activeDot={{ r: 5, stroke: cardBgHex, strokeWidth: 2 }}
                   label={renderCallout(row.name, row.color)}
                 />
               );
@@ -1112,11 +1167,12 @@ const CategoryLinesPanel = ({ d }) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </Panel>
   );
 };
 
 const CategoryList = ({ d }) => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const { tab, table, loading, selectedCategory, setSelectedCategory } = d;
   const maxTotal = table[0]?.total || 1;
 
@@ -1133,7 +1189,7 @@ const CategoryList = ({ d }) => {
           ))}
         </div>
       ) : table.length === 0 ? (
-        <p className="py-8 text-center text-[12px] text-slate-400">
+        <p className="py-8 text-center text-[12px] text-slate-400 dark:text-slate-500">
           Nothing recorded for this period. Try a wider date range.
         </p>
       ) : (
@@ -1148,11 +1204,13 @@ const CategoryList = ({ d }) => {
                     setSelectedCategory(selected ? null : row.name)
                   }
                   aria-pressed={selected}
-                  className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition-all hover:bg-[#F6F7F9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900"
+                  className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition-all hover:bg-[#F6F7F9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 dark:hover:bg-slate-800/70 dark:focus-visible:outline-slate-400"
                   style={
                     selected
                       ? {
-                          background: `${row.color}12`,
+                          background: isDark
+                            ? `${row.color}24`
+                            : `${row.color}12`,
                           boxShadow: `inset 0 0 0 1.5px ${row.color}`,
                         }
                       : undefined
@@ -1168,14 +1226,14 @@ const CategoryList = ({ d }) => {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-[12px] font-bold text-[#101828]">
+                      <p className="truncate text-[12px] font-bold text-[#101828] dark:text-slate-100">
                         {row.name}
                       </p>
                       {selected && (
                         <Check size={13} style={{ color: row.color }} />
                       )}
                     </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -1189,7 +1247,7 @@ const CategoryList = ({ d }) => {
                   <Spark values={row.cur} color={row.color} />
 
                   <div className="min-w-[76px] shrink-0 text-right">
-                    <p className="text-[12px] font-extrabold tabular-nums text-[#101828]">
+                    <p className="text-[12px] font-extrabold tabular-nums text-[#101828] dark:text-slate-100">
                       {fmt(row.total, tab.prefix)}
                     </p>
                     <Delta v={row.g} inverse={tab.inverse} />
@@ -1218,7 +1276,7 @@ export const AnalyticsView = ({ activeTab }) => {
       {d.tab.isDynamic && d.status?.type === "error" && (
         <div
           role="alert"
-          className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700"
+          className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
         >
           <span>{d.status.message}</span>
           <button
@@ -1250,6 +1308,7 @@ export const AnalyticsView = ({ activeTab }) => {
 
 
 const Dashboard = () => {
+  const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const [activeTab, setActiveTab] = useState("product");
 
   const resetProductCategory = productSaleStore((s) => s.setSelectedCategory);
@@ -1266,7 +1325,7 @@ const Dashboard = () => {
 
   return (
     <div
-      className="flex min-h-full min-w-0 flex-col overflow-x-clip bg-[#F4F5F7] text-[12px] text-[#101828]"
+      className="flex min-h-full min-w-0 flex-col overflow-x-clip bg-[#F4F5F7] text-[12px] text-[#101828] dark:bg-slate-950 dark:text-slate-100"
       style={{
         fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
       }}
@@ -1285,7 +1344,7 @@ const Dashboard = () => {
       <main className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col px-4 md:px-6">
         {/* DASHBOARD CATEGORY NAVIGATION */}
         <div className="sticky top-1 z-30 mb-4 w-full">
-          <div className="relative rounded-2xl border border-slate-200/80 bg-white/90 p-1.5 shadow-[0_4px_20px_-4px_rgba(16,24,40,0.06)] backdrop-blur-md ring-1 ring-slate-900/[0.03]">
+          <div className="relative rounded-2xl border border-slate-200/80 bg-white/90 p-1.5 shadow-[0_4px_20px_-4px_rgba(16,24,40,0.06)] backdrop-blur-md ring-1 ring-slate-900/[0.03] dark:border-slate-800 dark:bg-slate-900/90 dark:ring-white/[0.04]">
             <nav
               aria-label="Dashboard categories"
               className="flex items-center gap-1.5 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -1303,12 +1362,14 @@ const Dashboard = () => {
                     className={`group relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl px-3 py-1.5 text-[12.5px] tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.98] ${
                       active
                         ? "font-semibold shadow-[0_1px_2px_rgba(16,24,40,0.05)]"
-                        : "font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                        : "font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                     }`}
                     style={
                       active
                         ? {
-                            backgroundColor: `${tab.hue}12`,
+                            backgroundColor: isDark
+                              ? `${tab.hue}24`
+                              : `${tab.hue}12`,
                             color: tab.hue,
                             boxShadow: `inset 0 0 0 1px ${tab.hue}30, 0 1px 2px rgba(16,24,40,0.04)`,
                           }
@@ -1320,7 +1381,7 @@ const Dashboard = () => {
                       className={`flex h-5 w-5 items-center justify-center rounded-md transition-colors duration-200 ${
                         active
                           ? "text-white shadow-xs"
-                          : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-800 group-hover:shadow-2xs"
+                          : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-800 group-hover:shadow-2xs dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-100"
                       }`}
                       style={active ? { backgroundColor: tab.hue } : undefined}
                     >
@@ -1334,8 +1395,8 @@ const Dashboard = () => {
                       <span
                         className={`ml-0.5 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold tabular-nums transition-colors ${
                           active
-                            ? "bg-white/90 shadow-2xs"
-                            : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700"
+                            ? "bg-white/90 shadow-2xs dark:bg-slate-900/90"
+                            : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-200"
                         }`}
                         style={active ? { color: tab.hue } : undefined}
                       >

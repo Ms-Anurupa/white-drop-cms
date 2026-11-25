@@ -49,8 +49,8 @@ function StatusBadge({ status }) {
   return (
     <span
       className={`rounded-full px-2 py-0.5 text-xs font-medium ${active
-          ? "bg-emerald-50 text-emerald-800"
-          : "bg-stone-200 text-stone-700"
+          ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+          : "bg-stone-200 text-stone-700 dark:bg-slate-800 dark:text-slate-300"
         }`}
     >
       {active ? "Active" : "Deactivated"}
@@ -63,9 +63,9 @@ function StatusBadge({ status }) {
 // Zero amounts become a quiet dash so non-zero values stand out
 const Amount = ({ value, negative }) => {
   const n = num(value);
-  if (n <= 0) return <span className="text-stone-300">—</span>;
+  if (n <= 0) return <span className="text-stone-300 dark:text-slate-600">—</span>;
   return negative ? (
-    <span className="text-rose-700">−{money(n)}</span>
+    <span className="text-rose-700 dark:text-rose-400">−{money(n)}</span>
   ) : (
     <span>{money(n)}</span>
   );
@@ -74,8 +74,8 @@ const Amount = ({ value, negative }) => {
 function Skeleton() {
   return (
     <div className="animate-pulse space-y-4" aria-hidden="true">
-      <div className="h-24 rounded-xl bg-stone-100" />
-      <div className="h-64 rounded-xl bg-stone-100" />
+      <div className="h-24 rounded-xl bg-stone-100 dark:bg-slate-800" />
+      <div className="h-64 rounded-xl bg-stone-100 dark:bg-slate-800" />
     </div>
   );
 }
@@ -165,7 +165,7 @@ const EmployeeSalary = () => {
     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
       <Link
         to={BACK_ROUTE}
-        className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+        className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-400 dark:hover:text-slate-100"
       >
         <Icon d={ICONS.back} />
         Employees
@@ -180,13 +180,13 @@ const EmployeeSalary = () => {
 
           <div className="flex flex-col justify-center">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight text-stone-900">
+              <h1 className="text-xl font-semibold tracking-tight text-stone-900 dark:text-slate-100">
                 {employee?.empName || "Employee"}
               </h1>
               <StatusBadge status={employee?.status} />
             </div>
 
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-stone-500 dark:text-slate-400">
               {employee?.empPhone ? `${employee.empPhone} · ` : ""}
               Payment history
             </p>
@@ -198,7 +198,7 @@ const EmployeeSalary = () => {
             type="button"
             onClick={() => load()}
             disabled={loading}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             <Icon
               d={ICONS.refresh}
@@ -220,8 +220,8 @@ const EmployeeSalary = () => {
       </div>
 
       {/* Filters */}
-      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 sm:px-4">
-        <div className="flex items-center gap-1.5 text-sm font-medium text-stone-500">
+      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 sm:px-4">
+        <div className="flex items-center gap-1.5 text-sm font-medium text-stone-500 dark:text-slate-400">
           <Icon d={ICONS.filter} className="h-3.5 w-3.5" />
           Filter
         </div>
@@ -230,7 +230,7 @@ const EmployeeSalary = () => {
           aria-label="Financial year"
           value={fy}
           onChange={(e) => setFy(e.target.value)}
-          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         >
           <option value="">All financial years</option>
           {FY_OPTIONS.map((y) => (
@@ -240,7 +240,7 @@ const EmployeeSalary = () => {
           ))}
         </select>
 
-        <span className="text-xs text-stone-400">saved between</span>
+        <span className="text-xs text-stone-400 dark:text-slate-500">saved between</span>
 
         <input
           type="date"
@@ -255,10 +255,10 @@ const EmployeeSalary = () => {
               e.currentTarget?.focus();
             }
           }}
-          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:[color-scheme:dark]"
         />
 
-        <span className="text-xs text-stone-400">and</span>
+        <span className="text-xs text-stone-400 dark:text-slate-500">and</span>
 
         <input
           type="date"
@@ -273,14 +273,14 @@ const EmployeeSalary = () => {
               e.currentTarget?.focus();
             }
           }}
-          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none"
+          className="cursor-pointer rounded-lg border border-stone-300 bg-white px-2.5 py-1.5 text-sm text-stone-800 focus:border-teal-600 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:[color-scheme:dark]"
         />
 
         {hasFilters && (
           <button
             type="button"
             onClick={clearFilters}
-            className="ml-auto cursor-pointer text-xs font-medium text-stone-500 underline hover:text-stone-800"
+            className="ml-auto cursor-pointer text-xs font-medium text-stone-500 underline hover:text-stone-800 dark:text-slate-400 dark:hover:text-slate-200"
           >
             Clear filters
           </button>
@@ -290,8 +290,8 @@ const EmployeeSalary = () => {
       {!ready ? (
         <Skeleton />
       ) : error && records.length === 0 ? (
-        <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
-          <p className="text-sm text-stone-700">{error}</p>
+        <div className="rounded-xl border border-stone-200 bg-white px-6 py-14 text-center dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-sm text-stone-700 dark:text-slate-300">{error}</p>
           <button
             type="button"
             onClick={() => load()}
@@ -301,16 +301,16 @@ const EmployeeSalary = () => {
           </button>
         </div>
       ) : records.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-500">
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-stone-200 bg-white px-6 py-14 text-center dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-500 dark:bg-slate-800 dark:text-slate-400">
             <Icon d={ICONS.empty} className="h-5 w-5" />
           </div>
 
-          <p className="text-sm font-medium text-stone-800">
+          <p className="text-sm font-medium text-stone-800 dark:text-slate-100">
             {hasFilters ? "No payments match these filters" : "No payments yet"}
           </p>
 
-          <p className="max-w-sm text-sm text-stone-500">
+          <p className="max-w-sm text-sm text-stone-500 dark:text-slate-400">
             {hasFilters
               ? "Try another financial year or a wider date range."
               : "Payments you record from Manage salary will show up here."}
@@ -320,7 +320,7 @@ const EmployeeSalary = () => {
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-2 cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+              className="mt-2 cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               Clear filters
             </button>
@@ -335,39 +335,39 @@ const EmployeeSalary = () => {
           )}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           {/* Summary */}
-          <dl className="grid grid-cols-1 gap-px bg-stone-200 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="bg-white px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">
+          <dl className="grid grid-cols-1 gap-px bg-stone-200 dark:bg-slate-800 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-white px-5 py-4 dark:bg-slate-900 sm:px-6">
+              <dt className="text-sm text-stone-500 dark:text-slate-400">
                 {fy ? `Total paid out (FY ${fy})` : "Total paid out"}
               </dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-teal-700">
+              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-teal-700 dark:text-teal-400">
                 {money(totalPayout)}
               </dd>
-              <dd className="mt-0.5 text-xs text-stone-500">
+              <dd className="mt-0.5 text-xs text-stone-500 dark:text-slate-400">
                 {totalRecords} {totalRecords === 1 ? "payment" : "payments"}
                 {totalIsPartial ? " · loaded so far" : ""}
               </dd>
             </div>
 
-            <div className="bg-white px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">Latest payment</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900">
+            <div className="bg-white px-5 py-4 dark:bg-slate-900 sm:px-6">
+              <dt className="text-sm text-stone-500 dark:text-slate-400">Latest payment</dt>
+              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900 dark:text-slate-100">
                 {money(payoutOf(latest))}
               </dd>
-              <dd className="mt-0.5 text-xs text-stone-500">
+              <dd className="mt-0.5 text-xs text-stone-500 dark:text-slate-400">
                 {getMonthName(latest.month)} {latest.fy}
               </dd>
             </div>
 
-            <div className="bg-white px-5 py-4 sm:px-6">
-              <dt className="text-sm text-stone-500">Current base pay</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900">
+            <div className="bg-white px-5 py-4 dark:bg-slate-900 sm:px-6">
+              <dt className="text-sm text-stone-500 dark:text-slate-400">Current base pay</dt>
+              <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-stone-900 dark:text-slate-100">
                 {salary?.basePay != null ? money(salary.basePay) : "Not set"}
               </dd>
               {salary?.finalPay != null && (
-                <dd className="mt-0.5 text-xs tabular-nums text-stone-500">
+                <dd className="mt-0.5 text-xs tabular-nums text-stone-500 dark:text-slate-400">
                   Net {money(salary.finalPay)} a month
                 </dd>
               )}
@@ -375,9 +375,9 @@ const EmployeeSalary = () => {
           </dl>
 
           {/* Payment table */}
-          <div className="overflow-x-auto border-t border-stone-200">
+          <div className="overflow-x-auto border-t border-stone-200 dark:border-slate-800">
             <table className="w-full min-w-[1000px] text-left text-sm">
-              <thead className="bg-stone-50 text-xs text-stone-500">
+              <thead className="bg-stone-50 text-xs text-stone-500 dark:bg-slate-800/70 dark:text-slate-400">
                 <tr>
                   <th className="py-3 pl-5 pr-3 font-medium sm:pl-6">Period</th>
                   <th className="px-3 py-3 text-right font-medium">ESI NO</th>
@@ -407,51 +407,53 @@ const EmployeeSalary = () => {
                   return (
                     <tr
                       key={r.id || i}
-                      className={`border-t border-stone-200 ${
-                        i === 0 ? "bg-teal-50/40" : "hover:bg-stone-50"
+                      className={`border-t border-stone-200 dark:border-slate-800 ${
+                        i === 0
+                          ? "bg-teal-50/40 dark:bg-teal-950/30"
+                          : "hover:bg-stone-50 dark:hover:bg-slate-800/60"
                       }`}
                     >
                       <td className="py-3 pl-5 pr-3 sm:pl-6">
-                        <div className="font-medium text-stone-900">
+                        <div className="font-medium text-stone-900 dark:text-slate-100">
                           {getMonthName(r.month)} {r.fy}
                         </div>
-                        <div className="mt-0.5 text-xs text-stone-500">
+                        <div className="mt-0.5 text-xs text-stone-500 dark:text-slate-400">
                           Saved {fmtDate(r.createdAt)}
                         </div>
                         {r.note && (
                           <div
-                            className="mt-0.5 max-w-[220px] truncate text-xs text-stone-500"
+                            className="mt-0.5 max-w-[220px] truncate text-xs text-stone-500 dark:text-slate-400"
                             title={r.note}
                           >
                             {r.note}
                           </div>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         {r?.employees?.salary?.esiNo}
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-700">
+                      <td className="px-3 py-3 text-right text-stone-700 dark:text-slate-300">
                         {money(r.basePay)}
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         <Amount value={r.pTax} />
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         <Amount value={r.employerEsi} />
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         <Amount value={r.employeeEsi} />
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         <Amount value={r.bonus} />
                       </td>
 
-                      <td className="px-3 py-3 text-right text-stone-600">
+                      <td className="px-3 py-3 text-right text-stone-600 dark:text-slate-300">
                         <Amount value={r.overtime} />
                       </td>
 
@@ -460,7 +462,7 @@ const EmployeeSalary = () => {
                       </td>
 
                       <td className="py-3 pl-3 pr-5 text-right sm:pr-6">
-                        <div className="font-semibold text-stone-900">
+                        <div className="font-semibold text-stone-900 dark:text-slate-100">
                           {money(inHandOf(r))}
                         </div>
                       </td>
@@ -472,13 +474,13 @@ const EmployeeSalary = () => {
           </div>
 
           {/* Footer */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 text-sm text-stone-600 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 text-sm text-stone-600 dark:border-slate-800 dark:bg-slate-800/70 dark:text-slate-400 sm:px-6">
             <span>
               Showing {records.length} of {totalRecords}
               {hasMore ? "" : " · end of history"}
             </span>
 
-            {error && <span className="text-rose-700">{error}</span>}
+            {error && <span className="text-rose-700 dark:text-rose-400">{error}</span>}
 
             {hasMore && (
               <button

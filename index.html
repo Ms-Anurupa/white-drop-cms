@@ -5,6 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/logo_nobg.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>whitedropcms</title>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var mode =
+            saved === "light" || saved === "dark" || saved === "system"
+              ? saved
+              : "system";
+          var isDark =
+            mode === "dark" ||
+            (mode === "system" &&
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var root = document.documentElement;
+          root.classList.toggle("dark", isDark);
+          root.style.colorScheme = isDark ? "dark" : "light";
+        } catch (e) {}
+      })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   </head>
   <body>

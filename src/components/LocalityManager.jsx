@@ -92,12 +92,12 @@ const LocalityManager = () => {
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
             Locality Manager
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Total Localities:{" "}
-            <span className="font-medium text-gray-700">
+            <span className="font-medium text-gray-700 dark:text-slate-200">
               {localities.length}
             </span>
           </p>
@@ -108,7 +108,7 @@ const LocalityManager = () => {
           <div className="relative w-full sm:w-56">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
             <input
               value={search}
@@ -117,7 +117,7 @@ const LocalityManager = () => {
                 setPage(1);
               }}
               placeholder="Search locality..."
-              className="w-full pl-10 pr-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="w-full pl-10 pr-3 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
           </div>
 
@@ -125,7 +125,7 @@ const LocalityManager = () => {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-2 cursor-pointer text-sm border border-gray-200 rounded-xl bg-white"
+            className="px-3 py-2 cursor-pointer text-sm border border-gray-200 rounded-xl bg-white dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
           >
             <option value="all">All Dates</option>
             <option value="today">Today</option>
@@ -144,34 +144,34 @@ const LocalityManager = () => {
       </div>
 
       {/* ── TABLE ── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         {/* Mobile Cards */}
         <div className="sm:hidden p-3 space-y-3">
           {paginated.map((l) => (
-            <div key={l.id} className="border rounded-lg p-3 space-y-2">
+            <div key={l.id} className="border rounded-lg p-3 space-y-2 dark:border-slate-800 dark:bg-slate-800/40">
               <div className="flex justify-between">
-                <h3 className="font-semibold">{l.name}</h3>
+                <h3 className="font-semibold dark:text-slate-100">{l.name}</h3>
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${
                     l.status === "Active"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-red-50 text-red-600"
+                      ? "bg-green-50 text-green-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                      : "bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300"
                   }`}
                 >
                   {l.status}
                 </span>
               </div>
 
-              <p className="text-sm text-gray-500">Pincode: {l.pincode}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Pincode: {l.pincode}</p>
 
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
                 <span>{l.addedBy}</span>
                 <span>{l.createdAt}</span>
               </div>
 
               <button
                 onClick={() => toggleStatus(l.id)}
-                className="w-full text-xs border rounded-lg py-2 hover:bg-gray-50"
+                className="w-full text-xs border rounded-lg py-2 hover:bg-gray-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 Toggle Status
               </button>
@@ -182,7 +182,7 @@ const LocalityManager = () => {
         {/* Desktop Table */}
         <div className="hidden sm:block">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 border-b dark:bg-slate-800/70 dark:border-slate-800">
               <tr>
                 {[
                   "Sr. No.",
@@ -196,7 +196,7 @@ const LocalityManager = () => {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-slate-400"
                   >
                     {h}
                   </th>
@@ -204,29 +204,29 @@ const LocalityManager = () => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="dark:divide-y dark:divide-slate-800 dark:text-slate-300">
               {paginated.map((l, index) => (
-                <tr key={l.id} className=" hover:bg-gray-50 transition">
+                <tr key={l.id} className=" hover:bg-gray-50 transition dark:hover:bg-slate-800/60">
                   <td className="px-3 py-3">{start + index + 1}</td>
 
-                  <td className="px-3 py-3 font-medium">{l.name}</td>
+                  <td className="px-3 py-3 font-medium dark:text-slate-100">{l.name}</td>
 
                   <td className="px-3 py-3">{l.pincode}</td>
 
                   <td className="px-3 py-3">{l.addedBy}</td>
 
-                  <td className="px-3 py-3 text-gray-500">{l.createdAt}</td>
+                  <td className="px-3 py-3 text-gray-500 dark:text-slate-400">{l.createdAt}</td>
 
                   <td className="px-3 py-3">
-                    <button className="text-blue-600 text-xs">Edit</button>
+                    <button className="text-blue-600 text-xs dark:text-blue-400">Edit</button>
                   </td>
 
                   <td className="px-3 py-3">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
                         l.status === "Active"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-red-50 text-red-600"
+                          ? "bg-green-50 text-green-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                          : "bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300"
                       }`}
                     >
                       {l.status}
@@ -237,7 +237,7 @@ const LocalityManager = () => {
                     <button
                       onClick={() => toggleStatus(l.id)}
                       className={`relative cursor-pointer inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-                        l.status === "Active" ? "bg-green-500" : "bg-gray-300"
+                        l.status === "Active" ? "bg-green-500" : "bg-gray-300 dark:bg-slate-700"
                       }`}
                     >
                       <span
@@ -256,8 +256,8 @@ const LocalityManager = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t">
-          <p className="text-xs text-gray-500">
+        <div className="flex justify-between items-center px-4 py-3 bg-gray-50 border-t dark:bg-slate-800/50 dark:border-slate-800">
+          <p className="text-xs text-gray-500 dark:text-slate-400">
             {filtered.length === 0
               ? "No data"
               : `${start + 1}–${Math.min(
@@ -269,18 +269,18 @@ const LocalityManager = () => {
           <div className="flex gap-2 items-center">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              className="p-1 cursor-pointer border rounded"
+              className="p-1 cursor-pointer border rounded dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               <ChevronLeft size={16} />
             </button>
 
-            <span className="text-xs">
+            <span className="text-xs dark:text-slate-300">
               {page} / {totalPages || 1}
             </span>
 
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              className="p-1 cursor-pointer border rounded"
+              className="p-1 cursor-pointer border rounded dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               <ChevronRight size={16} />
             </button>
@@ -290,12 +290,12 @@ const LocalityManager = () => {
 
       {/* ── MODAL ── */}
       {openModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 dark:bg-black/60">
+          <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4 dark:bg-slate-900 dark:border dark:border-slate-800">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Add Locality</h2>
+              <h2 className="text-lg font-semibold dark:text-slate-100">Add Locality</h2>
 
-              <button onClick={() => setOpenModal(false)} className="cursor-pointer">
+              <button onClick={() => setOpenModal(false)} className="cursor-pointer dark:text-slate-400 dark:hover:text-slate-200">
                 <X size={18} />
               </button>
             </div>
@@ -304,14 +304,14 @@ const LocalityManager = () => {
               placeholder="Locality Name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border p-2 rounded-lg text-sm"
+              className="w-full border p-2 rounded-lg text-sm outline-none focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
 
             <input
               placeholder="Pincode"
               value={form.pincode}
               onChange={(e) => setForm({ ...form, pincode: e.target.value })}
-              className="w-full border p-2 rounded-lg text-sm"
+              className="w-full border p-2 rounded-lg text-sm outline-none focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
 
             <button

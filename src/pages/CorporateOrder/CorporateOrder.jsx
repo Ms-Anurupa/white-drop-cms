@@ -30,12 +30,12 @@ import ExportExcelButton from "@/components/ExportExcelButton";
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 const DELIVERY_STATUS_STYLES = {
-  PLACED: "bg-blue-50 text-blue-700",
-  PROCESSING: "bg-amber-50 text-amber-700",
-  INTRANSIT: "bg-indigo-50 text-indigo-700",
-  DELIVERED: "bg-emerald-50 text-emerald-700",
-  FAILED: "bg-red-50 text-red-700",
-  CANCELLED: "bg-gray-100 text-gray-600",
+  PLACED: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
+  PROCESSING: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  INTRANSIT: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+  DELIVERED: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  FAILED: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+  CANCELLED: "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300",
 };
 
 const DELIVERY_STATUS_DOT = {
@@ -48,10 +48,10 @@ const DELIVERY_STATUS_DOT = {
 };
 
 const PAYMENT_STATUS_STYLES = {
-  COMPLETE: "bg-emerald-50 text-emerald-700",
-  POSTPAID: "bg-purple-50 text-purple-700",
-  PENDING: "bg-amber-50 text-amber-700",
-  FAILED: "bg-red-50 text-red-700",
+  COMPLETE: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  POSTPAID: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
+  PENDING: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  FAILED: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
 };
 
 const PAYMENT_STATUS_DOT = {
@@ -115,6 +115,12 @@ const ScrollbarStyle = () => (
     }
     .futuristic-scroll::-webkit-scrollbar-corner {
       background: transparent;
+    }
+    .dark .futuristic-scroll {
+      scrollbar-color: #6366f1 #0f172a;
+    }
+    .dark .futuristic-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
     }
   `}</style>
 );
@@ -480,21 +486,21 @@ const CorporateOrder = () => {
   })
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gray-50 px-4 py-3 gap-2">
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-50 px-4 py-3 gap-2 dark:bg-slate-950">
       <ScrollbarStyle />
 
       {/* ── HEADER ── */}
       <div className="shrink-0 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
         <div className="flex items-baseline gap-3 flex-wrap">
-          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
+          <h1 className="text-lg font-semibold text-gray-900 tracking-tight dark:text-slate-100">
             Corporate / Bulk Orders
           </h1>
-          <span className="text-xs text-blue-600 font-medium">
+          <span className="text-xs text-blue-600 font-medium dark:text-blue-400">
             Total: {corporateOrderPagination?.pagination?.totalCount ?? 0}
           </span>
           <button
             onClick={handleRefresh}
-            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
+            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             <RefreshCw size={14} />
             Refresh
@@ -506,14 +512,14 @@ const CorporateOrder = () => {
           <div className="relative w-full sm:w-64">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search order ID, company, GST..."
               className="w-full h-8 pl-8 pr-3 text-xs rounded-lg bg-white border border-gray-200
-                focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
             />
           </div>
 
@@ -533,7 +539,7 @@ const CorporateOrder = () => {
       </div>
 
       {/* ── FILTER BAR — everything on one line on desktop ── */}
-      <div className="shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm px-3 py-2 flex flex-wrap xl:flex-nowrap items-center gap-2 overflow-x-auto futuristic-scroll">
+      <div className="shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm px-3 py-2 flex flex-wrap xl:flex-nowrap items-center gap-2 overflow-x-auto futuristic-scroll dark:bg-slate-900 dark:border-slate-800">
         {/* date-range pills */}
         <div className="flex items-center gap-1.5 shrink-0">
           {DATE_FILTERS.map((f) => {
@@ -545,7 +551,7 @@ const CorporateOrder = () => {
                 className={`h-8 px-3 flex items-center gap-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition cursor-pointer ${
                   active
                     ? "bg-blue-600 text-white"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
                 }`}
               >
                 {f.label}
@@ -553,7 +559,7 @@ const CorporateOrder = () => {
                   className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
                     active
                       ? "bg-white/20 text-white"
-                      : "bg-gray-100 text-gray-500"
+                      : "bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-300"
                   }`}
                 >
                   {dateCounts[f.key]}
@@ -563,7 +569,7 @@ const CorporateOrder = () => {
           })}
         </div>
 
-        <div className="hidden xl:block w-px h-6 bg-gray-100 shrink-0" />
+        <div className="hidden xl:block w-px h-6 bg-gray-100 shrink-0 dark:bg-slate-800" />
 
         {/* explicit from/to range */}
         <div className="flex items-center gap-1.5 shrink-0">
@@ -582,10 +588,10 @@ const CorporateOrder = () => {
               type="date"
               value={fromDate}
               onChange={(e) => handleFromDateChange(e.target.value)}
-              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
+              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500 dark:[color-scheme:dark]"
             />
           </div>
-          <span className="text-gray-300 text-xs">→</span>
+          <span className="text-gray-300 text-xs dark:text-slate-600">→</span>
           <div
             className="w-full cursor-pointer"
             onClick={(e) => {
@@ -601,28 +607,28 @@ const CorporateOrder = () => {
               type="date"
               value={toDate}
               onChange={(e) => handleToDateChange(e.target.value)}
-              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer"
+              className="h-8 rounded-lg border border-gray-200 px-2 text-xs text-gray-600 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500 dark:[color-scheme:dark]"
             />
           </div>
           {(fromDate || toDate) && (
             <button
               onClick={clearDates}
               title="Clear dates"
-              className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition cursor-pointer"
+              className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition cursor-pointer dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <X size={14} />
             </button>
           )}
         </div>
 
-        <div className="hidden xl:block w-px h-6 bg-gray-100 shrink-0" />
+        <div className="hidden xl:block w-px h-6 bg-gray-100 shrink-0 dark:bg-slate-800" />
 
         {/* status selects + actions */}
         <div className="flex flex-wrap items-center gap-1.5 shrink-0 xl:ml-auto">
           <select
             value={deliveryStatus}
             onChange={(e) => setDeliveryStatus(e.target.value)}
-            className="cursor-pointer h-8 rounded-lg border border-gray-200 px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
+            className="cursor-pointer h-8 rounded-lg border border-gray-200 px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500"
             title="Delivery status"
           >
             <option value="">All delivery</option>
@@ -637,7 +643,7 @@ const CorporateOrder = () => {
           <select
             value={paymentStatus}
             onChange={(e) => setPaymentStatus(e.target.value)}
-            className="cursor-pointer h-8 rounded-lg border border-gray-200 px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
+            className="cursor-pointer h-8 rounded-lg border border-gray-200 px-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500"
             title="Payment status"
           >
             <option value="">All payment</option>
@@ -649,7 +655,7 @@ const CorporateOrder = () => {
 
           <button
             onClick={resetFilters}
-            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
+            className="h-8 px-2.5 cursor-pointer rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             <Undo2 size={14} />
             Reset
@@ -658,42 +664,42 @@ const CorporateOrder = () => {
       </div>
 
       {/* ── TABLE CARD — fills all remaining vertical space ── */}
-      <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-gray-100">
+      <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-gray-100 dark:bg-slate-900 dark:border-slate-800">
         <div className="flex-1 min-h-0 overflow-auto futuristic-scroll">
           <table className="min-w-[1300px] w-full table-fixed text-xs">
-            <thead className="bg-gray-100 sticky top-0 z-10">
-              <tr className="border-b border-gray-300">
-                <th className="w-10 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 whitespace-nowrap">
+            <thead className="bg-gray-100 sticky top-0 z-10 dark:bg-slate-800">
+              <tr className="border-b border-gray-300 dark:border-slate-700">
+                <th className="w-10 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 whitespace-nowrap dark:text-slate-400">
                   Sl No.
                 </th>
-                <th className="w-36 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 whitespace-nowrap">
+                <th className="w-36 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 whitespace-nowrap dark:text-slate-400">
                   Order ID
                 </th>
-                <th className="w-40 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-40 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Company
                 </th>
-                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Product
                 </th>
-                <th className="w-14 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-14 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Qty
                 </th>
                 {/* <th className="w-16 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
                   Price/unit
                 </th> */}
-                <th className="w-20 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-20 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Total
                 </th>
-                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Delivery
                 </th>
-                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Payment
                 </th>
-                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500">
+                <th className="w-24 px-2 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Created
                 </th>
-                <th className="w-24 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
+                <th className="w-24 px-2 py-2 text-center text-[11px] font-semibold text-gray-500 dark:text-slate-400">
                   Invoice
                 </th>
                 {/* <th className="w-16 px-2 py-2 text-center text-[11px] font-semibold text-gray-500">
@@ -702,7 +708,7 @@ const CorporateOrder = () => {
               </tr>
             </thead>
 
-            <tbody className="bg-white divide-y divide-gray-50">
+            <tbody className="bg-white divide-y divide-gray-50 dark:bg-slate-900 dark:divide-slate-800">
               {!hasOrders ? (
                 <tr>
                   <td colSpan={12}>
@@ -719,47 +725,47 @@ const CorporateOrder = () => {
                 orders.map((o, idx) => (
                   <tr
                     key={o.id}
-                    className="transition hover:bg-slate-50 cursor-pointer"
+                    className="transition hover:bg-slate-50 cursor-pointer dark:hover:bg-slate-800/60"
                     title="Click to view more details"
                     onClick={() => handleDetailsNavigate(o.id)}
                   >
-                    <td className="px-2 py-1.5 text-gray-400">
+                    <td className="px-2 py-1.5 text-gray-400 dark:text-slate-500">
                       {start + idx + 1}
                     </td>
 
-                    <td className="px-2 py-1.5 font-medium text-blue-900 truncate">
+                    <td className="px-2 py-1.5 font-medium text-blue-900 truncate dark:text-blue-400">
                       {o.orderId}
                     </td>
 
                     <td
-                      className="px-2 py-1.5 text-gray-700 cursor-default"
+                      className="px-2 py-1.5 text-gray-700 cursor-default dark:text-slate-300"
                       onMouseEnter={(e) => showCompanyPopover(e, o)}
                       onMouseLeave={hideCompanyPopover}
                     >
                       <div className="flex items-center gap-1.5 min-w-0">
                         <Building2
                           size={12}
-                          className="text-gray-400 shrink-0"
+                          className="text-gray-400 shrink-0 dark:text-slate-500"
                         />
                         <span className="truncate font-medium">
                           {o.corpoAcc?.businessName}
                         </span>
                       </div>
-                      <p className="text-[10px] text-gray-400 truncate">
+                      <p className="text-[10px] text-gray-400 truncate dark:text-slate-400">
                         GST: {o.corpoAcc?.gstNo || "-"}
                       </p>
                     </td>
 
                     <td className="px-2 py-1.5 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
+                      <p className="font-medium text-gray-900 truncate dark:text-slate-100">
                         {o.orderDetails?.productName}
                       </p>
-                      <p className="text-[10px] text-gray-500 truncate">
+                      <p className="text-[10px] text-gray-500 truncate dark:text-slate-400">
                         {o.orderDetails?.description}
                       </p>
                     </td>
 
-                    <td className="px-2 py-1.5 text-gray-800 whitespace-nowrap">
+                    <td className="px-2 py-1.5 text-gray-800 whitespace-nowrap dark:text-slate-200">
                       {o.orderDetails?.receivedQuantity}{" "}
                       {o.orderDetails?.receivedUnit}
                     </td>
@@ -768,7 +774,7 @@ const CorporateOrder = () => {
                       {formatCurrency(o.orderDetails?.pricePerUnit)}
                     </td> */}
 
-                    <td className="px-2 py-1.5 font-semibold text-green-900 whitespace-nowrap">
+                    <td className="px-2 py-1.5 font-semibold text-green-900 whitespace-nowrap dark:text-emerald-400">
                       {formatCurrency(
                         o.orderDetails?.receivedTotalPrice == 0
                           ? o.orderDetails?.grandTotal
@@ -792,7 +798,7 @@ const CorporateOrder = () => {
                       />
                     </td>
 
-                    <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap text-[11px]">
+                    <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap text-[11px] dark:text-slate-400">
                       {formatDate(o.createdAt)}
                     </td>
 
@@ -837,7 +843,7 @@ const CorporateOrder = () => {
 
                         {openMenu === o.id && (
                           <div
-                            className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left"
+                            className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20 text-left dark:bg-slate-800 dark:border-slate-700"
                             onClick={(e) => e.stopPropagation()} // Prevents clicks inside the menu from triggering the row
                           >
                             <button
@@ -847,7 +853,7 @@ const CorporateOrder = () => {
                                 handleViewInvoice(o.id);
                                 setOpenMenu(null);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed dark:text-slate-200 dark:hover:bg-slate-700"
                             >
                               {invoiceLoading.regenerate === o.id ? (
                                 <Loader2 size={12} className="animate-spin" />
@@ -864,7 +870,7 @@ const CorporateOrder = () => {
                                 handleRegenerateInvoice(o.id);
                                 setOpenMenu(null);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed dark:text-slate-200 dark:hover:bg-slate-700"
                             >
                               {invoiceLoading.regenerate === o.id ? (
                                 <Loader2 size={12} className="animate-spin" />
@@ -883,7 +889,7 @@ const CorporateOrder = () => {
                                 handleDownloadInvoice(o.id, o.orderId);
                                 setOpenMenu(null);
                               }}
-                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed dark:text-slate-200 dark:hover:bg-slate-700"
                             >
                               {invoiceLoading.download === o.id ? (
                                 <Loader2 size={12} className="animate-spin" />
@@ -921,8 +927,8 @@ const CorporateOrder = () => {
         </div>
 
         {/* PAGINATION — always pinned to the bottom of the card */}
-        <div className="shrink-0 border-t border-gray-100 px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+        <div className="shrink-0 border-t border-gray-100 px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 dark:border-slate-800">
+          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
             <span>
               {orders.length === 0
                 ? "No results"
@@ -937,7 +943,7 @@ const CorporateOrder = () => {
                   setPageSize(Number(e.target.value));
                   setPage(1);
                 }}
-                className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="cursor-pointer text-xs border border-gray-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -949,7 +955,7 @@ const CorporateOrder = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Page {page}</span>
+            <span className="text-xs text-gray-500 dark:text-slate-400">Page {page}</span>
 
             <PageButton
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -974,33 +980,33 @@ const CorporateOrder = () => {
       {hoveredOrder && (
         <div
           ref={popoverRef}
-          className="fixed z-50 w-80 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100"
+          className="fixed z-50 w-80 bg-white border border-gray-100 rounded-xl shadow-lg p-4 pointer-events-none transition-opacity duration-100 dark:bg-slate-900 dark:border-slate-700"
           style={
             popoverPos
               ? { top: popoverPos.top, left: popoverPos.left, opacity: 1 }
               : { top: 0, left: 0, opacity: 0 }
           }
         >
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 dark:text-slate-400">
             Company details
           </p>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
             {hoveredOrder.order.corpoAcc?.businessName}
           </p>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 mt-0.5 dark:text-slate-400">
             GST: {hoveredOrder.order.corpoAcc?.gstNo || "-"}
           </p>
-          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+          <p className="text-sm text-gray-600 mt-2 leading-relaxed dark:text-slate-300">
             Address:{" "}
             {hoveredOrder.order.corpoAcc?.address ||
               "No address details available"}
           </p>
           {hoveredOrder.order.orderDetails?.notes && (
             <>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-3 mb-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-3 mb-1 dark:text-slate-400">
                 Notes
               </p>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-gray-600 leading-relaxed dark:text-slate-300">
                 {hoveredOrder.order.orderDetails.notes}
               </p>
             </>
@@ -1017,7 +1023,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     disabled={disabled}
     title={label}
     aria-label={label}
-    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+    className="w-8 h-8 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
   >
     {children}
   </button>
@@ -1026,7 +1032,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 const StatusPill = ({ status, styles, dots }) => (
   <span
     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${
-      styles[status] || "bg-gray-100 text-gray-700"
+      styles[status] || "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300"
     }`}
   >
     <span
@@ -1037,12 +1043,12 @@ const StatusPill = ({ status, styles, dots }) => (
 );
 
 const EmptyState = ({ onCreate }) => (
-  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400">
-    <PackageSearch size={32} className="text-gray-300" />
-    <p className="text-sm font-medium text-gray-500">
+  <div className="flex flex-col items-center justify-center gap-2 py-16 text-gray-400 dark:text-slate-500">
+    <PackageSearch size={32} className="text-gray-300 dark:text-slate-600" />
+    <p className="text-sm font-medium text-gray-500 dark:text-slate-300">
       No corporate orders found
     </p>
-    <p className="text-xs text-gray-400">
+    <p className="text-xs text-gray-400 dark:text-slate-400">
       Try adjusting your search or filters
     </p>
     {onCreate && (

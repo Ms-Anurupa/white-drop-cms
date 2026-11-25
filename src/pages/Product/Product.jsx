@@ -33,7 +33,7 @@ const PRODUCT_STATUS_LABEL = {
 
 const PRODUCT_STATUS_DOT = {
   ACTIVE: "bg-emerald-500",
-  INACTIVE: "bg-gray-400",
+  INACTIVE: "bg-gray-400 dark:bg-slate-500",
   COMING_SOON: "bg-blue-500",
 };
 
@@ -169,14 +169,14 @@ const Product = () => {
   }
 
   return (
-    <div className="px-3 py-4 sm:px-5 lg:px-6 space-y-4 bg-gray-50 min-h-full text-[13px]">
+    <div className="px-3 py-4 sm:px-5 lg:px-6 space-y-4 bg-gray-50 dark:bg-slate-950 min-h-full text-[13px]">
       {/* ── HEADER ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900 tracking-tight leading-tight">
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100 tracking-tight leading-tight">
             Product Management
           </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
             Manage inventory, pricing &amp; availability
           </p>
         </div>
@@ -185,7 +185,7 @@ const Product = () => {
           <div className="relative w-full sm:w-60">
             <Search
               size={14}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
             <input
               value={search}
@@ -194,7 +194,7 @@ const Product = () => {
                 setPage(1);
               }}
               placeholder="Search products…"
-              className="w-full h-8 pl-8 pr-3 text-xs rounded-md bg-white border border-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
+              className="w-full h-8 pl-8 pr-3 text-xs rounded-md bg-white border border-gray-200 placeholder:text-gray-400 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
             />
           </div>
 
@@ -209,7 +209,7 @@ const Product = () => {
 
             <button
               onClick={handleExport}
-              className="flex-1 sm:flex-none cursor-pointer inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+              className="flex-1 sm:flex-none cursor-pointer inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-800 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
             >
               <Download size={14} />
               Export
@@ -224,41 +224,41 @@ const Product = () => {
         <StatCard
           label="In stock"
           value={inStock}
-          valueClass="text-emerald-600"
+          valueClass="text-emerald-600 dark:text-emerald-400"
           dotClass="bg-emerald-500"
         />
         <StatCard
           label="Out of stock"
           value={outOfStock}
-          valueClass="text-red-600"
+          valueClass="text-red-600 dark:text-red-400"
           dotClass="bg-red-500"
         />
       </div>
 
       {/* TABLE CARD — no inner scroll, the page itself scrolls */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
         {/* MOBILE VIEW */}
-        <div className="block sm:hidden divide-y divide-gray-100">
+        <div className="block sm:hidden divide-y divide-gray-100 dark:divide-slate-800">
           {paginated.length === 0 ? (
             <EmptyState />
           ) : (
             paginated.map((item, index) => (
-              <div key={item.product_id} className="p-3 hover:bg-slate-50">
+              <div key={item.product_id} className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                 <div className="flex justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] text-gray-400 shrink-0">
+                      <span className="text-[11px] text-gray-400 dark:text-slate-500 shrink-0">
                         #{start + index + 1}
                       </span>
-                      <h3 className="text-[13px] font-medium text-gray-900 truncate">
+                      <h3 className="text-[13px] font-medium text-gray-900 dark:text-slate-100 truncate">
                         {item.product_name}
                       </h3>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-0.5 truncate">
+                    <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 truncate">
                       {item.catch_phrase}
                     </p>
                     <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-[13px] text-gray-900">
+                      <span className="font-semibold text-[13px] text-gray-900 dark:text-slate-100">
                         ₹{item.variant?.price ?? item.price}
                       </span>
                       <StatusPill available={item.variant?.availability} />
@@ -270,7 +270,7 @@ const Product = () => {
                       fileName: item?.product_images?.[0],
                     })}
                     alt={item.product_name}
-                    className="w-12 h-12 rounded-md object-cover shrink-0 border border-gray-100"
+                    className="w-12 h-12 rounded-md object-cover shrink-0 border border-gray-100 dark:border-slate-800"
                   />
                 </div>
 
@@ -281,14 +281,14 @@ const Product = () => {
                         `/dashboard/product/editProduct/${item.product_id}`,
                       )
                     }
-                    className="flex-1 h-8 text-xs font-medium rounded-md border border-gray-200 hover:bg-gray-50 inline-flex items-center justify-center gap-1.5"
+                    className="flex-1 h-8 text-xs font-medium rounded-md border border-gray-200 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 inline-flex items-center justify-center gap-1.5"
                   >
                     <Pencil size={12} />
                     Edit
                   </button>
                   <button
                     onClick={() => handleHardDelete(item.product_id)}
-                    className="flex-1 h-8 text-xs font-medium rounded-md border border-red-100 text-red-600 hover:bg-red-50 inline-flex items-center justify-center gap-1.5"
+                    className="flex-1 h-8 text-xs font-medium rounded-md border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/60 inline-flex items-center justify-center gap-1.5"
                   >
                     <Trash2 size={12} />
                     Delete
@@ -315,7 +315,7 @@ const Product = () => {
             </colgroup>
 
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
+              <tr className="bg-gray-50 dark:bg-slate-800/70 border-b border-gray-200 dark:border-slate-800">
                 {[
                   { label: "Sl No.", cls: "" },
                   { label: "Name", cls: "" },
@@ -329,7 +329,7 @@ const Product = () => {
                 ].map((h) => (
                   <th
                     key={h.label}
-                    className={`px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap ${h.cls}`}
+                    className={`px-3 py-2 text-left text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap ${h.cls}`}
                   >
                     {h.label}
                   </th>
@@ -337,7 +337,7 @@ const Product = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
               {paginated?.length === 0 ? (
                 <tr>
                   <td colSpan={9}>
@@ -348,21 +348,21 @@ const Product = () => {
                 paginated.map((item, index) => (
                   <tr
                     key={item.product_id}
-                    className="hover:bg-slate-50 transition-colors"
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
                   >
-                    <td className="px-3 py-1.5 text-gray-400 tabular-nums">
+                    <td className="px-3 py-1.5 text-gray-400 dark:text-slate-500 tabular-nums">
                       {start + index + 1}
                     </td>
 
                     <td
-                      className="px-3 py-1.5 font-medium text-gray-900 truncate"
+                      className="px-3 py-1.5 font-medium text-gray-900 dark:text-slate-100 truncate"
                       title={item.product_name}
                     >
                       {item.product_name}
                     </td>
 
                     <td
-                      className="hidden md:table-cell px-3 py-1.5 text-gray-500 truncate"
+                      className="hidden md:table-cell px-3 py-1.5 text-gray-500 dark:text-slate-400 truncate"
                       title={item.catch_phrase}
                     >
                       {item.catch_phrase}
@@ -375,11 +375,11 @@ const Product = () => {
                           fileName: item?.product_images?.[0],
                         })}
                         alt={item.product_name}
-                        className="w-9 h-9 rounded-md object-cover border border-gray-100"
+                        className="w-9 h-9 rounded-md object-cover border border-gray-100 dark:border-slate-800"
                       />
                     </td>
 
-                    <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap tabular-nums">
+                    <td className="px-3 py-1.5 font-medium text-gray-900 dark:text-slate-100 whitespace-nowrap tabular-nums">
                       ₹{item.variant?.price ?? "-"}
                     </td>
 
@@ -387,7 +387,7 @@ const Product = () => {
                       <StatusPill available={item.variant?.availability} />
                     </td>
 
-                    <td className="hidden md:table-cell px-3 py-1.5 text-gray-500 whitespace-nowrap">
+                    <td className="hidden md:table-cell px-3 py-1.5 text-gray-500 dark:text-slate-400 whitespace-nowrap">
                       {item.variant?.unit ?? "-"}
                     </td>
 
@@ -410,7 +410,7 @@ const Product = () => {
                               `/dashboard/product/editProduct/${item.product_id}`,
                             )
                           }
-                          className="p-1.5 cursor-pointer rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
+                          className="p-1.5 cursor-pointer rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 transition"
                         >
                           <Pencil size={13} />
                         </button>
@@ -419,7 +419,7 @@ const Product = () => {
                           title="Delete product"
                           aria-label="Delete product"
                           onClick={() => handleHardDelete(item.product_id)}
-                          className="p-1.5 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50 transition"
+                          className="p-1.5 cursor-pointer rounded-md border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-900/60 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-950/60 transition"
                         >
                           <Trash2 size={13} />
                         </button>
@@ -433,8 +433,8 @@ const Product = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="border-t border-gray-200 bg-gray-50/50 px-3 sm:px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-3 text-[11px] text-gray-500">
+        <div className="border-t border-gray-200 bg-gray-50/50 dark:border-slate-800 dark:bg-slate-800/50 px-3 sm:px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-slate-400">
             <span>
               {filtered.length === 0
                 ? "No results"
@@ -452,7 +452,7 @@ const Product = () => {
                   setPageSize(Number(e.target.value));
                   setPage(1);
                 }}
-                className="cursor-pointer text-[11px] border border-gray-200 rounded-md px-1.5 py-0.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="cursor-pointer text-[11px] border border-gray-200 rounded-md px-1.5 py-0.5 bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -490,7 +490,7 @@ const Product = () => {
                     className={`min-w-7 h-7 px-1 cursor-pointer rounded-md text-[11px] font-medium transition ${
                       p === currentPage
                         ? "bg-blue-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     }`}
                   >
                     {p}
@@ -498,7 +498,7 @@ const Product = () => {
                 ) : (
                   <span
                     key={`${p}-${i}`}
-                    className="w-7 h-7 flex items-center justify-center text-gray-300 text-[11px]"
+                    className="w-7 h-7 flex items-center justify-center text-gray-300 dark:text-slate-600 text-[11px]"
                   >
                     …
                   </span>
@@ -534,7 +534,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     disabled={disabled}
     title={label}
     aria-label={label}
-    className="w-7 h-7 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+    className="w-7 h-7 cursor-pointer rounded-md border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
   >
     {children}
   </button>
@@ -543,7 +543,9 @@ const PageButton = ({ children, onClick, disabled, label }) => (
 const StatusPill = ({ available }) => (
   <span
     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${
-      available ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"
+      available
+        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+        : "bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300"
     }`}
   >
     <span
@@ -556,22 +558,22 @@ const StatusPill = ({ available }) => (
 );
 
 const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center gap-1.5 py-10 text-gray-400">
-    <PackageSearch size={28} className="text-gray-300" />
-    <p className="text-[13px] font-medium text-gray-500">No products found</p>
-    <p className="text-[11px] text-gray-400">
+  <div className="flex flex-col items-center justify-center gap-1.5 py-10 text-gray-400 dark:text-slate-500">
+    <PackageSearch size={28} className="text-gray-300 dark:text-slate-600" />
+    <p className="text-[13px] font-medium text-gray-500 dark:text-slate-400">No products found</p>
+    <p className="text-[11px] text-gray-400 dark:text-slate-500">
       Try adjusting your search or add a new product
     </p>
   </div>
 );
 
-const StatCard = ({ label, value, valueClass = "text-gray-900", dotClass }) => (
-  <div className="bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm flex items-center justify-between gap-3">
+const StatCard = ({ label, value, valueClass = "text-gray-900 dark:text-slate-100", dotClass }) => (
+  <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg px-4 py-2.5 shadow-sm flex items-center justify-between gap-3">
     <div className="flex items-center gap-2 min-w-0">
       {dotClass && (
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotClass}`} />
       )}
-      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide truncate">
+      <p className="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide truncate">
         {label}
       </p>
     </div>
@@ -606,7 +608,7 @@ const ProductStatusSelect = ({
                   />
                   <span>{PRODUCT_STATUS_LABEL[s]}</span>
                 </div>
-                {current === s && <span className="text-blue-600">✓</span>}
+                {current === s && <span className="text-blue-600 dark:text-blue-400">✓</span>}
               </div>
             </SplitButtonItem>
           ))}

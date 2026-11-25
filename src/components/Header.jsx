@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell } from "lucide-react";
 import authStore from "../zustand/Store/authStore";
 import NotificationSidebar, { NotificationBell } from "./NotificationSideBar";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = ({ onLogOut }) => {
   const [open, setOpen] = useState(false);
@@ -33,7 +33,11 @@ const Header = ({ onLogOut }) => {
           h-14
           w-full
           bg-white
-          shadow
+          dark:bg-slate-900
+          border-b
+          border-slate-200/70
+          dark:border-slate-800
+          shadow-sm
           px-3
           sm:px-4
           md:px-6
@@ -42,12 +46,13 @@ const Header = ({ onLogOut }) => {
           justify-between
           relative
           z-40
+          transition-colors
         "
       >
         {/* Title */}
         <div className="min-w-0 flex-1">
           {/* 
-          <h2 className="text-base sm:text-lg font-semibold text-gray-700 truncate">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-slate-200 truncate">
             CMS Dashboard
           </h2> 
           */}
@@ -66,7 +71,8 @@ const Header = ({ onLogOut }) => {
             relative
           "
         >
-          <NotificationBell/>
+          <ThemeToggle />
+          <NotificationBell />
 
           {/* User Info */}
           <div
@@ -84,6 +90,7 @@ const Header = ({ onLogOut }) => {
                 text-sm
                 font-medium
                 text-gray-700
+                dark:text-slate-200
                 truncate
               "
               title={fullName}
@@ -95,6 +102,7 @@ const Header = ({ onLogOut }) => {
               className="
                 text-xs
                 text-gray-400
+                dark:text-slate-400
                 truncate
               "
               title={user?.email}
@@ -119,15 +127,18 @@ const Header = ({ onLogOut }) => {
                 sm:h-9
                 rounded-full
                 bg-blue-100
+                dark:bg-blue-950/70
                 flex
                 items-center
                 justify-center
                 text-blue-700
+                dark:text-blue-300
                 font-semibold
                 text-sm
                 select-none
                 cursor-pointer
                 hover:bg-blue-200
+                dark:hover:bg-blue-900/70
                 transition
                 focus:outline-none
               "
@@ -146,8 +157,10 @@ const Header = ({ onLogOut }) => {
                   w-36
                   sm:w-40
                   bg-white
+                  dark:bg-slate-900
                   border
                   border-gray-100
+                  dark:border-slate-800
                   rounded-lg
                   shadow-lg
                   overflow-hidden
@@ -166,7 +179,9 @@ const Header = ({ onLogOut }) => {
                     py-2.5
                     text-sm
                     text-red-600
+                    dark:text-red-400
                     hover:bg-red-50
+                    dark:hover:bg-red-950/40
                     transition
                   "
                 >

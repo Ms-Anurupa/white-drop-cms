@@ -51,13 +51,13 @@ const DashboardAnalytics = () => {
 
   return (
     <div
-      className="flex min-h-screen flex-col overflow-x-hidden bg-[#F4F5F7] text-[12px] text-[#101828]"
+      className="flex min-h-screen flex-col overflow-x-hidden bg-[#F4F5F7] text-[12px] text-[#101828] dark:bg-slate-950 dark:text-slate-100"
       style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap');
         @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}`}</style>
 
-      <header className="z-40 border-b border-[#E6E8EC] bg-white">
+      <header className="z-40 border-b border-[#E6E8EC] bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-2.5 md:px-6">
           {/* Top Tabs: Product (default), Expenses, Orders, Customers */}
           <nav
@@ -76,7 +76,7 @@ const DashboardAnalytics = () => {
                   className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-bold transition-all ${
                     isActive
                       ? "text-white shadow-sm"
-                      : "bg-[#F4F5F7] text-slate-600 hover:bg-slate-200/70 hover:text-[#101828]"
+                      : "bg-[#F4F5F7] text-slate-600 hover:bg-slate-200/70 hover:text-[#101828] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                   }`}
                   style={isActive ? { background: t.hue } : undefined}
                 >
@@ -87,7 +87,7 @@ const DashboardAnalytics = () => {
                       className={`ml-0.5 rounded px-1.5 py-px text-[10px] font-semibold ${
                         isActive
                           ? "bg-white/20 text-white"
-                          : "bg-white text-slate-500"
+                          : "bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-400"
                       }`}
                     >
                       {t.badge}
@@ -99,16 +99,16 @@ const DashboardAnalytics = () => {
           </nav>
 
           <div className="flex items-center gap-2">
-            <label className="hidden w-60 items-center gap-2 rounded-lg bg-[#F4F5F7] px-2.5 py-1.5 text-slate-500 focus-within:ring-2 focus-within:ring-slate-900 sm:flex">
+            <label className="hidden w-60 items-center gap-2 rounded-lg bg-[#F4F5F7] px-2.5 py-1.5 text-slate-500 focus-within:ring-2 focus-within:ring-slate-900 dark:bg-slate-800 dark:text-slate-400 dark:focus-within:ring-slate-500 sm:flex">
               <Search size={14} />
               <input
-                className="w-full bg-transparent outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                 placeholder="Search"
               />
             </label>
             <button
               aria-label="Notifications"
-              className="relative grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#F4F5F7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900"
+              className="relative grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#F4F5F7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:outline-slate-400"
             >
               <Bell size={15} />
               <i className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-rose-500" />

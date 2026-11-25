@@ -158,16 +158,16 @@ export default function LocationTracker() {
   if (!deliveryPartnerId) {
     return (
       <div className="p-4 md:p-6">
-        <div className="rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
-            <Truck size={22} className="text-red-500" />
+        <div className="rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm dark:border-red-900/60 dark:bg-slate-900">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/60">
+            <Truck size={22} className="text-red-500 dark:text-red-400" />
           </div>
 
-          <h3 className="text-base font-semibold text-slate-900">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
             Delivery partner not found
           </h3>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             No delivery partner ID was provided for tracking.
           </p>
         </div>
@@ -178,14 +178,14 @@ export default function LocationTracker() {
   if (loading) {
     return (
       <div className="p-4 md:p-6">
-        <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700" />
+        <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700 dark:border-slate-700 dark:border-t-slate-200" />
 
-          <p className="text-sm font-medium text-slate-700">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
             Loading delivery tracking...
           </p>
 
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
             Fetching assigned delivery jobs and orders
           </p>
         </div>
@@ -194,42 +194,42 @@ export default function LocationTracker() {
   }
 
   return (
-    <div className="min-h-full bg-slate-50 p-4 md:p-6">
+    <div className="min-h-full bg-slate-50 p-4 md:p-6 dark:bg-slate-950">
       <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           {/* Left - Back */}
           <button
             onClick={() => navigate(-1)}
-            className="flex mb-2 cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition"
+            className="flex mb-2 cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition dark:text-slate-400 dark:hover:text-slate-100"
           >
             <ArrowLeft size={18} />
             <span>Back</span>
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-slate-800">
               <Navigation size={17} className="text-white" />
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
                 Live Tracking
               </h2>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Delivery partner location & assigned orders
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <span
             className={`h-2.5 w-2.5 rounded-full ${
-              driverLocation ? "animate-pulse bg-emerald-500" : "bg-slate-300"
+              driverLocation ? "animate-pulse bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
             }`}
           />
 
-          <span className="text-xs font-medium text-slate-600">
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
             {driverLocation ? "Live signal active" : "Waiting for GPS"}
           </span>
         </div>
@@ -242,33 +242,33 @@ export default function LocationTracker() {
 
       <div className="mt-4">
         {driverLocation ? (
-          <div className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50">
-              <Navigation size={17} className="text-emerald-600" />
+          <div className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm dark:border-emerald-900/60 dark:bg-slate-900">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950/60">
+              <Navigation size={17} className="text-emerald-600 dark:text-emerald-400" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Live location active
               </p>
 
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 The delivery partner's location is being updated in real time.
               </p>
             </div>
           </div>
         ) : (
-          <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100">
-              <Clock3 size={17} className="text-slate-500" />
+          <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <Clock3 size={17} className="text-slate-500 dark:text-slate-400" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Waiting for GPS signal
               </p>
 
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                 The map will update automatically when the driver's device sends
                 its location.
               </p>
@@ -278,16 +278,16 @@ export default function LocationTracker() {
       </div>
 
       {uniqueDeliveryOrders.length === 0 && (
-        <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
-            <Package size={19} className="text-slate-500" />
+        <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+            <Package size={19} className="text-slate-500 dark:text-slate-400" />
           </div>
 
-          <p className="text-sm font-semibold text-slate-800">
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             No assigned orders
           </p>
 
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             This delivery partner currently has no orders assigned to their
             delivery jobs.
           </p>

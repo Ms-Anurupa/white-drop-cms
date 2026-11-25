@@ -173,15 +173,15 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
   return (
     <div className="space-y-8">
       {/* ================= 1. CUSTOMER & ADDRESS ================= */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-        <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-          <Search size={18} className="text-blue-600" /> Customer Details
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5 dark:bg-slate-900 dark:border-slate-800">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+          <Search size={18} className="text-blue-600 dark:text-blue-400" /> Customer Details
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* User Search Dropdown */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
               Select Customer
             </label>
             <input
@@ -199,11 +199,11 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
               }}
               onFocus={() => setIsUserDropdownOpen(true)}
               placeholder="Search by name or phone..."
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
 
             {isUserDropdownOpen && userSearchTerm && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
                 {userOptions.length > 0 ? (
                   userOptions.map((user) => (
                     <div
@@ -213,16 +213,16 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                         setUserSearchTerm("");
                         setIsUserDropdownOpen(false);
                       }}
-                      className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-50 last:border-0"
+                      className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-50 last:border-0 dark:hover:bg-slate-700/60 dark:border-slate-700/70"
                     >
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 dark:text-slate-100">
                         {user.customer_name || "Unknown"}
                       </p>
-                      <p className="text-xs text-gray-500">{user.phone_num}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">{user.phone_num}</p>
                     </div>
                   ))
                 ) : (
-                  <div className="px-4 py-3 text-sm text-gray-500">
+                  <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">
                     No customers found.
                   </div>
                 )}
@@ -232,7 +232,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
 
           {/* Address Dropdown */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
               Delivery Address
             </label>
             <div className="flex gap-2">
@@ -240,7 +240,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                 disabled={!selectedUser}
                 value={selectedAddressId}
                 onChange={(e) => setSelectedAddressId(e.target.value)}
-                className="flex-1 px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:bg-gray-50 disabled:text-gray-400 cursor-pointer"
+                className="flex-1 px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:bg-gray-50 disabled:text-gray-400 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-500"
               >
                 <option value="">Select saved address...</option>
                 {selectedUser?.userAddresses?.map((addr) => (
@@ -255,7 +255,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                 disabled={!selectedUser}
                 onClick={() => setIsAddressModalOpen(true)}
                 title="Add New Address"
-                className="px-3 py-2.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                className="px-3 py-2.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 dark:hover:bg-blue-900/60"
               >
                 <Plus size={18} />
               </button>
@@ -265,17 +265,17 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
       </div>
 
       {/* ================= 2. DELIVERY DETAILS ================= */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-        <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-          <Clock size={18} className="text-blue-600" /> Delivery Settings
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5 dark:bg-slate-900 dark:border-slate-800">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+          <Clock size={18} className="text-blue-600 dark:text-blue-400" /> Delivery Settings
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Only show Date Picker if Mode is Order */}
           {mode === "order" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                <Calendar size={14} className="text-gray-400" /> Delivery Date
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <Calendar size={14} className="text-gray-400 dark:text-slate-500" /> Delivery Date
               </label>
               <input
                 type="date"
@@ -283,19 +283,19 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                 onChange={(e) => setSelectedDate(e.target.value)}
                 onClick={(e) => e.target.showPicker && e.target.showPicker()} // Opens picker when clicking anywhere on the input
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
               Delivery Slot
             </label>
             <select
               value={selectedSlotId}
               onChange={(e) => setSelectedSlotId(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
             >
               <option value="">Select a time slot...</option>
               {deliverySlots?.map((slot) => (
@@ -309,15 +309,15 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
       </div>
 
       {/* ================= 3. PRODUCT CART ================= */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-        <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-          <ShoppingCart size={18} className="text-blue-600" /> Build Cart
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5 dark:bg-slate-900 dark:border-slate-800">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+          <ShoppingCart size={18} className="text-blue-600 dark:text-blue-400" /> Build Cart
         </h2>
 
         {/* Product Selection Row */}
         <div className="flex flex-col md:flex-row gap-3 items-end">
           <div className="flex-1 w-full relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
               Search Product
             </label>
             <input
@@ -329,10 +329,10 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                 setSelectedVariant("");
               }}
               placeholder="Type to search products..."
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
             {productSearchTerm && !selectedProduct && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
                 {filteredProducts.map((p) => (
                   <div
                     key={p.product_id}
@@ -343,7 +343,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                       if (p.variants?.length === 1)
                         setSelectedVariant(p.variants[0].product_item_id);
                     }}
-                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-50"
+                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-50 dark:text-slate-100 dark:hover:bg-slate-700/60 dark:border-slate-700/70"
                   >
                     {p.product_name}
                   </div>
@@ -353,14 +353,14 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
           </div>
 
           <div className="flex-1 w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
               Select Variant
             </label>
             <select
               disabled={!selectedProduct}
               value={selectedVariant}
               onChange={(e) => setSelectedVariant(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:bg-gray-50 cursor-pointer"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:bg-gray-50 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-500"
             >
               <option value="">Choose variant...</option>
               {activeProduct?.variants?.map((v) => (
@@ -375,7 +375,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
             type="button"
             disabled={!selectedVariant}
             onClick={handleAddToCart}
-            className="w-full md:w-auto px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition cursor-pointer"
+            className="w-full md:w-auto px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition cursor-pointer dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
           >
             Add Item
           </button>
@@ -383,9 +383,9 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
 
         {/* Local Cart Table */}
         {cart.length > 0 && (
-          <div className="mt-6 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="mt-6 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 border-b border-gray-200 text-gray-500">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-500 dark:bg-slate-800/70 dark:border-slate-700 dark:text-slate-400">
                 <tr>
                   <th className="px-4 py-3 font-medium">Product</th>
                   <th className="px-4 py-3 font-medium">Variant</th>
@@ -396,30 +396,30 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                 {cart.map((c) => (
-                  <tr key={c.item.variant_id} className="bg-white">
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                  <tr key={c.item.variant_id} className="bg-white dark:bg-slate-900">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">
                       {c.item.product_name}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600 dark:text-slate-300">
                       {c.item.variant_name}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">₹{c.item.price}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-slate-300">₹{c.item.price}</td>
                     <td className="px-4 py-3">
-                      <div className="inline-flex items-center border border-gray-200 rounded-md bg-white shadow-sm">
+                      <div className="inline-flex items-center border border-gray-200 rounded-md bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
                         <button
                           type="button"
                           onClick={() =>
                             updateCartQty(c.item.variant_id, c.qty - 1)
                           }
                           disabled={c.qty <= 1}
-                          className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors rounded-l-md cursor-pointer"
+                          className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors rounded-l-md cursor-pointer dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                         >
                           <Minus size={14} />
                         </button>
 
-                        <span className="w-8 text-center text-sm font-medium text-gray-900 border-x border-gray-200 py-1">
+                        <span className="w-8 text-center text-sm font-medium text-gray-900 border-x border-gray-200 py-1 dark:text-slate-100 dark:border-slate-700">
                           {c.qty}
                         </span>
 
@@ -428,7 +428,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                           onClick={() =>
                             updateCartQty(c.item.variant_id, c.qty + 1)
                           }
-                          className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-r-md cursor-pointer"
+                          className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-r-md cursor-pointer dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                         >
                           <Plus size={14} />
                         </button>
@@ -437,7 +437,7 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => removeCartItem(c.item.variant_id)}
-                        className="text-red-400 hover:text-red-600 transition cursor-pointer"
+                        className="text-red-400 hover:text-red-600 dark:hover:text-red-300 transition cursor-pointer"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -448,14 +448,14 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
             </table>
 
             {/* Cart Total Summary */}
-            <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 flex justify-end gap-6 text-sm">
-              <span className="text-gray-500">
+            <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 flex justify-end gap-6 text-sm dark:bg-slate-800/70 dark:border-slate-700">
+              <span className="text-gray-500 dark:text-slate-400">
                 Total Items:{" "}
-                <strong className="text-gray-900">{cart.length}</strong>
+                <strong className="text-gray-900 dark:text-slate-100">{cart.length}</strong>
               </span>
-              <span className="text-gray-500">
+              <span className="text-gray-500 dark:text-slate-400">
                 Est. Total:{" "}
-                <strong className="text-gray-900">
+                <strong className="text-gray-900 dark:text-slate-100">
                   ₹{cart.reduce((acc, c) => acc + c.item.price * c.qty, 0)}
                 </strong>
               </span>
@@ -466,16 +466,16 @@ const OfflineSelectionBlock = ({ mode = "order", onChange }) => {
 
       {/* ================= 4. ADDRESS MODAL ================= */}
       {isAddressModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative dark:bg-slate-900 dark:border dark:border-slate-800">
             <button
               onClick={() => setIsAddressModalOpen(false)}
-              className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600 transition z-10"
+              className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600 transition z-10 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300"
             >
               <X size={18} />
             </button>
             <div className="p-6 pt-10">
-              <h2 className="text-xl font-semibold mb-6">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-slate-100">
                 Add New Address for {selectedUser?.customer_name}
               </h2>
               <OfflineAddressForm

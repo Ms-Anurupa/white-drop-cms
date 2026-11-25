@@ -10,19 +10,19 @@ const OfferHeader = () => {
     };
 
     return (
-        <div className="relative mb-6 overflow-hidden rounded-2xl border border-[#E5E7F0] bg-white">
-            <div className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#6655DF]/8 blur-[80px]" />
-            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#14B8A6]/8 blur-[90px]" />
+        <div className="relative mb-6 overflow-hidden rounded-2xl border border-[#E5E7F0] bg-white dark:border-slate-800 dark:bg-slate-900">
+            <div className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#6655DF]/8 blur-[80px] dark:bg-[#6655DF]/20" />
+            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#14B8A6]/8 blur-[90px] dark:bg-[#14B8A6]/15" />
 
             <div className="relative flex flex-col gap-5 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <div className="mb-2.5 flex items-center gap-2">
                         <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#059669] opacity-60" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#059669]" />
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#059669] opacity-60 dark:bg-emerald-400" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#059669] dark:bg-emerald-400" />
                         </span>
                         <span
-                            className="text-[9px] font-medium uppercase tracking-[0.18em] text-[#5C6480]"
+                            className="text-[9px] font-medium uppercase tracking-[0.18em] text-[#5C6480] dark:text-slate-400"
                             style={{ fontFamily: "'JetBrains Mono', monospace" }}
                         >
                             Control Deck · Live
@@ -30,13 +30,13 @@ const OfferHeader = () => {
                     </div>
 
                     <h1
-                        className="text-[26px] font-semibold leading-tight tracking-tight text-[#12151F]"
+                        className="text-[26px] font-semibold leading-tight tracking-tight text-[#12151F] dark:text-slate-100"
                         style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     >
                         Offer Engine
                     </h1>
 
-                    <p className="mt-1.5 text-[12px] text-[#5C6480]">
+                    <p className="mt-1.5 text-[12px] text-[#5C6480] dark:text-slate-400">
                         Configure and monitor every live promotion rule in real time
                     </p>
                 </div>

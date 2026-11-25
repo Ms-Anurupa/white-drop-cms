@@ -9,17 +9,17 @@ import { ArrowLeft, ImagePlus, Plus, Trash2, X } from "lucide-react";
 /* ---------- UI-only helpers (no business logic) ---------- */
 
 const inputClass =
-  "w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition hover:border-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-600/15";
+  "w-full h-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-600 dark:focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-600/15 dark:focus:ring-indigo-500/20";
 
-const labelClass = "mb-1.5 block text-sm font-medium text-slate-700";
+const labelClass = "mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300";
 
 const Card = ({ title, subtitle, action, children }) => (
-  <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-    <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
+  <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 dark:border-slate-800 px-6 py-4">
       <div>
-        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
         {subtitle && (
-          <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
         )}
       </div>
       {action}
@@ -226,7 +226,7 @@ const EditProduct = () => {
 
   const addImageTile = (large) => (
     <label
-      className={`group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 transition hover:border-indigo-500 hover:bg-indigo-50/60 hover:text-indigo-700 focus-within:ring-4 focus-within:ring-indigo-600/15 ${
+      className={`group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 transition hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 hover:text-indigo-700 dark:hover:text-indigo-300 focus-within:ring-4 focus-within:ring-indigo-600/15 ${
         large ? "col-span-full h-44" : "aspect-square"
       }`}
     >
@@ -235,7 +235,7 @@ const EditProduct = () => {
         {large ? "Upload product images" : "Add"}
       </span>
       {large && (
-        <span className="text-xs text-slate-400 group-hover:text-indigo-500">
+        <span className="text-xs text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400">
           PNG, JPG or WEBP · select multiple at once
         </span>
       )}
@@ -250,22 +250,22 @@ const EditProduct = () => {
   );
 
   return (
-    <div className="min-h-[calc(100vh-64px)] w-full bg-slate-50">
+    <div className="min-h-[calc(100vh-64px)] w-full bg-slate-50 dark:bg-slate-950">
       {/* PAGE HEADER */}
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => navigate("/dashboard/product")}
               aria-label="Back to products"
-              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
             >
               <ArrowLeft size={18} />
             </button>
             <div className="min-w-0">
-              <p className="text-xs text-slate-500">Products / Edit</p>
-              <h1 className="truncate text-lg font-semibold leading-tight text-slate-900">
+              <p className="text-xs text-slate-500 dark:text-slate-400">Products / Edit</p>
+              <h1 className="truncate text-lg font-semibold leading-tight text-slate-900 dark:text-slate-100">
                 {productList.product_name || "Edit product"}
               </h1>
             </div>
@@ -275,7 +275,7 @@ const EditProduct = () => {
             <button
               type="button"
               onClick={() => navigate("/dashboard/product")}
-              className="h-9 cursor-pointer rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+              className="h-9 cursor-pointer rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
             >
               Cancel
             </button>
@@ -309,7 +309,7 @@ const EditProduct = () => {
               {productList.images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="group relative aspect-square w-full min-w-[100px] max-w-[160px] overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                  className="group relative aspect-square w-full min-w-[100px] max-w-[160px] overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
                 >
                   <img
                     src={
@@ -345,7 +345,7 @@ const EditProduct = () => {
                         images: prev.images.filter((_, i) => i !== idx),
                       }))
                     }
-                    className="absolute right-2 top-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white text-slate-700 opacity-100 shadow ring-1 ring-slate-200 transition hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                    className="absolute right-2 top-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 opacity-100 shadow ring-1 ring-slate-200 dark:ring-slate-700 transition hover:bg-red-50 dark:hover:bg-red-950/60 hover:text-red-600 dark:hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                   >
                     <X size={15} />
                   </button>
@@ -353,7 +353,7 @@ const EditProduct = () => {
               ))}
 
               {/* Add Image Tile */}
-              <label className="flex aspect-square w-full min-w-[100px] max-w-[160px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 transition hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600">
+              <label className="flex aspect-square w-full min-w-[100px] max-w-[160px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 transition hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-300">
                 <ImagePlus size={22} />
                 <span className="mt-1 text-xs font-medium">Add Image</span>
 
@@ -406,7 +406,7 @@ const EditProduct = () => {
                   value={productList.product_description}
                   onChange={handleChange}
                   placeholder="Fresh and pure milk collected from local farms..."
-                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition hover:border-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-600/15"
+                  className="w-full resize-y rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm transition hover:border-slate-400 dark:hover:border-slate-600 focus:border-indigo-600 dark:focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-600/15 dark:focus:ring-indigo-500/20"
                 />
               </Field>
             </div>
@@ -421,7 +421,7 @@ const EditProduct = () => {
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+              className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 px-3 text-sm font-medium text-indigo-700 dark:text-indigo-300 transition hover:bg-indigo-100 dark:hover:bg-indigo-900/60 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
             >
               <Plus size={16} />
               Add variant
@@ -429,11 +429,11 @@ const EditProduct = () => {
           }
         >
           {productList.variants.length === 0 ? (
-            <div className="rounded-xl border-2 border-dashed border-slate-200 px-4 py-10 text-center">
-              <p className="text-sm font-medium text-slate-700">
+            <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 px-4 py-10 text-center">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 No variants yet
               </p>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Add a variant to set a price and stock for this product.
               </p>
             </div>
@@ -442,22 +442,22 @@ const EditProduct = () => {
               {productList.variants.map((variant, index) => (
                 <fieldset
                   key={index}
-                  className="overflow-hidden rounded-xl border border-slate-200"
+                  className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700"
                 >
                   {/* Variant header */}
-                  <div className="flex items-center justify-between gap-3 bg-slate-50 px-4 py-3">
+                  <div className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/70 px-4 py-3">
                     <div className="flex min-w-0 items-center gap-2.5">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white dark:bg-slate-900 text-xs font-semibold text-slate-600 dark:text-slate-300 ring-1 ring-slate-200 dark:ring-slate-700">
                         {index + 1}
                       </span>
-                      <span className="truncate text-sm font-semibold text-slate-900">
+                      <span className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {variant.variant_name || "Untitled variant"}
                       </span>
                       <span
                         className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                           variant.availability
-                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800"
+                            : "bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
                         }`}
                       >
                         {variant.availability ? "In stock" : "Out of stock"}
@@ -468,7 +468,7 @@ const EditProduct = () => {
                       <button
                         type="button"
                         onClick={() => removeVariant(index)}
-                        className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
+                        className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 transition hover:bg-red-50 dark:hover:bg-red-950/60 hover:text-red-600 dark:hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
                       >
                         <Trash2 size={15} />
                         Remove
@@ -533,7 +533,7 @@ const EditProduct = () => {
                       </Field>
                     </div>
 
-                    <div className="border-t border-dashed border-slate-200" />
+                    <div className="border-t border-dashed border-slate-200 dark:border-slate-700" />
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       <Field id={`v${index}-sku`} label="SKU">
@@ -550,7 +550,7 @@ const EditProduct = () => {
 
                       <Field id={`v${index}-price`} label="Price">
                         <div className="relative">
-                          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500">
+                          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500 dark:text-slate-400">
                             ₹
                           </span>
                           <input
@@ -602,7 +602,7 @@ const EditProduct = () => {
           <button
             type="button"
             onClick={() => navigate("/dashboard/product")}
-            className="h-10 cursor-pointer rounded-lg border border-slate-300 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
+            className="h-10 cursor-pointer rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-600/20"
           >
             Cancel
           </button>

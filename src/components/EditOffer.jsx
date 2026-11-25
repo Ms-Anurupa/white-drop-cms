@@ -414,8 +414,8 @@ const EditOffer = () => {
 
     if (fetching) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#f8fafc]">
-                <div className="flex items-center gap-2 text-[11px] text-slate-400">
+            <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] dark:bg-slate-950">
+                <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-400">
                     <Loader2 size={14} className="animate-spin" />
                     Loading offer...
                 </div>
@@ -425,9 +425,9 @@ const EditOffer = () => {
 
     if (fetchError) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#f8fafc]">
+            <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] dark:bg-slate-950">
                 <div className="text-center">
-                    <p className="text-[11px] text-red-500">{fetchError}</p>
+                    <p className="text-[11px] text-red-500 dark:text-red-400">{fetchError}</p>
 
                     <button
                         type="button"
@@ -446,32 +446,32 @@ const EditOffer = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f8fafc]">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950">
             {/* HEADER */}
 
-            <div className="border-b border-slate-200 bg-white">
+            <div className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <div className="mx-auto flex h-[58px] max-w-[1400px] items-center justify-between px-5">
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
                             onClick={handleBack}
-                            className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+                            className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 transition hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200"
                         >
                             <ArrowLeft size={15} />
                         </button>
 
                         <div>
                             <div className="flex items-center gap-2">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-cyan-50 text-cyan-600">
+                                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400">
                                     ✦
                                 </div>
 
-                                <h1 className="text-[15px] font-semibold text-slate-800">
+                                <h1 className="text-[15px] font-semibold text-slate-800 dark:text-slate-100">
                                     Edit offer
                                 </h1>
                             </div>
 
-                            <p className="ml-9 text-[9px] text-slate-500">
+                            <p className="ml-9 text-[9px] text-slate-500 dark:text-slate-400">
                                 Update your offer configuration
                             </p>
                         </div>
@@ -483,8 +483,8 @@ const EditOffer = () => {
 
             <div className="mx-auto max-w-[1400px] px-5 py-5">
                 {updateError && (
-                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                        <p className="text-[10px] text-red-600">{updateError}</p>
+                    <div className="mb-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/60 px-4 py-3">
+                        <p className="text-[10px] text-red-600 dark:text-red-300">{updateError}</p>
                     </div>
                 )}
 
@@ -496,13 +496,13 @@ const EditOffer = () => {
                         LEFT
                     ================================================= */}
 
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-                        <div className="border-b border-slate-100 px-5 py-4">
-                            <h2 className="text-[12px] font-semibold text-slate-700">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                        <div className="border-b border-slate-100 dark:border-slate-800 px-5 py-4">
+                            <h2 className="text-[12px] font-semibold text-slate-700 dark:text-slate-200">
                                 Offer Basics
                             </h2>
 
-                            <p className="mt-1 text-[9px] text-slate-400">
+                            <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-400">
                                 Update the basic information for your offer.
                             </p>
                         </div>
@@ -511,7 +511,7 @@ const EditOffer = () => {
                             {/* TITLE */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Title <span className="text-red-500">*</span>
                                 </label>
 
@@ -521,12 +521,12 @@ const EditOffer = () => {
                                     value={formData.offerLabel}
                                     onChange={handleChange}
                                     placeholder="e.g. Diwali Flash — 40% Off"
-                                    className={`h-9 w-full rounded-md border bg-white px-2.5 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df] ${errors.offerLabel ? "border-red-400" : "border-slate-200"
+                                    className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df] ${errors.offerLabel ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"
                                         }`}
                                 />
 
                                 {errors.offerLabel && (
-                                    <p className="mt-1 text-[9px] text-red-500">
+                                    <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                         {errors.offerLabel}
                                     </p>
                                 )}
@@ -535,7 +535,7 @@ const EditOffer = () => {
                             {/* CODE */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Offer code
                                 </label>
 
@@ -545,14 +545,14 @@ const EditOffer = () => {
                                     value={formData.offerCode}
                                     onChange={handleChange}
                                     placeholder="e.g. DIWALI40"
-                                    className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-[11px] uppercase text-slate-700 outline-none placeholder:normal-case placeholder:text-slate-400 focus:border-[#6655df]"
+                                    className="h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-[11px] uppercase text-slate-700 dark:text-slate-100 outline-none placeholder:normal-case placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df]"
                                 />
                             </div>
 
                             {/* DESCRIPTION */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Description
                                 </label>
 
@@ -562,14 +562,14 @@ const EditOffer = () => {
                                     onChange={handleChange}
                                     rows={3}
                                     placeholder="Describe this offer..."
-                                    className="w-full resize-none rounded-md border border-slate-200 bg-white px-2.5 py-2 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df]"
+                                    className="w-full resize-none rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 py-2 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df]"
                                 />
                             </div>
 
                             {/* OFFER TYPE */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Offer type <span className="text-red-500">*</span>
                                 </label>
 
@@ -577,7 +577,7 @@ const EditOffer = () => {
                                     name="offerTypeId"
                                     value={formData.offerTypeId}
                                     onChange={handleChange}
-                                    className={`h-9 w-full rounded-md border bg-white px-2.5 text-[11px] text-slate-700 outline-none focus:border-[#6655df] ${errors.offerTypeId ? "border-red-400" : "border-slate-200"
+                                    className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none focus:border-[#6655df] ${errors.offerTypeId ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"
                                         }`}
                                 >
                                     <option value="">Select offer type</option>
@@ -592,7 +592,7 @@ const EditOffer = () => {
                                 </select>
 
                                 {errors.offerTypeId && (
-                                    <p className="mt-1 text-[9px] text-red-500">
+                                    <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                         {errors.offerTypeId}
                                     </p>
                                 )}
@@ -602,7 +602,7 @@ const EditOffer = () => {
 
                             <div className="mb-4 grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                         Valid from
                                     </label>
 
@@ -611,19 +611,19 @@ const EditOffer = () => {
                                         name="fromDate"
                                         value={formData.fromDate}
                                         onChange={handleChange}
-                                        className={`h-9 w-full rounded-md border bg-white px-2 text-[10px] text-slate-700 outline-none focus:border-[#6655df] ${errors.fromDate ? "border-red-400" : "border-slate-200"
+                                        className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2 text-[10px] text-slate-700 dark:text-slate-100 outline-none focus:border-[#6655df] ${errors.fromDate ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"
                                             }`}
                                     />
 
                                     {errors.fromDate && (
-                                        <p className="mt-1 text-[9px] text-red-500">
+                                        <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                             {errors.fromDate}
                                         </p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                         Valid to
                                     </label>
 
@@ -632,12 +632,12 @@ const EditOffer = () => {
                                         name="toDate"
                                         value={formData.toDate}
                                         onChange={handleChange}
-                                        className={`h-9 w-full rounded-md border bg-white px-2 text-[10px] text-slate-700 outline-none focus:border-[#6655df] ${errors.toDate ? "border-red-400" : "border-slate-200"
+                                        className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2 text-[10px] text-slate-700 dark:text-slate-100 outline-none focus:border-[#6655df] ${errors.toDate ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"
                                             }`}
                                     />
 
                                     {errors.toDate && (
-                                        <p className="mt-1 text-[9px] text-red-500">
+                                        <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                             {errors.toDate}
                                         </p>
                                     )}
@@ -664,7 +664,7 @@ const EditOffer = () => {
                             {/* MAX USAGE */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Maximum usage
                                 </label>
 
@@ -675,14 +675,14 @@ const EditOffer = () => {
                                     value={formData.maxUsage}
                                     onChange={handleChange}
                                     placeholder="Unlimited"
-                                    className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df]"
+                                    className="h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df]"
                                 />
                             </div>
 
                             {/* PER USER */}
 
                             <div className="mb-4">
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Per user limit
                                 </label>
 
@@ -693,28 +693,28 @@ const EditOffer = () => {
                                     value={formData.perUserLimit}
                                     onChange={handleChange}
                                     placeholder="Unlimited"
-                                    className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df]"
+                                    className="h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df]"
                                 />
                             </div>
 
                             {/* STATUS */}
 
                             <div>
-                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                     Status
                                 </label>
 
                                 <button
                                     type="button"
                                     onClick={handleStatusToggle}
-                                    className="flex h-9 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-2.5"
+                                    className="flex h-9 w-full items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5"
                                 >
-                                    <span className="text-[11px] text-slate-700">
+                                    <span className="text-[11px] text-slate-700 dark:text-slate-200">
                                         {formData.isActive ? "Enabled" : "Disabled"}
                                     </span>
 
                                     <span
-                                        className={`relative h-4 w-7 rounded-full ${formData.isActive ? "bg-emerald-400" : "bg-slate-300"
+                                        className={`relative h-4 w-7 rounded-full ${formData.isActive ? "bg-emerald-400" : "bg-slate-300 dark:bg-slate-600"
                                             }`}
                                     >
                                         <span
@@ -731,13 +731,13 @@ const EditOffer = () => {
                         RIGHT — RULE COMPOSER
                     ================================================= */}
 
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-                        <div className="border-b border-slate-100 px-5 py-4">
-                            <h2 className="text-[12px] font-semibold text-slate-700">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                        <div className="border-b border-slate-100 dark:border-slate-800 px-5 py-4">
+                            <h2 className="text-[12px] font-semibold text-slate-700 dark:text-slate-200">
                                 Rule Composer
                             </h2>
 
-                            <p className="mt-1 text-[9px] text-slate-400">
+                            <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-400">
                                 Update the conditions and rewards for this offer.
                             </p>
                         </div>
@@ -745,19 +745,19 @@ const EditOffer = () => {
                         <div className="p-5">
                             {!selectedOfferType ? (
                                 <div className="flex min-h-[250px] items-center justify-center">
-                                    <p className="text-[11px] text-slate-500">
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                                         Loading offer type...
                                     </p>
                                 </div>
                             ) : (
                                 <>
-                                    <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                                        <p className="text-[10px] font-semibold text-slate-700">
+                                    <div className="mb-5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-3">
+                                        <p className="text-[10px] font-semibold text-slate-700 dark:text-slate-200">
                                             {selectedOfferType.name?.trim()}
                                         </p>
 
                                         {selectedOfferType.description && (
-                                            <p className="mt-1 text-[9px] leading-4 text-slate-400">
+                                            <p className="mt-1 text-[9px] leading-4 text-slate-400 dark:text-slate-400">
                                                 {selectedOfferType.description}
                                             </p>
                                         )}
@@ -774,7 +774,7 @@ const EditOffer = () => {
                                             if (property.type === "array") {
                                                 return (
                                                     <div key={key}>
-                                                        <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                                        <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                                             {formatLabel(key)}
 
                                                             {isRequired && (
@@ -793,20 +793,20 @@ const EditOffer = () => {
                                                             }
                                                             placeholder="Enter IDs separated by commas"
                                                             rows={3}
-                                                            className={`w-full resize-none rounded-md border bg-white px-2.5 py-2 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df] ${fieldError
-                                                                    ? "border-red-400"
-                                                                    : "border-slate-200"
+                                                            className={`w-full resize-none rounded-md border bg-white dark:bg-slate-800 px-2.5 py-2 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df] ${fieldError
+                                                                    ? "border-red-400 dark:border-red-500"
+                                                                    : "border-slate-200 dark:border-slate-700"
                                                                 }`}
                                                         />
 
                                                         {property.description && (
-                                                            <p className="mt-1 text-[9px] text-slate-400">
+                                                            <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-400">
                                                                 {property.description}
                                                             </p>
                                                         )}
 
                                                         {fieldError && (
-                                                            <p className="mt-1 text-[9px] text-red-500">
+                                                            <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                                                 {fieldError}
                                                             </p>
                                                         )}
@@ -819,7 +819,7 @@ const EditOffer = () => {
                                             if (property.enum && property.enum.length > 0) {
                                                 return (
                                                     <div key={key}>
-                                                        <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                                        <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                                             {formatLabel(key)}
 
                                                             {isRequired && (
@@ -832,9 +832,9 @@ const EditOffer = () => {
                                                             onChange={(e) =>
                                                                 handleRuleChange(key, e.target.value, property)
                                                             }
-                                                            className={`h-9 w-full rounded-md border bg-white px-2.5 text-[11px] text-slate-700 outline-none focus:border-[#6655df] ${fieldError
-                                                                    ? "border-red-400"
-                                                                    : "border-slate-200"
+                                                            className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none focus:border-[#6655df] ${fieldError
+                                                                    ? "border-red-400 dark:border-red-500"
+                                                                    : "border-slate-200 dark:border-slate-700"
                                                                 }`}
                                                         >
                                                             <option value="">
@@ -849,13 +849,13 @@ const EditOffer = () => {
                                                         </select>
 
                                                         {property.description && (
-                                                            <p className="mt-1 text-[9px] text-slate-400">
+                                                            <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-400">
                                                                 {property.description}
                                                             </p>
                                                         )}
 
                                                         {fieldError && (
-                                                            <p className="mt-1 text-[9px] text-red-500">
+                                                            <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                                                 {fieldError}
                                                             </p>
                                                         )}
@@ -867,7 +867,7 @@ const EditOffer = () => {
 
                                             return (
                                                 <div key={key}>
-                                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600">
+                                                    <label className="mb-1.5 block text-[10px] font-medium text-slate-600 dark:text-slate-300">
                                                         {formatLabel(key)}
 
                                                         {isRequired && (
@@ -892,18 +892,18 @@ const EditOffer = () => {
                                                             handleRuleChange(key, e.target.value, property)
                                                         }
                                                         placeholder={`Enter ${formatLabel(key)}`}
-                                                        className={`h-9 w-full rounded-md border bg-white px-2.5 text-[11px] text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#6655df] ${fieldError ? "border-red-400" : "border-slate-200"
+                                                        className={`h-9 w-full rounded-md border bg-white dark:bg-slate-800 px-2.5 text-[11px] text-slate-700 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#6655df] ${fieldError ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"
                                                             }`}
                                                     />
 
                                                     {property.description && (
-                                                        <p className="mt-1 text-[9px] text-slate-400">
+                                                        <p className="mt-1 text-[9px] text-slate-400 dark:text-slate-400">
                                                             {property.description}
                                                         </p>
                                                     )}
 
                                                     {fieldError && (
-                                                        <p className="mt-1 text-[9px] text-red-500">
+                                                        <p className="mt-1 text-[9px] text-red-500 dark:text-red-400">
                                                             {fieldError}
                                                         </p>
                                                     )}
@@ -914,8 +914,8 @@ const EditOffer = () => {
 
                                     {/* PREVIEW */}
 
-                                    <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                                        <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+                                    <div className="mt-6 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-4">
+                                        <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                                             Rule Preview
                                         </p>
 
@@ -925,11 +925,11 @@ const EditOffer = () => {
                                                     key={key}
                                                     className="flex items-start justify-between gap-4 text-[10px]"
                                                 >
-                                                    <span className="text-slate-500">
+                                                    <span className="text-slate-500 dark:text-slate-400">
                                                         {formatLabel(key)}
                                                     </span>
 
-                                                    <span className="text-right font-semibold text-slate-700">
+                                                    <span className="text-right font-semibold text-slate-700 dark:text-slate-200">
                                                         {Array.isArray(value)
                                                             ? value.join(", ") || "-"
                                                             : value !== ""
@@ -952,7 +952,7 @@ const EditOffer = () => {
                             type="button"
                             onClick={handleBack}
                             disabled={updating}
-                            className="h-9 rounded-md border border-slate-200 bg-white px-5 text-[10px] font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                            className="h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 text-[10px] font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
                         >
                             Cancel
                         </button>

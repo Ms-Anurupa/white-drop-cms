@@ -55,18 +55,18 @@ function pageWindow(current, total) {
 /* ---------- shared class strings ---------- */
 const fieldLabel = "flex min-w-0 flex-col gap-1";
 const fieldLabelText =
-    "text-[11px] font-semibold uppercase tracking-wide text-slate-500";
+    "text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400";
 const fieldControl =
-    "h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-[13px] text-slate-800 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
+    "h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-[13px] text-slate-800 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-teal-900/50 dark:disabled:bg-slate-800/50 dark:disabled:text-slate-500 dark:[color-scheme:dark]";
 
 const th =
-    "whitespace-nowrap border-b border-slate-200 px-2.5 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500";
+    "whitespace-nowrap border-b border-slate-200 px-2.5 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400";
 const td = "px-2.5 py-1.5 align-middle";
 
 /* Money cell: muted dash for zero so the eye lands on real values */
-function Money({ value, tone = "text-slate-700" }) {
+function Money({ value, tone = "text-slate-700 dark:text-slate-300" }) {
     return value === 0 ? (
-        <span className="text-slate-300">—</span>
+        <span className="text-slate-300 dark:text-slate-600">—</span>
     ) : (
         <span className={tone}>{inr.format(value)}</span>
     );
@@ -77,7 +77,7 @@ const NoteIcon = ({ note }) => (
         title={note}
         aria-label={`Note: ${note}`}
         tabIndex={0}
-        className="inline-flex h-4 w-4 shrink-0 cursor-help items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700"
+        className="inline-flex h-4 w-4 shrink-0 cursor-help items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700 dark:bg-amber-950/80 dark:text-amber-300"
     >
         i
     </span>
@@ -202,12 +202,12 @@ export default function SalaryPaymentLogs() {
 
     /* mobile: each td becomes a labelled row via data-label */
     const mobileCell =
-        "max-[720px]:flex max-[720px]:items-center max-[720px]:justify-between max-[720px]:px-0 max-[720px]:py-1 max-[720px]:before:text-[11px] max-[720px]:before:font-medium max-[720px]:before:text-slate-500 max-[720px]:before:content-[attr(data-label)]";
+        "max-[720px]:flex max-[720px]:items-center max-[720px]:justify-between max-[720px]:px-0 max-[720px]:py-1 max-[720px]:before:text-[11px] max-[720px]:before:font-medium max-[720px]:before:text-slate-500 dark:max-[720px]:before:text-slate-400 max-[720px]:before:content-[attr(data-label)]";
     const numCell = `${td} whitespace-nowrap text-right tabular-nums ${mobileCell}`;
 
     return (
       <section
-        className="min-h-full bg-slate-100 p-3 text-[13px] leading-snug text-slate-800 sm:p-4 md:p-5"
+        className="min-h-full bg-slate-100 p-3 text-[13px] leading-snug text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:p-4 md:p-5"
         aria-labelledby="spl-title"
       >
         {/* Header */}
@@ -216,11 +216,11 @@ export default function SalaryPaymentLogs() {
             <div>
               <h1
                 id="spl-title"
-                className="text-lg font-bold tracking-tight text-slate-800"
+                className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100"
               >
                 Salary payments
               </h1>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Every payout recorded for your team.
               </p>
             </div>
@@ -253,7 +253,7 @@ export default function SalaryPaymentLogs() {
               type="button"
               onClick={handleRefresh}
               disabled={loading}
-              className="cursor-pointer flex inline-flexcursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-[15px] font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer flex inline-flexcursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-[15px] font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -277,7 +277,7 @@ export default function SalaryPaymentLogs() {
 
         {/* Filters */}
         <div
-          className="grid grid-cols-1 gap-2.5 rounded-lg border border-slate-200 bg-white p-3 sm:grid-cols-2 lg:grid-cols-[minmax(240px,2fr)_minmax(160px,1fr)]"
+          className="grid grid-cols-1 gap-2.5 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2 lg:grid-cols-[minmax(240px,2fr)_minmax(160px,1fr)]"
           role="search"
         >
           <label className={fieldLabel}>
@@ -320,7 +320,7 @@ export default function SalaryPaymentLogs() {
                 key={chip.key}
                 type="button"
                 onClick={chip.clear}
-                className="cursor-pointer inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs text-teal-900 transition hover:bg-teal-200"
+                className="cursor-pointer inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs text-teal-900 transition hover:bg-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:hover:bg-teal-900/60"
               >
                 {chip.label}
                 <span aria-hidden="true">×</span>
@@ -330,7 +330,7 @@ export default function SalaryPaymentLogs() {
             <button
               type="button"
               onClick={handleReset}
-              className="cursor-pointer p-1 text-xs text-teal-700 underline hover:text-teal-900"
+              className="cursor-pointer p-1 text-xs text-teal-700 underline hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
             >
               Reset all
             </button>
@@ -340,14 +340,14 @@ export default function SalaryPaymentLogs() {
         {/* Error */}
         {error && (
           <div
-            className="mt-3 flex items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 p-2.5 text-sm text-red-700"
+            className="mt-3 flex items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 p-2.5 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300"
             role="alert"
           >
             <p>{error}</p>
             <button
               type="button"
               onClick={() => getSalaryPaymentLogs(page, limit)}
-              className="shrink-0 rounded-md border border-red-300 px-3 py-1 text-xs font-medium transition hover:bg-red-100"
+              className="shrink-0 rounded-md border border-red-300 px-3 py-1 text-xs font-medium transition hover:bg-red-100 dark:border-red-700 dark:hover:bg-red-900/50"
             >
               Try again
             </button>
@@ -356,7 +356,7 @@ export default function SalaryPaymentLogs() {
 
         {/* Table */}
         <div
-          className={`mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white transition-opacity duration-150 ${
+          className={`mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white transition-opacity duration-150 dark:border-slate-800 dark:bg-slate-900 ${
             loading && !firstLoad ? "pointer-events-none opacity-55" : ""
           }`}
           aria-busy={loading}
@@ -364,11 +364,11 @@ export default function SalaryPaymentLogs() {
           <div
             className="max-h-[70vh] overflow-auto min-[721px]:overscroll-contain
                         [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5
-                        [&::-webkit-scrollbar-track]:bg-slate-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-400"
+                        [&::-webkit-scrollbar-track]:bg-slate-100 dark:[&::-webkit-scrollbar-track]:bg-slate-800
+                        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-400 dark:[&::-webkit-scrollbar-thumb]:bg-slate-600"
           >
             <table className="w-full border-collapse text-left text-[12px] min-[721px]:min-w-[860px]">
-              <thead className="bg-slate-50 max-[720px]:sr-only min-[721px]:sticky min-[721px]:top-0 min-[721px]:z-10">
+              <thead className="bg-slate-50 dark:bg-slate-800 max-[720px]:sr-only min-[721px]:sticky min-[721px]:top-0 min-[721px]:z-10">
                 <tr>
                   <th scope="col" className={th}>
                     Employee
@@ -409,7 +409,7 @@ export default function SalaryPaymentLogs() {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {firstLoad &&
                   Array.from({ length: 8 }).map((_, index) => (
                     <tr
@@ -421,7 +421,7 @@ export default function SalaryPaymentLogs() {
                           key={cell}
                           className="px-2.5 py-2.5 max-[720px]:block max-[720px]:p-1"
                         >
-                          <span className="block h-3 w-3/4 animate-pulse rounded bg-slate-200" />
+                          <span className="block h-3 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
                         </td>
                       ))}
                     </tr>
@@ -447,7 +447,7 @@ export default function SalaryPaymentLogs() {
                     return (
                       <tr
                         key={row.id}
-                        className="transition-colors even:bg-slate-50/50 hover:bg-teal-50/50 max-[720px]:block max-[720px]:p-3"
+                        className="transition-colors even:bg-slate-50/50 hover:bg-teal-50/50 dark:even:bg-slate-800/40 dark:hover:bg-slate-800/70 max-[720px]:block max-[720px]:p-3"
                       >
                         {/* Employee */}
                         <td
@@ -455,16 +455,16 @@ export default function SalaryPaymentLogs() {
                         >
                           <div className="flex items-center gap-2">
                             <span
-                              className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 text-[10px] font-semibold text-emerald-700"
+                              className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300"
                               aria-hidden="true"
                             >
                               {initials(emp?.empName)}
                             </span>
                             <div className="min-w-0">
-                              <strong className="block truncate text-[12.5px] font-semibold text-slate-800">
+                              <strong className="block truncate text-[12.5px] font-semibold text-slate-800 dark:text-slate-100">
                                 {emp?.empName || "Unknown employee"}
                               </strong>
-                              <div className="truncate text-[11px] text-slate-500">
+                              <div className="truncate text-[11px] text-slate-500 dark:text-slate-400">
                                 {emp?.empPhone || "No phone on file"}
                               </div>
                             </div>
@@ -477,10 +477,10 @@ export default function SalaryPaymentLogs() {
                           className={`${td} whitespace-nowrap ${mobileCell}`}
                         >
                           <div className="max-[720px]:text-right">
-                            <div className="font-medium text-slate-700">
+                            <div className="font-medium text-slate-700 dark:text-slate-300">
                               {getMonthName(row.month)}
                             </div>
-                            <div className="text-[11px] text-slate-500">
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400">
                               FY {row.fy}
                             </div>
                           </div>
@@ -492,10 +492,10 @@ export default function SalaryPaymentLogs() {
                           className={`${td} whitespace-nowrap ${mobileCell}`}
                         >
                           <div className="max-[720px]:text-right">
-                            <div className="text-slate-700">
+                            <div className="text-slate-700 dark:text-slate-300">
                               {fmtDate(row.createdAt)}
                             </div>
-                            <div className="text-[11px] text-slate-500">
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400">
                               {fmtTime(row.createdAt)}
                             </div>
                           </div>
@@ -505,31 +505,31 @@ export default function SalaryPaymentLogs() {
                           <Money value={basePay} />
                         </td>
                         <td data-label="Prof. Tax" className={numCell}>
-                          <Money value={pTax} tone="text-rose-600" />
+                          <Money value={pTax} tone="text-rose-600 dark:text-rose-400" />
                         </td>
                         <td data-label="ESI NO" className={numCell}>
                           <span tone="text-slate-300" >{esiNo}</span>
                         </td>
                         <td data-label="Employer Cont. (ESI)" className={numCell}>
-                          <Money value={employerEsi} tone="text-rose-600" />
+                          <Money value={employerEsi} tone="text-rose-600 dark:text-rose-400" />
                         </td>
                         <td data-label="Employee Cont. (ESI)" className={numCell}>
-                          <Money value={employeeEsi} tone="text-rose-600" />
+                          <Money value={employeeEsi} tone="text-rose-600 dark:text-rose-400" />
                         </td>
                         <td data-label="LOP" className={numCell}>
-                          <Money value={lop} tone="text-rose-600" />
+                          <Money value={lop} tone="text-rose-600 dark:text-rose-400" />
                         </td>
                         <td data-label="Bonus" className={numCell}>
-                          <Money value={bonus} tone="text-emerald-600" />
+                          <Money value={bonus} tone="text-emerald-600 dark:text-emerald-400" />
                         </td>
                         <td data-label="Overtime" className={numCell}>
-                          <Money value={overtime} tone="text-emerald-600" />
+                          <Money value={overtime} tone="text-emerald-600 dark:text-emerald-400" />
                         </td>
 
                         {/* Net payout */}
                         <td
                           data-label="Net payout"
-                          className={`${numCell} font-semibold text-emerald-700 max-[720px]:mt-1 max-[720px]:border-t max-[720px]:border-slate-100 max-[720px]:pt-2 max-[720px]:text-sm`}
+                          className={`${numCell} font-semibold text-emerald-700 dark:text-emerald-400 max-[720px]:mt-1 max-[720px]:border-t max-[720px]:border-slate-100 dark:max-[720px]:border-slate-800 max-[720px]:pt-2 max-[720px]:text-sm`}
                         >
                           <span className="inline-flex items-center justify-end gap-1.5">
                             {row.note && <NoteIcon note={row.note} />}
@@ -546,10 +546,10 @@ export default function SalaryPaymentLogs() {
           {/* Empty state */}
           {!loading && !error && logs.length === 0 && (
             <div className="px-4 py-10 text-center">
-              <h2 className="mb-1 text-sm font-semibold text-slate-800">
+              <h2 className="mb-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
                 No payments found for {periodLabel}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {chips.length > 0
                   ? "Try removing a filter or choosing a wider period."
                   : "Payments you record will appear here."}
@@ -558,7 +558,7 @@ export default function SalaryPaymentLogs() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="mt-3 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="mt-3 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Reset filters
                 </button>
@@ -573,7 +573,7 @@ export default function SalaryPaymentLogs() {
             className="mt-3 flex flex-wrap items-center justify-between gap-2 max-[720px]:flex-col max-[720px]:items-stretch"
             aria-label="Pagination"
           >
-            <p className="text-xs tabular-nums text-slate-500">
+            <p className="text-xs tabular-nums text-slate-500 dark:text-slate-400">
               Showing {from}–{to} of {total}
             </p>
 
@@ -582,7 +582,7 @@ export default function SalaryPaymentLogs() {
                 type="button"
                 disabled={!pagination.hasPrevPage || loading}
                 onClick={() => setPage((c) => c - 1)}
-                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 Previous
               </button>
@@ -592,7 +592,7 @@ export default function SalaryPaymentLogs() {
                   typeof number === "string" ? (
                     <span
                       key={number}
-                      className="px-1 text-slate-500"
+                      className="px-1 text-slate-500 dark:text-slate-400"
                       aria-hidden="true"
                     >
                       …
@@ -608,8 +608,8 @@ export default function SalaryPaymentLogs() {
                       onClick={() => setPage(number)}
                       className={`cursor-pointer inline-flex min-h-8 min-w-8 items-center justify-center rounded-md border px-2 py-1 text-xs tabular-nums transition disabled:cursor-not-allowed disabled:opacity-50 ${
                         number === pagination.currentPage
-                          ? "border-slate-800 bg-slate-800 text-white"
-                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                          ? "border-slate-800 bg-slate-800 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                       }`}
                     >
                       {number}
@@ -621,13 +621,13 @@ export default function SalaryPaymentLogs() {
                 type="button"
                 disabled={!pagination.hasNextPage || loading}
                 onClick={() => setPage((c) => c + 1)}
-                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer inline-flex min-h-8 items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 Next
               </button>
             </div>
 
-            <label className="flex items-center gap-2 text-xs text-slate-500 max-[720px]:justify-between">
+            <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 max-[720px]:justify-between">
               Rows per page
               <select
                 value={limit}
@@ -635,7 +635,7 @@ export default function SalaryPaymentLogs() {
                   setPage(1);
                   setLimit(Number(e.target.value));
                 }}
-                className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-teal-900/50"
               >
                 {PAGE_SIZES.map((size) => (
                   <option key={size} value={size}>
@@ -652,7 +652,7 @@ export default function SalaryPaymentLogs() {
           <div
             role="status"
             className={`fixed bottom-5 right-5 z-50 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-lg ${
-              toast.tone === "error" ? "bg-red-600" : "bg-slate-900"
+              toast.tone === "error" ? "bg-red-600" : "bg-slate-900 dark:border dark:border-slate-700 dark:bg-slate-800"
             }`}
           >
             {toast.message}

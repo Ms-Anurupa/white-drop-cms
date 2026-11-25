@@ -48,7 +48,7 @@ const DocumentPreview = ({ src, alt, onClick, badgeCount, isPdf }) => {
         <button
           type="button"
           onClick={onClick}
-          className="w-25 h-24 rounded-xl border border-slate-200 bg-slate-100 cursor-pointer flex flex-col items-center justify-center gap-1 text-slate-500 hover:bg-slate-200 transition"
+          className="w-25 h-24 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 cursor-pointer flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
         >
           <FileText size={26} />
           <span className="text-[10px] font-medium">PDF Document</span>
@@ -57,7 +57,7 @@ const DocumentPreview = ({ src, alt, onClick, badgeCount, isPdf }) => {
         <img
           src={src || noDoc}
           alt={alt}
-          className="w-36 h-24 rounded-xl border object-cover bg-slate-100 cursor-pointer"
+          className="w-36 h-24 rounded-xl border border-slate-200 dark:border-slate-700 object-cover bg-slate-100 dark:bg-slate-800 cursor-pointer"
           onClick={onClick}
         />
       )}
@@ -554,12 +554,12 @@ const DeliveryPartnerDetails = () => {
       <div className="p-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 mb-5 text-sm text-slate-500 hover:text-slate-800 transition"
+          className="flex items-center gap-2 mb-5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
         >
           <ArrowLeft size={16} />
           Back
         </button>
-        <p className="text-slate-400 text-sm">Delivery partner not found.</p>
+        <p className="text-slate-400 dark:text-slate-500 text-sm">Delivery partner not found.</p>
       </div>
     );
   }
@@ -567,8 +567,8 @@ const DeliveryPartnerDetails = () => {
   const inputClass = (editable, extra = "") =>
     `w-full rounded-md border px-2.5 py-1.5 text-sm transition ${
       editable
-        ? "border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500"
-        : "border-transparent bg-transparent text-slate-700 px-0 py-0.5"
+        ? "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-500/20 focus:border-teal-500"
+        : "border-transparent bg-transparent text-slate-700 dark:text-slate-200 px-0 py-0.5"
     } ${extra}`;
 
   const fmtDate = (d) =>
@@ -593,7 +593,7 @@ const DeliveryPartnerDetails = () => {
         {/* Left - Back */}
         <button
           onClick={() => navigate(-1)}
-          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition"
+          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition"
         >
           <ArrowLeft size={18} />
           <span>Back</span>
@@ -604,7 +604,7 @@ const DeliveryPartnerDetails = () => {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition"
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-900 dark:bg-slate-100 px-4 py-2 text-sm font-medium text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition"
             >
               <Pencil size={15} />
               Edit Details
@@ -614,7 +614,7 @@ const DeliveryPartnerDetails = () => {
               <button
                 onClick={handleCancel}
                 disabled={saving}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition disabled:opacity-50"
               >
                 <X size={15} />
                 Cancel
@@ -623,7 +623,7 @@ const DeliveryPartnerDetails = () => {
               <button
                 onClick={handleSave}
                 disabled={!isDirty || saving}
-                className="flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-300 transition"
+                className="flex cursor-pointer items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-700 dark:disabled:text-slate-400 transition"
               >
                 <Check size={15} />
                 {saving ? "Saving..." : "Save Changes"}
@@ -635,7 +635,7 @@ const DeliveryPartnerDetails = () => {
 
       <div className="max-w-6xl mx-auto p-2 md:p-2 space-y-2">
         {/* Profile header */}
-        <div className="bg-white rounded-xl border border-slate-200/70 p-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/70 dark:border-slate-800 p-2">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             {/* Left Section */}
             <div className="flex items-center gap-5 flex-1">
@@ -649,7 +649,7 @@ const DeliveryPartnerDetails = () => {
                       getDisplayValue("photo"),
                     )
                   }
-                  className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-slate-100 bg-teal-50 flex items-center justify-center"
+                  className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-slate-100 dark:ring-slate-800 bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center"
                 >
                   {getDisplayValue("photo")?.length ? (
                     <img
@@ -658,7 +658,7 @@ const DeliveryPartnerDetails = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-xl font-semibold text-teal-700">
+                    <span className="text-xl font-semibold text-teal-700 dark:text-teal-300">
                       {updatedData?.firstName?.[0] ?? ""}
                       {updatedData?.lastName?.[0] ?? ""}
                     </span>
@@ -677,7 +677,7 @@ const DeliveryPartnerDetails = () => {
 
                     <label
                       htmlFor="profile-upload"
-                      className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-slate-900 p-1.5 text-white shadow hover:bg-slate-800"
+                      className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-slate-900 dark:bg-slate-100 p-1.5 text-white dark:text-slate-900 shadow hover:bg-slate-800 dark:hover:bg-slate-200"
                     >
                       <Pencil size={11} />
                     </label>
@@ -691,7 +691,7 @@ const DeliveryPartnerDetails = () => {
                     <div className="flex flex-col">
                       <label
                         htmlFor="firstName"
-                        className="mb-1 text-sm font-medium text-slate-600"
+                        className="mb-1 text-sm font-medium text-slate-600 dark:text-slate-300"
                       >
                         First Name
                       </label>
@@ -703,14 +703,14 @@ const DeliveryPartnerDetails = () => {
                           handleChange("firstName", e.target.value)
                         }
                         placeholder="First name"
-                        className="rounded-md border border-slate-300 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
+                        className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-500/20 focus:border-teal-500 outline-none"
                       />
                     </div>
 
                     <div className="flex flex-col">
                       <label
                         htmlFor="lastName"
-                        className="mb-1 text-sm font-medium text-slate-600"
+                        className="mb-1 text-sm font-medium text-slate-600 dark:text-slate-300"
                       >
                         Last Name
                       </label>
@@ -722,23 +722,23 @@ const DeliveryPartnerDetails = () => {
                           handleChange("lastName", e.target.value)
                         }
                         placeholder="Last name"
-                        className="rounded-md border border-slate-300 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 focus:border-teal-500 outline-none"
+                        className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 py-2 font-semibold focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-500/20 focus:border-teal-500 outline-none"
                       />
                     </div>
                   </div>
                 ) : (
-                  <h2 className="text-xl font-semibold text-slate-800">
+                  <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
                     {updatedData?.firstName} {updatedData?.lastName}
                   </h2>
                 )}
 
-                <div className="flex items-center gap-3 mt-2 text-sm text-slate-500">
+                <div className="flex items-center gap-3 mt-2 text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1">
                     <Phone size={14} />
                     {updatedData?.phoneNo || "—"}
                   </span>
 
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
 
                   <span className="flex items-center gap-1">
                     <Calendar size={14} />
@@ -750,14 +750,14 @@ const DeliveryPartnerDetails = () => {
 
             {/* Right Section */}
             <div className="flex justify-end">
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 px-4 py-3 shadow-sm">
                 <div className="text-right">
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                     Account Status
                   </p>
                   <p
                     className={`text-sm font-semibold ${
-                      updatedData?.active ? "text-green-600" : "text-red-600"
+                      updatedData?.active ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                     }`}
                   >
                     {updatedData?.active ? "Active" : "Inactive"}
@@ -769,35 +769,35 @@ const DeliveryPartnerDetails = () => {
         </div>
 
         {/* Contact information */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm py-2 px-8">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm py-2 px-8">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-xl font-bold text-slate-800">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                 Contact Information
               </h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Personal and vehicle details
               </p>
             </div>
 
-            <div className="h-12 w-12 rounded-2xl bg-cyan-50 flex items-center justify-center">
-              <BookUser className="text-cyan-600" size={22} />
+            <div className="h-12 w-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 flex items-center justify-center">
+              <BookUser className="text-cyan-600 dark:text-cyan-400" size={22} />
             </div>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Phone */}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-2">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Phone className="text-blue-600" size={18} />
+                <div className="w-11 h-11 rounded-xl bg-blue-100 dark:bg-blue-950/60 flex items-center justify-center">
+                  <Phone className="text-blue-600 dark:text-blue-400" size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-slate-400">
+                  <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-400">
                     Phone Number
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Registered mobile number
                   </p>
                 </div>
@@ -805,7 +805,7 @@ const DeliveryPartnerDetails = () => {
 
               <span
                 className={
-                  "h-11 rounded-xl border-slate-300 bg-white font-medium"
+                  "h-11 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
                 }
               >
                 {updatedData?.phoneNo || "Not Provided"}
@@ -813,17 +813,17 @@ const DeliveryPartnerDetails = () => {
             </div>
 
             {/* Vehicle */}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-2">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center">
-                  <Bike className="text-red-500" size={18} />
+                <div className="w-11 h-11 rounded-xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center">
+                  <Bike className="text-red-500 dark:text-red-400" size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-slate-400">
+                  <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-400">
                     Vehicle Number
                   </p>
-                  <p className="text-sm text-slate-500">Registered vehicle</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Registered vehicle</p>
                 </div>
               </div>
 
@@ -835,20 +835,20 @@ const DeliveryPartnerDetails = () => {
                 onChange={handleVehicleNumberChange}
                 className={inputClass(
                   isEditing,
-                  "h-11 rounded-xl border-slate-300 bg-white uppercase font-medium",
+                  "h-11 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800/50 uppercase font-medium",
                 )}
               />
             </div>
 
             {/* Details */}
-            <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
+            <div className="lg:col-span-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-2">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center">
-                  <BookUser className="text-purple-600" size={18} />
+                <div className="w-11 h-11 rounded-xl bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center">
+                  <BookUser className="text-purple-600 dark:text-purple-400" size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-slate-400">
+                  <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-400">
                     Area covered by delivery person
                   </p>
                 </div>
@@ -861,7 +861,7 @@ const DeliveryPartnerDetails = () => {
                 onChange={(e) => handleChange("areaCovered", e.target.value)}
                 className={`resize-none ${inputClass(
                   isEditing,
-                  "rounded-xl border-slate-300 bg-white",
+                  "rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-100 dark:disabled:bg-slate-800/50",
                 )}`}
               />
             </div>
@@ -869,28 +869,28 @@ const DeliveryPartnerDetails = () => {
         </div>
 
         {/* ================= DOCUMENTS ================= */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm py-2 px-8">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm py-2 px-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
               {/* Left */}
               <div>
-                <h2 className="text-xl font-bold text-slate-800">Documents</h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Documents</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   Uploaded identity and vehicle documents
                 </p>
               </div>
 
               {/* Right */}
-              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 px-4 py-3">
                 <div className="text-right">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Verification Status
                   </p>
                   <p
                     className={`text-sm font-semibold ${
                       partnerDetails?.documentsVerified
-                        ? "text-green-600"
-                        : "text-red-600"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
                     }`}
                   >
                     {partnerDetails?.documentsVerified
@@ -904,7 +904,7 @@ const DeliveryPartnerDetails = () => {
                   onChange={(e) =>
                     handleVerifyDocument(e.target.value === "true")
                   }
-                  className="rounded-lg border cursor-pointer border-slate-300 bg-white px-3 py-2 text-sm font-medium focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                  className="rounded-lg border cursor-pointer border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm font-medium focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-500/20"
                 >
                   <option value="true">Approved</option>
                   <option value="false">Rejected</option>
@@ -913,7 +913,7 @@ const DeliveryPartnerDetails = () => {
             </div>
 
             {isEditing && (
-              <span className="text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-full">
+              <span className="text-xs text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-full">
                 Click the image to upload new document(s) — you can select
                 multiple files
               </span>
@@ -922,13 +922,13 @@ const DeliveryPartnerDetails = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* ================= Vehicle ================= */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-5 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                     Vehicle
                   </h3>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Vehicle Registration Document
                   </p>
                 </div>
@@ -967,7 +967,7 @@ const DeliveryPartnerDetails = () => {
 
                       <label
                         htmlFor="vehicle-upload"
-                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer"
+                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center cursor-pointer"
                       >
                         <Pencil size={15} />
                       </label>
@@ -976,7 +976,7 @@ const DeliveryPartnerDetails = () => {
                 </div>
 
                 <div className="flex-1">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Vehicle Number
                   </label>
 
@@ -985,10 +985,10 @@ const DeliveryPartnerDetails = () => {
                       value={updatedData?.vehicleNumber || ""}
                       maxLength={14}
                       onChange={handleVehicleNumberChange}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-500/20"
                     />
                   ) : (
-                    <div className="mt-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 font-medium">
+                    <div className="mt-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 px-4 py-3 font-medium">
                       {updatedData?.vehicleNumber || "Not Available"}
                     </div>
                   )}
@@ -997,13 +997,13 @@ const DeliveryPartnerDetails = () => {
             </div>
 
             {/* ================= Aadhaar ================= */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-5 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                     Aadhaar Card
                   </h3>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Government Identity Proof
                   </p>
                 </div>
@@ -1040,7 +1040,7 @@ const DeliveryPartnerDetails = () => {
 
                       <label
                         htmlFor="aadhar-upload"
-                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer"
+                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center cursor-pointer"
                       >
                         <Pencil size={15} />
                       </label>
@@ -1049,7 +1049,7 @@ const DeliveryPartnerDetails = () => {
                 </div>
 
                 <div className="flex-1">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Aadhaar Number
                   </label>
 
@@ -1059,10 +1059,10 @@ const DeliveryPartnerDetails = () => {
                       inputMode="numeric"
                       maxLength={12}
                       onChange={handleAadharChange}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-500/20"
                     />
                   ) : (
-                    <div className="mt-2 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 font-medium">
+                    <div className="mt-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 px-4 py-3 font-medium">
                       {updatedData?.aadharNo || "Not Available"}
                     </div>
                   )}
@@ -1070,13 +1070,13 @@ const DeliveryPartnerDetails = () => {
               </div>
             </div>
             {/* ================= PAN CARD ================= */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-5 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                     PAN Card
                   </h3>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Permanent Account Number
                   </p>
                 </div>
@@ -1112,7 +1112,7 @@ const DeliveryPartnerDetails = () => {
                       />
                       <label
                         htmlFor="pan-upload"
-                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer hover:bg-slate-800 transition"
+                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center cursor-pointer hover:bg-slate-800 dark:hover:bg-slate-200 transition"
                       >
                         <Pencil size={15} />
                       </label>
@@ -1121,7 +1121,7 @@ const DeliveryPartnerDetails = () => {
                 </div>
 
                 <div className="flex-1">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     PAN Number
                   </label>
 
@@ -1130,10 +1130,10 @@ const DeliveryPartnerDetails = () => {
                       value={updatedData?.panNo || ""}
                       maxLength={10}
                       onChange={handlePanChange}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
+                      className="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-500/20 focus:border-cyan-500"
                     />
                   ) : (
-                    <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-medium">
+                    <div className="mt-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-3 font-medium">
                       {updatedData?.panNo || "Not Available"}
                     </div>
                   )}
@@ -1142,13 +1142,13 @@ const DeliveryPartnerDetails = () => {
             </div>
 
             {/* ================= DRIVING LICENCE ================= */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-5 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                     Driving Licence
                   </h3>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Driver's Licence Document
                   </p>
                 </div>
@@ -1183,7 +1183,7 @@ const DeliveryPartnerDetails = () => {
 
                       <label
                         htmlFor="dl-upload"
-                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer hover:bg-slate-800 transition"
+                        className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center cursor-pointer hover:bg-slate-800 dark:hover:bg-slate-200 transition"
                       >
                         <Pencil size={15} />
                       </label>
@@ -1192,7 +1192,7 @@ const DeliveryPartnerDetails = () => {
                 </div>
 
                 <div className="flex-1">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-400">
                     Licence Number
                   </label>
 
@@ -1201,10 +1201,10 @@ const DeliveryPartnerDetails = () => {
                       value={updatedData?.dlNo || ""}
                       maxLength={15}
                       onChange={handleDlChange}
-                      className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500"
+                      className="mt-2 w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-500/20 focus:border-cyan-500"
                     />
                   ) : (
-                    <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-medium">
+                    <div className="mt-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-3 font-medium">
                       {updatedData?.dlNo || "Not Available"}
                     </div>
                   )}
@@ -1237,10 +1237,10 @@ const DeliveryPartnerDetails = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image Card */}
-            <div className="overflow-hidden rounded-3xl bg-white shadow-2xl">
+            <div className="overflow-hidden rounded-3xl bg-white dark:bg-slate-900 dark:border dark:border-slate-800 shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                <h3 className="text-lg font-semibold text-slate-800">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                   {previewImage.label}
                 </h3>
 
@@ -1250,7 +1250,7 @@ const DeliveryPartnerDetails = () => {
                       href={previewImage.images[previewImage.index]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-medium text-cyan-700 hover:text-cyan-900 transition"
+                      className="flex items-center gap-1.5 text-xs font-medium text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 transition"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <ExternalLink size={13} />
@@ -1259,7 +1259,7 @@ const DeliveryPartnerDetails = () => {
                   )}
 
                   {previewImage.images.length > 1 && (
-                    <span className="text-xs font-medium text-slate-400">
+                    <span className="text-xs font-medium text-slate-400 dark:text-slate-400">
                       {previewImage.index + 1} / {previewImage.images.length}
                     </span>
                   )}
@@ -1268,7 +1268,7 @@ const DeliveryPartnerDetails = () => {
 
               {/* Sliding track */}
               <div
-                className="relative bg-slate-100 overflow-hidden max-h-[60vh]"
+                className="relative bg-slate-100 dark:bg-slate-950 overflow-hidden max-h-[60vh]"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >
@@ -1341,8 +1341,8 @@ const DeliveryPartnerDetails = () => {
               </div>
 
               {/* Footer */}
-              <div className="border-t border-slate-200 px-6 py-4 text-center">
-                <p className="text-sm text-slate-500">
+              <div className="border-t border-slate-200 dark:border-slate-800 px-6 py-4 text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {previewImage.images.length > 1
                     ? "Swipe, use the arrows, or click a dot to browse. Click outside or press Esc to close."
                     : "Click outside the image or press the close button to dismiss."}

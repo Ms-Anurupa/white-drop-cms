@@ -244,8 +244,8 @@ const AddInventory = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="text-sm text-gray-500">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="text-sm text-gray-500 dark:text-slate-400">
           Loading inventory details...
         </div>
       </div>
@@ -256,26 +256,26 @@ const AddInventory = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
       <form onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-5">
         <div>
           <button
             type="button"
             onClick={() => navigate("/dashboard/inventory")}
-            className="mb-3 flex cursor-pointer items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
+            className="mb-3 flex cursor-pointer items-center gap-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100"
           >
             <ArrowLeft size={16} />
             Back to Inventory
           </button>
 
           <div className="flex items-center gap-2">
-            <PackagePlus size={22} className="text-teal-600" />
-            <h1 className="text-xl font-semibold text-gray-900">
+            <PackagePlus size={22} className="text-teal-600 dark:text-teal-400" />
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
               {isEditMode ? "Edit Inventory Record" : "New Inventory Record"}
             </h1>
           </div>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             {isEditMode
               ? "Update daily milk inventory entry."
               : "Record daily stock entry as an Opening submission."}
@@ -283,22 +283,22 @@ const AddInventory = () => {
         </div>
 
         {/* General Information */}
-        <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-900">
+        <div className="space-y-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
             General Information
           </h2>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-teal-700">
+              <label className="mb-1.5 block text-sm font-semibold text-teal-700 dark:text-teal-400">
                 Entry Type
               </label>
               {/* Locked — display only, cannot be changed by the user */}
               <div
                 className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${
                   entryType === "OPENING"
-                    ? "border-teal-300 bg-teal-50/50 text-teal-900"
-                    : "border-amber-300 bg-amber-50/50 text-amber-900"
+                    ? "border-teal-300 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-300"
+                    : "border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300"
                 }`}
               >
                 <span
@@ -313,7 +313,7 @@ const AddInventory = () => {
             <div>
               <label
                 htmlFor="entryDate"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
               >
                 Entry Date *
               </label>
@@ -329,8 +329,8 @@ const AddInventory = () => {
                 disabled={isDateLocked}
                 className={`w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-500/20 ${
                   isDateLocked
-                    ? "border-gray-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-                    : "border-gray-200 focus:border-teal-500"
+                    ? "border-gray-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                    : "border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 dark:[color-scheme:dark] focus:border-teal-500"
                 }`}
               />
               {isDateLocked ? (
@@ -354,7 +354,7 @@ const AddInventory = () => {
             <div>
               <label
                 htmlFor="unit"
-                className="mb-1.5 block text-sm font-medium text-gray-700"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
               >
                 Unit of Measurement
               </label>
@@ -366,8 +366,8 @@ const AddInventory = () => {
                 disabled={entryType === "CLOSING"}
                 className={`w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-500/20 ${
                   entryType === "CLOSING"
-                    ? "border-gray-200 bg-slate-100 text-slate-500 cursor-not-allowed"
-                    : "border-gray-200 bg-white focus:border-teal-500"
+                    ? "border-gray-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                    : "border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:border-teal-500"
                 }`}
               >
                 <option value="L">Litre (L)</option>
@@ -386,8 +386,8 @@ const AddInventory = () => {
 
         {/* OPENING ENTRY SECTION */}
         {entryType === "OPENING" && (
-          <div className="space-y-4 rounded-2xl border border-teal-100 bg-teal-50/30 p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-teal-900">
+          <div className="space-y-4 rounded-2xl border border-teal-100 dark:border-teal-900/60 bg-teal-50/30 dark:bg-teal-950/30 p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-teal-900 dark:text-teal-300">
               1. Opening Stock
             </h2>
 
@@ -395,7 +395,7 @@ const AddInventory = () => {
               <div>
                 <label
                   htmlFor="openingQty"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
+                  className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                 >
                   Opening Quantity *
                 </label>
@@ -409,7 +409,7 @@ const AddInventory = () => {
                   step="0.01"
                   placeholder="0.00"
                   required={entryType === "OPENING"}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                 />
               </div>
             </div>
@@ -419,8 +419,8 @@ const AddInventory = () => {
         {/* CLOSING ENTRY SECTION */}
         {entryType === "CLOSING" && (
           <div className="space-y-5">
-            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-gray-900">
+            <div className="space-y-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">
                 1. Stock Movement & Production
               </h2>
 
@@ -428,7 +428,7 @@ const AddInventory = () => {
                 <div>
                   <label
                     htmlFor="produced"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Produced Qty
                   </label>
@@ -441,14 +441,14 @@ const AddInventory = () => {
                     min="0"
                     step="0.01"
                     placeholder="Addition to stock"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="bulkStockout"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Bulk Stockout Qty
                   </label>
@@ -461,14 +461,14 @@ const AddInventory = () => {
                     min="0"
                     step="0.01"
                     placeholder="Bulk dispatched"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="packetStockout"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Packet Stockout Qty
                   </label>
@@ -481,14 +481,14 @@ const AddInventory = () => {
                     min="0"
                     step="0.01"
                     placeholder="Packets dispatched"
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-amber-100 bg-amber-50/30 p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-amber-900">
+            <div className="space-y-4 rounded-2xl border border-amber-100 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-amber-900 dark:text-amber-300">
                 2. Closing Stock & Wastage
               </h2>
 
@@ -496,7 +496,7 @@ const AddInventory = () => {
                 <div>
                   <label
                     htmlFor="closingQty"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Closing Quantity *
                   </label>
@@ -510,17 +510,17 @@ const AddInventory = () => {
                     step="0.01"
                     placeholder="Enter closing quantity"
                     required={entryType === "CLOSING"}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="wastageQty"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Wastage Quantity{" "}
-                    <span className="font-normal text-gray-400">
+                    <span className="font-normal text-gray-400 dark:text-slate-500">
                       (Optional)
                     </span>
                   </label>
@@ -533,14 +533,14 @@ const AddInventory = () => {
                     min="0"
                     step="0.01"
                     placeholder="Spoilage or leaks"
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                   />
                 </div>
 
                 <div className="md:col-span-2">
                   <label
                     htmlFor="wastageNote"
-                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                    className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >
                     Wastage Note / Remarks
                   </label>
@@ -558,8 +558,8 @@ const AddInventory = () => {
                     }
                     className={`w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-500/20 ${
                       hasWastageQty
-                        ? "border-gray-200 bg-white focus:border-teal-500"
-                        : "border-gray-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+                        ? "border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 dark:placeholder:text-slate-500 focus:border-teal-500"
+                        : "border-gray-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     }`}
                   />
                 </div>
@@ -574,7 +574,7 @@ const AddInventory = () => {
             type="button"
             onClick={() => navigate("/dashboard/inventory")}
             disabled={submitting}
-            className="cursor-pointer rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+            className="cursor-pointer rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50"
           >
             Cancel
           </button>

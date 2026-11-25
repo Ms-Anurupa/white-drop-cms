@@ -29,23 +29,23 @@ const NEEDS_REASON = ["REJECTED", "DEACTIVATED"];
 const STATUS_META = {
   APPROVED: {
     label: "Approved",
-    pill: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+    pill: "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-500/30",
     dot: "bg-emerald-500",
   },
   INREVIEW: {
     label: "In review",
-    pill: "bg-amber-50 text-amber-700 ring-amber-600/20",
+    pill: "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-950/60 dark:text-amber-300 dark:ring-amber-500/30",
     dot: "bg-amber-500",
   },
   REJECTED: {
     label: "Rejected",
-    pill: "bg-red-50 text-red-700 ring-red-600/20",
+    pill: "bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-950/60 dark:text-red-300 dark:ring-red-500/30",
     dot: "bg-red-500",
   },
   DEACTIVATED: {
     label: "Deactivated",
-    pill: "bg-gray-100 text-gray-600 ring-gray-500/20",
-    dot: "bg-gray-400",
+    pill: "bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-600/40",
+    dot: "bg-gray-400 dark:bg-slate-500",
   },
 };
 
@@ -200,14 +200,14 @@ const CorporateAccounts = () => {
   const isRefreshing = loading && hasLoadedOnce;
 
   return (
-    <div className="min-h-full space-y-5 bg-gray-50 px-3 py-6 sm:px-4 lg:p-6">
+    <div className="min-h-full space-y-5 bg-gray-50 px-3 py-6 sm:px-4 lg:p-6 dark:bg-slate-950">
       {/* ── header ── */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl dark:text-slate-100">
             Corporate accounts
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Review, approve and manage business accounts.
           </p>
         </div>
@@ -225,15 +225,15 @@ const CorporateAccounts = () => {
       </header>
 
       {/* ── card ── */}
-      <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         {/* toolbar */}
-        <div className="space-y-3 border-b border-gray-100 p-3 sm:p-4">
+        <div className="space-y-3 border-b border-gray-100 p-3 sm:p-4 dark:border-slate-800">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-sm">
               <Search
                 size={16}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
               />
               <input
                 type="search"
@@ -241,14 +241,14 @@ const CorporateAccounts = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by business, GST or contact"
                 aria-label="Search corporate accounts"
-                className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-9 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 [&::-webkit-search-cancel-button]:hidden"
+                className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-9 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 [&::-webkit-search-cancel-button]:hidden"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
                   aria-label="Clear search"
-                  className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                 >
                   <X size={14} />
                 </button>
@@ -271,8 +271,8 @@ const CorporateAccounts = () => {
                     onClick={() => changeStatusFilter(option.value)}
                     className={`inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs font-medium transition focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 ${
                       active
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ? "bg-gray-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                     }`}
                   >
                     {option.value && (
@@ -288,14 +288,14 @@ const CorporateAccounts = () => {
           </div>
 
           {isFiltered && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
               <span>
                 Filtered
                 {debouncedSearch && (
                   <>
                     {" "}
                     by{" "}
-                    <strong className="font-medium text-gray-700">
+                    <strong className="font-medium text-gray-700 dark:text-slate-200">
                       “{debouncedSearch}”
                     </strong>
                   </>
@@ -305,7 +305,7 @@ const CorporateAccounts = () => {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="cursor-pointer font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                className="cursor-pointer font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Clear filters
               </button>
@@ -327,7 +327,7 @@ const CorporateAccounts = () => {
           className={`transition-opacity ${isRefreshing ? "opacity-60" : ""}`}
         >
           {/* ── mobile cards ── */}
-          <div className="divide-y divide-gray-100 lg:hidden">
+          <div className="divide-y divide-gray-100 lg:hidden dark:divide-slate-800">
             {showSkeleton ? (
               <SkeletonCards />
             ) : !hasAccounts ? (
@@ -345,10 +345,10 @@ const CorporateAccounts = () => {
                 <article key={account.id} className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="truncate font-medium text-gray-900">
+                      <h3 className="truncate font-medium text-gray-900 dark:text-slate-100">
                         {account.businessName}
                       </h3>
-                      <p className="mt-0.5 text-xs text-gray-500">
+                      <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
                         Serial #{account.serialNumber} · Created{" "}
                         {formatDate(account.createdAt)}
                       </p>
@@ -360,9 +360,9 @@ const CorporateAccounts = () => {
                     />
                   </div>
 
-                  <dl className="space-y-1.5 text-sm text-gray-600">
+                  <dl className="space-y-1.5 text-sm text-gray-600 dark:text-slate-300">
                     <div className="flex items-center gap-2">
-                      <dt className="w-10 shrink-0 text-xs text-gray-400">
+                      <dt className="w-10 shrink-0 text-xs text-gray-400 dark:text-slate-500">
                         GST
                       </dt>
                       <dd className="min-w-0 truncate">
@@ -370,7 +370,7 @@ const CorporateAccounts = () => {
                       </dd>
                     </div>
                     <div className="flex items-center gap-2">
-                      <dt className="w-10 shrink-0 text-xs text-gray-400">
+                      <dt className="w-10 shrink-0 text-xs text-gray-400 dark:text-slate-500">
                         <Phone size={13} aria-label="Contact" />
                       </dt>
                       <dd>
@@ -378,12 +378,12 @@ const CorporateAccounts = () => {
                       </dd>
                     </div>
                     <div className="flex items-start gap-2">
-                      <dt className="w-10 shrink-0 pt-0.5 text-xs text-gray-400">
+                      <dt className="w-10 shrink-0 pt-0.5 text-xs text-gray-400 dark:text-slate-500">
                         <MapPin size={13} aria-label="Address" />
                       </dt>
                       <dd className="min-w-0">
                         {formatAddress(account) || (
-                          <span className="text-gray-400">
+                          <span className="text-gray-400 dark:text-slate-500">
                             No address on file
                           </span>
                         )}
@@ -403,8 +403,8 @@ const CorporateAccounts = () => {
           <div className="hidden max-h-[calc(100vh-22rem)] min-h-[320px] overflow-auto lg:block">
             <table className="w-full min-w-[1000px] table-fixed text-sm">
               <caption className="sr-only">Corporate accounts</caption>
-              <thead className="sticky top-0 z-10 bg-gray-50 shadow-[0_1px_0_0_theme(colors.gray.100)]">
-                <tr className="text-left text-xs font-medium text-gray-500">
+              <thead className="sticky top-0 z-10 bg-gray-50 shadow-[0_1px_0_0_theme(colors.gray.100)] dark:bg-slate-800/70 dark:shadow-[0_1px_0_0_theme(colors.slate.800)]">
+                <tr className="text-left text-xs font-medium text-gray-500 dark:text-slate-400">
                   <th scope="col" className="w-14 px-4 py-3">
                     #
                   </th>
@@ -429,7 +429,7 @@ const CorporateAccounts = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                 {showSkeleton ? (
                   <SkeletonRows />
                 ) : !hasAccounts ? (
@@ -452,26 +452,26 @@ const CorporateAccounts = () => {
                     return (
                       <tr
                         key={account.id}
-                        className="transition-colors hover:bg-gray-50/80"
+                        className="transition-colors hover:bg-gray-50/80 dark:hover:bg-slate-800/60"
                       >
-                        <td className="px-4 py-3.5 tabular-nums text-gray-400">
+                        <td className="px-4 py-3.5 tabular-nums text-gray-400 dark:text-slate-500">
                           {start + idx + 1}
                         </td>
 
                         <td className="px-4 py-3.5">
                           <div className="flex min-w-0 items-center gap-2">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400">
                               <Building2 size={15} aria-hidden="true" />
                             </span>
                             <div className="min-w-0">
                               <p
-                                className="truncate font-medium text-gray-900"
+                                className="truncate font-medium text-gray-900 dark:text-slate-100"
                                 title={account.businessName}
                               >
                                 {account.businessName}
                               </p>
                               <p
-                                className="truncate text-xs text-gray-500"
+                                className="truncate text-xs text-gray-500 dark:text-slate-400"
                                 title={address || undefined}
                               >
                                 {address || `Serial #${account.serialNumber}`}
@@ -500,13 +500,13 @@ const CorporateAccounts = () => {
                           {NEEDS_REASON.includes(account.status) ? (
                             <ReasonCell notes={account.notes} />
                           ) : (
-                            <span className="text-gray-300" aria-label="None">
+                            <span className="text-gray-300 dark:text-slate-600" aria-label="None">
                               —
                             </span>
                           )}
                         </td>
 
-                        <td className="whitespace-nowrap px-4 py-3.5 text-gray-500">
+                        <td className="whitespace-nowrap px-4 py-3.5 text-gray-500 dark:text-slate-400">
                           {formatDate(account.createdAt)}
                         </td>
                       </tr>
@@ -519,8 +519,8 @@ const CorporateAccounts = () => {
         </div>
 
         {/* ── pagination ── */}
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row">
-          <div className="flex items-center gap-4 text-xs text-gray-500">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row dark:border-slate-800">
+          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400">
             <span aria-live="polite">
               {hasAccounts
                 ? `Showing ${start + 1}–${start + accounts.length}`
@@ -532,7 +532,7 @@ const CorporateAccounts = () => {
               <select
                 value={pageSize}
                 onChange={(e) => changePageSize(Number(e.target.value))}
-                className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -544,7 +544,7 @@ const CorporateAccounts = () => {
           </div>
 
           <nav className="flex items-center gap-2" aria-label="Pagination">
-            <span className="text-xs text-gray-500">Page {page}</span>
+            <span className="text-xs text-gray-500 dark:text-slate-400">Page {page}</span>
             <PageButton
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
@@ -655,14 +655,14 @@ const StatusMenu = ({ account, onChange, busy }) => {
         aria-expanded={open}
         aria-label={`Status for ${account.businessName}: ${meta?.label || "Unknown"}. Change status`}
         className={`inline-flex h-7 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-medium ring-1 ring-inset transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-wait ${
-          meta?.pill || "bg-gray-100 text-gray-600 ring-gray-500/20"
+          meta?.pill || "bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-600/40"
         }`}
       >
         {busy ? (
           <Loader2 size={12} className="animate-spin" aria-hidden="true" />
         ) : (
           <span
-            className={`h-1.5 w-1.5 rounded-full ${meta?.dot || "bg-gray-400"}`}
+            className={`h-1.5 w-1.5 rounded-full ${meta?.dot || "bg-gray-400 dark:bg-slate-500"}`}
           />
         )}
         {meta?.label || "Unknown"}
@@ -675,7 +675,7 @@ const StatusMenu = ({ account, onChange, busy }) => {
           role="menu"
           onKeyDown={onMenuKeyDown}
           style={{ top: pos.top, left: pos.left }}
-          className="fixed z-50 w-44 rounded-xl border border-gray-200 bg-white p-1 shadow-lg"
+          className="fixed z-50 w-44 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
         >
           {STATUS_ORDER.map((value) => {
             const selected = account.status === value;
@@ -688,7 +688,7 @@ const StatusMenu = ({ account, onChange, busy }) => {
                   setOpen(false);
                   onChange(account, value);
                 }}
-                className="flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 focus:bg-gray-100 focus:outline-none"
+                className="flex h-8 w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 focus:bg-gray-100 focus:outline-none dark:text-slate-200 dark:hover:bg-slate-800 dark:focus:bg-slate-800"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -699,7 +699,7 @@ const StatusMenu = ({ account, onChange, busy }) => {
                 {selected && (
                   <Check
                     size={14}
-                    className="text-blue-600"
+                    className="text-blue-600 dark:text-blue-400"
                     aria-label="Current"
                   />
                 )}
@@ -742,7 +742,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4 dark:bg-black/60"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !saving) onClose();
       }}
@@ -751,19 +751,19 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
         role="dialog"
         aria-modal="true"
         aria-labelledby="reason-title"
-        className="w-full max-w-md rounded-t-2xl bg-white p-5 shadow-xl sm:rounded-2xl sm:p-6"
+        className="w-full max-w-md rounded-t-2xl bg-white p-5 shadow-xl sm:rounded-2xl sm:p-6 dark:border dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2
               id="reason-title"
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-semibold text-gray-900 dark:text-slate-100"
             >
               {isReject ? "Reject account" : "Deactivate account"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               Add a reason for {isReject ? "rejecting" : "deactivating"}{" "}
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-gray-700 dark:text-slate-200">
                 {account.businessName}
               </span>
               . It's saved with the account.
@@ -774,7 +774,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
             onClick={onClose}
             disabled={saving}
             aria-label="Close"
-            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <X size={16} />
           </button>
@@ -783,7 +783,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
         <form onSubmit={submit} className="mt-5">
           <label
             htmlFor="account-reason"
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300"
           >
             Reason
           </label>
@@ -795,7 +795,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
                 type="button"
                 disabled={saving}
                 onClick={() => addSuggestion(text)}
-                className="cursor-pointer rounded-full border border-gray-200 px-2.5 py-1 text-xs text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                className="cursor-pointer rounded-full border border-gray-200 px-2.5 py-1 text-xs text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 {text}
               </button>
@@ -814,9 +814,9 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
             maxLength={1000}
             autoFocus
             disabled={saving}
-            className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:bg-gray-50"
+            className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 disabled:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800/50"
           />
-          <p className="mt-1 text-right text-xs tabular-nums text-gray-400">
+          <p className="mt-1 text-right text-xs tabular-nums text-gray-400 dark:text-slate-500">
             {reason.length}/1000
           </p>
 
@@ -825,7 +825,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="h-10 cursor-pointer rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              className="h-10 cursor-pointer rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               Cancel
             </button>
@@ -851,7 +851,7 @@ const ReasonModal = ({ account, status, saving, onClose, onConfirm }) => {
 /* ─────────────────────────── small pieces ─────────────────────────── */
 
 const GstValue = ({ value }) => {
-  if (!value) return <span className="text-gray-300">—</span>;
+  if (!value) return <span className="text-gray-300 dark:text-slate-600">—</span>;
 
   const copy = async () => {
     try {
@@ -864,14 +864,14 @@ const GstValue = ({ value }) => {
 
   return (
     <span className="group inline-flex max-w-full items-center gap-1.5">
-      <span className="truncate font-mono text-[13px] text-gray-700">
+      <span className="truncate font-mono text-[13px] text-gray-700 dark:text-slate-300">
         {value}
       </span>
       <button
         type="button"
         onClick={copy}
         aria-label={`Copy GST number ${value}`}
-        className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded text-gray-400 opacity-0 transition hover:bg-gray-100 hover:text-gray-600 focus-visible:opacity-100 group-hover:opacity-100 max-lg:opacity-100"
+        className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded text-gray-400 opacity-0 transition hover:bg-gray-100 hover:text-gray-600 focus-visible:opacity-100 group-hover:opacity-100 max-lg:opacity-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
       >
         <Copy size={12} />
       </button>
@@ -883,18 +883,18 @@ const ContactValue = ({ value }) =>
   value ? (
     <a
       href={`tel:${value}`}
-      className="text-gray-700 hover:text-blue-600 hover:underline"
+      className="text-gray-700 hover:text-blue-600 hover:underline dark:text-slate-300 dark:hover:text-blue-400"
     >
       {value}
     </a>
   ) : (
-    <span className="text-gray-300">—</span>
+    <span className="text-gray-300 dark:text-slate-600">—</span>
   );
 
 const NoteBlock = ({ notes }) => (
-  <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
-    <p className="text-xs font-medium text-gray-500">Reason</p>
-    <p className="mt-1 break-words text-sm text-gray-700">
+  <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-slate-800 dark:bg-slate-800/70">
+    <p className="text-xs font-medium text-gray-500 dark:text-slate-400">Reason</p>
+    <p className="mt-1 break-words text-sm text-gray-700 dark:text-slate-300">
       {notes || "No reason provided"}
     </p>
   </div>
@@ -907,7 +907,7 @@ const PageButton = ({ children, onClick, disabled, label }) => (
     disabled={disabled}
     title={label}
     aria-label={label}
-    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
   >
     {children}
   </button>
@@ -917,14 +917,14 @@ const EmptyState = ({ isFiltered, onClear, onCreate }) => {
   const Icon = isFiltered ? SearchX : PackageSearch;
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-slate-400">
         <Icon size={22} aria-hidden="true" />
       </span>
       <div>
-        <p className="text-sm font-medium text-gray-900">
+        <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
           {isFiltered ? "No matching accounts" : "No corporate accounts yet"}
         </p>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
           {isFiltered
             ? "Try a different search term or status."
             : "Create the first corporate account to get started."}
@@ -934,7 +934,7 @@ const EmptyState = ({ isFiltered, onClear, onCreate }) => {
         <button
           type="button"
           onClick={onClear}
-          className="h-9 cursor-pointer rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="h-9 cursor-pointer rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           Clear filters
         </button>
@@ -953,7 +953,7 @@ const EmptyState = ({ isFiltered, onClear, onCreate }) => {
 };
 
 const Bar = ({ className = "" }) => (
-  <div className={`animate-pulse rounded bg-gray-100 ${className}`} />
+  <div className={`animate-pulse rounded bg-gray-100 dark:bg-slate-800 ${className}`} />
 );
 
 const SkeletonRows = () =>
@@ -1053,7 +1053,7 @@ const SkeletonCards = () =>
     }, [pop]);
 
     if (!notes) {
-      return <span className="text-sm text-gray-400">No reason provided</span>;
+      return <span className="text-sm text-gray-400 dark:text-slate-500">No reason provided</span>;
     }
 
     return (
@@ -1065,7 +1065,7 @@ const SkeletonCards = () =>
           onMouseLeave={scheduleClose}
           onFocus={open}
           onBlur={scheduleClose}
-          className="line-clamp-2 cursor-default break-words rounded text-sm text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          className="line-clamp-2 cursor-default break-words rounded text-sm text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-slate-300"
         >
           {notes}
         </p>
@@ -1076,10 +1076,10 @@ const SkeletonCards = () =>
             onMouseEnter={() => clearTimeout(closeTimer.current)}
             onMouseLeave={scheduleClose}
             style={{ left: pop.left, top: pop.top, bottom: pop.bottom }}
-            className="fixed z-50 w-80 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
+            className="fixed z-50 w-80 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-900"
           >
-            <p className="mb-1.5 text-xs font-medium text-gray-500">Reason</p>
-            <p className="max-h-60 overflow-y-auto whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-800">
+            <p className="mb-1.5 text-xs font-medium text-gray-500 dark:text-slate-400">Reason</p>
+            <p className="max-h-60 overflow-y-auto whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-800 dark:text-slate-200">
               {notes}
             </p>
           </div>

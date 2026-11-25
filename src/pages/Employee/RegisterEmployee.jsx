@@ -94,7 +94,7 @@ const ICONS = {
 };
 
 const inputBase =
-    "w-full rounded-lg border bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20";
+    "w-full rounded-lg border bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500";
 
 function Field({
     label,
@@ -116,14 +116,14 @@ function Field({
         <div className={className}>
             <label
                 htmlFor={id}
-                className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800"
+                className="mb-1 flex items-baseline justify-between text-sm font-medium text-stone-800 dark:text-slate-200"
             >
                 <span>
                     {label}
-                    {required && <span className="ml-0.5 text-rose-600">*</span>}
+                    {required && <span className="ml-0.5 text-rose-600 dark:text-rose-400">*</span>}
                 </span>
                 {optional && (
-                    <span className="text-xs font-normal text-stone-400">Optional</span>
+                    <span className="text-xs font-normal text-stone-400 dark:text-slate-500">Optional</span>
                 )}
             </label>
             <Control
@@ -131,15 +131,15 @@ function Field({
                 name={name}
                 aria-invalid={Boolean(error)}
                 aria-describedby={error || hint ? descId : undefined}
-                className={`${inputBase} ${error ? "border-rose-400" : "border-stone-300"}`}
+                className={`${inputBase} ${error ? "border-rose-400 dark:border-rose-500" : "border-stone-300 dark:border-slate-700"}`}
                 {...props}
             />
             {error ? (
-                <p id={descId} className="mt-1 text-xs text-rose-700">
+                <p id={descId} className="mt-1 text-xs text-rose-700 dark:text-rose-400">
                     {error}
                 </p>
             ) : hint ? (
-                <p id={descId} className="mt-1 text-xs text-stone-500">
+                <p id={descId} className="mt-1 text-xs text-stone-500 dark:text-slate-400">
                     {hint}
                 </p>
             ) : null}
@@ -259,17 +259,17 @@ const RegisterEmployee = () => {
       <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
         <Link
           to={LIST_ROUTE}
-          className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+          className="mb-4 inline-flex items-center gap-1 rounded-md text-sm text-stone-600 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-400 dark:hover:text-slate-100"
         >
           <Icon d={ICONS.back} />
           Employee list
         </Link>
 
         <div className="mb-5">
-          <h1 className="text-xl font-semibold tracking-tight text-stone-900">
+          <h1 className="text-xl font-semibold tracking-tight text-stone-900 dark:text-slate-100">
             Register employee
           </h1>
-          <p className="mt-0.5 text-sm text-stone-500">
+          <p className="mt-0.5 text-sm text-stone-500 dark:text-slate-400">
             Add a new employee. You can set their base pay once they're
             registered.
           </p>
@@ -278,7 +278,7 @@ const RegisterEmployee = () => {
         {formError && (
           <div
             role="alert"
-            className="mb-5 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900"
+            className="mb-5 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200"
           >
             <Icon d={ICONS.alert} className="mt-0.5 h-4 w-4 shrink-0" />
             <p className="flex-1">{formError}</p>
@@ -292,13 +292,13 @@ const RegisterEmployee = () => {
               e.preventDefault();
               submit("list");
             }}
-            className="overflow-hidden rounded-xl border border-stone-200 bg-white"
+            className="overflow-hidden rounded-xl border border-stone-200 bg-white dark:border-slate-800 dark:bg-slate-900"
           >
             <div className="space-y-6 p-5 sm:p-6">
               <section aria-labelledby="sec-details">
                 <h2
                   id="sec-details"
-                  className="mb-3 text-sm font-semibold text-stone-900"
+                  className="mb-3 text-sm font-semibold text-stone-900 dark:text-slate-100"
                 >
                   Employee details
                 </h2>
@@ -359,10 +359,10 @@ const RegisterEmployee = () => {
               </section>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 sm:px-6">
+            <div className="flex flex-wrap items-center justify-end gap-3 border-t border-stone-200 bg-stone-50 px-5 py-3 dark:border-slate-800 dark:bg-slate-800/70 sm:px-6">
               <Link
                 to={LIST_ROUTE}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Cancel
               </Link>
@@ -382,9 +382,9 @@ const RegisterEmployee = () => {
           {/* Live preview */}
           <aside
             aria-label="Employee preview"
-            className="hidden h-fit rounded-xl border border-stone-200 bg-white p-5 lg:sticky lg:top-6 lg:block"
+            className="hidden h-fit rounded-xl border border-stone-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-6 lg:block"
           >
-            <h2 className="text-sm font-medium text-stone-800">Preview</h2>
+            <h2 className="text-sm font-medium text-stone-800 dark:text-slate-200">Preview</h2>
             <div className="mt-4 flex items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal-700 text-sm font-semibold text-white">
                 {initials(form.empName)}
@@ -392,26 +392,26 @@ const RegisterEmployee = () => {
               <div className="min-w-0">
                 <p
                   className={`truncate text-sm font-medium ${
-                    form.empName.trim() ? "text-stone-900" : "text-stone-400"
+                    form.empName.trim() ? "text-stone-900 dark:text-slate-100" : "text-stone-400 dark:text-slate-500"
                   }`}
                 >
                   {form.empName.trim() || "Employee name"}
                 </p>
-                <p className="truncate text-xs text-stone-500">
+                <p className="truncate text-xs text-stone-500 dark:text-slate-400">
                   {form.empEmail.trim() || "No email"}
                 </p>
               </div>
             </div>
-            <dl className="mt-4 space-y-3 border-t border-stone-200 pt-4 text-sm">
+            <dl className="mt-4 space-y-3 border-t border-stone-200 pt-4 text-sm dark:border-slate-800">
               <div className="flex items-baseline justify-between gap-3">
-                <dt className="text-stone-500">Phone</dt>
-                <dd className="tabular-nums text-stone-800">
+                <dt className="text-stone-500 dark:text-slate-400">Phone</dt>
+                <dd className="tabular-nums text-stone-800 dark:text-slate-200">
                   {form.empPhone.trim() || "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-stone-500">Address</dt>
-                <dd className="mt-1 whitespace-pre-line text-stone-800">
+                <dt className="text-stone-500 dark:text-slate-400">Address</dt>
+                <dd className="mt-1 whitespace-pre-line text-stone-800 dark:text-slate-200">
                   {form.empAddress.trim() || "—"}
                 </dd>
               </div>

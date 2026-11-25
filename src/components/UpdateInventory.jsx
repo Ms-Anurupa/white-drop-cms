@@ -388,11 +388,11 @@ const UpdateInventory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center dark:bg-slate-950">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 border-4 border-gray-200 border-t-gray-800 dark:border-slate-700 dark:border-t-slate-200 rounded-full animate-spin mx-auto mb-4" />
 
-          <p className="text-gray-600">Loading inventory...</p>
+          <p className="text-gray-600 dark:text-slate-300">Loading inventory...</p>
         </div>
       </div>
     );
@@ -400,14 +400,14 @@ const UpdateInventory = () => {
 
   if (!inventoryData) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
+      <div className="min-h-[60vh] flex items-center justify-center px-4 dark:bg-slate-950">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || "Inventory not found."}</p>
+          <p className="text-red-600 dark:text-red-400 mb-4">{error || "Inventory not found."}</p>
 
           <button
             type="button"
             onClick={() => navigate("/dashboard/inventory")}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
           >
             <ArrowLeft size={16} />
             Back to Inventory
@@ -418,7 +418,7 @@ const UpdateInventory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
 
@@ -427,23 +427,23 @@ const UpdateInventory = () => {
             <button
               type="button"
               onClick={() => navigate("/dashboard/inventory")}
-              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-3"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-100 mb-3"
             >
               <ArrowLeft size={16} />
               Back to Inventory
             </button>
 
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-slate-100">
               Update Inventory
             </h1>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               Update the inventory details below.
             </p>
           </div>
 
           {hasChanges && (
-            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-950/60 dark:border-amber-800 dark:text-amber-300 text-sm">
               <span className="w-2 h-2 rounded-full bg-amber-500" />
               Unsaved changes
             </div>
@@ -453,7 +453,7 @@ const UpdateInventory = () => {
         {/* ERROR */}
 
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/60 dark:text-red-300">
             {error}
           </div>
         )}
@@ -463,19 +463,19 @@ const UpdateInventory = () => {
               PRODUCTION DETAILS
           ================================================== */}
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="px-5 py-4 border-b border-gray-200">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <PackagePlus size={18} className="text-gray-700" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
+                  <PackagePlus size={18} className="text-gray-700 dark:text-slate-300" />
                 </div>
 
                 <div>
-                  <h2 className="font-semibold text-gray-900">
+                  <h2 className="font-semibold text-gray-900 dark:text-slate-100">
                     Production Details
                   </h2>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     Basic inventory production information
                   </p>
                 </div>
@@ -486,7 +486,7 @@ const UpdateInventory = () => {
               {/* ENTRY DATE */}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Entry Date
                 </label>
 
@@ -495,14 +495,14 @@ const UpdateInventory = () => {
                   name="entryDate"
                   value={inventoryDataList.entryDate || ""}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-500"
                 />
               </div>
 
               {/* BULK UNIT */}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Bulk Unit
                 </label>
 
@@ -510,7 +510,7 @@ const UpdateInventory = () => {
                   name="bulkUnit"
                   value={inventoryDataList.bulkUnit}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm bg-white outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm bg-white outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-500"
                 >
                   <option value="L">Liter (L)</option>
 
@@ -525,7 +525,7 @@ const UpdateInventory = () => {
               {/* PRODUCED */}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Bulk Produced Quantity
                 </label>
 
@@ -537,14 +537,14 @@ const UpdateInventory = () => {
                   value={inventoryDataList.bulkProducedQty}
                   onChange={handleChange}
                   placeholder="Enter quantity"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-500"
                 />
               </div>
 
               {/* WASTAGE */}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Wastage Quantity
                 </label>
 
@@ -556,7 +556,7 @@ const UpdateInventory = () => {
                   value={inventoryDataList.wastageQty}
                   onChange={handleChange}
                   placeholder="Enter wastage"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-gray-700 focus:ring-1 focus:ring-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-500"
                 />
               </div>
             </div>
@@ -566,12 +566,12 @@ const UpdateInventory = () => {
               STOCK IN
           ================================================== */}
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-gray-900">Stock In</h2>
+                <h2 className="font-semibold text-gray-900 dark:text-slate-100">Stock In</h2>
 
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   Products entering inventory
                 </p>
               </div>
@@ -579,7 +579,7 @@ const UpdateInventory = () => {
               <button
                 type="button"
                 onClick={addStockIn}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
               >
                 <Plus size={16} />
                 Add Stock In
@@ -588,13 +588,13 @@ const UpdateInventory = () => {
 
             <div className="p-5 space-y-4">
               {stockIn.length === 0 ? (
-                <div className="border border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <p className="text-sm text-gray-500">No stock-in records.</p>
+                <div className="border border-dashed border-gray-300 dark:border-slate-700 rounded-lg p-8 text-center">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">No stock-in records.</p>
 
                   <button
                     type="button"
                     onClick={addStockIn}
-                    className="mt-3 text-sm font-medium text-gray-900 hover:underline"
+                    className="mt-3 text-sm font-medium text-gray-900 dark:text-slate-100 hover:underline"
                   >
                     + Add Stock In
                   </button>
@@ -603,13 +603,13 @@ const UpdateInventory = () => {
                 stockIn.map((item, index) => (
                   <div
                     key={item.id || `stock-in-${index}`}
-                    className="border border-gray-200 rounded-xl p-4 bg-gray-50"
+                    className="border border-gray-200 rounded-xl p-4 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/70"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                       {/* TYPE */}
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                           Type
                         </label>
 
@@ -622,7 +622,7 @@ const UpdateInventory = () => {
                               e.target.value === "loose",
                             )
                           }
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                         >
                           <option value="packet">Packet</option>
 
@@ -633,7 +633,7 @@ const UpdateInventory = () => {
                       {/* UNIT */}
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                           Unit
                         </label>
 
@@ -642,7 +642,7 @@ const UpdateInventory = () => {
                           onChange={(e) =>
                             updateStockIn(index, "unit", e.target.value)
                           }
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                         >
                           <option value="L">L</option>
 
@@ -658,7 +658,7 @@ const UpdateInventory = () => {
 
                       {item.isLoose ? (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Quantity
                           </label>
 
@@ -670,12 +670,12 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockIn(index, "quantity", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       ) : (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Unit Size
                           </label>
 
@@ -687,7 +687,7 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockIn(index, "unitSize", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       )}
@@ -696,7 +696,7 @@ const UpdateInventory = () => {
 
                       {!item.isLoose && (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Packets
                           </label>
 
@@ -708,7 +708,7 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockIn(index, "packets", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       )}
@@ -723,7 +723,7 @@ const UpdateInventory = () => {
                         <button
                           type="button"
                           onClick={() => removeStockIn(index)}
-                          className="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm"
+                          className="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/60 text-sm"
                         >
                           <Trash2 size={16} />
                           Remove
@@ -740,12 +740,12 @@ const UpdateInventory = () => {
               STOCK OUT
           ================================================== */}
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-gray-900">Stock Out</h2>
+                <h2 className="font-semibold text-gray-900 dark:text-slate-100">Stock Out</h2>
 
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   Products leaving inventory
                 </p>
               </div>
@@ -753,7 +753,7 @@ const UpdateInventory = () => {
               <button
                 type="button"
                 onClick={addStockOut}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
               >
                 <Plus size={16} />
                 Add Stock Out
@@ -762,13 +762,13 @@ const UpdateInventory = () => {
 
             <div className="p-5 space-y-4">
               {stockOut.length === 0 ? (
-                <div className="border border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <p className="text-sm text-gray-500">No stock-out records.</p>
+                <div className="border border-dashed border-gray-300 dark:border-slate-700 rounded-lg p-8 text-center">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">No stock-out records.</p>
 
                   <button
                     type="button"
                     onClick={addStockOut}
-                    className="mt-3 text-sm font-medium text-gray-900 hover:underline"
+                    className="mt-3 text-sm font-medium text-gray-900 dark:text-slate-100 hover:underline"
                   >
                     + Add Stock Out
                   </button>
@@ -777,13 +777,13 @@ const UpdateInventory = () => {
                 stockOut.map((item, index) => (
                   <div
                     key={item.id || `stock-out-${index}`}
-                    className="border border-gray-200 rounded-xl p-4 bg-gray-50"
+                    className="border border-gray-200 rounded-xl p-4 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/70"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                       {/* TYPE */}
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                           Type
                         </label>
 
@@ -796,7 +796,7 @@ const UpdateInventory = () => {
                               e.target.value === "loose",
                             )
                           }
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                         >
                           <option value="packet">Packet</option>
 
@@ -807,7 +807,7 @@ const UpdateInventory = () => {
                       {/* UNIT */}
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                           Unit
                         </label>
 
@@ -816,7 +816,7 @@ const UpdateInventory = () => {
                           onChange={(e) =>
                             updateStockOut(index, "unit", e.target.value)
                           }
-                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                         >
                           <option value="L">L</option>
 
@@ -832,7 +832,7 @@ const UpdateInventory = () => {
 
                       {item.isLoose ? (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Quantity
                           </label>
 
@@ -844,12 +844,12 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockOut(index, "quantity", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       ) : (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Unit Size
                           </label>
 
@@ -861,7 +861,7 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockOut(index, "unitSize", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       )}
@@ -870,7 +870,7 @@ const UpdateInventory = () => {
 
                       {!item.isLoose && (
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-slate-300 mb-2">
                             Packets
                           </label>
 
@@ -882,7 +882,7 @@ const UpdateInventory = () => {
                             onChange={(e) =>
                               updateStockOut(index, "packets", e.target.value)
                             }
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                           />
                         </div>
                       )}
@@ -897,7 +897,7 @@ const UpdateInventory = () => {
                         <button
                           type="button"
                           onClick={() => removeStockOut(index)}
-                          className="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm"
+                          className="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/60 text-sm"
                         >
                           <Trash2 size={16} />
                           Remove
@@ -919,7 +919,7 @@ const UpdateInventory = () => {
               type="button"
               onClick={() => navigate("/dashboard/inventory")}
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50"
             >
               <ArrowLeft size={16} />
               Cancel
@@ -929,7 +929,7 @@ const UpdateInventory = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={16} />
 

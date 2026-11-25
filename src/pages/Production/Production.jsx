@@ -59,13 +59,13 @@ const inventoryData = [
 const filters = ["All", "In Stock", "Low Stock", "Out of Stock"];
 
 const statusColor = {
-  "In Stock": "bg-green-100 text-green-700",
-  "Low Stock": "bg-amber-100 text-amber-700",
-  "Out of Stock": "bg-red-100 text-red-700",
+  "In Stock": "bg-green-100 text-green-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  "Low Stock": "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  "Out of Stock": "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300",
 };
 
 const StatCard = ({ label, value, Icon, iconColor, bg }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-2">
+  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 px-5 py-2">
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-3 min-w-0">
         <div
@@ -73,10 +73,10 @@ const StatCard = ({ label, value, Icon, iconColor, bg }) => (
         >
           <Icon className={iconColor} size={20} />
         </div>
-        <p className="text-sm font-medium text-gray-600 truncate">{label}</p>
+        <p className="text-sm font-medium text-gray-600 dark:text-slate-400 truncate">{label}</p>
       </div>
 
-      <h3 className="text-2xl font-bold text-slate-900 shrink-0">{value}</h3>
+      <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 shrink-0">{value}</h3>
     </div>
   </div>
 );
@@ -109,15 +109,15 @@ export default function Production() {
   };
 
   return (
-    <div className="p-6 md:p-6 space-y-2">
+    <div className="p-6 md:p-6 space-y-2 min-h-full dark:bg-slate-950">
       {/* ── HEADER (LEFT) + TOOLBAR (RIGHT) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* LEFT */}
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
             Production Management
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
             Track stock levels & product availability
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function Production() {
           <div className="relative w-full sm:w-64">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             />
             <input
               value={search}
@@ -137,7 +137,7 @@ export default function Production() {
                 setPage(1);
               }}
               placeholder="Search inventory…"
-              className="w-full bg-white border border-gray-200 rounded-lg py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+              className="w-full bg-white border border-gray-200 rounded-lg py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
           </div>
 
@@ -161,25 +161,29 @@ export default function Production() {
           label="Total Items"
           value={stats.total}
           Icon={Package}
-          bg="bg-slate-100"
+          iconColor="dark:text-slate-200"
+          bg="bg-slate-100 dark:bg-slate-800"
         />
         <StatCard
           label="In Stock"
           value={stats.inStock}
           Icon={CheckCircle2}
-          bg="bg-green-100"
+          iconColor="dark:text-emerald-400"
+          bg="bg-green-100 dark:bg-emerald-950/60"
         />
         <StatCard
           label="Low Stock"
           value={stats.lowStock}
           Icon={AlertTriangle}
-          bg="bg-amber-100"
+          iconColor="dark:text-amber-400"
+          bg="bg-amber-100 dark:bg-amber-950/60"
         />
         <StatCard
           label="Out of Stock"
           value={stats.outStock}
           Icon={XCircle}
-          bg="bg-red-100"
+          iconColor="dark:text-red-400"
+          bg="bg-red-100 dark:bg-red-950/60"
         />
       </div>
 
@@ -196,7 +200,7 @@ export default function Production() {
             ${
               activeFilter === f
                 ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
+                : "bg-white text-gray-500 border-gray-200 hover:border-gray-300 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700 dark:hover:border-slate-600 dark:hover:bg-slate-800"
             }`}
           >
             {f}
@@ -205,11 +209,11 @@ export default function Production() {
       </div>
 
       {/* TABLE - DESKTOP */}
-      <div className="hidden xl:block bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="hidden xl:block bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="max-h-[430px] overflow-y-auto">
           <table className="w-full">
-            <thead className="sticky top-0 bg-slate-50">
-              <tr className="text-sm text-gray-500">
+            <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800/70">
+              <tr className="text-sm text-gray-500 dark:text-slate-400">
                 <th className="text-left px-6 py-2">Product</th>
                 <th className="text-left px-6 py-2">Category</th>
                 <th className="text-left px-6 py-2">Stock</th>
@@ -223,20 +227,20 @@ export default function Production() {
               {currentData.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-t hover:bg-blue-50/40 transition"
+                  className="border-t dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition"
                 >
                   <td className="px-6 py-2">
-                    <p className="font-medium">{item.product}</p>
-                    <p className="text-xs text-gray-400">{item.id}</p>
+                    <p className="font-medium dark:text-slate-100">{item.product}</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500">{item.id}</p>
                   </td>
 
-                  <td className="px-6 py-2 text-gray-600">{item.category}</td>
+                  <td className="px-6 py-2 text-gray-600 dark:text-slate-300">{item.category}</td>
 
-                  <td className="px-6 py-2 text-gray-600">
+                  <td className="px-6 py-2 text-gray-600 dark:text-slate-300">
                     {item.stock} {item.unit}
                   </td>
 
-                  <td className="px-6 py-2 text-gray-600">{item.minStock}</td>
+                  <td className="px-6 py-2 text-gray-600 dark:text-slate-300">{item.minStock}</td>
 
                   <td className="px-6 py-2">
                     <span
@@ -246,7 +250,7 @@ export default function Production() {
                     </span>
                   </td>
 
-                  <td className="px-6 py-2 text-gray-500">{item.updated}</td>
+                  <td className="px-6 py-2 text-gray-500 dark:text-slate-400">{item.updated}</td>
                 </tr>
               ))}
             </tbody>
@@ -259,12 +263,12 @@ export default function Production() {
         {currentData.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5"
+            className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-5"
           >
             <div className="flex justify-between">
               <div>
-                <h3 className="font-semibold">{item.product}</h3>
-                <p className="text-xs text-gray-400">{item.category}</p>
+                <h3 className="font-semibold dark:text-slate-100">{item.product}</h3>
+                <p className="text-xs text-gray-400 dark:text-slate-500">{item.category}</p>
               </div>
 
               <span
@@ -276,23 +280,23 @@ export default function Production() {
 
             <div className="grid grid-cols-2 gap-4 mt-5 text-sm">
               <div>
-                <p className="text-gray-400">Stock</p>
-                <p>{item.stock}</p>
+                <p className="text-gray-400 dark:text-slate-500">Stock</p>
+                <p className="dark:text-slate-200">{item.stock}</p>
               </div>
 
               <div>
-                <p className="text-gray-400">Min</p>
-                <p>{item.minStock}</p>
+                <p className="text-gray-400 dark:text-slate-500">Min</p>
+                <p className="dark:text-slate-200">{item.minStock}</p>
               </div>
 
               <div>
-                <p className="text-gray-400">Updated</p>
-                <p>{item.updated}</p>
+                <p className="text-gray-400 dark:text-slate-500">Updated</p>
+                <p className="dark:text-slate-200">{item.updated}</p>
               </div>
 
               <div>
-                <p className="text-gray-400">ID</p>
-                <p>{item.id}</p>
+                <p className="text-gray-400 dark:text-slate-500">ID</p>
+                <p className="dark:text-slate-200">{item.id}</p>
               </div>
             </div>
           </div>
@@ -301,7 +305,7 @@ export default function Production() {
 
       {/* PAGINATION */}
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-        <p className="text-xs sm:text-sm text-gray-400">
+        <p className="text-xs sm:text-sm text-gray-400 dark:text-slate-500">
           Showing {start + 1} -{" "}
           {Math.min(start + PAGE_SIZE, filteredData.length)} of{" "}
           {filteredData.length}
@@ -311,7 +315,7 @@ export default function Production() {
           <button
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
-            className="w-10 h-10 cursor-pointer rounded-lg border disabled:opacity-40"
+            className="w-10 h-10 cursor-pointer rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-40"
           >
             <ChevronLeft size={18} />
           </button>
@@ -319,7 +323,7 @@ export default function Production() {
           <button
             disabled={page === totalPages}
             onClick={() => setPage(page + 1)}
-            className="w-10 h-10 cursor-pointer rounded-lg border disabled:opacity-40"
+            className="w-10 h-10 cursor-pointer rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-40"
           >
             <ChevronRight size={18} />
           </button>

@@ -25,17 +25,20 @@ import Loader from "./Loader";
 
 const PARTNER_STATUS_STYLES = {
   AVAILABLE: {
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    badge:
+      "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800",
     dot: "bg-emerald-500",
     label: "Available",
   },
   BUSY: {
-    badge: "bg-amber-50 text-amber-700 border-amber-100",
+    badge:
+      "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
     dot: "bg-amber-500",
     label: "Busy",
   },
   OFFLINE: {
-    badge: "bg-slate-100 text-slate-500 border-slate-200",
+    badge:
+      "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700",
     dot: "bg-slate-400",
     label: "Offline",
   },
@@ -229,25 +232,25 @@ const AssignDeliveryPartner = () => {
 
   if (!deliveryJob) {
     return (
-      <div className="min-h-full bg-slate-50 p-4">
+      <div className="min-h-full bg-slate-50 dark:bg-slate-950 p-4">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm py-20 text-center">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm py-20 text-center">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
               <Truck size={25} />
             </div>
 
-            <h2 className="text-base font-semibold text-slate-900">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
               Delivery job not found
             </h2>
 
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               The delivery job may have been removed or is no longer available.
             </p>
 
             <button
               type="button"
               onClick={() => navigate("/dashboard/delivery-job")}
-              className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition-colors cursor-pointer"
+              className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 text-sm font-semibold transition-colors cursor-pointer"
             >
               <ArrowLeft size={16} />
               Back to Delivery Jobs
@@ -259,13 +262,13 @@ const AssignDeliveryPartner = () => {
   }
 
   return (
-    <div className="w-full min-h-full bg-slate-50 p-4">
+    <div className="w-full min-h-full bg-slate-50 dark:bg-slate-950 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-4">
           <button
             type="button"
             onClick={() => navigate("/dashboard/delivery-job")}
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
           >
             <ArrowLeft size={16} />
             Delivery Jobs
@@ -337,19 +340,19 @@ const AssignDeliveryPartner = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-5 sm:p-6 mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm p-5 sm:p-6 mb-4">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                 Job Summary
               </h2>
 
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Delivery details for this assignment
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
               <Package size={15} />
               {deliveryJob.orders?.length || 0} Orders
             </div>
@@ -358,17 +361,17 @@ const AssignDeliveryPartner = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* AREA */}
 
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-100 p-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
-                <MapPin size={18} className="text-slate-500" />
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800 p-3.5">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <MapPin size={18} className="text-slate-500 dark:text-slate-400" />
               </div>
 
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   Area
                 </p>
 
-                <p className="text-sm font-semibold text-slate-800 mt-0.5 truncate">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5 truncate">
                   {deliveryJob.area || "—"}
                 </p>
               </div>
@@ -376,17 +379,17 @@ const AssignDeliveryPartner = () => {
 
             {/* DATE */}
 
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-100 p-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
-                <CalendarDays size={18} className="text-slate-500" />
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800 p-3.5">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <CalendarDays size={18} className="text-slate-500 dark:text-slate-400" />
               </div>
 
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   Delivery Date
                 </p>
 
-                <p className="text-sm font-semibold text-slate-800 mt-0.5">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5">
                   {formatDate(deliveryJob.deliveryDate)}
                 </p>
               </div>
@@ -394,8 +397,8 @@ const AssignDeliveryPartner = () => {
 
             {/* SLOT */}
 
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-100 p-3.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800 p-3.5">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center shrink-0 overflow-hidden">
                 {deliveryJob.slot?.icon ? (
                   <img
                     src={resolveFirebaseUrl({
@@ -406,21 +409,21 @@ const AssignDeliveryPartner = () => {
                     className="w-6 h-6 object-contain"
                   />
                 ) : (
-                  <Clock3 size={18} className="text-blue-600" />
+                  <Clock3 size={18} className="text-blue-600 dark:text-blue-400" />
                 )}
               </div>
 
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   Delivery Slot
                 </p>
 
-                <p className="text-sm font-semibold text-slate-800 mt-0.5 truncate">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5 truncate">
                   {deliveryJob.slot?.name || "—"}
                 </p>
 
                 {deliveryJob.slot?.from && deliveryJob.slot?.to && (
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                     {deliveryJob.slot.from} - {deliveryJob.slot.to}
                   </p>
                 )}
@@ -429,17 +432,17 @@ const AssignDeliveryPartner = () => {
 
             {/* ORDERS */}
 
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-100 p-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
-                <Package size={18} className="text-slate-500" />
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800 p-3.5">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <Package size={18} className="text-slate-500 dark:text-slate-400" />
               </div>
 
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   Orders
                 </p>
 
-                <p className="text-sm font-semibold text-slate-800 mt-0.5">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-0.5">
                   {deliveryJob.orders?.length || 0} Orders
                 </p>
               </div>
@@ -448,21 +451,21 @@ const AssignDeliveryPartner = () => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4">
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-5 sm:px-6 py-4 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-semibold text-slate-900">
+                    <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                       Delivery Partners
                     </h2>
 
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold">
                       {deliveryPartners?.length || 0}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {availablePartners} partners currently available
                   </p>
                 </div>
@@ -470,7 +473,7 @@ const AssignDeliveryPartner = () => {
                 <div className="relative w-full sm:w-64">
                   <Search
                     size={15}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                   />
 
                   <input
@@ -483,12 +486,14 @@ const AssignDeliveryPartner = () => {
                       pl-9 pr-3 py-2.5
                       text-sm
                       rounded-xl
-                      border border-slate-200
-                      bg-slate-50
-                      focus:bg-white
-                      focus:border-blue-400
+                      border border-slate-200 dark:border-slate-700
+                      bg-slate-50 dark:bg-slate-800
+                      text-slate-900 dark:text-slate-100
+                      placeholder:text-slate-400 dark:placeholder:text-slate-500
+                      focus:bg-white dark:focus:bg-slate-800
+                      focus:border-blue-400 dark:focus:border-blue-500
                       focus:ring-2
-                      focus:ring-blue-100
+                      focus:ring-blue-100 dark:focus:ring-blue-500/20
                       outline-none
                       transition-all
                     "
@@ -499,20 +504,20 @@ const AssignDeliveryPartner = () => {
 
             {!filteredPartners.length ? (
               <div className="py-16 px-6 text-center">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mb-4">
                   <Users size={24} />
                 </div>
 
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                   No delivery partners found
                 </h3>
 
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Try changing your search or check partner availability.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredPartners.map((partner) => {
                   const statusStyle = getPartnerStatusStyle(partner.status);
 
@@ -533,7 +538,7 @@ const AssignDeliveryPartner = () => {
                         px-5 sm:px-6 py-4
                         transition-all
                         cursor-pointer
-                        ${isSelected ? "bg-blue-50/60" : "hover:bg-slate-50"}
+                        ${isSelected ? "bg-blue-50/60 dark:bg-blue-950/40" : "hover:bg-slate-50 dark:hover:bg-slate-800/60"}
                       `}
                     >
                       <div className="flex items-center gap-4">
@@ -551,7 +556,7 @@ const AssignDeliveryPartner = () => {
                             ${
                               isSelected
                                 ? "bg-blue-600 text-white"
-                                : "bg-violet-100 text-violet-700"
+                                : "bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300"
                             }
                           `}
                         >
@@ -566,7 +571,7 @@ const AssignDeliveryPartner = () => {
                               h-3
                               rounded-full
                               border-2
-                              border-white
+                              border-white dark:border-slate-900
                               ${statusStyle.dot}
                             `}
                           />
@@ -576,7 +581,7 @@ const AssignDeliveryPartner = () => {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-slate-900">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                               {getPartnerName(partner)}
                             </p>
 
@@ -601,21 +606,21 @@ const AssignDeliveryPartner = () => {
 
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
                             {getPartnerPhone(partner) && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
                                 {getPartnerPhone(partner)}
                               </span>
                             )}
 
                             <div className="flex flex-col gap-1 mt-1">
                               {getVehicleNumber(partner) && (
-                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                <span className="text-xs text-slate-400 dark:text-slate-400 flex items-center gap-1">
                                   <Truck size={12} className="shrink-0" />
                                   {getVehicleNumber(partner)}
                                 </span>
                               )}
 
                               {partner.areaCovered && (
-                                <span className="text-xs text-slate-400 truncate">
+                                <span className="text-xs text-slate-400 dark:text-slate-400 truncate">
                                   {partner.areaCovered}
                                 </span>
                               )}
@@ -636,7 +641,7 @@ const AssignDeliveryPartner = () => {
                             ${
                               isSelected
                                 ? "bg-blue-600 border-blue-600 text-white"
-                                : "bg-white border-slate-200 text-transparent"
+                                : "bg-white border-slate-200 text-transparent dark:bg-slate-800 dark:border-slate-700"
                             }
                           `}
                         >
@@ -651,13 +656,13 @@ const AssignDeliveryPartner = () => {
           </div>
 
           <div className="xl:sticky xl:top-4 h-fit">
-            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100">
-                <h2 className="text-base font-semibold text-slate-900">
+            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                   {isAlreadyAssigned ? "Reassignment" : "Assignment"}
                 </h2>
 
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {isAlreadyAssigned
                     ? "Review and change the delivery partner"
                     : "Review the selected delivery partner"}
@@ -668,7 +673,7 @@ const AssignDeliveryPartner = () => {
                 <div className="p-5">
                   {/* SELECTED PARTNER */}
 
-                  <div className="rounded-xl bg-blue-50/70 border border-blue-100 p-4">
+                  <div className="rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/70 p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
                         {getInitials(selectedPartner)}
@@ -676,14 +681,14 @@ const AssignDeliveryPartner = () => {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-sm font-semibold text-slate-900 truncate">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                             {getPartnerName(selectedPartner)}
                           </p>
 
                           {isAlreadyAssigned &&
                             getPartnerId(selectedPartner) ===
                               deliveryJob.deliveryPartnerId && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-semibold text-emerald-700">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
                                 <CheckCircle2 size={11} />
                                 Current
                               </span>
@@ -697,7 +702,7 @@ const AssignDeliveryPartner = () => {
                             }`}
                           />
 
-                          <span className="text-xs text-slate-600 font-medium">
+                          <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
                             {selectedPartner.status || "Available"}
                           </span>
                         </div>
@@ -706,7 +711,7 @@ const AssignDeliveryPartner = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedPartner(null)}
-                        className="ml-auto w-7 h-7 rounded-lg hover:bg-white text-slate-400 hover:text-slate-700 flex items-center justify-center cursor-pointer"
+                        className="ml-auto w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center cursor-pointer"
                       >
                         <X size={15} />
                       </button>
@@ -718,9 +723,9 @@ const AssignDeliveryPartner = () => {
                   <div className="mt-5 space-y-3">
                     {getPartnerPhone(selectedPartner) && (
                       <div className="flex items-center justify-between gap-3">
-                        <span className="text-xs text-slate-400">Phone</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">Phone</span>
 
-                        <span className="text-xs font-semibold text-slate-700">
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                           {getPartnerPhone(selectedPartner)}
                         </span>
                       </div>
@@ -728,36 +733,36 @@ const AssignDeliveryPartner = () => {
 
                     {getVehicleNumber(selectedPartner) && (
                       <div className="flex items-center justify-between gap-3">
-                        <span className="text-xs text-slate-400">Vehicle</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">Vehicle</span>
 
-                        <span className="text-xs font-semibold text-slate-700">
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                           {getVehicleNumber(selectedPartner)}
                         </span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
                         Delivery Area
                       </span>
 
-                      <span className="text-xs font-semibold text-slate-700 text-right">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 text-right">
                         {selectedPartner.areaCovered || "—"}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-slate-400">Orders</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">Orders</span>
 
-                      <span className="text-xs font-semibold text-slate-700">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                         {deliveryJob.orders?.length || 0}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-slate-400">Slot</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">Slot</span>
 
-                      <span className="text-xs font-semibold text-slate-700">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                         {deliveryJob.slot?.name || "—"}
                       </span>
                     </div>
@@ -765,14 +770,14 @@ const AssignDeliveryPartner = () => {
 
                   {/* ASSIGNMENT NOTE */}
 
-                  <div className="mt-5 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="mt-5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800">
                     <div className="flex gap-2.5">
                       <CheckCircle2
                         size={16}
-                        className="text-blue-600 shrink-0 mt-0.5"
+                        className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"
                       />
 
-                      <p className="text-xs leading-5 text-slate-500">
+                      <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
                         {isAlreadyAssigned
                           ? "Reassigning this delivery job will replace the currently assigned partner with the selected partner."
                           : "Assigning this partner will make them responsible for the orders included in this delivery job."}
@@ -798,7 +803,7 @@ const AssignDeliveryPartner = () => {
                       rounded-xl
                       bg-[#3B5CCC]
                       hover:bg-[#334FB3]
-                      disabled:bg-slate-300
+                      disabled:bg-slate-300 dark:disabled:bg-slate-700 dark:disabled:text-slate-400
                       disabled:cursor-not-allowed
                       text-white
                       text-sm
@@ -826,19 +831,19 @@ const AssignDeliveryPartner = () => {
                 </div>
               ) : (
                 <div className="px-5 py-12 text-center">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mb-4">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mb-4">
                     <UserRound size={24} />
                   </div>
 
-                  <h3 className="text-sm font-semibold text-slate-900">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     No partner selected
                   </h3>
 
-                  <p className="text-xs text-slate-500 mt-1 max-w-[220px] mx-auto leading-5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px] mx-auto leading-5">
                     Select a delivery partner from the list to assign this job.
                   </p>
 
-                  <div className="mt-5 flex items-center justify-center gap-1.5 text-xs text-blue-600 font-medium">
+                  <div className="mt-5 flex items-center justify-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-medium">
                     <span>Select a partner</span>
                     <ChevronRight size={14} />
                   </div>

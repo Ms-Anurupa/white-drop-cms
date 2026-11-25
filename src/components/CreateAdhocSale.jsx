@@ -182,15 +182,15 @@ export default function AdHocSaleForm() {
   };
 
   const inputClass =
-    "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
+    "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800/50";
 
   return (
-    <div className="mx-auto my-8 max-w-4xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-6 border-b border-slate-100 pb-4">
-        <h2 className="text-xl font-semibold text-slate-800">
+    <div className="mx-auto my-8 max-w-4xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="mb-6 border-b border-slate-100 pb-4 dark:border-slate-800">
+        <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
           Record Ad-Hoc Sale
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Record a manual sale with one or more product line items.
         </p>
       </div>
@@ -199,21 +199,21 @@ export default function AdHocSaleForm() {
         <div
           className={`mb-5 flex items-start gap-3 rounded-lg border p-4 ${
             status.type === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-rose-200 bg-rose-50 text-rose-800"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+              : "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
           }`}
         >
           {status.type === "success" ? (
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
           ) : (
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
           )}
 
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium">{status.message}</p>
 
             {status.errors && (
-              <pre className="mt-2 overflow-x-auto rounded bg-white/70 p-2 text-xs">
+              <pre className="mt-2 overflow-x-auto rounded bg-white/70 p-2 text-xs dark:bg-slate-900/70">
                 {JSON.stringify(status.errors, null, 2)}
               </pre>
             )}
@@ -230,7 +230,7 @@ export default function AdHocSaleForm() {
       )}
 
       {formError && (
-        <div className="mb-5 flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+        <div className="mb-5 flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{formError}</span>
         </div>
@@ -240,7 +240,7 @@ export default function AdHocSaleForm() {
         {/* Sale Details Header Information */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600">
+            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
               <Calendar className="h-3.5 w-3.5" /> Date & Time *
             </label>
             <input
@@ -254,7 +254,7 @@ export default function AdHocSaleForm() {
           </div>
 
           <div>
-            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600">
+            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
               <User className="h-3.5 w-3.5" /> Sold By *
             </label>
             <input
@@ -269,7 +269,7 @@ export default function AdHocSaleForm() {
           </div>
 
           <div>
-            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600">
+            <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
               <Phone className="h-3.5 w-3.5" /> Phone Number *
             </label>
             <input
@@ -282,19 +282,19 @@ export default function AdHocSaleForm() {
               className={inputClass}
             />
             {phoneError && (
-              <p className="mt-1 text-xs text-rose-600">{phoneError}</p>
+              <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{phoneError}</p>
             )}
           </div>
         </div>
 
         {/* Line Items Section */}
-        <div className="border-t border-slate-200 pt-5">
+        <div className="border-t border-slate-200 pt-5 dark:border-slate-800">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-800">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Sale Items
               </h3>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Enter quantity, unit measurement, and rate per unit.
               </p>
             </div>
@@ -302,7 +302,7 @@ export default function AdHocSaleForm() {
             <button
               type="button"
               onClick={addDetailRow}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300 dark:hover:bg-blue-900/60"
             >
               <Plus className="h-4 w-4" />
               Add Item
@@ -313,11 +313,11 @@ export default function AdHocSaleForm() {
             {details.map((item, index) => (
               <div
                 key={index}
-                className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/70"
               >
                 <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <Package className="h-4 w-4 text-blue-600" />
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+                    <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     Item {index + 1}
                   </div>
 
@@ -325,7 +325,7 @@ export default function AdHocSaleForm() {
                     <button
                       type="button"
                       onClick={() => removeDetailRow(index)}
-                      className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                      className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 dark:text-slate-400 dark:hover:bg-rose-950/60 dark:hover:text-rose-400"
                       aria-label={`Remove item ${index + 1}`}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -335,7 +335,7 @@ export default function AdHocSaleForm() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                       Quantity *
                     </label>
                     <input
@@ -352,7 +352,7 @@ export default function AdHocSaleForm() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                       Unit *
                     </label>
                     <select
@@ -371,7 +371,7 @@ export default function AdHocSaleForm() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
                       Rate (₹) *
                     </label>
                     <input
@@ -388,7 +388,7 @@ export default function AdHocSaleForm() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>
                     {Number(item.qty) || 0} {item.unit} × ₹
                     {(Number(item.rate) || 0).toFixed(2)}
@@ -396,7 +396,7 @@ export default function AdHocSaleForm() {
 
                   <span>
                     Item total:{" "}
-                    <span className="font-semibold text-slate-800">
+                    <span className="font-semibold text-slate-800 dark:text-slate-100">
                       ₹
                       {(
                         Math.max(0, Number(item.qty) || 0) *
@@ -409,10 +409,10 @@ export default function AdHocSaleForm() {
             ))}
           </div>
 
-          <div className="mt-4 flex justify-end rounded-lg bg-blue-50 p-4">
+          <div className="mt-4 flex justify-end rounded-lg bg-blue-50 p-4 dark:bg-blue-950/60">
             <div className="text-right">
-              <p className="text-xs text-slate-500">Calculated item total</p>
-              <p className="text-lg font-semibold text-blue-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400">Calculated item total</p>
+              <p className="text-lg font-semibold text-blue-700 dark:text-blue-300">
                 ₹{calculatedTotal.toFixed(2)}
               </p>
             </div>
@@ -424,7 +424,7 @@ export default function AdHocSaleForm() {
           disabled={loading || !isFormValid || Boolean(phoneError)}
           className={`rounded-lg px-5 py-2.5 text-sm font-medium text-white transition ${
             loading || !isFormValid || Boolean(phoneError)
-              ? "cursor-not-allowed bg-slate-300 opacity-70"
+              ? "cursor-not-allowed bg-slate-300 opacity-70 dark:bg-slate-700 dark:text-slate-400"
               : "cursor-pointer bg-blue-600 hover:bg-blue-700"
           }`}
         >
