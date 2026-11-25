@@ -35,9 +35,6 @@ import useThemeStore from "@/zustand/Store/themeStore";
    1. CONFIG & HELPERS
    ============================================================ */
 
-// Header is fixed, so its height must be known to offset the page content.
-const HEADER_H = 52; // px (keep in sync with the h-[52px] / pt-[52px] classes)
-
 const CATEGORY_COLORS = [
   "#2563EB",
   "#0D9488",
@@ -566,7 +563,7 @@ const CategoryDropdown = ({
             <button
               type="button"
               onClick={() => choose(null)}
-              className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] font-bold ${
+              className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] font-bold ${
                 value === null
                   ? "bg-slate-100 text-[#101828] dark:bg-slate-800 dark:text-slate-100"
                   : "text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
@@ -592,7 +589,7 @@ const CategoryDropdown = ({
                 <button
                   type="button"
                   onClick={() => choose(item.name)}
-                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${
                     selected
                       ? "font-bold text-[#101828] dark:text-slate-100"
                       : "font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
@@ -641,6 +638,16 @@ const CategoryDropdown = ({
    5. SECTIONS
    ============================================================ */
 
+const ManageButton = ({ className, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`shrink-0 cursor-pointer items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-600 ${className}`}
+  >
+    Manage <ChevronRight size={13} />
+  </button>
+);
+
 const FilterBar = ({ d }) => {
   const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const navigate = useNavigate();
@@ -673,16 +680,6 @@ const FilterBar = ({ d }) => {
     filters.month !== null ||
     filters.week !== null;
 
-  const ManageButton = ({ className }) => (
-    <button
-      type="button"
-      onClick={() => navigate(tab.managePath)}
-      className={`shrink-0 items-center gap-0.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-1.5 text-[12px] font-bold text-[#101828] hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-slate-600 ${className}`}
-    >
-      Manage <ChevronRight size={13} />
-    </button>
-  );
-
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900 2xl:flex-row 2xl:items-center 2xl:justify-between">
       <div className="flex items-start justify-between gap-3">
@@ -707,7 +704,10 @@ const FilterBar = ({ d }) => {
             {tab.blurb}
           </p>
         </div>
-        <ManageButton className="flex 2xl:hidden" />
+        <ManageButton
+          className="flex 2xl:hidden"
+          onClick={() => navigate(tab.managePath)}
+        />
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -816,7 +816,10 @@ const FilterBar = ({ d }) => {
           </button>
         )}
 
-        <ManageButton className="hidden 2xl:flex" />
+        <ManageButton
+          className="hidden 2xl:flex"
+          onClick={() => navigate(tab.managePath)}
+        />
       </div>
     </div>
   );
@@ -979,7 +982,7 @@ const TrendPanel = ({ d }) => {
               tickFormatter={(v) => fmt(v)}
             />
             <Tooltip
-              wrapperStyle={{ zIndex: 30 }}
+              wrapperStyle={{ zIndex: 20 }}
               content={<ChartTooltip pre={tab.prefix} />}
               cursor={{ stroke: selectedColor, strokeDasharray: 4 }}
             />
@@ -1007,6 +1010,7 @@ const TrendPanel = ({ d }) => {
   );
 };
 
+
 const CategoryLinesPanel = ({ d }) => {
   const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
   const {
@@ -1033,6 +1037,7 @@ const CategoryLinesPanel = ({ d }) => {
     const names = selectedCategory
       ? [selectedCategory]
       : table.slice(0, 2).map((r) => r.name);
+
     return Object.fromEntries(
       names.map((name) => {
         const values = rows.find((r) => r.name === name)?.cur ?? [];
@@ -1050,8 +1055,13 @@ const CategoryLinesPanel = ({ d }) => {
     (name, color) =>
     ({ x, y, index, value }) => {
       if (callouts[name] !== index || !value) return null;
+
       const nearEnd = index >= labels.length - 2;
-      const text = `${labels[index]}${filters.year != null && filters.month == null ? ` ${filters.year}` : ""}, ${fmt(value, tab.prefix)}`;
+
+      const text = `${labels[index]}${
+        filters.year != null && filters.month == null ? ` ${filters.year}` : ""
+      }, ${fmt(value, tab.prefix)}`;
+
       return (
         <g key={`${name}-${index}`}>
           <circle
@@ -1062,6 +1072,7 @@ const CategoryLinesPanel = ({ d }) => {
             stroke={cardBgHex}
             strokeWidth={2}
           />
+
           <text
             x={nearEnd ? x - 10 : x + 10}
             y={nearEnd ? y - 10 : y + 4}
@@ -1084,6 +1095,7 @@ const CategoryLinesPanel = ({ d }) => {
       <ul className="mt-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
         {rows.map((row) => {
           const dim = selectedCategory && selectedCategory !== row.name;
+
           return (
             <li key={row.name}>
               <button
@@ -1107,6 +1119,7 @@ const CategoryLinesPanel = ({ d }) => {
         })}
       </ul>
 
+      {/* Chart */}
       <div className="mt-2 h-[280px] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -1121,6 +1134,7 @@ const CategoryLinesPanel = ({ d }) => {
               tickLine={false}
               minTickGap={18}
             />
+
             <YAxis
               tick={{ fill: axisColor, fontSize: 10 }}
               axisLine={false}
@@ -1138,12 +1152,14 @@ const CategoryLinesPanel = ({ d }) => {
             />
             <ReferenceLine y={0} stroke={axisLineColor} />
             <Tooltip
-              wrapperStyle={{ zIndex: 30 }}
+              wrapperStyle={{ zIndex: 20 }}
               content={<ChartTooltip pre={tab.prefix} />}
               cursor={{ stroke: axisColor, strokeDasharray: 4 }}
             />
+
             {rows.map((row) => {
               const dim = selectedCategory && selectedCategory !== row.name;
+
               return (
                 <Line
                   key={row.name}
@@ -1170,6 +1186,7 @@ const CategoryLinesPanel = ({ d }) => {
     </Panel>
   );
 };
+
 
 const CategoryList = ({ d }) => {
   const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
@@ -1266,46 +1283,53 @@ const CategoryList = ({ d }) => {
    6. ANALYTICS VIEW
    ============================================================ */
 
-export const AnalyticsView = ({ activeTab }) => {
+export const AnalyticsView = ({ activeTab, topNav = null }) => {
   const d = useAnalyticsData(activeTab);
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-3">
-      <FilterBar d={d} />
+    <div className="flex min-w-0 flex-1 flex-col">
+      {/* Unified opaque sticky header so scrolled cards/charts never bleed through */}
+      <div className="sticky top-0 z-30 -mx-4 bg-[#F4F5F7] px-4 pt-3 pb-3 dark:bg-slate-950 md:-mx-6 md:px-6">
+        <div className="flex flex-col gap-3">
+          {topNav}
+          <FilterBar d={d} />
+        </div>
+      </div>
 
-      {d.tab.isDynamic && d.status?.type === "error" && (
-        <div
-          role="alert"
-          className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
-        >
-          <span>{d.status.message}</span>
-          <button
-            type="button"
-            onClick={() => d.fetchData().catch(() => {})}
-            className="rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-rose-700"
+      <div className="flex min-w-0 flex-1 flex-col gap-3 pb-6">
+        {d.tab.isDynamic && d.status?.type === "error" && (
+          <div
+            role="alert"
+            className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-[12px] font-semibold text-rose-700 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
           >
-            Retry
-          </button>
-        </div>
-      )}
+            <span>{d.status.message}</span>
+            <button
+              type="button"
+              onClick={() => d.fetchData().catch(() => {})}
+              className="cursor-pointer rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-rose-700"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
-      <KpiCards d={d} />
+        <KpiCards d={d} />
 
-      <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12">
-        <div className="flex min-w-0 flex-col gap-3 lg:col-span-8">
-          <TrendPanel d={d} />
-          <CategoryLinesPanel d={d} />
+        <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12">
+          <div className="flex min-w-0 flex-col gap-3 lg:col-span-8">
+            <TrendPanel d={d} />
+            <CategoryLinesPanel d={d} />
+          </div>
+          <CategoryList d={d} />
         </div>
-        <CategoryList d={d} />
       </div>
     </div>
   );
 };
 
 /* ============================================================
-   7. DASHBOARD PAGE  (fixed header)
+   7. DASHBOARD PAGE
    ============================================================ */
-
 
 const Dashboard = () => {
   const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
@@ -1322,6 +1346,75 @@ const Dashboard = () => {
     resetProductCategory(null);
     resetExpenseCategory(null);
   };
+
+  const categoryNav = (
+    <div className="w-full">
+      <div className="relative rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-[0_4px_20px_-4px_rgba(16,24,40,0.06)] ring-1 ring-slate-900/[0.03] dark:border-slate-800 dark:bg-slate-900 dark:ring-white/[0.04]">
+        <nav
+          aria-label="Dashboard categories"
+          className="flex items-center gap-1.5 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                aria-current={active ? "page" : undefined}
+                className={`group relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl px-3 py-1.5 text-[12.5px] tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.98] ${
+                  active
+                    ? "font-semibold shadow-[0_1px_2px_rgba(16,24,40,0.05)]"
+                    : "font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                }`}
+                style={
+                  active
+                    ? {
+                        backgroundColor: isDark
+                          ? `${tab.hue}24`
+                          : `${tab.hue}12`,
+                        color: tab.hue,
+                        boxShadow: `inset 0 0 0 1px ${tab.hue}30, 0 1px 2px rgba(16,24,40,0.04)`,
+                      }
+                    : undefined
+                }
+              >
+                {/* Icon Squircle Container */}
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-md transition-colors duration-200 ${
+                    active
+                      ? "text-white shadow-xs"
+                      : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-800 group-hover:shadow-2xs dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-100"
+                  }`}
+                  style={active ? { backgroundColor: tab.hue } : undefined}
+                >
+                  <Icon size={12} strokeWidth={2.25} />
+                </span>
+
+                <span>{tab.label}</span>
+
+                {/* Orders Count Pill */}
+                {tab.id === "orders" && (
+                  <span
+                    className={`ml-0.5 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold tabular-nums transition-colors ${
+                      active
+                        ? "bg-white/90 shadow-2xs dark:bg-slate-900/90"
+                        : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-200"
+                    }`}
+                    style={active ? { color: tab.hue } : undefined}
+                  >
+                    {tab.categories.length} types
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -1341,78 +1434,10 @@ const Dashboard = () => {
         }
       `}</style>
 
-      <main className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col px-4 md:px-6">
-        {/* DASHBOARD CATEGORY NAVIGATION */}
-        <div className="sticky top-1 z-30 mb-4 w-full">
-          <div className="relative rounded-2xl border border-slate-200/80 bg-white/90 p-1.5 shadow-[0_4px_20px_-4px_rgba(16,24,40,0.06)] backdrop-blur-md ring-1 ring-slate-900/[0.03] dark:border-slate-800 dark:bg-slate-900/90 dark:ring-white/[0.04]">
-            <nav
-              aria-label="Dashboard categories"
-              className="flex items-center gap-1.5 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {TABS.map((tab) => {
-                const Icon = tab.icon;
-                const active = activeTab === tab.id;
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => handleTabChange(tab.id)}
-                    aria-current={active ? "page" : undefined}
-                    className={`group relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl px-3 py-1.5 text-[12.5px] tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.98] ${
-                      active
-                        ? "font-semibold shadow-[0_1px_2px_rgba(16,24,40,0.05)]"
-                        : "font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                    }`}
-                    style={
-                      active
-                        ? {
-                            backgroundColor: isDark
-                              ? `${tab.hue}24`
-                              : `${tab.hue}12`,
-                            color: tab.hue,
-                            boxShadow: `inset 0 0 0 1px ${tab.hue}30, 0 1px 2px rgba(16,24,40,0.04)`,
-                          }
-                        : undefined
-                    }
-                  >
-                    {/* Icon Squircle Container */}
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-md transition-colors duration-200 ${
-                        active
-                          ? "text-white shadow-xs"
-                          : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-800 group-hover:shadow-2xs dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-100"
-                      }`}
-                      style={active ? { backgroundColor: tab.hue } : undefined}
-                    >
-                      <Icon size={12} strokeWidth={2.25} />
-                    </span>
-
-                    <span>{tab.label}</span>
-
-                    {/* Orders Count Pill */}
-                    {tab.id === "orders" && (
-                      <span
-                        className={`ml-0.5 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold tabular-nums transition-colors ${
-                          active
-                            ? "bg-white/90 shadow-2xs dark:bg-slate-900/90"
-                            : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-200"
-                        }`}
-                        style={active ? { color: tab.hue } : undefined}
-                      >
-                        {tab.categories.length} types
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* ANALYTICS CONTENT */}
-        <AnalyticsView activeTab={activeTab} />
-      </main>
+      <div className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col px-4 md:px-6">
+        {/* ANALYTICS CONTENT (includes sticky category navigation + filter bar) */}
+        <AnalyticsView activeTab={activeTab} topNav={categoryNav} />
+      </div>
     </div>
   );
 };

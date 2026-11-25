@@ -131,4 +131,8 @@
   html.dark {
     color-scheme: dark;
     }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+    }
 }
