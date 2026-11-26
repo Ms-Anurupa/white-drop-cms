@@ -811,13 +811,13 @@ const FilterBar = ({ d }) => {
   } = d;
 
   const previousPeriod =
-    filters.year == null ? "previous year" : `${filters.year - 1}`;
+    filters.year == null ? "prev yr" : `${filters.year - 1}`;
   const num = (v) => (v === "all" ? null : Number(v));
 
   const when = [
     filters.year ?? "All years",
     filters.month != null && MONTHS[filters.month],
-    filters.week != null && `Week ${filters.week + 1}`,
+    filters.week != null && `W${filters.week + 1}`,
   ]
     .filter(Boolean)
     .join(" › ");
@@ -829,58 +829,55 @@ const FilterBar = ({ d }) => {
     filters.week !== null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_1px_3px_rgba(16,24,40,0.04)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)] 2xl:flex-row 2xl:items-center 2xl:justify-between">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[18px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100">
-              {tab.title}
-            </h1>
-            <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {when}
-            </span>
-            {selectedCategory && (
-              <button
-                type="button"
-                onClick={() => setSelectedCategory(null)}
-                title="Clear category filter"
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold transition-opacity hover:opacity-85"
-                style={{
-                  backgroundColor: `${d.selectedColor}${isDark ? "24" : "15"}`,
-                  color: d.selectedColor,
-                }}
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: d.selectedColor }}
-                />
-                {selectedCategory}
-                <X size={11} />
-              </button>
-            )}
-            {loading && (
-              <span
-                className="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold"
-                style={{
-                  background: `${tabHue}${isDark ? "24" : "15"}`,
-                  color: tabHue,
-                }}
-              >
-                <RefreshCw size={11} className="animate-spin" /> Syncing
-              </span>
-            )}
-          </div>
-          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
-            {tab.blurb}
-          </p>
-        </div>
-        <ManageButton
-          className="flex 2xl:hidden"
-          onClick={() => navigate(tab.managePath)}
-        />
+    <div className="flex flex-nowrap items-center justify-between gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.03)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+      {/* Left: Title & active status pills in a single flex row */}
+      <div className="flex shrink-0 items-center gap-1.5">
+        <h1
+          title={tab.blurb}
+          className="whitespace-nowrap text-[14px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100"
+        >
+          {tab.title}
+        </h1>
+
+        <span className="whitespace-nowrap rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+          {when}
+        </span>
+
+        {selectedCategory && (
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(null)}
+            title="Clear category filter"
+            className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-opacity hover:opacity-85"
+            style={{
+              backgroundColor: `${d.selectedColor}${isDark ? "24" : "15"}`,
+              color: d.selectedColor,
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: d.selectedColor }}
+            />
+            {selectedCategory}
+            <X size={10} />
+          </button>
+        )}
+
+        {loading && (
+          <span
+            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
+            style={{
+              background: `${tabHue}${isDark ? "24" : "15"}`,
+              color: tabHue,
+            }}
+          >
+            <RefreshCw size={10} className="animate-spin" /> Syncing
+          </span>
+        )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Right: All controls in one strict non-wrapping flex row */}
+      <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
         <CategoryDropdown
           label={tab.categoryLabel}
           items={d.table}
@@ -892,7 +889,7 @@ const FilterBar = ({ d }) => {
           onChange={setSelectedCategory}
         />
 
-        <span className="hidden h-5 w-px bg-[#E6E8EC] dark:bg-slate-800 sm:inline-block" />
+        <span className="h-4 w-px shrink-0 bg-[#E6E8EC] dark:bg-slate-800" />
 
         <Select
           label="Year"
@@ -964,7 +961,7 @@ const FilterBar = ({ d }) => {
                     value={w}
                     className="dark:bg-slate-900 dark:text-slate-100"
                   >
-                    Week {w + 1} ({s}–{e})
+                    W{w + 1} ({s}–{e})
                   </option>
                 );
               },
@@ -976,10 +973,10 @@ const FilterBar = ({ d }) => {
           role="switch"
           aria-checked={compare}
           onClick={() => setCompare(!compare)}
-          className="flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-slate-600"
+          className="flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-slate-600"
         >
           <span
-            className="relative h-4 w-7 rounded-full transition-colors"
+            className="relative h-3.5 w-6 rounded-full transition-colors"
             style={{
               background: compare
                 ? d.selectedColor
@@ -989,7 +986,7 @@ const FilterBar = ({ d }) => {
             }}
           >
             <i
-              className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${compare ? "left-3.5" : "left-0.5"}`}
+              className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white transition-all ${compare ? "left-3" : "left-0.5"}`}
             />
           </span>
           vs {previousPeriod}
@@ -999,14 +996,14 @@ const FilterBar = ({ d }) => {
           <button
             type="button"
             onClick={resetFilters}
-            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            className="flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1 text-[10.5px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
-            <RotateCcw size={12} /> Reset
+            <RotateCcw size={11} /> Reset
           </button>
         )}
 
         <ManageButton
-          className="hidden 2xl:flex"
+          className="flex shrink-0"
           onClick={() => navigate(tab.managePath)}
         />
       </div>
@@ -1081,71 +1078,86 @@ const KpiCards = ({ d }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {kpis.map((k, i) => {
         const Icon = k.icon;
         return (
           <div
             key={k.key}
-            className="group relative min-w-0 overflow-hidden rounded-2xl border border-slate-200/80 bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(16,24,40,0.03)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(16,24,40,0.09)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.5)]"
+            className="group relative flex min-w-0 flex-col justify-between overflow-hidden rounded-lg border border-slate-200/80 bg-white px-2.5 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.03)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300/90 hover:shadow-[0_6px_18px_-6px_rgba(16,24,40,0.08)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_1px_2px_rgba(0,0,0,0.3)] dark:hover:border-slate-700/90 dark:hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.45)]"
             style={
               i === 0
                 ? {
-                    backgroundImage: `radial-gradient(280px 100px at 0% 0%, ${selectedColor}${isDark ? "28" : "18"}, transparent)`,
+                    backgroundImage: `radial-gradient(200px 70px at 0% 0%, ${selectedColor}${isDark ? "28" : "18"}, transparent)`,
                     borderColor: `${selectedColor}${isDark ? "55" : "38"}`,
                   }
                 : undefined
             }
           >
-            <div className="flex items-start justify-between gap-2">
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.03em] text-slate-500 dark:text-slate-400">
-                {k.key}
-              </p>
-              <span
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
-                style={{
-                  backgroundColor: `${k.accent}1A`,
-                  color: k.accent,
-                }}
-              >
-                <Icon size={13} strokeWidth={2.2} />
-              </span>
+            {/* Subtle top accent hairline on hover */}
+            <span
+              className="pointer-events-none absolute inset-x-2.5 top-0 h-[1.5px] rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+              style={{
+                background: `linear-gradient(90deg, transparent, ${k.accent}, transparent)`,
+              }}
+            />
+
+            <div>
+              <div className="flex items-center justify-between gap-1.5">
+                <p className="truncate text-[9.5px] font-semibold uppercase tracking-[0.04em] text-slate-500/90 dark:text-slate-400">
+                  {k.key}
+                </p>
+                <span
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded ring-1 ring-inset transition-transform duration-200 group-hover:scale-105"
+                  style={{
+                    backgroundColor: `${k.accent}14`,
+                    color: k.accent,
+                    boxShadow: `inset 0 0 0 1px ${k.accent}24`,
+                  }}
+                >
+                  <Icon size={10} strokeWidth={2.25} />
+                </span>
+              </div>
+
+              {loading && !k.value ? (
+                <Skeleton className="mt-1 h-4 w-20" />
+              ) : (
+                <div className="mt-0.5 flex flex-wrap items-baseline gap-1">
+                  <p
+                    className={`truncate font-bold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100 ${
+                      i === 0
+                        ? "text-[15px] sm:text-[16px]"
+                        : "text-[14px] sm:text-[15px]"
+                    }`}
+                  >
+                    {k.value}
+                  </p>
+                  {k.delta && (
+                    <span className="origin-left scale-85">{k.delta}</span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {loading && !k.value ? (
-              <Skeleton className="mt-2 h-7 w-28" />
-            ) : (
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <p
-                  className={`truncate font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100 ${
-                    i === 0
-                      ? "text-[24px] sm:text-[26px]"
-                      : "text-[20px] sm:text-[21px]"
-                  }`}
-                >
-                  {k.value}
+            <div className="mt-1">
+              {k.shareBar != null && (
+                <div className="mb-1 h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/90">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, k.shareBar))}%`,
+                      backgroundColor: k.accent,
+                    }}
+                  />
+                </div>
+              )}
+
+              {k.note && (
+                <p className="truncate text-[9.5px] font-normal leading-tight text-slate-400 dark:text-slate-500">
+                  {k.note}
                 </p>
-                {k.delta}
-              </div>
-            )}
-
-            {k.shareBar != null && (
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, k.shareBar))}%`,
-                    backgroundColor: k.accent,
-                  }}
-                />
-              </div>
-            )}
-
-            {k.note && (
-              <p className="mt-1 truncate text-[11px] text-slate-500 dark:text-slate-400">
-                {k.note}
-              </p>
-            )}
+              )}
+            </div>
           </div>
         );
       })}
@@ -1762,6 +1774,7 @@ const CategoryLinesPanel = ({ d }) => {
 };
 
 /* ---------- Section 5: Category Performance Breakdown ---------- */
+/* ---------- Section 5: Category Performance Breakdown ---------- */
 const CategoryList = ({ d }) => {
   const {
     tab,
@@ -1796,8 +1809,8 @@ const CategoryList = ({ d }) => {
     >
       {loading && table.length === 0 ? (
         <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }, (_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+          {Array.from({ length: 4 }, (_, i) => (
+            <Skeleton key={i} className="h-14 w-full" />
           ))}
         </div>
       ) : table.length === 0 ? (
@@ -1805,81 +1818,83 @@ const CategoryList = ({ d }) => {
           Nothing recorded for this period. Try a wider date range.
         </p>
       ) : (
-        <ul className="grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-3">
-          {table.map((row, idx) => {
-            const selected = selectedCategory === row.name;
-            const dim = selectedCategory && !selected;
-            const share = pct(row.total, grand, 1);
+        <div className="max-h-[268px] overflow-y-auto pr-1 md:max-h-[130px] [scrollbar-width:thin] [scrollbar-color:rgba(148,163,184,0.4)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/80 [&::-webkit-scrollbar-track]:bg-transparent">
+          <ul className="grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-3">
+            {table.map((row, idx) => {
+              const selected = selectedCategory === row.name;
+              const dim = selectedCategory && !selected;
+              const share = pct(row.total, grand, 1);
 
-            return (
-              <li key={row.name}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedCategory(selected ? null : row.name)
-                  }
-                  aria-pressed={selected}
-                  className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 dark:focus-visible:outline-slate-300 ${
-                    selected
-                      ? "border-transparent"
-                      : dim
-                        ? "border-slate-100 bg-slate-50/50 opacity-60 hover:opacity-100 dark:border-slate-800/60 dark:bg-slate-900/30"
-                        : "border-slate-200/75 bg-white hover:border-slate-300 hover:bg-[#F8FAFC] dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-slate-700 dark:hover:bg-slate-800/80"
-                  }`}
-                  style={
-                    selected
-                      ? {
-                          background: `${row.color}${isDark ? "20" : "10"}`,
-                          boxShadow: `inset 0 0 0 1.5px ${row.color}`,
-                        }
-                      : undefined
-                  }
-                >
-                  <span
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-extrabold text-white dark:text-slate-950"
-                    style={{ background: row.color }}
+              return (
+                <li key={row.name}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedCategory(selected ? null : row.name)
+                    }
+                    aria-pressed={selected}
+                    className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 dark:focus-visible:outline-slate-300 ${
+                      selected
+                        ? "border-transparent"
+                        : dim
+                          ? "border-slate-100 bg-slate-50/50 opacity-60 hover:opacity-100 dark:border-slate-800/60 dark:bg-slate-900/30"
+                          : "border-slate-200/75 bg-white hover:border-slate-300 hover:bg-[#F8FAFC] dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-slate-700 dark:hover:bg-slate-800/80"
+                    }`}
+                    style={
+                      selected
+                        ? {
+                            background: `${row.color}${isDark ? "20" : "10"}`,
+                            boxShadow: `inset 0 0 0 1.5px ${row.color}`,
+                          }
+                        : undefined
+                    }
                   >
-                    {idx + 1}
-                  </span>
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-extrabold text-white dark:text-slate-950"
+                      style={{ background: row.color }}
+                    >
+                      {idx + 1}
+                    </span>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-[12.5px] font-bold text-[#101828] dark:text-slate-100">
-                        {row.name}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-[12.5px] font-bold text-[#101828] dark:text-slate-100">
+                          {row.name}
+                        </p>
+                        <span className="shrink-0 text-[10.5px] font-semibold tabular-nums text-slate-400 dark:text-slate-500">
+                          {share}%
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${(row.total / maxTotal) * 100}%`,
+                            background: row.color,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <Spark values={row.cur} color={row.color} />
+
+                    <div className="min-w-[76px] shrink-0 text-right">
+                      <p className="text-[12.5px] font-extrabold tabular-nums text-[#101828] dark:text-slate-100">
+                        {fmt(row.total, tab.prefix)}
                       </p>
-                      <span className="shrink-0 text-[10.5px] font-semibold tabular-nums text-slate-400 dark:text-slate-500">
-                        {share}%
-                      </span>
+                      <div className="mt-0.5 flex items-center justify-end gap-1">
+                        <Delta v={row.g} inverse={tab.inverse} />
+                        {selected && (
+                          <Check size={13} style={{ color: row.color }} />
+                        )}
+                      </div>
                     </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${(row.total / maxTotal) * 100}%`,
-                          background: row.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <Spark values={row.cur} color={row.color} />
-
-                  <div className="min-w-[76px] shrink-0 text-right">
-                    <p className="text-[12.5px] font-extrabold tabular-nums text-[#101828] dark:text-slate-100">
-                      {fmt(row.total, tab.prefix)}
-                    </p>
-                    <div className="mt-0.5 flex items-center justify-end gap-1">
-                      <Delta v={row.g} inverse={tab.inverse} />
-                      {selected && (
-                        <Check size={13} style={{ color: row.color }} />
-                      )}
-                    </div>
-                  </div>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </Panel>
   );
@@ -1894,9 +1909,8 @@ export const AnalyticsView = ({ activeTab, topNav = null }) => {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      {/* Unified opaque sticky header so scrolled cards/charts never bleed through */}
-      <div className="sticky top-0 z-30 -mx-4 bg-[#F4F5F7] px-4 pt-3 pb-3 dark:bg-slate-950 md:-mx-6 md:px-6">
-        <div className="flex flex-col gap-3">
+      <div className="sticky top-0 z-30 -mx-4 bg-[#F4F5F7] px-4 py-2 dark:bg-slate-950 md:-mx-6 md:px-6">
+        <div className="flex flex-col gap-2">
           {topNav}
           <FilterBar d={d} />
         </div>
