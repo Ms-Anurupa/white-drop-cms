@@ -1,34 +1,43 @@
-import { useMemo, useState } from "react";
+import { useEffect } from "react";
 import AnalyticsShell from "./AnalyticsShell";
-import { CURRENT_YEAR, buildStaticSeries } from "./analyticsHelpers";
+import { orderAnalyticsStore } from "@/zustand/Store/analyticsStore";
 
 const ORDER_TYPES = [
-  "Mini Order",
-  "Subscription Order",
-  "Corporate Order",
-  "Adhoc Order",
-  "Special Order",
+  { key: "MINI", label: "Mini Order" },
+  { key: "SUBSCRIPTION", label: "Subscription Order" },
+  { key: "CORPORATE", label: "Corporate Order" },
+  { key: "ADHOC", label: "Adhoc Sale" },
+  { key: "SPECIAL", label: "Special Order" },
 ];
 
 const HUE = "#EA580C";
 
 const OrdersAnalytics = () => {
-  const [filters, setFilters] = useState({
-    year: CURRENT_YEAR,
-    month: null,
-    week: null,
-  });
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [compare, setCompare] = useState(true);
+  const {
+    labels,
+    per,
+    rows,
+    loading,
+    filters,
+    selectedCategory,
+    compare,
+    status,
+    setFilters,
+    setSelectedCategory,
+    setCompare,
+    resetFilters,
+    getOrderAnalytics,
+  } = orderAnalyticsStore();
 
-  const { labels, per, rows } = useMemo(
-    () =>
-      buildStaticSeries(
-        { key: "orders", dailyBase: 240, categories: ORDER_TYPES },
-        filters,
-      ),
-    [filters],
-  );
+  useEffect(() => {
+    getOrderAnalytics().catch(() => {});
+  }, [getOrderAnalytics]);
+
+  const filteredRows = selectedCategory
+    ? rows.filter(
+        (row) => row.key === selectedCategory || row.name === selectedCategory,
+      )
+    : rows;
 
   const orderTypePills = (
     <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-[#E6E8EC] bg-white px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900">
@@ -48,12 +57,12 @@ const OrdersAnalytics = () => {
         All Orders
       </button>
       {ORDER_TYPES.map((orderType) => {
-        const isSel = selectedCategory === orderType;
+        const isSel = selectedCategory === orderType.key;
         return (
           <button
-            key={orderType}
+            key={orderType.key}
             type="button"
-            onClick={() => setSelectedCategory(isSel ? null : orderType)}
+            onClick={() => setSelectedCategory(isSel ? null : orderType.key)}
             className={`rounded-full px-3 py-1 text-[11px] font-bold transition-colors ${
               isSel
                 ? "text-white"
@@ -61,7 +70,7 @@ const OrdersAnalytics = () => {
             }`}
             style={isSel ? { background: HUE } : undefined}
           >
-            {orderType}
+            {orderType.label}
           </button>
         );
       })}
@@ -79,17 +88,16 @@ const OrdersAnalytics = () => {
       managePath="/dashboard/orders"
       labels={labels}
       per={per}
-      rows={rows}
+      rows={filteredRows}
+      loading={loading}
+      status={status}
       filters={filters}
       setFilters={setFilters}
       selectedCategory={selectedCategory}
       setSelectedCategory={setSelectedCategory}
       compare={compare}
       setCompare={setCompare}
-      resetFilters={() => {
-        setFilters({ year: CURRENT_YEAR, month: null, week: null });
-        setSelectedCategory(null);
-      }}
+      resetFilters={resetFilters}
       subToolbar={orderTypePills}
     />
   );

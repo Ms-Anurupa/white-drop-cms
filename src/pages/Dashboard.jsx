@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
   Area,
@@ -40,6 +41,7 @@ import {
 } from "lucide-react";
 import productSaleStore, {
   expenseAnalyticsStore,
+  orderAnalyticsStore,
 } from "@/zustand/Store/analyticsStore";
 import useThemeStore from "@/zustand/Store/themeStore";
 
@@ -146,22 +148,21 @@ const TABS = [
     id: "orders",
     label: "Orders",
     title: "Order Analytics",
-    blurb: "Orders placed across different order types.",
-    metric: "Orders",
-    prefix: "",
+    blurb: "Order revenue across Mini, Subscription, Corporate, Adhoc, and Special orders.",
+    metric: "Order value",
+    prefix: "₹",
     hue: "#EA580C",
     darkHue: "#FB923C",
     managePath: "/dashboard/orders",
     icon: ShoppingBag,
-    isDynamic: false,
+    isDynamic: true,
     categoryLabel: "Order type",
     inverse: false,
-    dailyBase: 240,
     categories: [
       "Mini Order",
       "Subscription Order",
       "Corporate Order",
-      "Adhoc Order",
+      "Adhoc Sale",
       "Special Order",
     ],
   },
@@ -188,16 +189,7 @@ const sum = (arr = []) => arr.reduce((t, v) => t + (Number(v) || 0), 0);
 
 const fmt = (v, pre = "") => {
   const value = Number(v) || 0;
-  const a = Math.abs(value);
-  const out =
-    a >= 1e7
-      ? `${(value / 1e7).toFixed(2)}Cr`
-      : a >= 1e5
-        ? `${(value / 1e5).toFixed(2)}L`
-        : a >= 1e3
-          ? `${(value / 1e3).toFixed(1)}k`
-          : Math.round(value).toLocaleString("en-IN");
-  return pre + out;
+  return pre + Math.round(value).toLocaleString("en-IN");
 };
 
 const pct = (part, whole, digits = 0) =>
@@ -271,6 +263,7 @@ const useAnalyticsData = (activeTab) => {
   // Hooks must be called unconditionally.
   const productStore = productSaleStore();
   const expenseStore = expenseAnalyticsStore();
+  const orderStore = orderAnalyticsStore();
   const isDark = useThemeStore((s) => s.resolvedTheme) === "dark";
 
   const tab = useMemo(
@@ -278,11 +271,18 @@ const useAnalyticsData = (activeTab) => {
     [activeTab],
   );
   const tabHue = isDark ? tab.darkHue || tab.hue : tab.hue;
-  const store = activeTab === "expenses" ? expenseStore : productStore;
-  const fetchData =
-    activeTab === "expenses"
-      ? expenseStore.getExpenseAnalytics
-      : productStore.getProductAnalytics;
+  const storeMap = {
+    product: productStore,
+    expenses: expenseStore,
+    orders: orderStore,
+  };
+  const fetchMap = {
+    product: productStore.getProductAnalytics,
+    expenses: expenseStore.getExpenseAnalytics,
+    orders: orderStore.getOrderAnalytics,
+  };
+  const store = storeMap[activeTab] || productStore;
+  const fetchData = fetchMap[activeTab] || productStore.getProductAnalytics;
 
   const {
     filters,
@@ -318,6 +318,7 @@ const useAnalyticsData = (activeTab) => {
     () =>
       source.rows.map((r, i) => ({
         ...r,
+        name: r.name || r.key || "Unknown",
         color: getCategoryColor(i, isDark),
       })),
     [source.rows, isDark],
@@ -641,15 +642,46 @@ const CategoryDropdown = ({
   onChange,
 }) => {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const MENU_WIDTH = 288; // w-72
+
+  const updatePosition = () => {
+    const el = btnRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const maxLeft =
+      window.innerWidth - Math.min(MENU_WIDTH, window.innerWidth - 32) - 16;
+    setPos({
+      top: r.bottom + 6,
+      left: Math.max(16, Math.min(r.left, maxLeft)),
+    });
+  };
+
+  // Position before paint so the menu never flashes in the wrong place.
+  useLayoutEffect(() => {
+    if (open) updatePosition();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
-    const onDown = (e) => !ref.current?.contains(e.target) && setOpen(false);
+    const onDown = (e) => {
+      if (btnRef.current?.contains(e.target)) return;
+      if (menuRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
     const onKey = (e) => e.key === "Escape" && setOpen(false);
+
+    // capture = true so scrolling the filter bar (or any parent) re-anchors the menu
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
@@ -664,8 +696,9 @@ const CategoryDropdown = ({
   };
 
   return (
-    <div ref={ref} className="relative shrink-0">
+    <div className="relative shrink-0">
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
@@ -703,15 +736,18 @@ const CategoryDropdown = ({
         />
       </button>
 
-      {open && (
-        <ul
-          role="listbox"
-          aria-label={`Filter by ${label}`}
-          className="absolute left-0 top-full z-50 mt-1.5 max-h-72 w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
-        >
-          <li role="option" aria-selected={value === null}>
+      {open &&
+        createPortal(
+          <div
+            ref={menuRef}
+            style={{ position: "fixed", top: pos.top, left: pos.left }}
+            className="z-[100] w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-[#E6E8EC] bg-white p-1.5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+          >
+            {/* "All" row stays pinned, outside the scroll area */}
             <button
               type="button"
+              role="option"
+              aria-selected={value === null}
               onClick={() => choose(null)}
               className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] font-bold ${
                 value === null
@@ -725,61 +761,69 @@ const CategoryDropdown = ({
                 {value === null && <Check size={14} style={{ color: hue }} />}
               </span>
             </button>
-          </li>
 
-          <li
-            className="my-1 border-t border-slate-100 dark:border-slate-800"
-            aria-hidden
-          />
+            <div
+              className="my-1 border-t border-slate-100 dark:border-slate-800"
+              aria-hidden
+            />
 
-          {items.map((item) => {
-            const selected = value === item.name;
-            return (
-              <li key={item.name} role="option" aria-selected={selected}>
-                <button
-                  type="button"
-                  onClick={() => choose(item.name)}
-                  className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${
-                    selected
-                      ? "font-bold text-[#101828] dark:text-slate-100"
-                      : "font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/70"
-                  }`}
-                  style={
-                    selected
-                      ? { background: `${item.color}${isDark ? "22" : "12"}` }
-                      : undefined
-                  }
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <i
-                      className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                      style={{ background: item.color }}
-                    />
-                    <span className="truncate">{item.name}</span>
-                  </span>
-                  <span className="ml-2 flex shrink-0 items-center gap-2 text-[11px] tabular-nums">
-                    <span className="font-bold text-[#101828] dark:text-slate-100">
-                      {fmt(item.total, prefix)}
-                    </span>
-                    <span className="w-8 text-right text-slate-400 dark:text-slate-500">
-                      {pct(item.total, grand)}%
-                    </span>
-                    <span className="w-3.5">
-                      {selected && (
-                        <Check size={14} style={{ color: item.color }} />
-                      )}
-                    </span>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+            {/* Scrolls after 5 items */}
+            <ul
+              role="listbox"
+              aria-label={`Filter by ${label}`}
+              className="max-h-[188px] overflow-y-auto overscroll-contain pr-0.5 [scrollbar-width:thin] [scrollbar-color:rgba(148,163,184,0.4)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700/80 [&::-webkit-scrollbar-track]:bg-transparent"
+            >
+              {items.map((item) => {
+                const selected = value === item.name;
+                return (
+                  <li key={item.name} role="option" aria-selected={selected}>
+                    <button
+                      type="button"
+                      onClick={() => choose(item.name)}
+                      className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-2.5 py-2 text-left text-[12px] transition-colors ${
+                        selected
+                          ? "font-bold text-[#101828] dark:text-slate-100"
+                          : "font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/70"
+                      }`}
+                      style={
+                        selected
+                          ? {
+                              background: `${item.color}${isDark ? "22" : "12"}`,
+                            }
+                          : undefined
+                      }
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <i
+                          className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                          style={{ background: item.color }}
+                        />
+                        <span className="truncate">{item.name}</span>
+                      </span>
+                      <span className="ml-2 flex shrink-0 items-center gap-2 text-[11px] tabular-nums">
+                        <span className="font-bold text-[#101828] dark:text-slate-100">
+                          {fmt(item.total, prefix)}
+                        </span>
+                        <span className="w-8 text-right text-slate-400 dark:text-slate-500">
+                          {pct(item.total, grand)}%
+                        </span>
+                        <span className="w-3.5">
+                          {selected && (
+                            <Check size={14} style={{ color: item.color }} />
+                          )}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
-
 /* ============================================================
    5. SECTIONS
    ============================================================ */
@@ -810,6 +854,13 @@ const FilterBar = ({ d }) => {
     loading,
   } = d;
 
+  const accent = d.selectedColor || tabHue || "#2563EB";
+  const thumbColor = isDark ? `${accent}88` : `${accent}66`;
+  const thumbHoverColor = accent;
+  const trackColor = isDark
+    ? "rgba(30, 41, 59, 0.55)"
+    : "rgba(241, 245, 249, 0.9)";
+
   const previousPeriod =
     filters.year == null ? "prev yr" : `${filters.year - 1}`;
   const num = (v) => (v === "all" ? null : Number(v));
@@ -829,183 +880,218 @@ const FilterBar = ({ d }) => {
     filters.week !== null;
 
   return (
-    <div className="flex flex-nowrap items-center justify-between gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 shadow-[0_1px_2px_rgba(16,24,40,0.03)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
-      {/* Left: Title & active status pills in a single flex row */}
-      <div className="flex shrink-0 items-center gap-1.5">
-        <h1
-          title={tab.blurb}
-          className="whitespace-nowrap text-[14px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100"
-        >
-          {tab.title}
-        </h1>
+    <div className="relative w-full min-w-0 overflow-visible">
+      <div
+        style={{
+          "--sb-thumb": thumbColor,
+          "--sb-thumb-hover": thumbHoverColor,
+          "--sb-track": trackColor,
+          scrollbarWidth: "thin",
+          scrollbarColor: `${thumbColor} ${trackColor}`,
+        }}
+        className="
+        flex w-full min-w-0 flex-nowrap items-center justify-between gap-2
+        overflow-x-auto overflow-y-hidden
+        pb-1 rounded-xl border border-slate-200/80
+        bg-white px-3 pt-1.5
+        shadow-[0_1px_2px_rgba(16,24,40,0.03)]
+        scroll-smooth
+        [&::-webkit-scrollbar]:h-1.5
+        [&::-webkit-scrollbar-track]:rounded-full
+        [&::-webkit-scrollbar-track]:bg-[var(--sb-track)]
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb]:bg-[var(--sb-thumb)]
+        hover:[&::-webkit-scrollbar-thumb]:bg-[var(--sb-thumb-hover)]
+        dark:border-slate-800 dark:bg-slate-900
+        dark:shadow-[0_1px_2px_rgba(0,0,0,0.3)]
+      "
+      >
+        {/* Left: Title & active status pills in a single flex row */}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <h1
+            title={tab.blurb}
+            className="whitespace-nowrap text-[14px] font-extrabold tracking-tight text-[#101828] dark:text-slate-100"
+          >
+            {tab.title}
+          </h1>
 
-        <span className="whitespace-nowrap rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          {when}
-        </span>
+          <span className="whitespace-nowrap rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            {when}
+          </span>
 
-        {selectedCategory && (
+          {selectedCategory && (
+            <button
+              type="button"
+              onClick={() => setSelectedCategory(null)}
+              title="Clear category filter"
+              className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-opacity hover:opacity-85"
+              style={{
+                backgroundColor: `${d.selectedColor}${isDark ? "24" : "15"}`,
+                color: d.selectedColor,
+              }}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: d.selectedColor }}
+              />
+              {selectedCategory}
+              <X size={10} />
+            </button>
+          )}
+
+          {loading && (
+            <span
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
+              style={{
+                background: `${tabHue}${isDark ? "24" : "15"}`,
+                color: tabHue,
+              }}
+            >
+              <RefreshCw size={10} className="animate-spin" /> Syncing
+            </span>
+          )}
+        </div>
+
+        {/* Right: All controls in one strict non-wrapping flex row */}
+        <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
+          <CategoryDropdown
+            label={tab.categoryLabel}
+            items={d.table}
+            grand={d.grand}
+            prefix={tab.prefix}
+            hue={tabHue}
+            isDark={isDark}
+            value={selectedCategory}
+            onChange={setSelectedCategory}
+          />
+
+          <span className="h-4 w-px shrink-0 bg-[#E6E8EC] dark:bg-slate-800" />
+
+          <Select
+            label="Year"
+            value={filters.year ?? "all"}
+            onChange={(e) => {
+              const year = num(e.target.value);
+              setFilters({
+                year,
+                month: year == null ? null : filters.month,
+                week: null,
+              });
+            }}
+          >
+            <option
+              value="all"
+              className="dark:bg-slate-900 dark:text-slate-100"
+            >
+              All years
+            </option>
+            {YEARS.map((y) => (
+              <option
+                key={y}
+                value={y}
+                className="dark:bg-slate-900 dark:text-slate-100"
+              >
+                {y}
+              </option>
+            ))}
+          </Select>
+
+          <Select
+            label="Month"
+            value={filters.month ?? "all"}
+            disabled={filters.year == null}
+            onChange={(e) =>
+              setFilters({ ...filters, month: num(e.target.value), week: null })
+            }
+          >
+            <option
+              value="all"
+              className="dark:bg-slate-900 dark:text-slate-100"
+            >
+              All months
+            </option>
+            {MONTHS.map((m, i) => (
+              <option
+                key={m}
+                value={i}
+                className="dark:bg-slate-900 dark:text-slate-100"
+              >
+                {m}
+              </option>
+            ))}
+          </Select>
+
+          <Select
+            label="Week"
+            value={filters.week ?? "all"}
+            disabled={filters.month == null}
+            onChange={(e) =>
+              setFilters({ ...filters, week: num(e.target.value) })
+            }
+          >
+            <option
+              value="all"
+              className="dark:bg-slate-900 dark:text-slate-100"
+            >
+              All weeks
+            </option>
+            {filters.month != null &&
+              Array.from(
+                { length: weeksIn(filters.year, filters.month) },
+                (_, w) => {
+                  const [s, e] = weekRange(filters.year, filters.month, w);
+                  return (
+                    <option
+                      key={w}
+                      value={w}
+                      className="dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      W{w + 1} ({s}–{e})
+                    </option>
+                  );
+                },
+              )}
+          </Select>
+
           <button
             type="button"
-            onClick={() => setSelectedCategory(null)}
-            title="Clear category filter"
-            className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-opacity hover:opacity-85"
-            style={{
-              backgroundColor: `${d.selectedColor}${isDark ? "24" : "15"}`,
-              color: d.selectedColor,
-            }}
+            role="switch"
+            aria-checked={compare}
+            onClick={() => setCompare(!compare)}
+            className="flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-slate-600"
           >
             <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: d.selectedColor }}
-            />
-            {selectedCategory}
-            <X size={10} />
-          </button>
-        )}
-
-        {loading && (
-          <span
-            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
-            style={{
-              background: `${tabHue}${isDark ? "24" : "15"}`,
-              color: tabHue,
-            }}
-          >
-            <RefreshCw size={10} className="animate-spin" /> Syncing
-          </span>
-        )}
-      </div>
-
-      {/* Right: All controls in one strict non-wrapping flex row */}
-      <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
-        <CategoryDropdown
-          label={tab.categoryLabel}
-          items={d.table}
-          grand={d.grand}
-          prefix={tab.prefix}
-          hue={tabHue}
-          isDark={isDark}
-          value={selectedCategory}
-          onChange={setSelectedCategory}
-        />
-
-        <span className="h-4 w-px shrink-0 bg-[#E6E8EC] dark:bg-slate-800" />
-
-        <Select
-          label="Year"
-          value={filters.year ?? "all"}
-          onChange={(e) => {
-            const year = num(e.target.value);
-            setFilters({
-              year,
-              month: year == null ? null : filters.month,
-              week: null,
-            });
-          }}
-        >
-          <option value="all" className="dark:bg-slate-900 dark:text-slate-100">
-            All years
-          </option>
-          {YEARS.map((y) => (
-            <option
-              key={y}
-              value={y}
-              className="dark:bg-slate-900 dark:text-slate-100"
+              className="relative h-3.5 w-6 rounded-full transition-colors"
+              style={{
+                background: compare
+                  ? d.selectedColor
+                  : isDark
+                    ? "#475569"
+                    : "#CBD5E1",
+              }}
             >
-              {y}
-            </option>
-          ))}
-        </Select>
-
-        <Select
-          label="Month"
-          value={filters.month ?? "all"}
-          disabled={filters.year == null}
-          onChange={(e) =>
-            setFilters({ ...filters, month: num(e.target.value), week: null })
-          }
-        >
-          <option value="all" className="dark:bg-slate-900 dark:text-slate-100">
-            All months
-          </option>
-          {MONTHS.map((m, i) => (
-            <option
-              key={m}
-              value={i}
-              className="dark:bg-slate-900 dark:text-slate-100"
-            >
-              {m}
-            </option>
-          ))}
-        </Select>
-
-        <Select
-          label="Week"
-          value={filters.week ?? "all"}
-          disabled={filters.month == null}
-          onChange={(e) =>
-            setFilters({ ...filters, week: num(e.target.value) })
-          }
-        >
-          <option value="all" className="dark:bg-slate-900 dark:text-slate-100">
-            All weeks
-          </option>
-          {filters.month != null &&
-            Array.from(
-              { length: weeksIn(filters.year, filters.month) },
-              (_, w) => {
-                const [s, e] = weekRange(filters.year, filters.month, w);
-                return (
-                  <option
-                    key={w}
-                    value={w}
-                    className="dark:bg-slate-900 dark:text-slate-100"
-                  >
-                    W{w + 1} ({s}–{e})
-                  </option>
-                );
-              },
-            )}
-        </Select>
-
-        <button
-          type="button"
-          role="switch"
-          aria-checked={compare}
-          onClick={() => setCompare(!compare)}
-          className="flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg border border-[#E6E8EC] bg-[#F8FAFC] px-2 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-slate-600"
-        >
-          <span
-            className="relative h-3.5 w-6 rounded-full transition-colors"
-            style={{
-              background: compare
-                ? d.selectedColor
-                : isDark
-                  ? "#475569"
-                  : "#CBD5E1",
-            }}
-          >
-            <i
-              className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white transition-all ${compare ? "left-3" : "left-0.5"}`}
-            />
-          </span>
-          vs {previousPeriod}
-        </button>
-
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1 text-[10.5px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-          >
-            <RotateCcw size={11} /> Reset
+              <i
+                className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white transition-all ${compare ? "left-3" : "left-0.5"}`}
+              />
+            </span>
+            vs {previousPeriod}
           </button>
-        )}
 
-        <ManageButton
-          className="flex shrink-0"
-          onClick={() => navigate(tab.managePath)}
-        />
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1 text-[10.5px] font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-[#101828] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            >
+              <RotateCcw size={11} /> Reset
+            </button>
+          )}
+
+          <ManageButton
+            className="flex shrink-0"
+            onClick={() => navigate(tab.managePath)}
+          />
+        </div>
       </div>
     </div>
   );
@@ -1246,7 +1332,7 @@ const TrendPanel = ({ d }) => {
                 strokeDasharray="3 3"
               />
               <XAxis dataKey="l" {...axisProps} minTickGap={18} />
-              <YAxis {...axisProps} width={48} tickFormatter={(v) => fmt(v)} />
+              <YAxis {...axisProps} width={64} tickFormatter={(v) => fmt(v, tab.prefix)} />
               <Tooltip
                 wrapperStyle={{ zIndex: 20 }}
                 content={<ChartTooltip pre={tab.prefix} />}
@@ -1345,8 +1431,8 @@ const CategoryPiePanel = ({ d }) => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius="60%"
-                  outerRadius="88%"
+                  innerRadius="64%"
+                  outerRadius="90%"
                   paddingAngle={pieData.length > 1 ? 2.5 : 0}
                   cornerRadius={5}
                   stroke={chartTheme.surfaceBorder}
@@ -1371,16 +1457,16 @@ const CategoryPiePanel = ({ d }) => {
             </ResponsiveContainer>
 
             {/* Center Label */}
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-10 text-center">
-              <span className="max-w-[115px] truncate text-[10px] font-semibold uppercase tracking-[0.04em] text-slate-400">
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
+              <span className="max-w-[96px] truncate text-[10px] font-semibold uppercase tracking-[0.04em] text-slate-400">
                 {activeSlice ? activeSlice.name : "Total"}
               </span>
-              <span className="mt-0.5 text-[18px] font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100">
+              <span className="mt-0.5 max-w-[100px] truncate text-[15px] font-extrabold leading-tight tracking-tight text-[#101828] tabular-nums dark:text-slate-100">
                 {activeSlice
                   ? `${activeSlice.share}%`
                   : fmt(grand, tab.prefix)}
               </span>
-              <span className="text-[10.5px] font-semibold text-slate-500 tabular-nums dark:text-slate-400">
+              <span className="max-w-[96px] truncate text-[10px] font-semibold text-slate-500 tabular-nums dark:text-slate-400">
                 {activeSlice
                   ? fmt(activeSlice.value, tab.prefix)
                   : `${pieData.length} ${pieData.length === 1 ? "item" : "items"}`}
@@ -1538,7 +1624,7 @@ const CategoryBarPanel = ({ d }) => {
                 interval={isCategoryMode ? 0 : "preserveStartEnd"}
                 minTickGap={12}
               />
-              <YAxis {...axisProps} width={48} tickFormatter={(v) => fmt(v)} />
+              <YAxis {...axisProps} width={64} tickFormatter={(v) => fmt(v, tab.prefix)} />
               <Tooltip
                 wrapperStyle={{ zIndex: 20 }}
                 cursor={{ fill: chartTheme.barCursor, radius: 6 }}
@@ -1725,7 +1811,7 @@ const CategoryLinesPanel = ({ d }) => {
 
               <XAxis dataKey="l" {...axisProps} minTickGap={18} />
 
-              <YAxis {...axisProps} width={52} tickFormatter={(v) => fmt(v)} />
+              <YAxis {...axisProps} width={64} tickFormatter={(v) => fmt(v, tab.prefix)} />
 
               <ReferenceLine y={0} stroke={chartTheme.refLine} />
 
@@ -1909,8 +1995,8 @@ export const AnalyticsView = ({ activeTab, topNav = null }) => {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="sticky top-0 z-30 -mx-4 bg-[#F4F5F7] px-4 py-2 dark:bg-slate-950 md:-mx-6 md:px-6">
-        <div className="flex flex-col gap-2">
+      <div className="sticky top-0 z-40 -mx-4 bg-[#F4F5F7] px-4 py-2 dark:bg-slate-950 md:-mx-6 md:px-6">
+        <div className="relative flex flex-col gap-2 overflow-visible">
           {topNav}
           <FilterBar d={d} />
         </div>
@@ -1970,10 +2056,13 @@ const Dashboard = () => {
     (s) => s.setSelectedCategory,
   );
 
+  const resetOrderCategory = orderAnalyticsStore((s) => s.setSelectedCategory);
+
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     resetProductCategory(null);
     resetExpenseCategory(null);
+    resetOrderCategory(null);
   };
 
   const categoryNav = (

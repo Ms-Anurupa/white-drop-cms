@@ -116,4 +116,10 @@ export const expenseAnalyticsStore = createAnalyticsStore({
   errorLabel: "expense analytics",
 });
 
+export const orderAnalyticsStore = createAnalyticsStore({
+  endpoint: "/admin/getOrderAnalytics",
+  fetchKey: "getOrderAnalytics",
+  errorLabel: "order analytics",
+});
+
 export default productSaleStore;
