@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useConfirm } from "./ConfirmProvider";
 import { resolveFirebaseUrl } from "../utils/resolveUrl";
 import { ArrowLeft, ImagePlus, Plus, Trash2, X } from "lucide-react";
+import subscriptionStore from "@/zustand/Store/subscriptionStore";
 
 /* ---------- UI-only helpers (no business logic) ---------- */
 
@@ -49,6 +50,8 @@ const EditProduct = () => {
   const deleteProductVariantById = productDataStore(
     (state) => state.deleteProductVariantById,
   );
+  const activeSubPlans = subscriptionStore((state) => state.activeSubPlans);
+  const getActiveSubPlan = subscriptionStore((state) => state.getActiveSubPlan);
 
   const [productList, setProductList] = useState({
     product_name: "",
@@ -56,12 +59,24 @@ const EditProduct = () => {
     catch_phrase: "",
     images: [],
     variants: [],
+    subPlanIds: [],
   });
+  const [planSearch, setPlanSearch] = useState("");
 
   // Fetch units
   useEffect(() => {
     getProductUnit().catch(() => {
       toast.error("Failed to get product units");
+    });
+  }, []);
+
+  useEffect(() => {
+    getActiveSubPlan({
+      page: 1,
+      limit: 100,
+      search: "",
+    }).catch(() => {
+      toast.error("Failed to fetch subscription plans");
     });
   }, []);
 
@@ -71,6 +86,13 @@ const EditProduct = () => {
       try {
         await getProductById(product_id);
         const store = productDataStore.getState().ProductData;
+        const existingSubPlanIds = [
+          ...new Set(
+            (store.product?.variants || []).flatMap((variant) =>
+              (variant.subPlans || []).map((plan) => plan.id),
+            ),
+          ),
+        ];
 
         setProductList({
           product_name: store.product?.product_name || "",
@@ -90,6 +112,7 @@ const EditProduct = () => {
                 sku: v.sku || "",
               }))
             : [],
+          subPlanIds: existingSubPlanIds,
         });
       } catch {
         toast.error("Failed to fetch product");
@@ -97,6 +120,21 @@ const EditProduct = () => {
     };
     fetchProduct();
   }, [product_id]);
+
+  const handleSubPlanToggle = (planId) => {
+    setProductList((prev) => ({
+      ...prev,
+      subPlanIds: prev.subPlanIds.includes(planId)
+        ? prev.subPlanIds.filter((id) => id !== planId)
+        : [...prev.subPlanIds, planId],
+    }));
+  };
+
+  const filteredSubPlans = (activeSubPlans || []).filter((plan) =>
+    (plan.name || "")
+      .toLowerCase()
+      .includes(planSearch.toLowerCase()),
+  );
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -202,6 +240,7 @@ const EditProduct = () => {
         ),
 
         variants: productList.variants,
+        subPlanIds: productList.subPlanIds
       };
 
       formData.append("productData", JSON.stringify(payload));
@@ -264,7 +303,9 @@ const EditProduct = () => {
               <ArrowLeft size={18} />
             </button>
             <div className="min-w-0">
-              <p className="text-xs text-slate-500 dark:text-slate-400">Products / Edit</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Products / Edit
+              </p>
               <h1 className="truncate text-lg font-semibold leading-tight text-slate-900 dark:text-slate-100">
                 {productList.product_name || "Edit product"}
               </h1>
@@ -595,6 +636,120 @@ const EditProduct = () => {
               ))}
             </div>
           )}
+        </Card>
+
+        {/* Subscription plan */}
+
+        <Card
+          title="Subscription plans"
+          subtitle="Select which subscription plans are available for this product"
+          action={
+            <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+              {productList.subPlanIds.length} selected
+            </span>
+          }
+        >
+          <div className="space-y-4">
+            {/* Search */}
+            <input
+              type="text"
+              value={planSearch}
+              onChange={(e) => setPlanSearch(e.target.value)}
+              placeholder="Search subscription plans..."
+              className={inputClass}
+            />
+
+            {/* Select all / Clear */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {filteredSubPlans.length} plans available
+              </p>
+
+              <div className="flex gap-3 text-sm font-medium">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setProductList((prev) => ({
+                      ...prev,
+                      subPlanIds: [
+                        ...new Set([
+                          ...prev.subPlanIds,
+                          ...filteredSubPlans.map((plan) => plan.id),
+                        ]),
+                      ],
+                    }))
+                  }
+                  className="cursor-pointer text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+                >
+                  Select all
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setProductList((prev) => ({
+                      ...prev,
+                      subPlanIds: [],
+                    }))
+                  }
+                  className="cursor-pointer text-red-500 hover:text-red-600"
+                >
+                  Clear all
+                </button>
+              </div>
+            </div>
+
+            {/* Plans */}
+            {filteredSubPlans.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 py-10 text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No subscription plans found.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {filteredSubPlans.map((plan) => {
+                  const selected = productList.subPlanIds.includes(plan.id);
+
+                  return (
+                    <label
+                      key={plan.id}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
+                        selected
+                          ? "border-indigo-500 bg-indigo-50/70 dark:border-indigo-500 dark:bg-indigo-950/30"
+                          : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => handleSubPlanToggle(plan.id)}
+                        className="h-4 w-4 cursor-pointer accent-indigo-600"
+                      />
+
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          {plan.name || plan.plan_name}
+                        </p>
+
+                        {plan.description && (
+                          <p className="mt-1 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                            {plan.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {selected && (
+                        <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                          Selected
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </Card>
 
         {/* FOOTER ACTIONS */}
